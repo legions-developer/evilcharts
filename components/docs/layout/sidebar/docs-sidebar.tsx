@@ -12,6 +12,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { SIDEBAR_OPTIONS } from "@/constants/docs/sidebar-options";
 import DocsSidebarHeader from "./sidebar-header";
@@ -24,6 +25,13 @@ export function DocsSidebar({
   ...props
 }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
+  const { isMobile, setOpenMobile } = useSidebar();
+
+  const handleLinkClick = () => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
 
   const getActiveItem = (items: SidebarOptionsProps) => {
     return [...items.gettingStarted, ...items.components]
@@ -55,7 +63,7 @@ export function DocsSidebar({
                             "shadow-[inset_0px_0px_0px_1px_#fff] dark:shadow-[inset_0px_0px_0px_1px_#000] border"
                         )}
                       >
-                        <Link href={item.url}>
+                        <Link href={item.url} onClick={handleLinkClick}>
                           {item.icon}
                           <span>{item.title}</span>
                           {item.badge && (
@@ -98,7 +106,7 @@ export function DocsSidebar({
                             "shadow-[inset_0px_0px_0px_1px_#fff] dark:shadow-[inset_0px_0px_0px_1px_#000] border"
                         )}
                       >
-                        <Link href={item.url}>
+                        <Link href={item.url} onClick={handleLinkClick}>
                           {item.icon}
                           <span>{item.title}</span>
                           {item.badge && (
