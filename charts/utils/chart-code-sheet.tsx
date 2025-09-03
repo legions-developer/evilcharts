@@ -1,7 +1,7 @@
 import {
-  AddShadcnCodeBlock,
   CodeBlock,
 } from "@/components/ui/code-block/code-block";
+import { PackageManagerSwitcher } from "@/components/ui/package-manager-switcher";
 import {
   Sheet,
   SheetContent,
@@ -10,8 +10,9 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { codeToHtml } from "shiki";
 
-export function ChartCodeSheet({
+export async function ChartCodeSheet({
   code,
   children,
   name,
@@ -20,7 +21,63 @@ export function ChartCodeSheet({
   children: React.ReactNode;
   name: string;
 }) {
-  const npxShadcnAdd = `npx shadcn@latest add https://evilcharts.com/chart/${name}.json`;
+  const shadcnCommands = {
+    npm: `npx shadcn@latest add https://evilcharts.com/chart/${name}.json`,
+    yarn: `yarn dlx shadcn@latest add https://evilcharts.com/chart/${name}.json`,
+    pnpm: `pnpm dlx shadcn@latest add https://evilcharts.com/chart/${name}.json`,
+    bun: `bunx shadcn@latest add https://evilcharts.com/chart/${name}.json`,
+  };
+
+  const shadcnSnippets = {
+    npm: {
+      code: shadcnCommands.npm,
+      language: "bash" as const,
+      html: await codeToHtml(shadcnCommands.npm, {
+        lang: "bash",
+        themes: {
+          light: "min-light",
+          dark: "vesper",
+        },
+        defaultColor: false,
+      }),
+    },
+    yarn: {
+      code: shadcnCommands.yarn,
+      language: "bash" as const,
+      html: await codeToHtml(shadcnCommands.yarn, {
+        lang: "bash",
+        themes: {
+          light: "min-light",
+          dark: "vesper",
+        },
+        defaultColor: false,
+      }),
+    },
+    pnpm: {
+      code: shadcnCommands.pnpm,
+      language: "bash" as const,
+      html: await codeToHtml(shadcnCommands.pnpm, {
+        lang: "bash",
+        themes: {
+          light: "min-light",
+          dark: "vesper",
+        },
+        defaultColor: false,
+      }),
+    },
+    bun: {
+      code: shadcnCommands.bun,
+      language: "bash" as const,
+      html: await codeToHtml(shadcnCommands.bun, {
+        lang: "bash",
+        themes: {
+          light: "min-light",
+          dark: "vesper",
+        },
+        defaultColor: false,
+      }),
+    },
+  };
 
   return (
     <Sheet>
@@ -32,7 +89,7 @@ export function ChartCodeSheet({
             You can copy the code to your clipboard.
           </SheetDescription>
         </SheetHeader>
-        <AddShadcnCodeBlock text={npxShadcnAdd} />
+        <PackageManagerSwitcher snippets={shadcnSnippets} heightAuto={true} />
         <CodeBlock code={code} clickToViewMore={false} language="tsx" />
       </SheetContent>
     </Sheet>

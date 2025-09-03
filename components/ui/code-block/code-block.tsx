@@ -61,6 +61,7 @@ interface CodeBlockClientProps {
   clickToViewMore?: boolean;
   title?: string;
   type?: CodeBlockType;
+  heightAuto?: boolean;
 }
 
 const CodeBlockClient = ({
@@ -69,6 +70,7 @@ const CodeBlockClient = ({
   language,
   title,
   type = "terminal",
+  heightAuto = false,
 }: CodeBlockClientProps) => {
   return (
     <div className="bg-border/40 p-1 rounded-[14px] group dark:shadow-md h-auto">
@@ -81,7 +83,7 @@ const CodeBlockClient = ({
         </div>
         <CopyButton code={code} />
       </div>
-      <CodeBlockHtml html={html} />
+      <CodeBlockHtml html={html} heightAuto={heightAuto} />
     </div>
   );
 };

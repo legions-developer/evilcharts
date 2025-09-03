@@ -9,13 +9,80 @@ import {
   DocsTitle,
 } from "@/components/docs/components/docs-typography";
 import { Steps, Step, StepContent } from "@/components/ui/steps";
-import { CodeBlock } from "@/components/ui/code-block/code-block";
+import { PackageManagerSwitcher } from "@/components/ui/package-manager-switcher";
 import {
   CODE_DOCS_LINKS,
   CODE_SNIPPETS,
 } from "@/constants/docs/pre-requisites-code-snippets";
+import { codeToHtml } from "shiki";
 
-const Page = () => {
+type PreparedSnippet = {
+  code: string;
+  language: "bash";
+  html: string;
+};
+
+type PreparedSnippets = {
+  npm: PreparedSnippet;
+  yarn: PreparedSnippet;
+  pnpm: PreparedSnippet;
+  bun: PreparedSnippet;
+};
+
+const prepareCodeSnippets = async (snippets: typeof CODE_SNIPPETS.INSTALL_RECHARTS): Promise<PreparedSnippets> => {
+  const prepared = {
+    npm: {
+      ...snippets.npm,
+      html: await codeToHtml(snippets.npm.code, {
+        lang: snippets.npm.language,
+        themes: {
+          light: "min-light",
+          dark: "vesper",
+        },
+        defaultColor: false,
+      }),
+    },
+    yarn: {
+      ...snippets.yarn,
+      html: await codeToHtml(snippets.yarn.code, {
+        lang: snippets.yarn.language,
+        themes: {
+          light: "min-light",
+          dark: "vesper",
+        },
+        defaultColor: false,
+      }),
+    },
+    pnpm: {
+      ...snippets.pnpm,
+      html: await codeToHtml(snippets.pnpm.code, {
+        lang: snippets.pnpm.language,
+        themes: {
+          light: "min-light",
+          dark: "vesper",
+        },
+        defaultColor: false,
+      }),
+    },
+    bun: {
+      ...snippets.bun,
+      html: await codeToHtml(snippets.bun.code, {
+        lang: snippets.bun.language,
+        themes: {
+          light: "min-light",
+          dark: "vesper",
+        },
+        defaultColor: false,
+      }),
+    },
+  };
+  return prepared;
+};
+
+const Page = async () => {
+  const rechartsSnippets = await prepareCodeSnippets(CODE_SNIPPETS.INSTALL_RECHARTS);
+  const shadcnSnippets = await prepareCodeSnippets(CODE_SNIPPETS.INSTALL_SHADCN_UI);
+  const componentsSnippets = await prepareCodeSnippets(CODE_SNIPPETS.ADD_COMPONENTS);
   return (
     <div className="page">
       <GenerateBreadcrumb />
@@ -27,9 +94,9 @@ const Page = () => {
         </DocsDescription>
       </DocsContainer>
       <Steps>
-        <InstallRechartsStep />
-        <InstallShadcnUiStep />
-        <InstallShadcnUiComponentsStep />
+        <InstallRechartsStep snippets={rechartsSnippets} />
+        <InstallShadcnUiStep snippets={shadcnSnippets} />
+        <InstallShadcnUiComponentsStep snippets={componentsSnippets} />
       </Steps>
       <DocsContainer>
         <DocsDescription>
@@ -41,28 +108,24 @@ const Page = () => {
 };
 export default Page;
 
-const InstallRechartsStep = () => {
+const InstallRechartsStep = ({ snippets }: { snippets: PreparedSnippets }) => {
   return (
     <Step>
       <DocsSubtitle title="Install Recharts" withoutLink />
       <StepContent>
         <DocsParagraph>
-          Install Recharts by running the following command{" "}
+          Install Recharts by running one of the following commands{" "}
           <DocsLink href={CODE_DOCS_LINKS.INSTALL_RECHARTS} _blank>
             Recharts Docs
           </DocsLink>
         </DocsParagraph>
-        <CodeBlock
-          language={CODE_SNIPPETS.INSTALL_RECHARTS.language}
-          code={CODE_SNIPPETS.INSTALL_RECHARTS.code}
-          heightAuto={true}
-        />
+        <PackageManagerSwitcher snippets={snippets} heightAuto={true} />
       </StepContent>
     </Step>
   );
 };
 
-const InstallShadcnUiStep = () => {
+const InstallShadcnUiStep = ({ snippets }: { snippets: PreparedSnippets }) => {
   return (
     <Step>
       <DocsSubtitle title="Install Shadcn UI" withoutLink />
@@ -74,30 +137,22 @@ const InstallShadcnUiStep = () => {
             Shadcn UI Docs
           </DocsLink>
         </DocsParagraph>
-        <CodeBlock
-          language={CODE_SNIPPETS.INSTALL_SHADCN_UI.language}
-          code={CODE_SNIPPETS.INSTALL_SHADCN_UI.code}
-          heightAuto={true}
-        />
+        <PackageManagerSwitcher snippets={snippets} heightAuto={true} />
       </StepContent>
     </Step>
   );
 };
 
-const InstallShadcnUiComponentsStep = () => {
+const InstallShadcnUiComponentsStep = ({ snippets }: { snippets: PreparedSnippets }) => {
   return (
     <Step>
       <DocsSubtitle title="Add Components" withoutLink />
       <StepContent>
         <DocsParagraph>
-          Add the required components to your project by running the following
-          command:
+          Add the required components to your project by running one of the following
+          commands:
         </DocsParagraph>
-        <CodeBlock
-          language={CODE_SNIPPETS.ADD_COMPONENTS.language}
-          code={CODE_SNIPPETS.ADD_COMPONENTS.code}
-          heightAuto={true}
-        />
+        <PackageManagerSwitcher snippets={snippets} heightAuto={true} />
       </StepContent>
     </Step>
   );

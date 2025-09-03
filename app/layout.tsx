@@ -6,6 +6,7 @@ import MicrosoftClarity from "@/providers/microsoft-clarity";
 import Analytics from "@/providers/analytics";
 import { ThemeProvider } from "next-themes";
 import { Analytics as VercelAnalytics } from "@vercel/analytics/next";
+import { PackageManagerProvider } from "@/contexts/package-manager-context";
 
 const dotoFont = Doto({
   variable: "--font-doto",
@@ -50,10 +51,12 @@ export default function RootLayout({
         )}
       >
         <ThemeProvider defaultTheme="system" attribute="class">
-          <MicrosoftClarity />
-          <Analytics />
-          <VercelAnalytics />
-          {children}
+          <PackageManagerProvider>
+            <MicrosoftClarity />
+            <Analytics />
+            <VercelAnalytics />
+            {children}
+          </PackageManagerProvider>
         </ThemeProvider>
       </body>
     </html>
