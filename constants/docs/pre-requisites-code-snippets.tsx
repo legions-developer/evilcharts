@@ -1,16 +1,4 @@
-import { BundledLanguage } from "shiki";
-
-interface SnippetProps {
-  code: string;
-  language: BundledLanguage;
-}
-
-interface PackageManagerSnippets {
-  npm: SnippetProps;
-  yarn: SnippetProps;
-  pnpm: SnippetProps;
-  bun: SnippetProps;
-}
+import type { PackageManagerSnippets } from "@/types/docs/snippet-types";
 
 interface CodeSnippetProps {
   INSTALL_SHADCN_UI: PackageManagerSnippets;

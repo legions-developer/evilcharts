@@ -6,20 +6,7 @@ import React from "react";
 import { ChartCodeSheetClient } from "./chart-code-sheet-client";
 import { cn } from "@/lib/utils";
 import { usePackageManager } from "@/contexts/package-manager-context";
-import { BundledLanguage } from "shiki";
-
-interface PackageManagerSnippet {
-  code: string;
-  language: BundledLanguage;
-  html: string;
-}
-
-interface PackageManagerSnippets {
-  npm: PackageManagerSnippet;
-  yarn: PackageManagerSnippet;
-  pnpm: PackageManagerSnippet;
-  bun: PackageManagerSnippet;
-}
+import type { PreparedSnippets } from "@/types/docs/snippet-types";
 
 interface ChartDisplayClientProps {
   name: string;
@@ -28,7 +15,7 @@ interface ChartDisplayClientProps {
   fileName: string;
   children: React.ReactNode;
   className?: string;
-  shadcnSnippets: PackageManagerSnippets;
+  shadcnSnippets: PreparedSnippets;
 }
 
 export const ChartDisplayClient = ({

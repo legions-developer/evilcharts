@@ -1,6 +1,6 @@
 import React from "react";
 import { ChartDisplayClient } from "./chart-display-client";
-import { codeToHtml } from "shiki";
+import { prepareShadcnSnippets, generateCodeHtml } from "@/lib/chart-command-utils";
 
 interface ChartDisplayProps {
   name: string;
@@ -23,72 +23,8 @@ const ChartDisplay = async ({
     return null;
   }
 
-  const shadcnCommands = {
-    npm: `npx shadcn@latest add https://evilcharts.com/chart/${fileName}.json`,
-    yarn: `yarn dlx shadcn@latest add https://evilcharts.com/chart/${fileName}.json`,
-    pnpm: `pnpm dlx shadcn@latest add https://evilcharts.com/chart/${fileName}.json`,
-    bun: `bunx shadcn@latest add https://evilcharts.com/chart/${fileName}.json`,
-  };
-
-  const shadcnSnippets = {
-    npm: {
-      code: shadcnCommands.npm,
-      language: "bash" as const,
-      html: await codeToHtml(shadcnCommands.npm, {
-        lang: "bash",
-        themes: {
-          light: "min-light",
-          dark: "vesper",
-        },
-        defaultColor: false,
-      }),
-    },
-    yarn: {
-      code: shadcnCommands.yarn,
-      language: "bash" as const,
-      html: await codeToHtml(shadcnCommands.yarn, {
-        lang: "bash",
-        themes: {
-          light: "min-light",
-          dark: "vesper",
-        },
-        defaultColor: false,
-      }),
-    },
-    pnpm: {
-      code: shadcnCommands.pnpm,
-      language: "bash" as const,
-      html: await codeToHtml(shadcnCommands.pnpm, {
-        lang: "bash",
-        themes: {
-          light: "min-light",
-          dark: "vesper",
-        },
-        defaultColor: false,
-      }),
-    },
-    bun: {
-      code: shadcnCommands.bun,
-      language: "bash" as const,
-      html: await codeToHtml(shadcnCommands.bun, {
-        lang: "bash",
-        themes: {
-          light: "min-light",
-          dark: "vesper",
-        },
-        defaultColor: false,
-      }),
-    },
-  };
-
-  const codeHtml = await codeToHtml(code, {
-    lang: "tsx",
-    themes: {
-      light: "min-light",
-      dark: "vesper",
-    },
-    defaultColor: false,
-  });
+  const shadcnSnippets = await prepareShadcnSnippets(fileName);
+  const codeHtml = await generateCodeHtml(code, "tsx");
 
   return (
     <ChartDisplayClient 

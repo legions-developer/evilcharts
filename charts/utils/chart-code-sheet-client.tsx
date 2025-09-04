@@ -13,26 +13,13 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { BundledLanguage } from "shiki";
-
-interface PackageManagerSnippet {
-  code: string;
-  language: BundledLanguage;
-  html: string;
-}
-
-interface PackageManagerSnippets {
-  npm: PackageManagerSnippet;
-  yarn: PackageManagerSnippet;
-  pnpm: PackageManagerSnippet;
-  bun: PackageManagerSnippet;
-}
+import type { PreparedSnippets } from "@/types/docs/snippet-types";
 
 interface ChartCodeSheetClientProps {
   code: string;
   codeHtml: string;
   children: React.ReactNode;
-  shadcnSnippets: PackageManagerSnippets;
+  shadcnSnippets: PreparedSnippets;
 }
 
 export function ChartCodeSheetClient({

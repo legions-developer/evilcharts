@@ -3,24 +3,11 @@
 import React from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { CodeBlockClient } from "@/components/ui/code-block/code-block";
-import { BundledLanguage } from "shiki";
 import { usePackageManager } from "@/contexts/package-manager-context";
-
-interface PackageManagerSnippet {
-  code: string;
-  language: BundledLanguage;
-  html: string;
-}
-
-interface PackageManagerSnippets {
-  npm: PackageManagerSnippet;
-  yarn: PackageManagerSnippet;
-  pnpm: PackageManagerSnippet;
-  bun: PackageManagerSnippet;
-}
+import type { PreparedSnippets } from "@/types/docs/snippet-types";
 
 interface PackageManagerSwitcherProps {
-  snippets: PackageManagerSnippets;
+  snippets: PreparedSnippets;
   heightAuto?: boolean;
 }
 

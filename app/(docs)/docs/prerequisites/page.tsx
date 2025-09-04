@@ -14,75 +14,53 @@ import {
   CODE_DOCS_LINKS,
   CODE_SNIPPETS,
 } from "@/constants/docs/pre-requisites-code-snippets";
+import type { PreparedSnippets, PackageManagerSnippets } from "@/types/docs/snippet-types";
 import { codeToHtml } from "shiki";
 
-type PreparedSnippet = {
-  code: string;
-  language: "bash";
-  html: string;
+const HTML_CONFIG = {
+  themes: {
+    light: "min-light",
+    dark: "vesper",
+  },
+  defaultColor: false,
+} as const;
+
+const generateHtml = async (code: string, language: string) => {
+  return await codeToHtml(code, {
+    lang: language,
+    ...HTML_CONFIG,
+  });
 };
 
-type PreparedSnippets = {
-  npm: PreparedSnippet;
-  yarn: PreparedSnippet;
-  pnpm: PreparedSnippet;
-  bun: PreparedSnippet;
-};
-
-const prepareCodeSnippets = async (snippets: typeof CODE_SNIPPETS.INSTALL_RECHARTS): Promise<PreparedSnippets> => {
-  const prepared = {
-    npm: {
-      ...snippets.npm,
-      html: await codeToHtml(snippets.npm.code, {
-        lang: snippets.npm.language,
-        themes: {
-          light: "min-light",
-          dark: "vesper",
-        },
-        defaultColor: false,
-      }),
-    },
-    yarn: {
-      ...snippets.yarn,
-      html: await codeToHtml(snippets.yarn.code, {
-        lang: snippets.yarn.language,
-        themes: {
-          light: "min-light",
-          dark: "vesper",
-        },
-        defaultColor: false,
-      }),
-    },
-    pnpm: {
-      ...snippets.pnpm,
-      html: await codeToHtml(snippets.pnpm.code, {
-        lang: snippets.pnpm.language,
-        themes: {
-          light: "min-light",
-          dark: "vesper",
-        },
-        defaultColor: false,
-      }),
-    },
-    bun: {
-      ...snippets.bun,
-      html: await codeToHtml(snippets.bun.code, {
-        lang: snippets.bun.language,
-        themes: {
-          light: "min-light",
-          dark: "vesper",
-        },
-        defaultColor: false,
-      }),
-    },
-  };
+const prepareCodeSnippets = async (snippets: PackageManagerSnippets): Promise<PreparedSnippets> => {
+  const packageManagers = Object.keys(snippets) as (keyof PackageManagerSnippets)[];
+  
+  const prepared = {} as PreparedSnippets;
+  
+  for (const manager of packageManagers) {
+    const snippet = snippets[manager];
+    prepared[manager] = {
+      ...snippet,
+      html: await generateHtml(snippet.code, snippet.language),
+    };
+  }
+  
   return prepared;
 };
 
+const prepareAllSnippets = async () => {
+  const [recharts, shadcn, components] = await Promise.all([
+    prepareCodeSnippets(CODE_SNIPPETS.INSTALL_RECHARTS),
+    prepareCodeSnippets(CODE_SNIPPETS.INSTALL_SHADCN_UI),
+    prepareCodeSnippets(CODE_SNIPPETS.ADD_COMPONENTS),
+  ]);
+
+  return { recharts, shadcn, components };
+};
+
 const Page = async () => {
-  const rechartsSnippets = await prepareCodeSnippets(CODE_SNIPPETS.INSTALL_RECHARTS);
-  const shadcnSnippets = await prepareCodeSnippets(CODE_SNIPPETS.INSTALL_SHADCN_UI);
-  const componentsSnippets = await prepareCodeSnippets(CODE_SNIPPETS.ADD_COMPONENTS);
+  const htmlSnippets = await prepareAllSnippets();
+
   return (
     <div className="page">
       <GenerateBreadcrumb />
@@ -94,9 +72,9 @@ const Page = async () => {
         </DocsDescription>
       </DocsContainer>
       <Steps>
-        <InstallRechartsStep snippets={rechartsSnippets} />
-        <InstallShadcnUiStep snippets={shadcnSnippets} />
-        <InstallShadcnUiComponentsStep snippets={componentsSnippets} />
+        <InstallRechartsStep snippets={htmlSnippets.recharts} />
+        <InstallShadcnUiStep snippets={htmlSnippets.shadcn} />
+        <InstallShadcnUiComponentsStep snippets={htmlSnippets.components} />
       </Steps>
       <DocsContainer>
         <DocsDescription>
