@@ -1,3 +1,9 @@
+import {
+  SidebarHeader,
+  SidebarInset,
+  SidebarProvider,
+} from "@/components/ui/sidebar";
+import { DocsSidebar } from "@/components/docs/sidebar";
 import React from "react";
 
 export default function DocsLayout({
@@ -5,5 +11,13 @@ export default function DocsLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <div>{children}</div>;
+  return (
+    <SidebarProvider>
+      <DocsSidebar />
+      <SidebarInset>
+        <SidebarHeader className="h-14 border-b"></SidebarHeader>
+        <>{children}</>
+      </SidebarInset>
+    </SidebarProvider>
+  );
 }

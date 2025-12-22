@@ -1,8 +1,8 @@
-import { source } from "@/lib/source";
+import { findNeighbour } from "fumadocs-core/page-tree";
 import { notFound } from "next/navigation";
+import { source } from "@/lib/source";
 import fm from "front-matter";
 import { z } from "zod";
-import { findNeighbour } from "fumadocs-core/page-tree";
 
 export function generateStaticParams() {
   return source.generateParams();
@@ -41,9 +41,12 @@ export default async function Page(props: {
   console.log("NEIGHBOURS", neighbours);
 
   return (
-    <div className="flex items-stretch text-[1.05rem] sm:text-[15px] xl:w-full flex-col gap-10 p-10">
-      <div>{doc.title}</div>
-      <MDX />
+    <div className="flex">
+      <div className="docs-container flex flex-col py-20">
+        <div>{doc.title}</div>
+        <MDX />
+      </div>
+      <div>toc</div>
     </div>
   );
 }
