@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import * as MenubarPrimitive from "@radix-ui/react-menubar"
-import { CheckIcon, ChevronRightIcon, CircleIcon } from "lucide-react"
+import * as React from "react";
+import * as MenubarPrimitive from "@radix-ui/react-menubar";
+import { CheckIcon, ChevronRightIcon, CircleIcon } from "lucide-react";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 function Menubar({
   className,
@@ -19,25 +19,25 @@ function Menubar({
       )}
       {...props}
     />
-  )
+  );
 }
 
 function MenubarMenu({
   ...props
 }: React.ComponentProps<typeof MenubarPrimitive.Menu>) {
-  return <MenubarPrimitive.Menu data-slot="menubar-menu" {...props} />
+  return <MenubarPrimitive.Menu data-slot="menubar-menu" {...props} />;
 }
 
 function MenubarGroup({
   ...props
 }: React.ComponentProps<typeof MenubarPrimitive.Group>) {
-  return <MenubarPrimitive.Group data-slot="menubar-group" {...props} />
+  return <MenubarPrimitive.Group data-slot="menubar-group" {...props} />;
 }
 
 function MenubarPortal({
   ...props
 }: React.ComponentProps<typeof MenubarPrimitive.Portal>) {
-  return <MenubarPrimitive.Portal data-slot="menubar-portal" {...props} />
+  return <MenubarPrimitive.Portal data-slot="menubar-portal" {...props} />;
 }
 
 function MenubarRadioGroup({
@@ -45,7 +45,7 @@ function MenubarRadioGroup({
 }: React.ComponentProps<typeof MenubarPrimitive.RadioGroup>) {
   return (
     <MenubarPrimitive.RadioGroup data-slot="menubar-radio-group" {...props} />
-  )
+  );
 }
 
 function MenubarTrigger({
@@ -61,7 +61,7 @@ function MenubarTrigger({
       )}
       {...props}
     />
-  )
+  );
 }
 
 function MenubarContent({
@@ -85,7 +85,7 @@ function MenubarContent({
         {...props}
       />
     </MenubarPortal>
-  )
+  );
 }
 
 function MenubarItem({
@@ -94,8 +94,8 @@ function MenubarItem({
   variant = "default",
   ...props
 }: React.ComponentProps<typeof MenubarPrimitive.Item> & {
-  inset?: boolean
-  variant?: "default" | "destructive"
+  inset?: boolean;
+  variant?: "default" | "destructive";
 }) {
   return (
     <MenubarPrimitive.Item
@@ -108,7 +108,7 @@ function MenubarItem({
       )}
       {...props}
     />
-  )
+  );
 }
 
 function MenubarCheckboxItem({
@@ -134,7 +134,7 @@ function MenubarCheckboxItem({
       </span>
       {children}
     </MenubarPrimitive.CheckboxItem>
-  )
+  );
 }
 
 function MenubarRadioItem({
@@ -158,7 +158,7 @@ function MenubarRadioItem({
       </span>
       {children}
     </MenubarPrimitive.RadioItem>
-  )
+  );
 }
 
 function MenubarLabel({
@@ -166,7 +166,7 @@ function MenubarLabel({
   inset,
   ...props
 }: React.ComponentProps<typeof MenubarPrimitive.Label> & {
-  inset?: boolean
+  inset?: boolean;
 }) {
   return (
     <MenubarPrimitive.Label
@@ -178,7 +178,7 @@ function MenubarLabel({
       )}
       {...props}
     />
-  )
+  );
 }
 
 function MenubarSeparator({
@@ -191,7 +191,7 @@ function MenubarSeparator({
       className={cn("bg-border -mx-1 my-1 h-px", className)}
       {...props}
     />
-  )
+  );
 }
 
 function MenubarShortcut({
@@ -207,13 +207,13 @@ function MenubarShortcut({
       )}
       {...props}
     />
-  )
+  );
 }
 
 function MenubarSub({
   ...props
 }: React.ComponentProps<typeof MenubarPrimitive.Sub>) {
-  return <MenubarPrimitive.Sub data-slot="menubar-sub" {...props} />
+  return <MenubarPrimitive.Sub data-slot="menubar-sub" {...props} />;
 }
 
 function MenubarSubTrigger({
@@ -222,7 +222,7 @@ function MenubarSubTrigger({
   children,
   ...props
 }: React.ComponentProps<typeof MenubarPrimitive.SubTrigger> & {
-  inset?: boolean
+  inset?: boolean;
 }) {
   return (
     <MenubarPrimitive.SubTrigger
@@ -237,7 +237,7 @@ function MenubarSubTrigger({
       {children}
       <ChevronRightIcon className="ml-auto h-4 w-4" />
     </MenubarPrimitive.SubTrigger>
-  )
+  );
 }
 
 function MenubarSubContent({
@@ -253,7 +253,7 @@ function MenubarSubContent({
       )}
       {...props}
     />
-  )
+  );
 }
 
 export {
@@ -273,4 +273,4 @@ export {
   MenubarSub,
   MenubarSubTrigger,
   MenubarSubContent,
-}
+};
