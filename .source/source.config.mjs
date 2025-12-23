@@ -18,14 +18,8 @@ var transformers = [
         }
         if (raw.startsWith("npx create-")) {
           node.properties["__npm__"] = raw;
-          node.properties["__yarn__"] = raw.replace(
-            "npx create-",
-            "yarn create "
-          );
-          node.properties["__pnpm__"] = raw.replace(
-            "npx create-",
-            "pnpm create "
-          );
+          node.properties["__yarn__"] = raw.replace("npx create-", "yarn create ");
+          node.properties["__pnpm__"] = raw.replace("npx create-", "pnpm create ");
           node.properties["__bun__"] = raw.replace("npx", "bunx --bun");
         }
         if (raw.startsWith("npm create")) {

@@ -1,4 +1,5 @@
-import { SidebarHeader, SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import DocsHeader from "@/components/docs/sidebar/header";
 import { DocsSidebar } from "@/components/docs/sidebar";
 import React from "react";
 
@@ -7,9 +8,12 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
     <SidebarProvider>
       <DocsSidebar />
       <SidebarInset>
-        <SidebarHeader className="bg-background fixed z-50 h-14 w-full border-b"></SidebarHeader>
+        <DocsHeader />
         <>{children}</>
       </SidebarInset>
     </SidebarProvider>
   );
 }
+
+export const dynamic = "force-static";
+export const revalidate = 86400; // 1 day – we need to rebuild the page so that it refreshes the GitHub stars daily

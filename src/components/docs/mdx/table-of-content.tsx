@@ -1,4 +1,4 @@
-// Component taken from @shadcn official repo
+// Component taken from @shadcn official repo and modified by evilcharts
 
 "use client";
 
@@ -9,6 +9,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import { TocIndicator } from "./toc-indicator";
+import { BookIcon } from "@/assets/icons";
 import { cn } from "@/lib/utils";
 import * as React from "react";
 
@@ -24,7 +26,7 @@ function useActiveItem(itemIds: string[]) {
           }
         }
       },
-      { rootMargin: "0% 0% -80% 0%" },
+      { rootMargin: "0% 0% -60% 0%" },
     );
 
     for (const id of itemIds ?? []) {
@@ -63,6 +65,7 @@ export function DocsTableOfContents({
   const [open, setOpen] = React.useState(false);
   const itemIds = React.useMemo(() => toc.map((item) => item.url.replace("#", "")), [toc]);
   const activeHeading = useActiveItem(itemIds);
+  const activeIndex = activeHeading ? itemIds.indexOf(activeHeading) : -1;
 
   if (!toc?.length) {
     return null;
@@ -96,19 +99,27 @@ export function DocsTableOfContents({
   }
 
   return (
-    <div className={cn("flex flex-col gap-2 p-4 pt-0 text-sm", className)}>
-      <p className="text-muted-foreground bg-background sticky top-0 h-6 text-xs">On This Page</p>
-      {toc.map((item) => (
-        <a
-          key={item.url}
-          href={item.url}
-          className="text-muted-foreground hover:text-foreground data-[active=true]:text-foreground text-[0.8rem] no-underline transition-colors data-[depth=3]:pl-4 data-[depth=4]:pl-6"
-          data-active={item.url === `#${activeHeading}`}
-          data-depth={item.depth}
-        >
-          {item.title}
-        </a>
-      ))}
+    <div className={cn("flex flex-col px-4 pt-0 text-sm", className)}>
+      <div className="flex h-6 flex-row items-center gap-2">
+        <BookIcon className={cn("duration-200", activeIndex >= 0 ? "text-primary" : "text-muted-foreground")} />
+        <p className="text-muted-foreground bg-background sticky top-0 text-xs">On This Page</p>
+      </div>
+      <div className="flex flex-row gap-2.5">
+        <TocIndicator itemsLength={toc.length} activeIndex={activeIndex} className="w-3.5" />
+        <div className="flex h-fit flex-col gap-2 pt-2">
+          {toc.map((item) => (
+            <a
+              key={item.url}
+              href={item.url}
+              className="text-muted-foreground/80 hover:text-foreground data-[active=true]:text-foreground text-[0.8rem] no-underline transition-colors empty:hidden data-[depth=3]:pl-4 data-[depth=4]:pl-6"
+              data-active={item.url === `#${activeHeading}`}
+              data-depth={item.depth}
+            >
+              {item.title}
+            </a>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

@@ -1,10 +1,12 @@
-import { JetBrains_Mono, Geist, Google_Sans } from "next/font/google";
+import { JetBrains_Mono, Geist, Google_Sans, Inter } from "next/font/google";
+import { Analytics as VercelAnalytics } from "@vercel/analytics/next";
+import { ThemeProvider } from "next-themes";
 import type { Metadata } from "next";
 import { cn } from "@/lib/utils";
 import "./globals.css";
 
-const googleSans = Google_Sans({
-  variable: "--font-google-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
   display: "swap",
 });
@@ -34,11 +36,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={cn(geist.variable, jetbrainsMono.variable, googleSans.variable, "dark font-google-sans antialiased")}
-      >
-        {children}
+    <html lang="en" suppressHydrationWarning>
+      <body className={cn(geist.variable, jetbrainsMono.variable, inter.variable, "font-inter antialiased")}>
+        <ThemeProvider defaultTheme="system" attribute="class">
+          <VercelAnalytics />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
