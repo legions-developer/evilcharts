@@ -11,11 +11,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { getNavItemIcon } from "@/globals/functions/getNavItemIcon";
 import { CaretRight } from "@carbon/icons-react";
 import { usePathname } from "next/navigation";
@@ -35,12 +31,9 @@ function TreeIndicator({
   const activeIndex = activeTrigger.index;
 
   return (
-    <svg
-      className={cn(
-        "text-muted pointer-events-none absolute z-10 ml-[5px] flex h-full w-5! duration-200",
-      )}
-    >
+    <svg className={cn("text-muted pointer-events-none absolute z-10 ml-[5px] flex h-full w-5! duration-200")}>
       <ellipse
+        className="dark:text-muted text-[#DFDFDF]"
         cx="50%"
         cy="calc(100% - 15px)"
         rx="2"
@@ -48,7 +41,7 @@ function TreeIndicator({
         fill="currentColor"
       />
       <line
-        className="text-muted"
+        className="dark:text-muted text-[#DFDFDF]"
         x1="50%"
         y1="0%"
         x2="50%"
@@ -60,11 +53,11 @@ function TreeIndicator({
         <>
           <motion.line
             key="line-1"
-            className="text-muted"
+            className="text-primary"
             x1="50%"
             y1="0"
             x2="50%"
-            stroke="white"
+            stroke="currentColor"
             strokeWidth="1"
             initial={{
               y2: 0,
@@ -76,17 +69,18 @@ function TreeIndicator({
             }}
             transition={{
               type: "spring",
-              stiffness: 130,
+              stiffness: 180,
               damping: 20,
             }}
           />
           <motion.rect
+            className="text-primary"
             key="rect-1"
             x="32.5%"
             width="7"
             height="7"
             rx="1"
-            fill="white"
+            fill="currentColor"
             style={{
               rotate: 45,
               transformOrigin: "center",
@@ -102,7 +96,7 @@ function TreeIndicator({
             }}
             transition={{
               type: "spring",
-              stiffness: 130,
+              stiffness: 180,
               damping: 20,
             }}
           />
@@ -118,9 +112,7 @@ interface ActiveTriggerProps {
   id?: string;
 }
 
-export function NavMain({
-  tree,
-}: React.ComponentProps<typeof Sidebar> & { tree: typeof source.pageTree }) {
+export function NavMain({ tree }: React.ComponentProps<typeof Sidebar> & { tree: typeof source.pageTree }) {
   const pathname = usePathname();
 
   const [activeTrigger, setActiveTrigger] = useState<ActiveTriggerProps>(() => {
@@ -131,9 +123,7 @@ export function NavMain({
 
     for (const item of tree.children) {
       if (item.type === "folder") {
-        const foundIndex = item.children.findIndex(
-          (child) => child.type === "page" && child.url === pathname,
-        );
+        const foundIndex = item.children.findIndex((child) => child.type === "page" && child.url === pathname);
         if (foundIndex !== -1) {
           childIndex = foundIndex;
           const child = item.children[foundIndex];
@@ -162,25 +152,15 @@ export function NavMain({
 
           // Check if any child is active (matches current pathname)
           const hasActiveChild = item.children.some(
-            (child) =>
-              child.type === "page" && child.url === activeTrigger?.url,
+            (child) => child.type === "page" && child.url === activeTrigger?.url,
           );
 
           return (
-            <Collapsible
-              key={item.$id}
-              asChild
-              className="group/collapsible"
-              defaultOpen={hasActiveChild}
-            >
+            <Collapsible key={item.$id} asChild className="group/collapsible" defaultOpen={hasActiveChild}>
               <SidebarMenuItem>
                 <CollapsibleTrigger asChild>
                   <SidebarMenuButton
-                    className={
-                      !hasActiveChild
-                        ? "text-muted-foreground hover:text-primary"
-                        : ""
-                    }
+                    className={!hasActiveChild ? "text-muted-foreground hover:text-primary" : ""}
                     isActive={hasActiveChild}
                   >
                     {getNavItemIcon(item.$id)}
@@ -190,25 +170,15 @@ export function NavMain({
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                   <SidebarMenuSub>
-                    <TreeIndicator
-                      activeTrigger={activeTrigger}
-                      hasActiveChild={hasActiveChild}
-                      key={item.$id}
-                    />
+                    <TreeIndicator activeTrigger={activeTrigger} hasActiveChild={hasActiveChild} key={item.$id} />
                     {item.children.map((subItem, index) => {
                       if (subItem.type !== "page") return null;
                       const isActive = activeTrigger.url === subItem.url;
 
                       return (
-                        <SidebarMenuSubItem
-                          key={subItem.$id}
-                          className={cn("relative flex w-full")}
-                        >
+                        <SidebarMenuSubItem key={subItem.$id} className={cn("relative flex w-full")}>
                           <SidebarMenuSubButton
-                            className={cn(
-                              "w-full pl-8",
-                              !isActive && "text-muted-foreground",
-                            )}
+                            className={cn("w-full pl-8", !isActive && "text-muted-foreground")}
                             onClick={() =>
                               setActiveTrigger({
                                 url: subItem.url,

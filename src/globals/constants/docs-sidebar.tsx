@@ -1,4 +1,4 @@
-import { HistoryIcon, HouseIcon, ShapesIcon } from "@/assets/icons";
+import { HistoryIcon, HouseIcon, ShapesIcon, SquareAddon } from "@/assets/icons";
 
 export const getStartedOptions: {
   name: string;
@@ -7,17 +7,22 @@ export const getStartedOptions: {
 }[] = [
   {
     name: "Get Started",
-    url: "#",
+    url: "/docs",
     icon: <HouseIcon />,
   },
   {
+    name: "Installation",
+    url: "/installation",
+    icon: <SquareAddon />,
+  },
+  {
     name: "Components",
-    url: "#",
+    url: "/components",
     icon: <ShapesIcon />,
   },
   {
     name: "Changelog",
-    url: "#",
+    url: "/changelog",
     icon: <HistoryIcon />,
   },
 ];

@@ -1,11 +1,18 @@
-import { JetBrains_Mono, Google_Sans } from "next/font/google";
+import { JetBrains_Mono, Geist, Google_Sans } from "next/font/google";
 import type { Metadata } from "next";
 import { cn } from "@/lib/utils";
 import "./globals.css";
 
 const googleSans = Google_Sans({
   variable: "--font-google-sans",
-  subsets: ["latin-ext"],
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const geist = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+  display: "swap",
 });
 
 const jetbrainsMono = JetBrains_Mono({
@@ -29,11 +36,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={cn(
-          googleSans.variable,
-          jetbrainsMono.variable,
-          "dark font-sans antialiased",
-        )}
+        className={cn(geist.variable, jetbrainsMono.variable, googleSans.variable, "dark font-google-sans antialiased")}
       >
         {children}
       </body>

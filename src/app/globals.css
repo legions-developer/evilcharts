@@ -6,7 +6,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-google-sans);
+  --font-sans: var(--font-geist-sans);
+  --font-google-sans: var(--font-google-sans);
   --font-mono: var(--font-jetbrains-mono);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -113,7 +114,7 @@
   --chart-3: oklch(0.769 0.188 70.08);
   --chart-4: oklch(0.627 0.265 303.9);
   --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(17% 0.00002 271.152);
+  --sidebar: oklch(16% 0.00002 270);
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.488 0.243 264.376);
   --sidebar-primary-foreground: oklch(0.985 0 0);
@@ -136,8 +137,13 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground overscroll-none;
+    @apply bg-background text-foreground;
   }
+}
+
+body,
+html {
+  scroll-behavior: smooth;
 }
 
 ::selection {
