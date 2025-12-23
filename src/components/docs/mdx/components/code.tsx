@@ -3,10 +3,12 @@ import React from "react";
 import { cn } from "@/lib/utils";
 
 export const Pre = ({ className, children, ...props }: React.ComponentProps<"pre">) => {
+  console.log("pre:", children);
   return (
     <pre
       className={cn(
-        "no-scrollbar min-w-0 overflow-x-auto px-4 py-3.5 outline-none has-data-highlighted-line:px-0 has-data-line-numbers:px-0 has-data-[slot=tabs]:p-0",
+        "no-scrollbar min-w-0 overflow-x-auto p-4 text-[13px] leading-relaxed outline-none has-data-highlighted-line:px-0 has-data-line-numbers:px-0 has-data-[slot=tabs]:p-0",
+        "[&>code>span.highlighted]:inline-flex",
         className,
       )}
       {...props}

@@ -12,17 +12,19 @@ export const getStartedOptions: {
   },
   {
     name: "Installation",
-    url: "/installation",
+    url: "/docs/installation",
     icon: <SquareAddonIcon />,
   },
   {
     name: "Components",
-    url: "/components",
+    url: "/docs/components",
     icon: <ShapesIcon />,
   },
   {
     name: "Changelog",
-    url: "/changelog",
+    url: "/docs/changelog",
     icon: <HistoryIcon />,
   },
 ];
+
+export const EXCLUDED_PAGES: string[] = ["/docs/installation", "/docs/components", "/docs/changelog"];

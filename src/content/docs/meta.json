@@ -1,0 +1,4 @@
+{
+  "root": true,
+  "pages": ["index", "installation", "components", "changelog", "area-charts", "line-charts"]
+}

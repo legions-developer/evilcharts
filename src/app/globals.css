@@ -1,5 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "fumadocs-ui/css/shadcn.css";
+@import "fumadocs-ui/css/preset.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -171,5 +173,5 @@ html {
 }
 
 @utility docs-container {
-  @apply mx-auto w-full max-w-[800px] px-4;
+  @apply mx-auto w-full max-w-2xl px-4;
 }

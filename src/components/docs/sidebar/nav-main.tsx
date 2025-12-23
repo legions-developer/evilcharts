@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { getNavItemIcon } from "@/globals/functions/getNavItemIcon";
+import { EXCLUDED_PAGES } from "@/globals/constants/docs-sidebar";
 import { CaretRight } from "@carbon/icons-react";
 import { usePathname } from "next/navigation";
 import { motion } from "motion/react";
@@ -69,7 +70,7 @@ function TreeIndicator({
             }}
             transition={{
               type: "spring",
-              stiffness: 180,
+              stiffness: 180 + activeIndex * 5,
               damping: 20,
             }}
           />
@@ -96,7 +97,7 @@ function TreeIndicator({
             }}
             transition={{
               type: "spring",
-              stiffness: 180,
+              stiffness: 180 + activeIndex * 5,
               damping: 20,
             }}
           />
@@ -150,6 +151,14 @@ export function NavMain({ tree }: React.ComponentProps<typeof Sidebar> & { tree:
         {tree.children.map((item) => {
           if (item.type !== "folder") return null;
 
+          // Filter out pages that are in EXCLUDED_PAGES
+          const visibleChildren = item.children.filter(
+            (child) => child.type === "page" && !EXCLUDED_PAGES.includes(child.url),
+          );
+
+          // Skip folder if no visible children
+          if (visibleChildren.length === 0) return null;
+
           // Check if any child is active (matches current pathname)
           const hasActiveChild = item.children.some(
             (child) => child.type === "page" && child.url === activeTrigger?.url,
@@ -173,6 +182,8 @@ export function NavMain({ tree }: React.ComponentProps<typeof Sidebar> & { tree:
                     <TreeIndicator activeTrigger={activeTrigger} hasActiveChild={hasActiveChild} key={item.$id} />
                     {item.children.map((subItem, index) => {
                       if (subItem.type !== "page") return null;
+                      if (EXCLUDED_PAGES.includes(subItem.url)) return null;
+
                       const isActive = activeTrigger.url === subItem.url;
 
                       return (

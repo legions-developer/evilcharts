@@ -10,8 +10,8 @@ export const H1 = ({ className, ...props }: React.ComponentProps<"h1">) => (
 export const H2 = ({ className, ...props }: React.ComponentProps<"h2">) => {
   const headingId = props.children?.toString().replace(/ /g, "-").replace(/'/g, "").replace(/\?/g, "").toLowerCase();
   return (
-    <a href={`#${headingId}`} className="group hover:text-primary relative no-underline">
-      <LinkIcon className="absolute top-[5px] -left-4.5 hidden size-4 translate-x-0.5 opacity-0 duration-200 ease-in-out group-hover:-translate-x-0.5 group-hover:opacity-100 lg:block" />
+    <a href={`#${headingId}`} className="group text-primary relative no-underline">
+      <LinkIcon className="absolute top-[5px] -left-5 hidden size-4 translate-x-0.5 opacity-0 duration-200 ease-in-out group-hover:-translate-x-0.5 group-hover:opacity-100 lg:block" />
       <h2
         id={headingId}
         className={cn(
