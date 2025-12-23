@@ -1,73 +1,29 @@
 ---
 title: Introduction
-description: shadcn/ui is a set of beautifully-designed, accessible components and a code distribution platform. Works with your favorite frameworks and AI models. Open Source. Open Code.
+description: EvilCharts is an open-source chart UI website built with shadcn and Recharts, beautifully designed and handcrafted.
 ---
 
-**This is not a component library. It is how you build your component library.**
+Wait... It's not another chart library. While searching for chart components with smooth animations and dynamic data visualizations, I realized there weren't many options available. So, I decided to build my own. Built with <Link href="https://recharts.github.io/" _blank={true}>Recharts</Link> and <Link href="https://shadcn.com/ui" _blank={true}>Shadcn</Link>.
 
-You know how most traditional component libraries work: you install a package from NPM, import the components, and use them in your app.
+## Why EvilCharts?
 
-This approach works well until you need to customize a component to fit your design system or require one that isn’t included in the library. **Often, you end up wrapping library components, writing workarounds to override styles, or mixing components from different libraries with incompatible APIs.**
+EvilCharts is built by <Link href="https://x.com/legionsdev" _blank={true}>Gurbinder</Link> (Design Engineer @ Axiom.co). As a design engineer, I see ugly and common charts everywhere, and no one in the community is creating a beautiful chart library.
 
-This is what shadcn/ui aims to solve. It is built around the following principles:
+There are tons of chart libraries out there, but none of them are beautiful — even though they allow customization, I see that no one is customizing them and they just use them as provided via docs.
 
-- **Open Code:** The top layer of your component code is open for modification.
-- **Composition:** Every component uses a common, composable interface, making them predictable.
-- **Distribution:** A flat-file schema and command-line tool make it easy to distribute components.
-- **Beautiful Defaults:** Carefully chosen default styles, so you get great design out-of-the-box.
-- **AI-Ready:** Open code for LLMs to read, understand, and improve.
+So, here I'm building a beautiful charts component website, open source, open code, it's all yours...
 
-## Open Code
+## Why I named it EvilCharts?
 
-shadcn/ui hands you the actual component code. You have full control to customize and extend the <Link href="/docs/introduction">introduction</Link> to your needs. This means:
+I named it EvilCharts because "Evil" doesn't mean malicious. It means:
 
-- **Full Transparency:** You see exactly how each component is built.
-- **Easy Customization:** Modify any part of a component to fit your design and functionality requirements.
-- **AI Integration:** Access to the code makes it straightforward for LLMs to read, understand, and even improve your components.
+- Unapologetically opinionated UI choices
+- Breaking from default, soulless dashboards
+- Design-first, animated, unique designs
+- Handcrafted with SVGs and <Link href="https://motion.dev" _blank={true}>motion.dev</Link>
 
-_In a typical library, if you need to change a button’s behavior, you have to override styles or wrap the component. With shadcn/ui, you simply edit the button code directly._
+Also, it's based on my inspiration <Link href="https://x.com/evilrabbit_" _blank={true}>EvilRabbit</Link> (Founding Designer @ Vercel).
 
-<Accordion collapsible>
-  <AccordionItem value="faq-1" className="border-none">
-    <AccordionTrigger>How do I pull upstream updates in an Open Code approach?</AccordionTrigger>
-    <AccordionContent>
-      <p>
-        shadcn/ui follows a headless component architecture. This means the core of your app can receive fixes by
-        updating your dependencies, for instance, radix-ui or input-otp.
-      </p>
-      <p className="mt-4">
-        The topmost layer, i.e., the one closest to your design system, is not coupled with the implementation of the
-        library. It stays open for modification.
-      </p>
-    </AccordionContent>
-  </AccordionItem>
-</Accordion>
+## Why Recharts?
 
-## Composition
-
-Every component in shadcn/ui shares a common, composable interface. **If a component does not exist, we bring it in, make it composable, and adjust its style to match and work with the rest of the design system.**
-
-_A shared, composable interface means it's predictable for both your team and LLMs. You are not learning different APIs for every new component. Even for third-party ones._
-
-## Distribution
-
-shadcn/ui is also a code distribution system. It defines a schema for components and a CLI to distribute them.
-
-- **Schema:** A flat-file structure that defines the components, their dependencies, and properties.
-- **CLI:** A command-line tool to distribute and install components across projects with cross-framework support.
-
-_You can use the schema to distribute your components to other projects or have AI generate completely new components based on existing schema._
-
-## Beautiful Defaults
-
-shadcn/ui comes with a large collection of components that have carefully chosen default styles. They are designed to look good on their own and to work well together as a consistent system:
-
-- **Good Out-of-the-Box:** Your UI has a clean and minimal look without extra work.
-- **Unified Design:** Components naturally fit with one another. Each component is built to match the others, keeping your UI consistent.
-- **Easily Customizable:** If you want to change something, it's simple to override and extend the defaults.
-
-## AI-Ready
-
-The design of shadcn/ui makes it easy for AI tools to work with your code. Its open code and consistent API allow AI models to read, understand, and even generate new components.
-
-_An AI model can learn how your components work and suggest improvements or even create new components that integrate with your existing design._
+While finalising the design for EvilCharts, I wanted a good headless chart library. I went over tons of chart libraries and found that Recharts has amazing features and is easy to use in every project.

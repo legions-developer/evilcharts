@@ -26,9 +26,9 @@ export default async function Page(props: { params: Promise<{ slug: string[] }> 
       <div className="docs-container flex flex-col py-12 pb-32">
         <div className="flex flex-col gap-1">
           <h1 className="scroll-m-20 text-4xl font-semibold tracking-tight sm:text-3xl xl:text-4xl">{doc.title}</h1>
-          {doc.description && <p className="text-muted-foreground text-[15px] text-balance">{doc.description}</p>}
+          {doc.description && <p className="text-muted-foreground text-[15px]">{doc.description}</p>}
         </div>
-        <div className="text-primary/70 mt-8 w-full flex-1 text-[14px] *:data-[slot=alert]:first:mt-0">
+        <div className="text-primary/80 mt-8 w-full flex-1 text-[14px] *:data-[slot=alert]:first:mt-0">
           <MDX components={mdxComponents} />
         </div>
         <div className="mt-40">

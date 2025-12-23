@@ -11,7 +11,7 @@ const DocsHeader = async () => {
   const stars = await useGithubStars();
 
   return (
-    <SidebarHeader className="sticky top-0 z-50 flex h-14 w-full flex-row justify-between border-b p-0 md:border-b-0">
+    <SidebarHeader className="bg-background sticky top-0 z-50 flex h-14 w-full flex-row justify-between border-b p-0 md:border-b-0 md:bg-transparent">
       <div className="flex items-center pl-3">
         <SidebarTrigger className="md:hidden" />
       </div>
