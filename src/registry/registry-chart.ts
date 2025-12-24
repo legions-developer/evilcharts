@@ -2,13 +2,14 @@ import type { Registry } from "shadcn/schema";
 
 export const charts: Registry["items"] = [
   {
-    name: "area-simple-chart",
+    name: "area-chart",
+    description: "Area chart component",
     dependencies: ["recharts"],
-    type: "registry:ui",
+    type: "registry:component",
     files: [
       {
-        path: "charts/area-simple-chart.tsx",
-        type: "registry:ui",
+        path: "charts/area-chart.tsx",
+        type: "registry:component",
       },
     ],
   },

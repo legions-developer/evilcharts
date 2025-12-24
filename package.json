@@ -4,13 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "bun run registry:build && next build",
     "start": "next start",
     "lint": "eslint",
     "clean": "rm -rf node_modules && rm -rf .next && rm -rf .source",
-    "registry:build": "tsx --tsconfig ./tsconfig.scripts.json ./src/scripts/build-registry.mts",
-    "registry:validate-deps": "tsx --tsconfig ./tsconfig.scripts.json ./src/scripts/validate-registry-deps.mts",
-    "ui:sync": "tsx --tsconfig ./tsconfig.scripts.json ./src/scripts/sync-ui.mts"
+    "registry:build": "bun run ./src/scripts/build-registry.mts"
   },
   "dependencies": {
     "@base-ui/react": "^1.0.0",
@@ -55,6 +53,7 @@
     "fumadocs-mdx": "^14.2.2",
     "fumadocs-ui": "^16.3.2",
     "input-otp": "^1.4.2",
+    "jotai": "^2.16.0",
     "lucide-react": "^0.562.0",
     "motion": "^12.23.26",
     "next": "16.1.0",

@@ -32,12 +32,12 @@ import * as React from "react"
 // biome-ignore lint/suspicious/noExplicitAny: Auto-generated registry index with dynamic component types
 export const Index: Record<string, any> = {`;
   for (const item of registry.items) {
-    const resolveFiles = item.files?.map((file: RegistryFile) => `registry/default/${file.path}`);
+    const resolveFiles = item.files?.map((file: RegistryFile) => `src/registry/${file.path}`);
     if (!resolveFiles) {
       continue;
     }
 
-    const componentPath = item.files?.[0]?.path ? `@/registry/default/${item.files[0].path}` : "";
+    const componentPath = item.files?.[0]?.path ? `@/registry/${item.files[0].path}` : "";
 
     index += `
   "${item.name}": {
@@ -46,7 +46,7 @@ export const Index: Record<string, any> = {`;
     type: "${item.type}",
     registryDependencies: ${JSON.stringify(item.registryDependencies)},
     files: [${item.files?.map((file: RegistryFile) => {
-      const filePath = `registry/default/${typeof file === "string" ? file : file.path}`;
+      const filePath = `@/registry/${typeof file === "string" ? file : file.path}`;
       const resolvedFilePath = path.resolve(filePath);
       return typeof file === "string"
         ? `"${resolvedFilePath}"`
@@ -76,8 +76,8 @@ export const Index: Record<string, any> = {`;
   console.log(`#️⃣  ${Object.keys(registry.items).length} items found`);
 
   // Write style index.
-  rimraf.sync(path.join(process.cwd(), "registry/__index__.tsx"));
-  await fs.writeFile(path.join(process.cwd(), "registry/__index__.tsx"), index);
+  rimraf.sync(path.join(process.cwd(), "src/registry/__index__.tsx"));
+  await fs.writeFile(path.join(process.cwd(), "src/registry/__index__.tsx"), index);
 }
 
 async function buildRegistryJsonFile() {
@@ -88,7 +88,7 @@ async function buildRegistryJsonFile() {
       const files = item.files?.map((file: RegistryFile) => {
         return {
           ...file,
-          path: `registry/default/${file.path}`,
+          path: `src/registry/${file.path}`,
         };
       });
 
@@ -124,16 +124,16 @@ async function buildRegistry() {
 }
 
 try {
-  console.log("🗂️ Building registry/__index__.tsx...");
+  console.log("└ Building src/registry/__index__.tsx...");
   await buildRegistryIndex();
 
-  console.log("💅 Building registry.json...");
+  console.log("└ Building registry.json...");
   await buildRegistryJsonFile();
 
-  console.log("🏗️ Building registry...");
+  console.log("└ Building registry...");
   await buildRegistry();
 
-  console.log("✅ Registry build completed successfully!");
+  console.log("└ Registry build completed successfully!");
 } catch (error) {
   console.error(error);
   process.exit(1);

@@ -13,8 +13,7 @@ import { Img, MDXImage } from "./components/image";
 import { Step, Steps } from "./components/steps";
 import { Ul, Ol, Li } from "./components/lists";
 import { A, MDXLink } from "./components/link";
-import type { MDXComponents } from "mdx/types";
-import { mdxChartPreviews } from "../charts";
+import type { MDXComponents } from "mdx/types"; 
 import { Kbd } from "./components/kbd";
 import { Hr } from "./components/hr";
 
@@ -57,6 +56,4 @@ export const mdxComponents: MDXComponents = {
   ComponentPreview,
   ComponentCode,
   Description,
-  // charts
-  ...mdxChartPreviews,
 };
