@@ -14,7 +14,7 @@ export function TocIndicator({ itemsLength, activeIndex, className }: TocIndicat
     <div className={className}>
       <svg
         style={{
-          height: `${itemsLength * 26.28 - 5}px`, // 18.28px (height) + 8px (gap) = 26.28px <--- dont change the pointer value
+          height: `${itemsLength * 26.28 - 8}px`, // 18.28px (height) + 8px (gap) = 26.28px <--- dont change the pointer value
         }}
         className="w-full"
         overflow="visible"

@@ -19,7 +19,7 @@ import { usePathname } from "next/navigation";
 import { motion } from "motion/react";
 import { source } from "@/lib/source";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { useMemo } from "react";
 import Link from "next/link";
 
 function TreeIndicator({
@@ -70,14 +70,14 @@ function TreeIndicator({
             }}
             transition={{
               type: "spring",
-              stiffness: 180 + activeIndex * 5,
+              stiffness: 200 - activeIndex * 10,
               damping: 20,
             }}
           />
           <motion.rect
             className="text-primary"
             key="rect-1"
-            x="32.5%"
+            x="32.10%"
             width="7"
             height="7"
             rx="1"
@@ -97,7 +97,7 @@ function TreeIndicator({
             }}
             transition={{
               type: "spring",
-              stiffness: 180 + activeIndex * 5,
+              stiffness: 200 - activeIndex * 10,
               damping: 20,
             }}
           />
@@ -116,10 +116,10 @@ interface ActiveTriggerProps {
 export function NavMain({ tree }: React.ComponentProps<typeof Sidebar> & { tree: typeof source.pageTree }) {
   const pathname = usePathname();
 
-  const [activeTrigger, setActiveTrigger] = useState<ActiveTriggerProps>(() => {
-    // Find the folder containing the active page
+  // Derive activeTrigger from pathname - automatically resets when navigating away
+  const activeTrigger = useMemo<ActiveTriggerProps>(() => {
     let childIndex = -1;
-    let activeUrl = pathname;
+    let activeUrl = "";
     let activeId: string | undefined = undefined;
 
     for (const item of tree.children) {
@@ -142,7 +142,7 @@ export function NavMain({ tree }: React.ComponentProps<typeof Sidebar> & { tree:
       index: childIndex,
       id: activeId,
     };
-  });
+  }, [pathname, tree.children]);
 
   return (
     <SidebarGroup>
@@ -180,7 +180,7 @@ export function NavMain({ tree }: React.ComponentProps<typeof Sidebar> & { tree:
                 <CollapsibleContent>
                   <SidebarMenuSub>
                     <TreeIndicator activeTrigger={activeTrigger} hasActiveChild={hasActiveChild} key={item.$id} />
-                    {item.children.map((subItem, index) => {
+                    {item.children.map((subItem) => {
                       if (subItem.type !== "page") return null;
                       if (EXCLUDED_PAGES.includes(subItem.url)) return null;
 
@@ -190,13 +190,6 @@ export function NavMain({ tree }: React.ComponentProps<typeof Sidebar> & { tree:
                         <SidebarMenuSubItem key={subItem.$id} className={cn("relative flex w-full")}>
                           <SidebarMenuSubButton
                             className={cn("w-full pl-8", !isActive && "text-muted-foreground")}
-                            onClick={() =>
-                              setActiveTrigger({
-                                url: subItem.url,
-                                index: index,
-                                id: subItem.$id,
-                              })
-                            }
                             asChild
                           >
                             <Link href={subItem.url}>

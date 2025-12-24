@@ -3,7 +3,6 @@ import React from "react";
 import { cn } from "@/lib/utils";
 
 export const Pre = ({ className, children, ...props }: React.ComponentProps<"pre">) => {
-  console.log("pre:", children);
   return (
     <pre
       className={cn(

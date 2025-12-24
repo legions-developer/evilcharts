@@ -56,7 +56,7 @@ function ComponentCode({ children }: { children: React.ReactNode }) {
         <>{children}</>
         {!isOpen && (
           <div className="to-background via-background/80 sticky right-0 bottom-0 left-0 z-20 flex h-20 w-full items-end justify-center bg-linear-to-b from-transparent p-2">
-            <Button variant="outline" size="sm" onClick={() => setIsOpen(!isOpen)}>
+            <Button className="hover:dark:bg-[#1F1F1F]" variant="outline" size="sm" onClick={() => setIsOpen(!isOpen)}>
               {isOpen ? "Collapse" : "Expand"}
             </Button>
           </div>

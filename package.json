@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "clean": "rm -rf node_modules && rm -rf .next && rm -rf .source",
+    "registry:build": "tsx --tsconfig ./tsconfig.scripts.json ./src/scripts/build-registry.mts",
+    "registry:validate-deps": "tsx --tsconfig ./tsconfig.scripts.json ./src/scripts/validate-registry-deps.mts",
+    "ui:sync": "tsx --tsconfig ./tsconfig.scripts.json ./src/scripts/sync-ui.mts"
   },
   "dependencies": {
     "@base-ui/react": "^1.0.0",
@@ -62,9 +66,12 @@
     "react-resizable-panels": "^4.0.14",
     "recharts": "2.15.4",
     "rehype-pretty-code": "^0.14.1",
+    "rimraf": "^6.1.2",
+    "shadcn": "^3.6.2",
     "shiki": "^3.20.0",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.4.0",
+    "tsx": "^4.21.0",
     "vaul": "^1.1.2",
     "zod": "^4.2.1"
   },
