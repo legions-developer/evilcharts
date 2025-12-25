@@ -6,11 +6,12 @@ import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 interface EvilAreaChartProps {
   chartConfig: ChartConfig;
   data: unknown[];
+  className?: string;
 }
 
-export function EvilAreaChart({ chartConfig, data }: EvilAreaChartProps) {
+export function EvilAreaChart({ chartConfig, data, className }: EvilAreaChartProps) {
   return (
-    <ChartContainer config={chartConfig}>
+    <ChartContainer className={className} config={chartConfig}>
       <AreaChart accessibilityLayer data={data}>
         <CartesianGrid vertical={false} strokeDasharray="3 3" />
         <XAxis

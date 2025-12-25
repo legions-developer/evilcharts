@@ -1,10 +1,10 @@
 "use client";
 
 import { Tabs, TabsList, TabsPanel, TabsTab } from "@/components/ui/tabs";
-import { CheckIcon, CopyIcon } from "@/assets/icons";
-import { Button } from "@/components/ui/button";
-import { useClipboard } from "@mantine/hooks";
-import { useState } from "react";
+import { BunIcon, NpmIcon, PnpmIcon, YarnIcon } from "@/assets/icons";
+import { useConfig } from "@/hooks/use-config";
+import CopyButton from "./copy-button";
+import { cn } from "@/lib/utils";
 
 type PackageManager = "npm" | "yarn" | "bun" | "pnpm";
 
@@ -20,39 +20,48 @@ const packageCommands: Record<PackageManager, string> = {
 };
 
 function CliBlock({ name }: CliBlockProps) {
-  const { copied, copy } = useClipboard({ timeout: 1000 });
-  const [activeTab, setActiveTab] = useState<PackageManager>("npm");
+  const { packageManager, setConfig } = useConfig();
+
   return (
-    <Tabs defaultValue="npm" onValueChange={(value) => setActiveTab(value as PackageManager)}>
-      <div className="dark:bg-primary-foreground bg-muted-foreground/10 group mt-6 flex flex-col rounded-[8px] p-1">
+    <Tabs
+      defaultValue="npm"
+      value={packageManager}
+      onValueChange={(value) => setConfig({ packageManager: value as PackageManager })}
+    >
+      <div className="dark:bg-primary-foreground bg-muted-foreground/10 group mt-2 flex flex-col rounded-[8px] p-1">
         <div className="flex flex-row items-center justify-between pr-1 pl-1.5">
-          <TabsList variant="underline">
-            <TabsTab className="h-5! px-1.5 hover:bg-transparent!" value="npm">
+          <TabsList
+            variant="underline"
+            indicatorClassName={cn(
+              packageManager === "npm" && "bg-[#C3292F]!",
+              packageManager === "yarn" && "bg-[#3592BD]!",
+              packageManager === "bun" && "bg-primary!",
+              packageManager === "pnpm" && "bg-[#FAAF18]!",
+            )}
+          >
+            <TabsTab className="h-5! gap-2 px-1.5 hover:bg-transparent! data-active:text-[#C3292F]" value="npm">
+              <NpmIcon className="size-3" />
               npm
             </TabsTab>
-            <TabsTab className="h-5! px-1.5 hover:bg-transparent!" value="yarn">
+            <TabsTab className="h-5! gap-2 px-1.5 hover:bg-transparent! data-active:text-[#3592BD]" value="yarn">
+              <YarnIcon className="size-3" />
               yarn
             </TabsTab>
-            <TabsTab className="h-5! px-1.5 hover:bg-transparent!" value="bun">
+            <TabsTab className="data-active:text-primary h-5! gap-2 px-1.5 hover:bg-transparent!" value="bun">
+              <BunIcon className="size-3" />
               bun
             </TabsTab>
-            <TabsTab className="h-5! px-1.5 hover:bg-transparent!" value="pnpm">
+            <TabsTab className="h-5! gap-2 px-1.5 hover:bg-transparent! data-active:text-[#FAAF18]" value="pnpm">
+              <PnpmIcon className="size-3" />
               pnpm
             </TabsTab>
           </TabsList>
-          <Button
-            className="h-6 w-6 rounded"
-            variant="ghost"
-            size="icon"
-            onClick={() => copy(packageCommands[activeTab] + " " + name)}
-          >
-            {copied ? <CheckIcon /> : <CopyIcon />}
-          </Button>
+          <CopyButton code={packageCommands[packageManager] + " " + name} />
         </div>
         <div className="bg-background text-muted-foreground rounded-[5px] border p-3 text-[13px]">
           {Object.keys(packageCommands).map((manager) => (
-            <TabsPanel key={manager} value={manager}>
-              {packageCommands[activeTab]} {name}
+            <TabsPanel className="font-mono" key={manager} value={manager}>
+              {packageCommands[packageManager]} {name}
             </TabsPanel>
           ))}
         </div>

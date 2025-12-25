@@ -18,5 +18,7 @@
     "lib": "@/lib",
     "hooks": "@/hooks"
   },
-  "registries": {}
+  "registries": {
+    "@evilcharts": "http://localhost:3000/r/{name}.json"
+  }
 }

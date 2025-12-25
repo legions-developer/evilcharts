@@ -1,10 +1,6 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { EvilAreaChart } from "@/registry/charts/area-chart";
-import { Badge } from "@/components/ui/badge";
-import { TrendingUp } from "lucide-react";
-
 const data = [
   { month: "January", desktop: 342, mobile: 245 },
   { month: "February", desktop: 876, mobile: 654 },
@@ -33,20 +29,8 @@ const chartConfig = {
 
 export function EvilExampleSimpleAreaChart() {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>
-          Area Chart
-          <Badge variant="outline" className="ml-2 border-none bg-green-500/10 text-green-500">
-            <TrendingUp className="h-4 w-4" />
-            <span>5.2%</span>
-          </Badge>
-        </CardTitle>
-        <CardDescription>Showing total visitors for the last 6 months</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <EvilAreaChart chartConfig={chartConfig} data={data} />
-      </CardContent>
-    </Card>
+    <div className="h-full w-full p-4">
+      <EvilAreaChart className="h-full w-full" chartConfig={chartConfig} data={data} />
+    </div>
   );
 }

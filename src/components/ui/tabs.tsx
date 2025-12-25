@@ -18,11 +18,13 @@ function Tabs({ className, ...props }: TabsPrimitive.Root.Props) {
 
 function TabsList({
   variant = "default",
+  indicatorClassName,
   className,
   children,
   ...props
 }: TabsPrimitive.List.Props & {
   variant?: TabsVariant;
+  indicatorClassName?: string;
 }) {
   return (
     <TabsPrimitive.List
@@ -31,7 +33,7 @@ function TabsList({
         "data-[orientation=vertical]:flex-col",
         variant === "default"
           ? "bg-muted text-muted-foreground/72 rounded-lg p-0.5"
-          : "*:data-[slot=tabs-trigger]:hover:bg-accent data-[orientation=horizontal]:py-1 data-[orientation=vertical]:px-1",
+          : "*:data-[slot=tabs-trigger]:hover:bg-accent/50 data-[orientation=horizontal]:py-1 data-[orientation=vertical]:px-1",
         className,
       )}
       data-slot="tabs-list"
@@ -42,8 +44,9 @@ function TabsList({
         className={cn(
           "absolute bottom-0 left-0 h-(--active-tab-height) w-(--active-tab-width) translate-x-(--active-tab-left) -translate-y-(--active-tab-bottom) transition-[width,translate] duration-200 ease-in-out",
           variant === "underline"
-            ? "bg-primary z-10 data-[orientation=horizontal]:h-px data-[orientation=horizontal]:translate-y-px data-[orientation=vertical]:w-0.5 data-[orientation=vertical]:-translate-x-px"
+            ? "bg-primary! z-10 data-[orientation=horizontal]:h-px data-[orientation=horizontal]:translate-y-px data-[orientation=vertical]:w-0.5 data-[orientation=vertical]:-translate-x-px"
             : "bg-background dark:bg-accent -z-1 rounded-md shadow-sm",
+          indicatorClassName,
         )}
         data-slot="tab-indicator"
       />
@@ -57,7 +60,7 @@ function TabsTab({ className, ...props }: TabsPrimitive.Tab.Props) {
       className={cn(
         "focus-visible:ring-ring flex shrink-0 grow cursor-pointer items-center justify-center rounded-md text-sm font-medium whitespace-nowrap transition-[color,background-color,box-shadow] outline-none focus-visible:ring-2 data-disabled:pointer-events-none data-disabled:opacity-64 sm:text-xs [&_svg]:pointer-events-none [&_svg]:-mx-0.5 [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4",
         "hover:text-primary data-active:text-foreground",
-        "h-8 gap-1.5 px-[calc(--spacing(2.5)-1px)] sm:h-7",
+        "h-6 gap-1.5 px-[calc(--spacing(2.5)-1px)]",
         "data-[orientation=vertical]:w-full data-[orientation=vertical]:justify-start",
         className,
       )}

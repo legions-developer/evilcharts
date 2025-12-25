@@ -46,10 +46,11 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --color-path: var(--path);
 }
 
 :root {
-  --radius: 0.625rem;
+  --radius: 0.525rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -90,6 +91,7 @@
   --code-number: oklch(0.56 0 0);
   --selection: oklch(0.145 0 0);
   --selection-foreground: oklch(1 0 0);
+  --path: oklch(0.9037 0 0);
 }
 
 .dark {
@@ -133,6 +135,7 @@
   --code-number: oklch(0.72 0 0);
   --selection: oklch(0.922 0 0);
   --selection-foreground: oklch(15% 0 0);
+  --path: oklch(0.269 0 0);
 }
 
 @layer base {
@@ -174,4 +177,62 @@ html {
 
 @utility docs-container {
   @apply mx-auto w-full max-w-2xl px-4;
+}
+
+/* Shiki multi-theme support - switch between light/dark themes */
+html:not(.dark) .shiki,
+html:not(.dark) .shiki span,
+html:not(.dark) [data-rehype-pretty-code-figure] code,
+html:not(.dark) [data-rehype-pretty-code-figure] code span,
+:root:not(.dark) .shiki,
+:root:not(.dark) .shiki span,
+:root:not(.dark) [data-rehype-pretty-code-figure] code,
+:root:not(.dark) [data-rehype-pretty-code-figure] code span {
+  color: var(--shiki-light) !important;
+  font-style: var(--shiki-light-font-style) !important;
+  font-weight: var(--shiki-light-font-weight) !important;
+  text-decoration: var(--shiki-light-text-decoration) !important;
+}
+
+html.dark .shiki,
+html.dark .shiki span,
+html.dark [data-rehype-pretty-code-figure] code,
+html.dark [data-rehype-pretty-code-figure] code span,
+:root.dark .shiki,
+:root.dark .shiki span,
+:root.dark [data-rehype-pretty-code-figure] code,
+:root.dark [data-rehype-pretty-code-figure] code span {
+  color: var(--shiki-dark) !important;
+  font-style: var(--shiki-dark-font-style) !important;
+  font-weight: var(--shiki-dark-font-weight) !important;
+  text-decoration: var(--shiki-dark-text-decoration) !important;
+}
+
+/* Code block line numbers */
+code[data-line-numbers] {
+  counter-reset: line;
+}
+
+code[data-line-numbers] > [data-line]::before {
+  counter-increment: line;
+  content: counter(line);
+  display: inline-block;
+  width: 1rem;
+  margin-right: 1.5rem;
+  text-align: right;
+  color: var(--code-number);
+  user-select: none;
+  opacity: 50%;
+}
+
+code[data-line-numbers-max-digits="2"] > [data-line]::before {
+  width: 1.5rem;
+}
+
+code[data-line-numbers-max-digits="3"] > [data-line]::before {
+  width: 2rem;
+}
+
+code[data-line-numbers-max-digits="4"] > [data-line]::before {
+  width: 2.5rem;
 }

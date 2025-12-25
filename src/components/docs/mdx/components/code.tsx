@@ -1,54 +1,71 @@
-import React from "react";
-
+import { getIconForLanguageExtension } from "@/assets/language/icons";
+import { highlightCode } from "@/lib/highlight-code";
+import CopyButton from "./copy-button";
 import { cn } from "@/lib/utils";
 
-export const Pre = ({ className, children, ...props }: React.ComponentProps<"pre">) => {
-  return (
-    <pre
-      className={cn(
-        "no-scrollbar min-w-0 overflow-x-auto p-4 text-[13px] leading-relaxed outline-none has-data-highlighted-line:px-0 has-data-line-numbers:px-0 has-data-[slot=tabs]:p-0",
-        "[&>code>span.highlighted]:inline-flex",
-        className,
-      )}
-      {...props}
-    >
-      {children}
-    </pre>
-  );
-};
+export async function CodeBlock({
+  code,
+  language,
+  title,
+  className,
+  copyButton = true,
+  showLineNumbers = true,
+  withWrapper = false,
+}: {
+  code: string;
+  language: string;
+  title?: string | undefined;
+  className?: string;
+  copyButton?: boolean;
+  showLineNumbers?: boolean;
+  withWrapper?: boolean;
+}) {
+  const highlightedCode = await highlightCode(code, language, {
+    showLineNumbers,
+  });
 
-export const Figure = ({ className, ...props }: React.ComponentProps<"figure">) => {
-  return <figure className={cn(className)} {...props} />;
-};
-
-export const Figcaption = ({ className, children, ...props }: React.ComponentProps<"figcaption">) => {
-  return (
-    <figcaption
-      className={cn(
-        "text-code-foreground [&_svg]:text-code-foreground flex items-center gap-2 [&_svg]:size-4 [&_svg]:opacity-70",
-        className,
-      )}
-      {...props}
-    >
-      {children}
-    </figcaption>
-  );
-};
-
-export const Code = ({ className, ...props }: React.ComponentProps<"code">) => {
-  // Inline Code.
-  if (typeof props.children === "string") {
+  if (withWrapper) {
     return (
-      <code
-        className={cn(
-          "bg-muted relative rounded-md px-[0.3rem] py-[0.2rem] font-mono text-[0.8rem] wrap-break-word outline-none",
-          className,
-        )}
-        {...props}
-      />
+      <div className={cn("dark:bg-primary-foreground bg-muted-foreground/10 rounded-md p-1")}>
+        <div className="flex h-7 justify-between px-1">
+          <figcaption
+            className="text-muted-foreground/50 flex items-center gap-1.5 text-xs [&_svg]:size-3.5"
+            data-language={language}
+            data-rehype-pretty-code-title=""
+          >
+            {getIconForLanguageExtension(language)}
+            <span className="font-mono">{title}</span>
+          </figcaption>
+          {copyButton && <CopyButton code={code} />}
+        </div>
+        <figure data-rehype-pretty-code-figure="">
+          <div
+            className={cn("bg-background rounded-md border [&>pre]:px-4!", className)}
+            dangerouslySetInnerHTML={{ __html: highlightedCode }}
+          />
+        </figure>
+      </div>
     );
   }
 
-  // Default codeblock.
-  return <code {...props} />;
-};
+  return (
+    <figure className="relative" data-rehype-pretty-code-figure="">
+      {title && (
+        <figcaption
+          className="text-muted-foreground/50 flex items-center gap-1.5 text-xs [&_svg]:size-3.5"
+          data-language={language}
+          data-rehype-pretty-code-title=""
+        >
+          {getIconForLanguageExtension(language)}
+          <span className="font-mono">{title}</span>
+        </figcaption>
+      )}
+      {copyButton && (
+        <div className="sticky top-0 z-10 flex h-0 justify-end">
+          <CopyButton withBlurBg code={code} className="mt-2 mr-2" />
+        </div>
+      )}
+      <div className={cn("[&>pre]:px-4!", className)} dangerouslySetInnerHTML={{ __html: highlightedCode }} />
+    </figure>
+  );
+}

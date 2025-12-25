@@ -1,11 +1,91 @@
-import React from "react";
+"use client";
 
 import { cn } from "@/lib/utils";
+import * as React from "react";
 
-export const Step = ({ className, ...props }: React.ComponentProps<"h3">) => (
-  <h3 className={cn("font-heading mt-8 scroll-m-32 text-xl font-medium tracking-tight", className)} {...props} />
-);
+interface StepsProps extends React.HTMLAttributes<HTMLDivElement> {
+  children: React.ReactNode;
+}
 
-export const Steps = ({ ...props }) => (
-  <div className="[&>h3]:step steps mb-12 [counter-reset:step] *:[h3]:first:mt-0!" {...props} />
-);
+interface StepProps extends React.HTMLAttributes<HTMLDivElement> {
+  children: React.ReactNode;
+  stepNumber?: number;
+}
+
+interface StepContentProps extends React.HTMLAttributes<HTMLDivElement> {
+  children: React.ReactNode;
+}
+
+function Steps({ className, children, ...props }: StepsProps) {
+  // Convert children to array to work with them
+  const stepsArray = React.Children.toArray(children);
+
+  return (
+    <div className={cn("relative mt-4", className)} {...props}>
+      {React.Children.map(children, (child, index) => {
+        if (!React.isValidElement<StepProps>(child)) return null;
+
+        const isLastStep = index === stepsArray.length - 1;
+
+        return (
+          <div key={index} className="relative">
+            {/* Add connecting line except for last item */}
+
+            <div
+              className={cn(
+                "bg-border absolute top-[26px] left-[12px] h-[calc(100%-24px)] w-px",
+                isLastStep && "hidden",
+              )}
+              aria-hidden="true"
+            />
+
+            {/* Clone child and inject index for numbering */}
+            {React.cloneElement(child, {
+              ...child.props,
+              stepNumber: index + 1,
+              className: cn(child.props.className, "relative"),
+            })}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+const StepTitle = ({
+  className,
+  children,
+  withoutLink = false,
+}: {
+  className?: string;
+  children: string;
+  withoutLink?: boolean;
+}) => {
+  return (
+    <h3 id={children} className={cn(className, "pt-0.5 text-xs font-medium not-first:mt-2")}>
+      {withoutLink ? children : <a href={`#${children}`}>{children}</a>}
+    </h3>
+  );
+};
+
+function Step({ stepNumber, className, children, ...props }: StepProps & { stepNumber?: number }) {
+  return (
+    <div className={cn("pl-9", className)} {...props}>
+      {/* Step number circle */}
+      <div className="bg-border text-primary jetbrains absolute top-0.5 left-0 flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold">
+        {stepNumber}
+      </div>
+      <div>{children}</div>
+    </div>
+  );
+}
+
+function StepContent({ children, ...props }: StepContentProps) {
+  return (
+    <div className={cn("flex flex-col gap-4 py-4", props.className)} {...props}>
+      {children}
+    </div>
+  );
+}
+
+export { Steps, Step, StepTitle, StepContent };

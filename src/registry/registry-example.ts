@@ -3,11 +3,11 @@ import type { Registry } from "shadcn/schema";
 export const examples: Registry["items"] = [
   {
     name: "ex-area-simple-chart",
-    registryDependencies: ["area-chart"],
+    registryDependencies: ["@evilcharts/area-chart"],
     type: "registry:block",
     files: [
       {
-        path: "charts/ex-area-simple-chart.tsx",
+        path: "examples/ex-area-simple-chart.tsx",
         type: "registry:block",
       },
     ],

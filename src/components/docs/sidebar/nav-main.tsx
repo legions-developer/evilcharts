@@ -33,16 +33,9 @@ function TreeIndicator({
 
   return (
     <svg className={cn("text-muted pointer-events-none absolute z-10 ml-[5px] flex h-full w-5! duration-200")}>
-      <ellipse
-        className="dark:text-muted text-[#DFDFDF]"
-        cx="50%"
-        cy="calc(100% - 15px)"
-        rx="2"
-        ry="2"
-        fill="currentColor"
-      />
+      <ellipse className="text-path" cx="50%" cy="calc(100% - 15px)" rx="2" ry="2" fill="currentColor" />
       <line
-        className="dark:text-muted text-[#DFDFDF]"
+        className="text-path"
         x1="50%"
         y1="0%"
         x2="50%"

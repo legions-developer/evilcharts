@@ -1,0 +1,100 @@
+---
+title: Dummy
+description: A set of collapsible panels with headings.
+
+links:
+  doc: https://base-ui.com/react/components/accordion#api-reference
+---
+
+<ComponentPreview title="Simple" name="ex-area-simple-chart" align="start" />
+
+## Installation
+
+<CodeTabs>
+
+<TabsList variant="underline">
+  <TabsTab value="cli">CLI</TabsTab>
+  <TabsTab value="manual">Manual</TabsTab>
+</TabsList>
+
+<TabsPanel value="cli">
+
+<CliBlock name="@coss/accordion" />
+
+</TabsPanel>
+
+<TabsPanel value="manual">
+
+<Steps>
+
+<Step>
+  <StepTitle>Install the following dependencies:</StepTitle>
+  <StepContent>
+    <CodeBlock withWrapper showLineNumbers={false} code="npm install @base-ui/react" language="bash" />
+  </StepContent>
+</Step>
+
+<Step>
+  <StepTitle>Copy and paste the following code into your project.</StepTitle>
+  <StepContent>
+    <ComponentSource name="ex-area-simple-chart" title="components/ui/accordion.tsx" />
+  </StepContent>
+</Step>
+
+</Steps>
+
+</TabsPanel>
+
+</CodeTabs>
+
+This is dummy code field `console.log("hello world")`
+
+## Usage
+
+```tsx
+import { 
+  Accordion, 
+  AccordionItem, 
+  AccordionPanel, 
+  AccordionTrigger 
+} from "@/components/ui/accordion";
+```
+
+```tsx
+<Accordion>
+  <AccordionItem value="item-1">
+    <AccordionTrigger>Is it accessible?</AccordionTrigger>
+    <AccordionPanel>Yes. It adheres to the WAI-ARIA design pattern.</AccordionPanel>
+  </AccordionItem>
+</Accordion>
+```
+
+## Examples
+
+<ComponentPreview name="ex-area-simple-chart" align="start" />
+
+### Simple Area Chart
+
+<ComponentPreview name="ex-area-simple-chart" align="start" />
+
+### Double Area Chart
+
+<ComponentPreview name="ex-area-simple-chart" align="start" />
+
+### Animated Area Chart
+
+<ComponentPreview name="ex-area-simple-chart" align="start" />
+
+## Test Cases
+
+### Props
+
+<ComponentPreview name="ex-area-simple-chart" align="start" />
+
+### Allowed Variables
+
+<ComponentPreview name="ex-area-simple-chart" align="start" />
+
+### Usecases
+
+<ComponentPreview name="ex-area-simple-chart" align="start" />

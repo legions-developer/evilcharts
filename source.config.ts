@@ -1,16 +1,39 @@
-import { defineConfig, defineDocs } from "fumadocs-mdx/config";
+import { defineConfig, defineDocs, frontmatterSchema } from "fumadocs-mdx/config";
+import { transformers } from "@/lib/highlight-code";
+import rehypePrettyCode from "rehype-pretty-code";
+import z from "zod";
 
 export default defineConfig({
   mdxOptions: {
-    rehypeCodeOptions: {
-      themes: {
-        light: "min-light",
-        dark: "vesper",
-      },
+    rehypePlugins: (plugins) => {
+      plugins.shift();
+      plugins.push([
+        rehypePrettyCode,
+        {
+          theme: {
+            light: "min-light",
+            dark: "vesper",
+          },
+          defaultColor: false,
+          transformers,
+        },
+      ]);
+
+      return plugins;
     },
   },
 });
 
 export const docs = defineDocs({
   dir: "src/content/docs",
+  docs: {
+    schema: frontmatterSchema.extend({
+      links: z
+        .object({
+          api: z.string().optional(),
+          doc: z.string().optional(),
+        })
+        .optional(),
+    }),
+  },
 });

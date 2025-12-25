@@ -7,35 +7,12 @@ description: Simple static & beauitfully designed area charts
 
 <Description>a simple chart without any decorations.</Description>
 
-this is demo `code` block
-
-this will be code---
-
-```tsx title="mdx-components.tsx"
-import { CodeBlock, Pre } from "fumadocs-ui/components/codeblock";
-import defaultComponents from "fumadocs-ui/mdx";
-import type { MDXComponents } from "mdx/types";
-
-export function getMDXComponents(components?: MDXComponents): MDXComponents {
-  return {
-    ...defaultComponents,
-    // HTML `ref` attribute conflicts with `forwardRef`
-    pre: ({ ref: _ref, ...props }) => (
-      <CodeBlock {...props}>
-        <Pre>{props.children}</Pre>
-      </CodeBlock>
-    ),
-    ...components,
-  };
-}
-```
-
 <ComponentPreviewAndCode title="Simple">
- <ComponentPreview>
+ <MyComponentPreview>
    <div className="bg-background rounded-[5px] border p-4">
      <p className="text-muted-foreground p-4 text-center text-xs">Preview</p>
    </div>
- </ComponentPreview>
+ </MyComponentPreview>
  <ComponentCode>
    ```jsx 
 "use client";
