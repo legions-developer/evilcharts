@@ -1,116 +1,44 @@
 ---
 title: Static
 description: Simple static & beauitfully designed area charts
+links:
+  doc: https://base-ui.com/react/components/accordion#api-reference
 ---
 
-## Simple chart
+<ComponentPreview title="Simple" name="ex-area-simple-chart" align="start" />
 
-<Description>a simple chart without any decorations.</Description>
+## Installation
 
-<ComponentPreviewAndCode title="Simple">
- <MyComponentPreview>
-   <div className="bg-background rounded-[5px] border p-4">
-     <p className="text-muted-foreground p-4 text-center text-xs">Preview</p>
-   </div>
- </MyComponentPreview>
- <ComponentCode>
-   ```jsx 
-"use client";
-
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
-
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { TrendingUp } from "lucide-react";
-
-const chartData = [
-{ month: "January", desktop: 342, mobile: 245 },
-{ month: "February", desktop: 876, mobile: 654 },
-{ month: "March", desktop: 512, mobile: 387 },
-{ month: "April", desktop: 629, mobile: 521 },
-{ month: "May", desktop: 458, mobile: 412 },
-{ month: "June", desktop: 781, mobile: 598 },
-{ month: "July", desktop: 394, mobile: 312 },
-{ month: "August", desktop: 925, mobile: 743 },
-{ month: "September", desktop: 647, mobile: 489 },
-{ month: "October", desktop: 532, mobile: 476 },
-{ month: "November", desktop: 803, mobile: 687 },
-{ month: "December", desktop: 271, mobile: 198 },
-];
-
-const chartConfig = {
-desktop: {
-label: "Desktop",
-color: "var(--chart-1)",
-},
-mobile: {
-label: "Mobile",
-color: "var(--chart-2)",
-},
-} satisfies ChartConfig;
-
-export function GradientAreaChart() {
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>
-          Area Chart
-          <Badge variant="outline" className="ml-2 border-none bg-green-500/10 text-green-500">
-            <TrendingUp className="h-4 w-4" />
-            <span>5.2%</span>
-          </Badge>
-        </CardTitle>
-        <CardDescription>Showing total visitors for the last 6 months</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <ChartContainer config={chartConfig}>
-          <AreaChart accessibilityLayer data={chartData}>
-            <CartesianGrid vertical={false} strokeDasharray="3 3" />
-            <XAxis
-              dataKey="month"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              tickFormatter={(value) => value.slice(0, 3)}
-            />
-            <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-            <defs>
-              <linearGradient id="gradient-chart-desktop" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="var(--color-desktop)" stopOpacity={0.5} />
-                <stop offset="95%" stopColor="var(--color-desktop)" stopOpacity={0.1} />
-              </linearGradient>
-              <linearGradient id="gradient-chart-mobile" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="var(--color-mobile)" stopOpacity={0.5} />
-                <stop offset="95%" stopColor="var(--color-mobile)" stopOpacity={0.1} />
-              </linearGradient>
-            </defs>
-            <Area
-              dataKey="mobile"
-              fill="url(#gradient-chart-mobile)"
-              fillOpacity={0.4}
-              stroke="var(--color-mobile)"
-              stackId="a"
-              strokeWidth={0.8}
-              strokeDasharray={"3 3"}
-            />
-            <Area
-              dataKey="desktop"
-              fill="url(#gradient-chart-desktop)"
-              fillOpacity={0.4}
-              stroke="var(--color-desktop)"
-              stackId="a"
-              strokeWidth={0.8}
-              strokeDasharray={"3 3"}
-            />
-          </AreaChart>
-        </ChartContainer>
-      </CardContent>
-    </Card>
-  );
-}
-```
-</ComponentCode>
-</ComponentPreviewAndCode>
-
-<CliBlock name="simple-area-chart" />
+<CodeTabs>
+  <TabsList variant="underline">
+    <TabsTab value="cli">CLI</TabsTab>
+    <TabsTab value="manual">Manual</TabsTab>
+  </TabsList>
+  <TabsPanel value="cli">
+    <CliBlock name="@coss/accordion" />
+  </TabsPanel>
+  <TabsPanel value="manual">
+    <Steps>
+      <Step>
+        <StepTitle>Install the following dependencies:</StepTitle>
+        <StepContent>
+          <CodeBlock
+            withWrapper
+            showLineNumbers={false}
+            code="npm install @base-ui/react"
+            language="bash"
+          />
+        </StepContent>
+      </Step>
+      <Step>
+        <StepTitle>Copy and paste the following code into your project.</StepTitle>
+        <StepContent>
+          <ComponentSource
+            name="ex-area-simple-chart"
+            title="components/ui/accordion.tsx"
+          />
+        </StepContent>
+      </Step>
+    </Steps>
+  </TabsPanel>
+</CodeTabs>

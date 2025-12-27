@@ -1,10 +1,5 @@
 // Some of mdx components are taken from @shadcn official repo
 
-import {
-  ComponentPreviewAndCode,
-  ComponentPreview as MyComponentPreview,
-  ComponentCode,
-} from "../charts/v1-component-preview";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionPanel } from "@/components/ui/accordion";
 import { CodeCollapsibleWrapper } from "../charts/code-collapsible-wrapper";
 import { Tabs, TabsList, TabsPanel, TabsTab } from "@/components/ui/tabs";
@@ -58,9 +53,6 @@ export const mdxComponents: MDXComponents = {
   Kbd,
   CliBlock,
   CodeBlock,
-  ComponentPreviewAndCode,
-  MyComponentPreview,
-  ComponentCode,
   Description,
   // shadcn code previews
   CodeCollapsibleWrapper,

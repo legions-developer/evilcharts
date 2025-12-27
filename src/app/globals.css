@@ -228,11 +228,9 @@ code[data-line-numbers] > [data-line]::before {
 code[data-line-numbers-max-digits="2"] > [data-line]::before {
   width: 1.5rem;
 }
-
 code[data-line-numbers-max-digits="3"] > [data-line]::before {
   width: 2rem;
 }
-
 code[data-line-numbers-max-digits="4"] > [data-line]::before {
   width: 2.5rem;
 }

@@ -17,7 +17,6 @@ interface StepContentProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 function Steps({ className, children, ...props }: StepsProps) {
-  // Convert children to array to work with them
   const stepsArray = React.Children.toArray(children);
 
   return (
@@ -29,8 +28,6 @@ function Steps({ className, children, ...props }: StepsProps) {
 
         return (
           <div key={index} className="relative">
-            {/* Add connecting line except for last item */}
-
             <div
               className={cn(
                 "bg-border absolute top-[26px] left-[12px] h-[calc(100%-24px)] w-px",
@@ -38,8 +35,6 @@ function Steps({ className, children, ...props }: StepsProps) {
               )}
               aria-hidden="true"
             />
-
-            {/* Clone child and inject index for numbering */}
             {React.cloneElement(child, {
               ...child.props,
               stepNumber: index + 1,
@@ -52,20 +47,8 @@ function Steps({ className, children, ...props }: StepsProps) {
   );
 }
 
-const StepTitle = ({
-  className,
-  children,
-  withoutLink = false,
-}: {
-  className?: string;
-  children: string;
-  withoutLink?: boolean;
-}) => {
-  return (
-    <h3 id={children} className={cn(className, "pt-0.5 text-xs font-medium not-first:mt-2")}>
-      {withoutLink ? children : <a href={`#${children}`}>{children}</a>}
-    </h3>
-  );
+const StepTitle = ({ className, children }: { className?: string; children: string }) => {
+  return <h3 className={cn(className, "pt-1 text-[15px]! font-normal! not-first:mt-2")}>{children}</h3>;
 };
 
 function Step({ stepNumber, className, children, ...props }: StepProps & { stepNumber?: number }) {
