@@ -130,8 +130,9 @@ export function TocIndicator({ toc, activeIndex, className }: TocIndicatorProps)
         </defs>
         <path d={path} stroke="currentColor" strokeWidth="1" fill="none" markerEnd="url(#toc-end-circle)" />
         <motion.path
+          className="text-primary"
           d={path}
-          stroke="white"
+          stroke="currentColor"
           strokeWidth="1"
           fill="none"
           strokeDasharray={totalLength}

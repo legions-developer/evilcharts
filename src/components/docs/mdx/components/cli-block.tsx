@@ -29,7 +29,7 @@ function CliBlock({ name }: CliBlockProps) {
       onValueChange={(value) => setConfig({ packageManager: value as PackageManager })}
     >
       <div className="dark:bg-primary-foreground bg-muted-foreground/10 group mt-2 flex flex-col rounded-[8px] p-1">
-        <div className="flex flex-row items-center justify-between pr-1 pl-1.5">
+        <div className="flex flex-row items-center justify-between pr-1 pl-2">
           <TabsList
             variant="underline"
             indicatorClassName={cn(
