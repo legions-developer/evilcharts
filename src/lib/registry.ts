@@ -140,7 +140,7 @@ function fixFilePaths(
 }
 
 export function fixImport(content: string) {
-  const regex = /@\/(.+?)\/((?:.*?\/)?(?:components|ui|hooks|lib))\/([\w-]+)/g;
+  const regex = /@\/(.+?)\/((?:.*?\/)?(?:components|ui|hooks|lib|charts))\/([\w-]+)/g;
 
   const replacement = (match: string, _path: string, type: string, component: string) => {
     if (type.endsWith("components")) {
@@ -154,6 +154,9 @@ export function fixImport(content: string) {
     }
     if (type.endsWith("lib")) {
       return `@/lib/${component}`;
+    }
+    if (type.endsWith("charts")) {
+      return `@/components/evilcharts/charts/${component}`;
     }
 
     return match;

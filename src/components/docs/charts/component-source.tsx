@@ -52,7 +52,7 @@ export async function ComponentSource({
 
   return (
     <CodeCollapsibleWrapper className={className}>
-    <CodeBlock withWrapper code={code} language={lang} title={title} />
-  </CodeCollapsibleWrapper>
+      <CodeBlock withWrapper code={code} language={lang} title={title} />
+    </CodeCollapsibleWrapper>
   );
 }
