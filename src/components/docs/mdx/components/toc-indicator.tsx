@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "motion/react";
+import { motion, useSpring, useTransform } from "motion/react";
 import { cn } from "@/lib/utils";
 import * as React from "react";
 
@@ -9,13 +9,19 @@ const ITEM_HEIGHT = 26.28;
 const ITEM_GAP = 8;
 const DEPTH_INDENT = 10;
 const INITIAL_OFFSET = 8;
+const DEPTH_BEND_LENGTH = 8;
+const CENTER_OFFSET = 6.5;
+
+const SPRING_CONFIG = { stiffness: 180, damping: 20 };
+
+interface TocItem {
+  title?: React.ReactNode;
+  url: string;
+  depth: number;
+}
 
 interface TocIndicatorProps {
-  toc: {
-    title?: React.ReactNode;
-    url: string;
-    depth: number;
-  }[];
+  toc: TocItem[];
   activeIndex: number;
   className?: string;
 }
@@ -23,148 +29,127 @@ interface TocIndicatorProps {
 interface PathData {
   path: string;
   totalLength: number;
-  segmentStartLengths: number[]; // cumulative length at START of each item's vertical segment
-  hasDepthChangeBefore: boolean[]; // whether the previous item had a depth change
+  itemCenterDistances: number[];
 }
 
-function generateZigZagPath(toc: TocIndicatorProps["toc"]): PathData {
-  const empty: PathData = { path: "", totalLength: 0, segmentStartLengths: [], hasDepthChangeBefore: [] };
-  if (toc.length === 0) return empty;
+function getXForDepth(depth: number, minDepth: number): number {
+  return STARTING_MARGIN + (depth - minDepth) * DEPTH_INDENT;
+}
+
+function getRowBottomY(index: number, isLast: boolean): number {
+  const baseY = INITIAL_OFFSET + ITEM_HEIGHT * (index + 1) - ITEM_GAP;
+  return isLast ? baseY - 8 : baseY;
+}
+
+function getDiagonalDistance(deltaX: number): number {
+  return Math.sqrt(deltaX ** 2 + DEPTH_BEND_LENGTH ** 2);
+}
+
+function getItemCenterY(index: number): number {
+  return INITIAL_OFFSET + ITEM_HEIGHT * index + ITEM_HEIGHT / 2 - ITEM_GAP;
+}
+
+function generatePathData(toc: TocItem[]): PathData {
+  if (toc.length === 0) return { path: "", totalLength: 0, itemCenterDistances: [] };
 
   const minDepth = Math.min(...toc.map((item) => item.depth));
-  const getX = (depth: number) => STARTING_MARGIN + (depth - minDepth) * DEPTH_INDENT;
-  const getRowBottom = (i: number, isLast: boolean) =>
-    INITIAL_OFFSET + ITEM_HEIGHT * (i + 1) - ITEM_GAP - (isLast ? 8 : 0);
-
-  const segments: number[] = [];
-  const depthChanges: boolean[] = [false];
   const pathParts: string[] = [];
+  const itemCenterDistances: number[] = [];
 
-  let x = getX(toc[0].depth);
-  let y = INITIAL_OFFSET - STARTING_MARGIN;
-  let length = 0;
+  let currentX = getXForDepth(toc[0].depth, minDepth);
+  let currentY = INITIAL_OFFSET - STARTING_MARGIN;
+  let accumulatedLength = 0;
 
-  pathParts.push(`M ${x} ${y}`);
+  pathParts.push(`M ${currentX} ${currentY}`);
 
-  toc.forEach((item, i) => {
-    const isLast = i === toc.length - 1;
-    const bottom = getRowBottom(i, isLast);
+  for (let i = 0; i < toc.length; i++) {
+    const isLastItem = i === toc.length - 1;
+    const rowBottomY = getRowBottomY(i, isLastItem);
+    const nextItem = toc[i + 1];
 
-    // Record length at segment start, then draw vertical line
-    segments.push(length);
-    length += Math.abs(bottom - y);
-    pathParts.push(`L ${x} ${bottom}`);
-    y = bottom;
+    const itemCenterY = getItemCenterY(i);
+    const distanceToCenter = itemCenterY - currentY;
+    itemCenterDistances.push(accumulatedLength + distanceToCenter + CENTER_OFFSET);
 
-    // Handle depth transition to next item
-    const next = toc[i + 1];
-    if (!next) return;
+    const verticalLength = rowBottomY - currentY;
+    accumulatedLength += verticalLength;
+    pathParts.push(`L ${currentX} ${rowBottomY}`);
+    currentY = rowBottomY;
 
-    const nextX = getX(next.depth);
-    const hasChange = nextX !== x;
-    depthChanges.push(hasChange);
+    if (nextItem) {
+      const nextX = getXForDepth(nextItem.depth, minDepth);
 
-    if (hasChange) {
-      length += Math.sqrt((nextX - x) ** 2 + 64); // diagonal with 8px vertical
-      pathParts.push(`L ${nextX} ${bottom + 8}`);
-      x = nextX;
-      y = bottom + 8;
+      if (nextX !== currentX) {
+        const deltaX = nextX - currentX;
+        accumulatedLength += getDiagonalDistance(deltaX);
+        pathParts.push(`L ${nextX} ${currentY + DEPTH_BEND_LENGTH}`);
+        currentX = nextX;
+        currentY += DEPTH_BEND_LENGTH;
+      }
     }
-  });
+  }
 
-  return {
-    path: pathParts.join(" "),
-    totalLength: length,
-    segmentStartLengths: segments,
-    hasDepthChangeBefore: depthChanges,
-  };
+  return { path: pathParts.join(" "), totalLength: accumulatedLength, itemCenterDistances };
+}
+
+function usePathData(toc: TocItem[]) {
+  return React.useMemo(() => generatePathData(toc), [toc]);
+}
+
+function getActiveDistance(activeIndex: number, itemCenterDistances: number[]): number {
+  const isValidIndex = activeIndex >= 0 && activeIndex < itemCenterDistances.length;
+  return isValidIndex ? itemCenterDistances[activeIndex] : 0;
 }
 
 export function TocIndicator({ toc, activeIndex, className }: TocIndicatorProps) {
-  const pathRef = React.useRef<SVGPathElement>(null);
-  const [position, setPosition] = React.useState({ x: 8, y: 0 });
-  const {
-    path: pathD,
-    totalLength,
-    segmentStartLengths,
-    hasDepthChangeBefore,
-  } = React.useMemo(() => generateZigZagPath(toc), [toc]);
+  const { path, totalLength, itemCenterDistances } = usePathData(toc);
 
-  const getOffsetForItem = (index: number) => {
-    if (hasDepthChangeBefore[index]) {
-      return (ITEM_HEIGHT - ITEM_GAP) / 2;
-    }
-    return ITEM_HEIGHT / 1.6;
-  };
+  const activeDistance = getActiveDistance(activeIndex, itemCenterDistances);
+  const isActive = activeDistance > 0;
 
-  const activeLength =
-    activeIndex >= 0 && activeIndex < segmentStartLengths.length
-      ? segmentStartLengths[activeIndex] + getOffsetForItem(activeIndex)
-      : 0;
-
-  const dashOffset = totalLength - activeLength;
+  const animatedDistance = useSpring(0, SPRING_CONFIG);
 
   React.useEffect(() => {
-    if (pathRef.current && activeLength > 0) {
-      const point = pathRef.current.getPointAtLength(activeLength);
-      setPosition({ x: point.x, y: point.y });
-    }
-  }, [activeLength]);
+    animatedDistance.set(activeDistance);
+  }, [activeDistance, animatedDistance]);
+
+  const strokeDashOffset = useTransform(animatedDistance, (v) => totalLength - v);
+  const offsetDistancePercent = useTransform(animatedDistance, (v) =>
+    totalLength > 0 ? `${(v / totalLength) * 100}%` : "0%",
+  );
+
+  const cssOffsetPath = `path('${path}')`;
 
   return (
     <div className={cn("text-path pointer-events-none absolute h-full w-full", className)}>
       <svg className="h-full w-full" overflow="visible">
         <defs>
           <marker id="toc-end-circle" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
-            <circle cx="3" cy="3" r="2.5" fill="currentColor" />
+            <circle cx="3" cy="3" r="2" fill="currentColor" />
           </marker>
         </defs>
-        <path
-          ref={pathRef}
-          d={pathD}
-          stroke="currentColor"
-          strokeWidth="1"
-          fill="none"
-          markerEnd="url(#toc-end-circle)"
-        />
+        <path d={path} stroke="currentColor" strokeWidth="1" fill="none" markerEnd="url(#toc-end-circle)" />
         <motion.path
-          d={pathD}
+          d={path}
           stroke="white"
           strokeWidth="1"
           fill="none"
           strokeDasharray={totalLength}
-          initial={{ strokeDashoffset: totalLength }}
-          animate={{ strokeDashoffset: dashOffset }}
-          transition={{
-            type: "spring",
-            stiffness: 180,
-            damping: 20,
-          }}
-        />
-        <motion.rect
-          className="text-primary"
-          width="6"
-          height="6"
-          rx="1"
-          fill="currentColor"
-          style={{
-            rotate: 45,
-            transformOrigin: "center",
-            transformBox: "fill-box",
-          }}
-          initial={{ x: 8, y: 0, opacity: 0 }}
-          animate={{
-            x: position.x - 3,
-            y: position.y - 3,
-            opacity: activeLength > 0 ? 1 : 0,
-          }}
-          transition={{
-            type: "spring",
-            stiffness: 180,
-            damping: 20,
-          }}
+          style={{ strokeDashoffset: strokeDashOffset }}
         />
       </svg>
+      <motion.div
+        className="bg-primary absolute top-0 left-0 size-[6px] rounded-[1px]"
+        style={{
+          offsetPath: cssOffsetPath,
+          offsetRotate: "0deg",
+          rotate: "45deg",
+          marginLeft: 0.2,
+          marginTop: -3,
+          offsetDistance: offsetDistancePercent,
+          opacity: isActive ? 1 : 0,
+        }}
+      />
     </div>
   );
 }

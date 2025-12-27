@@ -111,7 +111,7 @@ export function DocsTableOfContents({
             <a
               key={item.url}
               href={item.url}
-              className="text-muted-foreground/75 hover:text-foreground data-[active=true]:text-foreground text-[0.8rem] no-underline transition-colors empty:hidden data-[depth=2]:pl-5 data-[depth=3]:pl-8 data-[depth=4]:pl-11"
+              className="text-muted-foreground/75 hover:text-foreground data-[active=true]:text-foreground text-[0.8rem] no-underline transition-colors duration-200 empty:hidden data-[active=true]:font-medium data-[depth=2]:pl-5 data-[depth=3]:pl-8 data-[depth=4]:pl-11"
               data-active={item.url === `#${activeHeading}`}
               data-depth={item.depth}
             >
