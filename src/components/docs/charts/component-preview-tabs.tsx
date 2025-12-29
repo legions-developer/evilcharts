@@ -25,7 +25,7 @@ export function ComponentPreviewTabs({
       <Tabs defaultValue="preview" className="relative w-full">
         <div className="dark:bg-primary-foreground bg-muted-foreground/10 flex flex-col rounded-[8px] p-1">
           <div className="flex flex-row items-center justify-between px-2">
-            <span className="text-primary/50 text-[13px] font-medium">{title}</span>
+            <span className="text-muted-foreground/50 flex items-center gap-1.5 text-xs">{title}</span>
             {!hideCode && (
               <TabsList variant="underline">
                 <TabsTab className="h-5! px-1.5 hover:bg-transparent!" value="code">

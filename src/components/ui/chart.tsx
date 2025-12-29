@@ -1,7 +1,5 @@
 "use client";
 
-/* eslint-disable */
-
 import type { NameType, ValueType } from "recharts/types/component/DefaultTooltipContent";
 import * as RechartsPrimitive from "recharts";
 import { cn } from "@/lib/utils";
