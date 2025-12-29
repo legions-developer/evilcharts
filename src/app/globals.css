@@ -92,6 +92,9 @@
   --selection: oklch(0.145 0 0);
   --selection-foreground: oklch(1 0 0);
   --path: oklch(0.9037 0 0);
+  /* code stuff */
+  --color-vesper-type: oklch(0.5645 0.1633 253.27);
+  --color-vesper-string: oklch(0.5464 0.1442 147.32);
 }
 
 .dark {
@@ -136,6 +139,9 @@
   --selection: oklch(0.922 0 0);
   --selection-foreground: oklch(15% 0 0);
   --path: oklch(0.269 0 0);
+  /* code stuff */
+  --color-vesper-type: oklch(0.8689 0.0877 60.68);
+  --color-vesper-string: oklch(0.93 0.1035 175.07);
 }
 
 @layer base {
@@ -233,4 +239,25 @@ code[data-line-numbers-max-digits="3"] > [data-line]::before {
 }
 code[data-line-numbers-max-digits="4"] > [data-line]::before {
   width: 2.5rem;
+}
+
+svg:focus,
+svg:focus-visible,
+path:focus,
+path:focus-visible,
+ellipse:focus,
+ellipse:focus-visible,
+circle:focus,
+circle:focus-visible,
+rect:focus,
+g:focus,
+g:focus-visible,
+rect:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+text,
+tspan {
+  user-select: none;
 }

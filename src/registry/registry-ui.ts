@@ -1,0 +1,43 @@
+import type { Registry } from "shadcn/schema";
+
+const TARGET_BASE_PATH = "components/evilcharts/ui";
+
+export const ui: Registry["items"] = [
+  {
+    name: "chart",
+    type: "registry:component",
+    registryDependencies: ["@evilcharts/tooltip", "@evilcharts/legend"],
+    dependencies: ["recharts"],
+    files: [
+      {
+        path: "ui/chart.tsx",
+        type: "registry:component",
+        target: TARGET_BASE_PATH + "/chart.tsx",
+      },
+    ],
+  },
+  {
+    name: "tooltip",
+    type: "registry:component",
+    dependencies: ["recharts"],
+    files: [
+      {
+        path: "ui/tooltip.tsx",
+        type: "registry:component",
+        target: TARGET_BASE_PATH + "/tooltip.tsx",
+      },
+    ],
+  },
+  {
+    name: "legend",
+    type: "registry:component",
+    dependencies: ["recharts"],
+    files: [
+      {
+        path: "ui/legend.tsx",
+        type: "registry:component",
+        target: TARGET_BASE_PATH + "/legend.tsx",
+      },
+    ],
+  },
+];

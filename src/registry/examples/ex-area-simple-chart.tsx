@@ -1,6 +1,8 @@
 "use client";
 
 import { EvilAreaChart } from "@/registry/charts/area-chart";
+import { type ChartConfig } from "@/registry/ui/chart";
+
 const data = [
   { month: "January", desktop: 342, mobile: 245 },
   { month: "February", desktop: 876, mobile: 654 },
@@ -25,12 +27,21 @@ const chartConfig = {
     label: "Mobile",
     color: "var(--chart-2)",
   },
-};
+} satisfies ChartConfig;
 
 export function EvilExampleSimpleAreaChart() {
   return (
-    <div className="h-full w-full p-4">
-      <EvilAreaChart className="h-full w-full" chartConfig={chartConfig} data={data} />
-    </div>
+    <EvilAreaChart
+      isClickable
+      className="h-full w-full p-4"
+      xDataKey="month"
+      type="stacked"
+      lineVariant="dashed"
+      variant="gradient"
+      dotType="colored-border"
+      chartConfig={chartConfig}
+      data={data}
+      xAxisProps={{ tickFormatter: (value) => value.substring(0, 3) }} // Formatting first 3 characters eg: January -> Jan
+    />
   );
 }

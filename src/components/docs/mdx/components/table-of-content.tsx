@@ -101,7 +101,12 @@ export function DocsTableOfContents({
   return (
     <div className={cn("flex flex-col px-4 pt-0 text-sm", className)}>
       <div className="flex h-6 flex-row items-center gap-[5px]">
-        <BookIcon className={cn("duration-200", activeIndex >= 0 ? "text-primary" : "text-muted-foreground")} />
+        <BookIcon
+          className={cn(
+            "duration-200",
+            activeIndex >= 0 ? "text-primary" : "text-muted-foreground",
+          )}
+        />
         <p className="text-muted-foreground bg-background sticky top-0 text-xs">On This Page</p>
       </div>
       <div className="relative flex flex-row">
@@ -111,7 +116,7 @@ export function DocsTableOfContents({
             <a
               key={item.url}
               href={item.url}
-              className="text-muted-foreground/75 hover:text-foreground data-[active=true]:text-foreground text-[0.8rem] no-underline transition-colors duration-200 empty:hidden data-[active=true]:font-medium data-[depth=2]:pl-5 data-[depth=3]:pl-8 data-[depth=4]:pl-11"
+              className="text-muted-foreground/75 hover:text-foreground data-[active=true]:text-foreground text-[0.8rem] no-underline transition-colors duration-200 empty:hidden data-[active=true]:font-medium data-[depth=1]:pl-5 data-[depth=2]:pl-5 data-[depth=3]:pl-8 data-[depth=4]:pl-11"
               data-active={item.url === `#${activeHeading}`}
               data-depth={item.depth}
             >

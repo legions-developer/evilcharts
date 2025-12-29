@@ -4,6 +4,6 @@
   "useTabs": false,
   "semi": true,
   "singleQuote": false,
-  "printWidth": 120,
+  "printWidth": 100,
   "plugins": ["prettier-plugin-sort-imports", "prettier-plugin-tailwindcss"]
 }
