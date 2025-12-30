@@ -1,14 +1,23 @@
 "use client";
 
-import { axisValueToPercentFormatter, type ChartConfig, ChartContainer } from "@/registry/ui/chart";
+import {
+  axisValueToPercentFormatter,
+  type ChartConfig,
+  ChartContainer,
+  getLoadingData,
+  LoadingIndicator,
+} from "@/registry/ui/chart";
 import { Area, AreaChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from "recharts";
 import { ChartTooltip, ChartTooltipContent } from "@/registry/ui/tooltip";
 import { ChartLegend, ChartLegendContent } from "@/registry/ui/legend";
+import { useMemo, useState, type ComponentProps } from "react";
 import { ChartDot, DotVariant } from "@/registry/ui/dot";
-import { useState, type ComponentProps } from "react";
 
 // Constants
 const STROKE_WIDTH = 1;
+const LOADING_AREA_DATA_KEY = "loading";
+const LOADING_HATCH_WIDTH = 400;
+const LOADING_ANIMATION_DURATION = "2s"; // 2 seconds
 
 type ChartProps = ComponentProps<typeof AreaChart>;
 type XAxisProps = ComponentProps<typeof XAxis>;
@@ -50,6 +59,7 @@ type EvilAreaChartProps<
   // Interactive Stuffs
   isClickable?: boolean;
   isLoading?: boolean;
+  loadingPoints?: number;
 };
 
 export function EvilAreaChart<
@@ -77,18 +87,22 @@ export function EvilAreaChart<
   hideCursorLine = false,
   isClickable = false,
   isLoading = false,
+  loadingPoints,
 }: EvilAreaChartProps<TData, TConfig>) {
   const [selectedDataKey, setSelectedDataKey] = useState<string | null>(defaultSelectedDataKey);
+
+  const loadingData = useMemo(() => getLoadingData(loadingPoints), [loadingPoints]);
 
   const isExpanded = type === "expanded";
   const isStacked = type === "stacked" || type === "expanded";
 
   return (
     <ChartContainer className={className} config={chartConfig}>
+      <LoadingIndicator isLoading={isLoading} />
       <AreaChart
         accessibilityLayer
         stackOffset={isExpanded ? "expand" : undefined}
-        data={data}
+        data={isLoading ? loadingData : data}
         {...chartProps}
       >
         <ReferenceLine color="white" />
@@ -106,7 +120,7 @@ export function EvilAreaChart<
             }
           />
         )}
-        {xDataKey && (
+        {xDataKey && !isLoading && (
           <XAxis
             dataKey={xDataKey}
             tickLine={false}
@@ -115,18 +129,20 @@ export function EvilAreaChart<
             {...xAxisProps}
           />
         )}
-        {yDataKey && (
+        {yDataKey && !isLoading && (
           <YAxis
             dataKey={yDataKey}
             tickLine={false}
             axisLine={false}
             tickMargin={8}
             width="auto"
-            tickFormatter={type === "expanded" ? axisValueToPercentFormatter : undefined}
+            tickFormatter={
+              type === "expanded" ? axisValueToPercentFormatter : yAxisProps?.tickFormatter
+            }
             {...yAxisProps}
           />
         )}
-        {!hideTooltip && (
+        {!hideTooltip && !isLoading && (
           <ChartTooltip
             cursor={
               hideCursorLine
@@ -143,6 +159,7 @@ export function EvilAreaChart<
           />
         )}
         <defs>
+          {isLoading && <LoadingAreaPatternStyle />}
           {areaVariant === "gradient" && <LinearGradientStyle chartConfig={chartConfig} />}
           {areaVariant === "gradient-reverse" && <ReverseGradientStyle chartConfig={chartConfig} />}
           {areaVariant === "lines" && <LinesPatternStyle chartConfig={chartConfig} />}
@@ -217,6 +234,23 @@ export function EvilAreaChart<
               </Area>
             );
           })}
+        {/* ======== LOADING AREA ======== */}
+        {isLoading && (
+          <Area
+            type={areaType}
+            dataKey={LOADING_AREA_DATA_KEY}
+            fillOpacity={0.1}
+            fill="currentColor"
+            stroke="currentColor"
+            strokeOpacity={0.6}
+            isAnimationActive={false}
+            legendType="none"
+            tooltipType="none"
+            activeDot={false}
+            dot={false}
+            style={{ mask: "url(#evil-area-chart-loading-mask)" }}
+          />
+        )}
       </AreaChart>
     </ChartContainer>
   );
@@ -476,6 +510,63 @@ const HatchedPatternStyle = ({ chartConfig }: { chartConfig: ChartConfig }) => {
           </pattern>
         </g>
       ))}
+    </>
+  );
+};
+
+// Loading area pattern with animated skeleton effect - uses mask to clip both fill AND stroke
+const LoadingAreaPatternStyle = () => {
+  const patternWidth = LOADING_HATCH_WIDTH * 2;
+
+  return (
+    <>
+      {/* Gradient for smooth fade: 0 → 1 → 0 opacity (bell curve distribution) */}
+      <linearGradient id="evil-area-chart-loading-mask-gradient" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0%" stopColor="white" stopOpacity={0.05} />
+        <stop offset="8%" stopColor="white" stopOpacity={0.08} />
+        <stop offset="16%" stopColor="white" stopOpacity={0.1} />
+        <stop offset="24%" stopColor="white" stopOpacity={0.2} />
+        <stop offset="32%" stopColor="white" stopOpacity={0.35} />
+        <stop offset="40%" stopColor="white" stopOpacity={0.55} />
+        <stop offset="48%" stopColor="white" stopOpacity={0.9} />
+        <stop offset="50%" stopColor="white" stopOpacity={0.9} />
+        <stop offset="52%" stopColor="white" stopOpacity={0.9} />
+        <stop offset="60%" stopColor="white" stopOpacity={0.55} />
+        <stop offset="68%" stopColor="white" stopOpacity={0.35} />
+        <stop offset="76%" stopColor="white" stopOpacity={0.2} />
+        <stop offset="84%" stopColor="white" stopOpacity={0.1} />
+        <stop offset="92%" stopColor="white" stopOpacity={0.08} />
+        <stop offset="100%" stopColor="white" stopOpacity={0.05} />
+      </linearGradient>
+      {/* Loading pattern animation */}
+      <pattern
+        id="evil-area-chart-loading-mask-pattern"
+        patternUnits="userSpaceOnUse"
+        width={patternWidth}
+        height="100%"
+        x="0"
+        y="0"
+        patternTransform="rotate(35)"
+      >
+        <rect
+          x="0"
+          y="0"
+          width={patternWidth}
+          height="100%"
+          fill="url(#evil-area-chart-loading-mask-gradient)"
+        />
+        <animate
+          attributeName="x"
+          values={`0;${patternWidth}`}
+          keyTimes="0;1"
+          dur={LOADING_ANIMATION_DURATION}
+          repeatCount="indefinite"
+        />
+      </pattern>
+      {/* Masking */}
+      <mask id="evil-area-chart-loading-mask" maskUnits="userSpaceOnUse">
+        <rect width="100%" height="100%" fill="url(#evil-area-chart-loading-mask-pattern)" />
+      </mask>
     </>
   );
 };

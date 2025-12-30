@@ -74,7 +74,7 @@ function ChartContainer({
         data-slot="chart"
         data-chart={chartId}
         className={cn(
-          "[&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border flex aspect-video justify-center text-xs [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-hidden [&_.recharts-sector]:outline-hidden [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-surface]:outline-hidden",
+          "[&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border relative flex aspect-video justify-center text-xs [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-hidden [&_.recharts-sector]:outline-hidden [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-surface]:outline-hidden",
           className,
         )}
         {...props}
@@ -85,6 +85,21 @@ function ChartContainer({
         </RechartsPrimitive.ResponsiveContainer>
       </div>
     </ChartContext.Provider>
+  );
+}
+
+function LoadingIndicator({ isLoading }: { isLoading: boolean }) {
+  if (!isLoading) {
+    return null;
+  }
+
+  return (
+    <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center">
+      <div className="text-primary bg-background flex items-center justify-center gap-2 rounded-md border px-2 py-0.5 font-mono text-sm">
+        <div className="border-border border-t-primary h-3 w-3 animate-spin rounded-full border" />
+        <span>Loading</span>
+      </div>
+    </div>
   );
 }
 
@@ -138,8 +153,16 @@ export function getPayloadConfigFromPayload(config: ChartConfig, payload: unknow
   return configLabelKey in config ? config[configLabelKey] : config[key];
 }
 
+// Format values to percent for expanded charts
 function axisValueToPercentFormatter(value: number) {
   return `${Math.round(value * 100).toFixed(0)}%`;
 }
 
-export { ChartContainer, ChartStyle, axisValueToPercentFormatter };
+// Generate random loading data for skeleton/loading state
+export const getLoadingData = (points: number = 7) => {
+  return Array.from({ length: points }, () => ({
+    loading: Math.floor(Math.random() * 10) + 1,
+  }));
+};
+
+export { ChartContainer, ChartStyle, axisValueToPercentFormatter, LoadingIndicator };
