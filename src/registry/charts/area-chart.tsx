@@ -158,20 +158,6 @@ export function EvilAreaChart<
             content={<ChartTooltipContent selected={selectedDataKey} />}
           />
         )}
-        <defs>
-          {isLoading && <LoadingAreaPatternStyle />}
-          {areaVariant === "gradient" && <LinearGradientStyle chartConfig={chartConfig} />}
-          {areaVariant === "gradient-reverse" && <ReverseGradientStyle chartConfig={chartConfig} />}
-          {areaVariant === "lines" && <LinesPatternStyle chartConfig={chartConfig} />}
-          {areaVariant === "solid" && <SolidPatternStyle chartConfig={chartConfig} />}
-          {areaVariant === "dotted" && <DottedPatternStyle chartConfig={chartConfig} />}
-          {areaVariant === "hatched" && <HatchedPatternStyle chartConfig={chartConfig} />}
-          <UnselectedDiagonalPatternStyle
-            chartConfig={chartConfig}
-            selectedDataKey={selectedDataKey}
-            isClickable={isClickable}
-          />
-        </defs>
         {!isLoading &&
           Object.keys(chartConfig).map((dataKey) => {
             const _opacity = getOpacity(isClickable, selectedDataKey, dataKey);
@@ -251,6 +237,21 @@ export function EvilAreaChart<
             style={{ mask: "url(#evil-area-chart-loading-mask)" }}
           />
         )}
+        {/* ======== CHART STYLES ======== */}
+        <defs>
+          {isLoading && <LoadingAreaPatternStyle />}
+          {areaVariant === "gradient" && <LinearGradientStyle chartConfig={chartConfig} />}
+          {areaVariant === "gradient-reverse" && <ReverseGradientStyle chartConfig={chartConfig} />}
+          {areaVariant === "lines" && <LinesPatternStyle chartConfig={chartConfig} />}
+          {areaVariant === "solid" && <SolidPatternStyle chartConfig={chartConfig} />}
+          {areaVariant === "dotted" && <DottedPatternStyle chartConfig={chartConfig} />}
+          {areaVariant === "hatched" && <HatchedPatternStyle chartConfig={chartConfig} />}
+          <UnselectedDiagonalPatternStyle
+            chartConfig={chartConfig}
+            selectedDataKey={selectedDataKey}
+            isClickable={isClickable}
+          />
+        </defs>
       </AreaChart>
     </ChartContainer>
   );
