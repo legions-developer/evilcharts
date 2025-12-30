@@ -3,11 +3,11 @@ import * as RechartsPrimitive from "recharts";
 import { cn } from "@/lib/utils";
 import * as React from "react";
 
-export type DotType = "default" | "border" | "colored-border";
+export type DotVariant = "default" | "border" | "colored-border";
 
 type ChartDotProps = React.ComponentProps<typeof RechartsPrimitive.Dot> & {
   dataKey: keyof ChartConfig;
-  type?: DotType;
+  type?: DotVariant;
 };
 
 const ChartDot = React.memo(function ChartDot({
@@ -18,7 +18,6 @@ const ChartDot = React.memo(function ChartDot({
   className,
   fillOpacity = 1,
   type = "default",
-  ...restProps
 }: ChartDotProps) {
   const commonProps = {
     cx,
@@ -27,21 +26,23 @@ const ChartDot = React.memo(function ChartDot({
     dataKey,
     fillOpacity,
     className,
-    ...restProps,
   };
+
+  const { config } = useChart();
+  const baseColor = config[dataKey]?.color;
 
   switch (type) {
     case "border":
-      return <PrimaryBorderDot {...commonProps} />;
+      return <PrimaryBorderDot {...commonProps} fill={baseColor} />;
     case "colored-border":
-      return <ColoredBorderDot {...commonProps} />;
+      return <ColoredBorderDot {...commonProps} stroke={baseColor} />;
     default:
-      return <DefaultDot {...commonProps} />;
+      return <DefaultDot {...commonProps} fill={baseColor} />;
   }
 });
 
 const DefaultDot = React.memo((props: ChartDotProps) => {
-  return <RechartsPrimitive.Dot {...props} r={4} />;
+  return <RechartsPrimitive.Dot {...props} r={3} />;
 });
 
 DefaultDot.displayName = "DefaultDot";
@@ -50,7 +51,7 @@ const PrimaryBorderDot = React.memo((props: ChartDotProps) => {
   return (
     <RechartsPrimitive.Dot
       {...props}
-      r={4}
+      r={4.5}
       strokeWidth="3"
       stroke="currentColor"
       className={cn(props.className, "text-background")}
@@ -61,16 +62,12 @@ const PrimaryBorderDot = React.memo((props: ChartDotProps) => {
 PrimaryBorderDot.displayName = "PrimaryBorderDot";
 
 const ColoredBorderDot = React.memo((props: ChartDotProps) => {
-  const { config } = useChart();
-  const strokeColor = config[props.dataKey]?.color;
-
   return (
     <RechartsPrimitive.Dot
       {...props}
-      r={4}
+      r={3}
       fill="currentColor"
       strokeWidth="1"
-      stroke={strokeColor}
       fillOpacity="1"
       strokeOpacity={props.fillOpacity}
       className={cn(props.className, "text-background")}

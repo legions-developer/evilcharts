@@ -35,10 +35,11 @@ export function EvilExampleSimpleAreaChart() {
       isClickable
       className="h-full w-full p-4"
       xDataKey="month"
+      yDataKey="desktop"
       type="stacked"
       strokeVariant="dashed"
-      variant="gradient"
-      dotType="colored-border"
+      areaVariant="gradient"
+      activeDotVariant="default"
       chartConfig={chartConfig}
       data={data}
       xAxisProps={{ tickFormatter: (value) => value.substring(0, 3) }} // Formatting first 3 characters eg: January -> Jan

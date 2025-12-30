@@ -45,7 +45,7 @@ export function ComponentPreviewTabs({
             <TabsPanel value="preview">
               <div
                 className={cn(
-                  "flex h-90 w-full justify-center overflow-y-auto data-[align=center]:items-center data-[align=end]:items-end data-[align=start]:items-start",
+                  "flex h-64 w-full justify-center overflow-y-auto data-[align=center]:items-center data-[align=end]:items-end data-[align=start]:items-start sm:h-90",
                 )}
                 data-align={align}
               >
@@ -56,7 +56,7 @@ export function ComponentPreviewTabs({
             </TabsPanel>
 
             <TabsPanel value="code">
-              <div className="flex h-90 w-full flex-col overflow-hidden">
+              <div className="flex h-64 w-full flex-col overflow-hidden sm:h-90">
                 <div className="no-scrollbar relative size-full overflow-y-auto">{source}</div>
               </div>
             </TabsPanel>

@@ -3,7 +3,7 @@ import React from "react";
 import { cn } from "@/lib/utils";
 
 export const P = ({ className, ...props }: React.ComponentProps<"p">) => (
-  <p className={cn("leading-relaxed not-first:mt-6", className)} {...props} />
+  <p className={cn("leading-relaxed not-first:mt-4.5", className)} {...props} />
 );
 
 export const Description = ({ className, ...props }: React.ComponentProps<"p">) => (

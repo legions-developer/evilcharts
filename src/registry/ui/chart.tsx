@@ -138,4 +138,8 @@ export function getPayloadConfigFromPayload(config: ChartConfig, payload: unknow
   return configLabelKey in config ? config[configLabelKey] : config[key];
 }
 
-export { ChartContainer, ChartStyle };
+function axisValueToPercentFormatter(value: number) {
+  return `${Math.round(value * 100).toFixed(0)}%`;
+}
+
+export { ChartContainer, ChartStyle, axisValueToPercentFormatter };

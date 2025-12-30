@@ -10,7 +10,13 @@ export function AddMagicIcon({
   secondaryfill = secondaryfill || fill;
 
   return (
-    <svg height={height} width={width} viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <svg
+      height={height}
+      width={width}
+      viewBox="0 0 18 18"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
       <g fill={fill}>
         <path
           d="m14,9.25c0-.3076-.1885-.5845-.4746-.6973l-3.8184-1.5103-1.5098-3.8184c-.1133-.2861-.3896-.4741-.6973-.4741s-.584.188-.6973.4741l-1.5107,3.8184-3.8174,1.5103c-.2861.1128-.4746.3896-.4746.6973s.1885.5845.4746.6973l3.8174,1.5103,1.5107,3.8184c.1133.2861.3896.4741.6973.4741s.584-.188.6973-.4741l1.5098-3.8184,3.8184-1.5103c.2861-.1128.4746-.3896.4746-.6973Z"
@@ -39,7 +45,13 @@ export function ChartStackedAreaIcon({
   secondaryfill = secondaryfill || fill;
 
   return (
-    <svg height={height} width={width} viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <svg
+      height={height}
+      width={width}
+      viewBox="0 0 18 18"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
       <g fill={fill}>
         <path
           d="M17 3.70299C17 2.69702 15.8709 2.10066 15.0402 2.67357L8.99926 6.83961L5.76729 4.61823C5.27016 4.27631 4.60011 4.33822 4.17467 4.76366L1.36567 7.57266L1.36284 7.5755C1.13264 7.80818 1 8.12404 1 8.45699V12.25C1 13.7692 2.23079 15 3.75 15H14.25C15.7692 15 17 13.7692 17 12.25V3.70299Z"
@@ -65,7 +77,13 @@ export function ChartStackedLineIcon({
   secondaryfill = secondaryfill || fill;
 
   return (
-    <svg height={height} width={width} viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <svg
+      height={height}
+      width={width}
+      viewBox="0 0 18 18"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
       <g fill={fill}>
         <path
           d="M16.4033 2.11827C16.7522 2.34154 16.854 2.80536 16.6307 3.15425L12.9307 8.93625C12.5316 9.55989 11.6784 9.70427 11.097 9.23827V9.23827L7.26314 6.1706L5.84311 9.08181C5.66151 9.45409 5.2125 9.60868 4.84022 9.42708C4.46793 9.24549 4.31335 8.79648 4.49494 8.4242L6.0515 5.23311V5.23311C6.403 4.51103 7.333 4.30551 7.95654 4.80435L11.8172 7.89346L15.3673 2.34575C15.5905 1.99685 16.0544 1.89501 16.4033 2.11827Z"
@@ -99,7 +117,13 @@ export function ShapesIcon({
   secondaryfill = secondaryfill || fill;
 
   return (
-    <svg height={height} width={width} viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <svg
+      height={height}
+      width={width}
+      viewBox="0 0 18 18"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
       <g fill={fill}>
         <path
           d="M9.5 6C9.5 3.79079 11.2908 2 13.5 2C15.7092 2 17.5 3.79079 17.5 6C17.5 8.20921 15.7092 10 13.5 10C11.2908 10 9.5 8.20921 9.5 6Z"
@@ -133,7 +157,13 @@ export function HouseIcon({
   secondaryfill = secondaryfill || fill;
 
   return (
-    <svg height={height} width={width} viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <svg
+      height={height}
+      width={width}
+      viewBox="0 0 18 18"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
       <g fill={fill}>
         <path
           d="M15.999 7.75C15.843 7.75 15.685 7.701 15.55 7.6L9.00001 2.688L2.45001 7.6C2.11901 7.85 1.64701 7.781 1.40001 7.45C1.15101 7.118 1.21801 6.648 1.54901 6.4L8.55001 1.15C8.81801 0.95 9.18301 0.95 9.45001 1.15L16.45 6.4C16.781 6.649 16.848 7.119 16.599 7.45C16.453 7.646 16.228 7.75 15.999 7.75Z"
@@ -159,7 +189,13 @@ export function HistoryIcon({
   secondaryfill = secondaryfill || fill;
 
   return (
-    <svg height={height} width={width} viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <svg
+      height={height}
+      width={width}
+      viewBox="0 0 18 18"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
       <g fill={fill}>
         <path
           d="m9,4c-.414,0-.75.336-.75.75v4.25c0,.246.121.477.323.617l3.25,2.25c.13.09.279.133.426.133.238,0,.472-.113.617-.323.236-.34.151-.808-.19-1.043l-2.927-2.026v-3.857c0-.414-.336-.75-.75-.75l.001-.001Z"
@@ -187,7 +223,13 @@ export function SquareAddonIcon({
   secondaryfill = secondaryfill || fill;
 
   return (
-    <svg height={height} width={width} viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <svg
+      height={height}
+      width={width}
+      viewBox="0 0 18 18"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
       <g fill={fill}>
         <path
           d="m6.75,2h-2c-1.5166,0-2.75,1.2334-2.75,2.75v1.5c0,.4141.3359.75.75.75s.75-.3359.75-.75v-1.5c0-.6895.5605-1.25,1.25-1.25h2c.4141,0,.75-.3359.75-.75s-.3359-.75-.75-.75Z"
@@ -217,11 +259,23 @@ export function SquareAddonIcon({
   );
 }
 
-export function BookIcon({ fill = "currentColor", secondaryfill, width = "1em", height = "1em", ...props }: IconProps) {
+export function BookIcon({
+  fill = "currentColor",
+  secondaryfill,
+  width = "1em",
+  height = "1em",
+  ...props
+}: IconProps) {
   secondaryfill = secondaryfill || fill;
 
   return (
-    <svg height={height} width={width} viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <svg
+      height={height}
+      width={width}
+      viewBox="0 0 18 18"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
       <g fill={fill}>
         <path
           d="M6 12.5H15.2541C15.539 12.5 15.7993 12.6614 15.9259 12.9166C15.9663 12.998 15.9908 13.0843 16 13.1716V1.75C16 1.33579 15.6642 1 15.25 1H6V12.5Z"
@@ -243,15 +297,29 @@ export function BookIcon({ fill = "currentColor", secondaryfill, width = "1em", 
           fill={fill}
           fillRule="evenodd"
         />
-        <path d="M6 1V12.5H4.25C3.00736 12.5 2 13.5074 2 14.75V3.75C2 2.23079 3.23079 1 4.75 1H6Z" fill={fill} />
+        <path
+          d="M6 1V12.5H4.25C3.00736 12.5 2 13.5074 2 14.75V3.75C2 2.23079 3.23079 1 4.75 1H6Z"
+          fill={fill}
+        />
       </g>
     </svg>
   );
 }
 
-export function GithubIcon({ fill = "currentColor", width = "1em", height = "1em", ...props }: IconProps) {
+export function GithubIcon({
+  fill = "currentColor",
+  width = "1em",
+  height = "1em",
+  ...props
+}: IconProps) {
   return (
-    <svg height={height} width={width} viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <svg
+      height={height}
+      width={width}
+      viewBox="0 0 32 32"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
       <g fill={fill}>
         <path d="M16,2.345c7.735,0,14,6.265,14,14-.002,6.015-3.839,11.359-9.537,13.282-.7,.14-.963-.298-.963-.665,0-.473,.018-1.978,.018-3.85,0-1.312-.437-2.152-.945-2.59,3.115-.35,6.388-1.54,6.388-6.912,0-1.54-.543-2.783-1.435-3.762,.14-.35,.63-1.785-.14-3.71,0,0-1.173-.385-3.85,1.435-1.12-.315-2.31-.472-3.5-.472s-2.38,.157-3.5,.472c-2.677-1.802-3.85-1.435-3.85-1.435-.77,1.925-.28,3.36-.14,3.71-.892,.98-1.435,2.24-1.435,3.762,0,5.355,3.255,6.563,6.37,6.913-.403,.35-.77,.963-.893,1.872-.805,.368-2.818,.963-4.077-1.155-.263-.42-1.05-1.452-2.152-1.435-1.173,.018-.472,.665,.017,.927,.595,.332,1.277,1.575,1.435,1.978,.28,.787,1.19,2.293,4.707,1.645,0,1.173,.018,2.275,.018,2.607,0,.368-.263,.787-.963,.665-5.719-1.904-9.576-7.255-9.573-13.283,0-7.735,6.265-14,14-14Z" />
       </g>
@@ -259,11 +327,23 @@ export function GithubIcon({ fill = "currentColor", width = "1em", height = "1em
   );
 }
 
-export function MoonIcon({ fill = "currentColor", secondaryfill, width = "1em", height = "1em", ...props }: IconProps) {
+export function MoonIcon({
+  fill = "currentColor",
+  secondaryfill,
+  width = "1em",
+  height = "1em",
+  ...props
+}: IconProps) {
   secondaryfill = secondaryfill || fill;
 
   return (
-    <svg height={height} width={width} viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <svg
+      height={height}
+      width={width}
+      viewBox="0 0 18 18"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
       <g fill={fill}>
         <path
           d="M8.54419 1.47446C8.70875 1.73227 8.70028 2.06417 8.52278 2.31324C7.88003 3.21522 7.5 4.31129 7.5 5.49999C7.5 8.53778 9.96222 11 13 11C14.0509 11 15.029 10.7009 15.8667 10.1868C16.1275 10.0267 16.4594 10.0412 16.7053 10.2233C16.9513 10.4054 17.0619 10.7186 16.9848 11.0148C16.0904 14.4535 12.9735 17 9.25 17C4.83179 17 1.25 13.4182 1.25 8.99999C1.25 5.08453 4.06262 1.83365 7.77437 1.14073C8.07502 1.0846 8.37963 1.21666 8.54419 1.47446Z"
@@ -275,11 +355,23 @@ export function MoonIcon({ fill = "currentColor", secondaryfill, width = "1em", 
   );
 }
 
-export function SunIcon({ fill = "currentColor", secondaryfill, width = "1em", height = "1em", ...props }: IconProps) {
+export function SunIcon({
+  fill = "currentColor",
+  secondaryfill,
+  width = "1em",
+  height = "1em",
+  ...props
+}: IconProps) {
   secondaryfill = secondaryfill || fill;
 
   return (
-    <svg height={height} width={width} viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <svg
+      height={height}
+      width={width}
+      viewBox="0 0 18 18"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
       <g fill={fill}>
         <path
           d="M9.00009 3C9.41419 3 9.75009 2.6641 9.75009 2.25V0.75C9.75009 0.3359 9.41419 0 9.00009 0C8.58599 0 8.25009 0.3359 8.25009 0.75V2.25C8.25009 2.6641 8.58599 3 9.00009 3Z"
@@ -332,7 +424,13 @@ export function SidebarLeft({
   secondaryfill = secondaryfill || fill;
 
   return (
-    <svg height={height} width={width} viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <svg
+      height={height}
+      width={width}
+      viewBox="0 0 18 18"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
       <g fill={fill}>
         <path
           d="M14.2501 15.5H3.75012C2.23352 15.5 1.00012 14.2666 1.00012 12.75V5.25C1.00012 3.7334 2.23352 2.5 3.75012 2.5H14.2501C15.7667 2.5 17.0001 3.7334 17.0001 5.25V12.75C17.0001 14.2666 15.7667 15.5 14.2501 15.5Z"
@@ -358,7 +456,13 @@ export function ThumbsUpIcon({
   secondaryfill = secondaryfill || fill;
 
   return (
-    <svg height={height} width={width} viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <svg
+      height={height}
+      width={width}
+      viewBox="0 0 18 18"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
       <g fill={fill}>
         <path
           d="M16.811 9.4546C17.0627 8.5026 16.7973 7.50479 16.0836 6.79069C15.5494 6.25619 14.7945 6.00059 14.0388 6.00059H10.4705L11.3571 3.24719C11.7056 2.19469 11.2901 1.41069 10.8725 0.93339C10.5807 0.59999 10.0531 0.621588 9.7635 0.956888L5.6683 5.6985C5.2372 6.1976 5 6.8352 5 7.4947V13.2507C5 14.7695 6.2312 16.0007 7.75 16.0007H12.961C14.2086 16.0007 15.2998 15.1607 15.619 13.9547L16.81 9.45469L16.811 9.4546Z"
@@ -384,7 +488,13 @@ export function ThumbsDownIcon({
   secondaryfill = secondaryfill || fill;
 
   return (
-    <svg height={height} width={width} viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <svg
+      height={height}
+      width={width}
+      viewBox="0 0 18 18"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
       <g fill={fill}>
         <path
           d="M16.81 8.54671L15.619 4.04671C15.2998 2.84071 14.2086 2.0007 12.961 2.0007H7.75C6.2312 2.0007 5 3.2319 5 4.7507V10.5067C5 11.1662 5.2372 11.8037 5.6683 12.3029L9.76349 17.0445C10.0531 17.3798 10.5808 17.4014 10.8725 17.068C11.2902 16.5907 11.7056 15.8066 11.3571 14.7542L10.4705 12.0008H14.0388C14.7945 12.0008 15.5493 11.7452 16.0836 11.2107C16.7973 10.4966 17.0627 9.4988 16.811 8.5468L16.81 8.54671Z"
@@ -400,11 +510,23 @@ export function ThumbsDownIcon({
   );
 }
 
-export function CopyIcon({ fill = "currentColor", secondaryfill, width = "1em", height = "1em", ...props }: IconProps) {
+export function CopyIcon({
+  fill = "currentColor",
+  secondaryfill,
+  width = "1em",
+  height = "1em",
+  ...props
+}: IconProps) {
   secondaryfill = secondaryfill || fill;
 
   return (
-    <svg height={height} width={width} viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <svg
+      height={height}
+      width={width}
+      viewBox="0 0 18 18"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
       <g fill={fill}>
         <path
           d="M11.75 14.5H4.25C3.5605 14.5 3 13.9395 3 13.25V6.75C3 6.3359 2.6641 6 2.25 6C1.8359 6 1.5 6.3359 1.5 6.75V13.25C1.5 14.7666 2.7334 16 4.25 16H11.75C12.1641 16 12.5 15.6641 12.5 15.25C12.5 14.8359 12.1641 14.5 11.75 14.5Z"
@@ -420,9 +542,20 @@ export function CopyIcon({ fill = "currentColor", secondaryfill, width = "1em", 
   );
 }
 
-export function CheckIcon({ fill = "currentColor", width = "1em", height = "1em", ...props }: IconProps) {
+export function CheckIcon({
+  fill = "currentColor",
+  width = "1em",
+  height = "1em",
+  ...props
+}: IconProps) {
   return (
-    <svg height={height} width={width} viewBox="-1 -2 20 20" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <svg
+      height={height}
+      width={width}
+      viewBox="-1 -2 20 20"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
       <g fill={fill}>
         <path
           d="M6.5001 14C6.3077 14 6.1163 13.9268 5.9698 13.7803L2.21981 10.0303C1.92681 9.7373 1.92681 9.2627 2.21981 8.9698C2.51281 8.6769 2.98741 8.6768 3.28031 8.9698L6.50001 12.1895L14.7197 3.9698C15.0127 3.6768 15.4873 3.6768 15.7802 3.9698C16.0731 4.2628 16.0732 4.7374 15.7802 5.0303L7.03022 13.7803C6.88372 13.9268 6.6925 14 6.5001 14Z"
@@ -433,9 +566,20 @@ export function CheckIcon({ fill = "currentColor", width = "1em", height = "1em"
   );
 }
 
-export function NpmIcon({ fill = "currentColor", width = "1em", height = "1em", ...props }: IconProps) {
+export function NpmIcon({
+  fill = "currentColor",
+  width = "1em",
+  height = "1em",
+  ...props
+}: IconProps) {
   return (
-    <svg height={height} width={width} viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <svg
+      height={height}
+      width={width}
+      viewBox="0 0 32 32"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
       <path
         d="m7.415 7.656 17.291.024-.011 17.29h-4.329l.012-12.974h-4.319l-.01 12.964H7.393zM3.207 1.004h-.005a2.2 2.2 0 0 0-2.198 2.198v25.596c0 1.214.984 2.198 2.198 2.198h25.596a2.2 2.2 0 0 0 2.198-2.198V3.202a2.2 2.2 0 0 0-2.198-2.198h-.006z"
         fill={fill}
@@ -444,9 +588,20 @@ export function NpmIcon({ fill = "currentColor", width = "1em", height = "1em", 
   );
 }
 
-export function YarnIcon({ fill = "currentColor", width = "1em", height = "1em", ...props }: IconProps) {
+export function YarnIcon({
+  fill = "currentColor",
+  width = "1em",
+  height = "1em",
+  ...props
+}: IconProps) {
   return (
-    <svg height={height} width={width} viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <svg
+      height={height}
+      width={width}
+      viewBox="0 0 32 32"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
       <path
         d="M28.208 24.409a10.5 10.5 0 0 0-3.959 1.822 23.7 23.7 0 0 1-5.835 2.642 1.63 1.63 0 0 1-.983.55 62 62 0 0 1-6.447.577c-1.163.009-1.876-.3-2.074-.776a1.573 1.573 0 0 1 .866-2.074 4 4 0 0 1-.514-.379c-.171-.171-.352-.514-.406-.388-.225.55-.343 1.894-.947 2.5-.83.839-2.4.559-3.328.072-1.019-.541.072-1.813.072-1.813a.73.73 0 0 1-.992-.343 4.85 4.85 0 0 1-.667-2.949 5.37 5.37 0 0 1 1.749-2.895 9.3 9.3 0 0 1 .658-4.4 10.45 10.45 0 0 1 3.165-3.661S6.628 10.747 7.35 8.817c.469-1.262.658-1.253.812-1.308a3.6 3.6 0 0 0 1.452-.857 5.27 5.27 0 0 1 4.41-1.7S15.2 1.4 16.277 2.09a18.4 18.4 0 0 1 1.533 2.886s1.281-.748 1.425-.469a11.33 11.33 0 0 1 .523 6.132 14 14 0 0 1-2.6 5.411c-.135.225 1.551.938 2.615 3.887.983 2.7.108 4.96.262 5.212.027.045.036.063.036.063s1.127.09 3.391-1.308a8.5 8.5 0 0 1 4.277-1.604 1.081 1.081 0 0 1 .469 2.11Z"
         fill={fill}
@@ -455,9 +610,20 @@ export function YarnIcon({ fill = "currentColor", width = "1em", height = "1em",
   );
 }
 
-export function BunIcon({ fill = "currentColor", width = "1em", height = "1em", ...props }: IconProps) {
+export function BunIcon({
+  fill = "currentColor",
+  width = "1em",
+  height = "1em",
+  ...props
+}: IconProps) {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" width={width} height={height} viewBox="0 0 32 32" {...props}>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={width}
+      height={height}
+      viewBox="0 0 32 32"
+      {...props}
+    >
       <path
         fill={fill}
         d="M29 17c0 5.65-5.82 10.23-13 10.23S3 22.61 3 17c0-3.5 2.24-6.6 5.66-8.44S14.21 4.81 16 4.81s3.32 1.54 7.34 3.71C26.76 10.36 29 13.46 29 17"
@@ -493,9 +659,20 @@ export function BunIcon({ fill = "currentColor", width = "1em", height = "1em", 
   );
 }
 
-export function PnpmIcon({ fill = "currentColor", width = "1em", height = "1em", ...props }: IconProps) {
+export function PnpmIcon({
+  fill = "currentColor",
+  width = "1em",
+  height = "1em",
+  ...props
+}: IconProps) {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" width={width} height={height} viewBox="0 0 32 32" {...props}>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={width}
+      height={height}
+      viewBox="0 0 32 32"
+      {...props}
+    >
       <path
         d="M30 10.75h-8.749V2H30Zm-9.626 0h-8.75V2h8.75Zm-9.625 0H2V2h8.749ZM30 20.375h-8.749v-8.75H30Z"
         fill={fill}
@@ -505,6 +682,182 @@ export function PnpmIcon({ fill = "currentColor", width = "1em", height = "1em",
         fill={fill}
         opacity="0.4"
       />
+    </svg>
+  );
+}
+
+export function InfoIcon({
+  fill = "currentColor",
+  secondaryfill,
+  width = "1em",
+  height = "1em",
+  ...props
+}: IconProps) {
+  secondaryfill = secondaryfill || fill;
+
+  return (
+    <svg
+      height={height}
+      width={width}
+      viewBox="0 0 18 18"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <g fill={fill}>
+        <path
+          d="M9 16.25C13.0041 16.25 16.25 13.004 16.25 9C16.25 4.996 13.0041 1.75 9 1.75C4.9959 1.75 1.75 4.996 1.75 9C1.75 13.004 4.9959 16.25 9 16.25Z"
+          fill="none"
+          stroke={fill}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="1.5"
+        />
+        <path
+          d="M9 5.431V9.5"
+          fill="none"
+          stroke={secondaryfill}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="1.5"
+        />
+        <path
+          d="M9 13.417C8.448 13.417 8 12.968 8 12.417C8 11.866 8.448 11.417 9 11.417C9.552 11.417 10 11.866 10 12.417C10 12.968 9.552 13.417 9 13.417Z"
+          fill={secondaryfill}
+          stroke="none"
+        />
+      </g>
+    </svg>
+  );
+}
+
+export function WarningIcon({
+  fill = "currentColor",
+  secondaryfill,
+  width = "1em",
+  height = "1em",
+  ...props
+}: IconProps) {
+  secondaryfill = secondaryfill || fill;
+
+  return (
+    <svg
+      height={height}
+      width={width}
+      viewBox="0 0 18 18"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <g fill={fill}>
+        <path
+          d="M7.63796 3.48996L2.21295 12.89C1.60795 13.9399 2.36395 15.25 3.57495 15.25H14.425C15.636 15.25 16.392 13.9399 15.787 12.89L10.362 3.48996C9.75696 2.44996 8.24296 2.44996 7.63796 3.48996Z"
+          fill="none"
+          stroke={fill}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="1.5"
+        />
+        <path
+          d="M9 6.75V9.75"
+          fill="none"
+          stroke={secondaryfill}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="1.5"
+        />
+        <path
+          d="M9 13.5C8.448 13.5 8 13.05 8 12.5C8 11.95 8.448 11.5 9 11.5C9.552 11.5 10 11.9501 10 12.5C10 13.0499 9.552 13.5 9 13.5Z"
+          fill={secondaryfill}
+          stroke="none"
+        />
+      </g>
+    </svg>
+  );
+}
+
+export function AlertIcon({
+  fill = "currentColor",
+  secondaryfill,
+  width = "1em",
+  height = "1em",
+  ...props
+}: IconProps) {
+  secondaryfill = secondaryfill || fill;
+
+  return (
+    <svg
+      height={height}
+      width={width}
+      viewBox="0 0 18 18"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <g fill={fill}>
+        <path
+          d="M13.25 2.75H4.75C3.6454 2.75 2.75 3.65 2.75 4.75V13.25C2.75 14.35 3.6454 15.25 4.75 15.25H13.25C14.3546 15.25 15.25 14.35 15.25 13.25V4.75C15.25 3.65 14.3546 2.75 13.25 2.75Z"
+          fill="none"
+          stroke={fill}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="1.5"
+        />
+        <path
+          d="M9 5.43103V9.5"
+          fill="none"
+          stroke={secondaryfill}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="1.5"
+        />
+        <path
+          d="M9 13.417C8.448 13.417 8 12.968 8 12.417C8 11.866 8.448 11.417 9 11.417C9.552 11.417 10 11.866 10 12.417C10 12.968 9.552 13.417 9 13.417Z"
+          fill={secondaryfill}
+          stroke="none"
+        />
+      </g>
+    </svg>
+  );
+}
+
+export function CheckboxCheckedIcon({
+  fill = "currentColor",
+  secondaryfill,
+  width = "1em",
+  height = "1em",
+  ...props
+}: IconProps) {
+  secondaryfill = secondaryfill || fill;
+
+  return (
+    <svg
+      height={height}
+      width={width}
+      viewBox="0 0 12 12"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <g fill={fill}>
+        <rect
+          height="9.5"
+          width="9.5"
+          fill="none"
+          rx="2"
+          ry="2"
+          stroke={fill}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="1"
+          x="1.25"
+          y="1.25"
+        />
+        <polyline
+          fill="none"
+          points="3.747 6.5 5.25 8 8.253 4"
+          stroke={secondaryfill}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="1"
+        />
+      </g>
     </svg>
   );
 }
