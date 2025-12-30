@@ -3,6 +3,7 @@
 import * as React from "react";
 
 import { Tabs, TabsList, TabsPanel, TabsTab } from "@/components/ui/tabs";
+import { getIconForLanguageExtension } from "@/assets/language/icons";
 import { cn } from "@/lib/utils";
 
 export function ComponentPreviewTabs({
@@ -23,10 +24,10 @@ export function ComponentPreviewTabs({
   return (
     <div className={cn("group relative mt-4 mb-12", className)} {...props}>
       <Tabs defaultValue="preview" className="relative w-full">
-        <div className="dark:bg-primary-foreground bg-muted-foreground/10 flex flex-col rounded-[8px] p-1">
+        <div className="dark:bg-primary-foreground bg-muted-foreground/5 flex flex-col rounded-[8px] p-1">
           <div className="flex flex-row items-center justify-between px-2">
-            <span className="text-muted-foreground/50 flex items-center gap-1.5 text-xs">
-              {title}
+            <span className="text-muted-foreground/80 flex items-center gap-1.5 font-mono text-xs [&_svg]:size-3.5">
+              {getIconForLanguageExtension("component")} {title}
             </span>
             {!hideCode && (
               <TabsList variant="underline">

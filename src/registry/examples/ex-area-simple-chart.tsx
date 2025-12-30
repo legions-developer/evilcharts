@@ -36,7 +36,7 @@ export function EvilExampleSimpleAreaChart() {
       className="h-full w-full p-4"
       xDataKey="month"
       type="stacked"
-      lineVariant="dashed"
+      strokeVariant="dashed"
       variant="gradient"
       dotType="colored-border"
       chartConfig={chartConfig}

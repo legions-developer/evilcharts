@@ -1,6 +1,11 @@
 // Some of mdx components are taken from @shadcn official repo
 
-import { Accordion, AccordionItem, AccordionTrigger, AccordionPanel } from "@/components/ui/accordion";
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionPanel,
+} from "@/components/ui/accordion";
 import { CodeCollapsibleWrapper } from "../charts/code-collapsible-wrapper";
 import { Tabs, TabsList, TabsPanel, TabsTab } from "@/components/ui/tabs";
 import { Step, Steps, StepTitle, StepContent } from "./components/steps";
@@ -59,7 +64,9 @@ export const mdxComponents: MDXComponents = {
   CodeTabs,
   ComponentPreview,
   ComponentSource,
-  Tab: ({ className, ...props }: React.ComponentProps<"div">) => <div className={cn(className)} {...props} />,
+  Tab: ({ className, ...props }: React.ComponentProps<"div">) => (
+    <div className={cn(className)} {...props} />
+  ),
   Tabs: ({ className, ...props }: React.ComponentProps<typeof Tabs>) => {
     return <Tabs className={cn(className)} {...props} />;
   },
@@ -74,7 +81,10 @@ export const mdxComponents: MDXComponents = {
   ),
   TabsPanel: ({ className, ...props }: React.ComponentProps<typeof TabsPanel>) => (
     <TabsPanel
-      className={cn("relative [&_h3]:text-base [&_h3]:font-medium *:[figure]:first:mt-0 [&>.steps]:mt-6", className)}
+      className={cn(
+        "relative [&_h3]:text-base [&_h3]:font-medium *:[figure]:first:mt-0 [&>.steps]:mt-6",
+        className,
+      )}
       {...props}
     />
   ),
@@ -83,7 +93,7 @@ export const mdxComponents: MDXComponents = {
   ),
   pre: ({ className, children, ...props }: React.ComponentProps<"pre">) => {
     return (
-      <div className="dark:bg-primary-foreground bg-muted-foreground/10 relative mt-4 rounded-md p-1">
+      <div className="dark:bg-primary-foreground bg-muted-foreground/5 relative mt-4 rounded-md p-1">
         <pre
           className={cn(
             "no-scrollbar bg-background min-w-0 overflow-x-auto rounded-md border py-3.5 text-[.8125rem] outline-none has-data-highlighted-line:px-0 has-data-line-numbers:px-0 has-data-[slot=tabs]:p-0 [&>code]:px-4",

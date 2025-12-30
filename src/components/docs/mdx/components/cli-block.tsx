@@ -28,7 +28,7 @@ function CliBlock({ name }: CliBlockProps) {
       value={packageManager}
       onValueChange={(value) => setConfig({ packageManager: value as PackageManager })}
     >
-      <div className="dark:bg-primary-foreground bg-muted-foreground/10 group mt-2 flex flex-col rounded-[8px] p-1">
+      <div className="dark:bg-primary-foreground bg-muted-foreground/5 group mt-2 flex flex-col rounded-[8px] p-1">
         <div className="flex flex-row items-center justify-between pr-1 pl-2">
           <TabsList
             variant="underline"
@@ -39,19 +39,31 @@ function CliBlock({ name }: CliBlockProps) {
               packageManager === "pnpm" && "bg-[#FAAF18]!",
             )}
           >
-            <TabsTab className="h-5! gap-2 px-1.5 hover:bg-transparent! data-active:text-[#C3292F]" value="npm">
+            <TabsTab
+              className="h-5! gap-2 px-1.5 hover:bg-transparent! data-active:text-[#C3292F]"
+              value="npm"
+            >
               <NpmIcon className="size-3" />
               npm
             </TabsTab>
-            <TabsTab className="h-5! gap-2 px-1.5 hover:bg-transparent! data-active:text-[#3592BD]" value="yarn">
+            <TabsTab
+              className="h-5! gap-2 px-1.5 hover:bg-transparent! data-active:text-[#3592BD]"
+              value="yarn"
+            >
               <YarnIcon className="size-3" />
               yarn
             </TabsTab>
-            <TabsTab className="data-active:text-primary h-5! gap-2 px-1.5 hover:bg-transparent!" value="bun">
+            <TabsTab
+              className="data-active:text-primary h-5! gap-2 px-1.5 hover:bg-transparent!"
+              value="bun"
+            >
               <BunIcon className="size-3" />
               bun
             </TabsTab>
-            <TabsTab className="h-5! gap-2 px-1.5 hover:bg-transparent! data-active:text-[#FAAF18]" value="pnpm">
+            <TabsTab
+              className="h-5! gap-2 px-1.5 hover:bg-transparent! data-active:text-[#FAAF18]"
+              value="pnpm"
+            >
               <PnpmIcon className="size-3" />
               pnpm
             </TabsTab>

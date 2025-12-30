@@ -71,6 +71,8 @@ const ColoredBorderDot = React.memo((props: ChartDotProps) => {
       fill="currentColor"
       strokeWidth="1"
       stroke={strokeColor}
+      fillOpacity="1"
+      strokeOpacity={props.fillOpacity}
       className={cn(props.className, "text-background")}
     />
   );

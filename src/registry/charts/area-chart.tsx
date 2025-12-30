@@ -35,7 +35,7 @@ type EvilAreaChartProps<
   defaultSelectedDataKey?: string | null;
   areaType?: AreaType;
   variant?: "gradient" | "solid";
-  lineVariant?: "solid" | "dashed" | "animated-dashed";
+  strokeVariant?: "solid" | "dashed" | "animated-dashed";
   type?: "default" | "expanded" | "stacked";
   dotType?: DotType;
   // Hide Stuffs
@@ -61,7 +61,7 @@ export function EvilAreaChart<
   defaultSelectedDataKey = null,
   areaType = "linear",
   variant = "gradient",
-  lineVariant = "dashed",
+  strokeVariant = "dashed",
   type = "default",
   dotType = "default",
   hideTooltip = false,
@@ -122,9 +122,24 @@ export function EvilAreaChart<
             content={<ChartTooltipContent selected={selectedDataKey} />}
           />
         )}
-        <defs>{variant === "gradient" && <LinearGradientStyle chartConfig={chartConfig} />}</defs>
+        <defs>
+          {variant === "gradient" && <LinearGradientStyle chartConfig={chartConfig} />}
+          <HatchedPatternStyle
+            chartConfig={chartConfig}
+            selectedDataKey={selectedDataKey}
+            isClickable={isClickable}
+          />
+        </defs>
         {Object.keys(chartConfig).map((dataKey) => {
           const _opacity = getOpacity(isClickable, selectedDataKey, dataKey);
+          const isSelected = selectedDataKey === dataKey;
+          const hasSelection = selectedDataKey !== null;
+
+          // Determine fill pattern - use hatched for non-selected when there's a selection
+          const fillPattern =
+            isClickable && hasSelection && !isSelected
+              ? `url(#evil-area-chart-hatched-${dataKey})`
+              : `url(#evil-area-chart-${dataKey})`;
 
           return (
             <Area
@@ -133,7 +148,7 @@ export function EvilAreaChart<
               dataKey={dataKey}
               fillOpacity={_opacity.fill}
               strokeOpacity={_opacity.stroke}
-              fill={`url(#evil-area-chart-${dataKey})`}
+              fill={fillPattern}
               stroke={`var(--color-${dataKey})`}
               stackId={isStacked ? "evil-stacked" : undefined}
               activeDot={
@@ -145,9 +160,9 @@ export function EvilAreaChart<
               }
               strokeWidth={STROKE_WIDTH}
               strokeDasharray={
-                lineVariant === "dashed"
+                strokeVariant === "dashed"
                   ? "3 3"
-                  : lineVariant === "animated-dashed"
+                  : strokeVariant === "animated-dashed"
                     ? "3 3"
                     : undefined
               }
@@ -158,7 +173,7 @@ export function EvilAreaChart<
                 setSelectedDataKey(selectedDataKey === dataKey ? null : dataKey);
               }}
             >
-              {lineVariant === "animated-dashed" && <AnimatedDashedStyle />}
+              {strokeVariant === "animated-dashed" && !hasSelection && <AnimatedDashedStyle />}
             </Area>
           );
         })}
@@ -174,9 +189,10 @@ const getOpacity = (isClickable: boolean, selectedDataKey: string | null, dataKe
   }
   return selectedDataKey === dataKey
     ? { fill: 0.8, stroke: 0.8, dot: 1 }
-    : { fill: 0.2, stroke: 0.4, dot: 0.6 };
+    : { fill: 0.2, stroke: 0.3, dot: 0.3 };
 };
 
+// Animated dashed-stroke style for the area chart
 const AnimatedDashedStyle = () => {
   return (
     <>
@@ -198,6 +214,7 @@ const AnimatedDashedStyle = () => {
   );
 };
 
+// Linear gradient for the area chart
 const LinearGradientStyle = ({ chartConfig }: { chartConfig: ChartConfig }) => {
   return (
     <>
@@ -210,10 +227,53 @@ const LinearGradientStyle = ({ chartConfig }: { chartConfig: ChartConfig }) => {
           x2="0"
           y2="1"
         >
-          <stop offset="0%" stopColor={`var(--color-${dataKey})`} stopOpacity={0.2} />
+          <stop offset="0%" stopColor={`var(--color-${dataKey})`} stopOpacity={0.1} />
           <stop offset="100%" stopColor={`var(--color-${dataKey})`} stopOpacity={0} />
         </linearGradient>
       ))}
+    </>
+  );
+};
+
+// Hatched pattern for non-selected areas
+const HatchedPatternStyle = ({
+  chartConfig,
+  selectedDataKey,
+  isClickable,
+}: {
+  chartConfig: ChartConfig;
+  selectedDataKey: string | null;
+  isClickable: boolean;
+}) => {
+  if (!isClickable || selectedDataKey === null) return null;
+
+  return (
+    <>
+      {Object.keys(chartConfig).map((dataKey) => {
+        const isSelected = selectedDataKey === dataKey;
+        if (isSelected) return null;
+
+        return (
+          <pattern
+            key={`evil-area-chart-hatched-${dataKey}`}
+            id={`evil-area-chart-hatched-${dataKey}`}
+            patternUnits="userSpaceOnUse"
+            width="4"
+            height="4"
+            patternTransform="rotate(45)"
+          >
+            <line
+              x1="0"
+              y1="0"
+              x2="0"
+              y2="4"
+              stroke={`var(--color-${dataKey})`}
+              strokeWidth="1"
+              strokeOpacity="0.3"
+            />
+          </pattern>
+        );
+      })}
     </>
   );
 };
