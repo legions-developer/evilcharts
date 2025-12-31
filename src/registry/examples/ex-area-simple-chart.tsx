@@ -33,6 +33,8 @@ export function EvilExampleSimpleAreaChart() {
   return (
     <EvilAreaChart
       isClickable
+      isLoading
+      areaType="bump"
       className="h-full w-full p-4"
       xDataKey="month"
       yDataKey="desktop"
@@ -40,8 +42,8 @@ export function EvilExampleSimpleAreaChart() {
       strokeVariant="dashed"
       areaVariant="gradient"
       activeDotVariant="default"
+      data={data} // if isLoading is true, pass empty array -> i.e isLoading ? [] : data
       chartConfig={chartConfig}
-      data={data}
       xAxisProps={{ tickFormatter: (value) => value.substring(0, 3) }} // Formatting first 3 characters eg: January -> Jan
     />
   );

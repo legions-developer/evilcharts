@@ -95,7 +95,7 @@ function LoadingIndicator({ isLoading }: { isLoading: boolean }) {
 
   return (
     <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center">
-      <div className="text-primary bg-background flex items-center justify-center gap-2 rounded-md border px-2 py-0.5 font-mono text-sm">
+      <div className="text-primary bg-background flex items-center justify-center gap-2 rounded-md border px-2 py-0.5 text-sm">
         <div className="border-border border-t-primary h-3 w-3 animate-spin rounded-full border" />
         <span>Loading</span>
       </div>
@@ -123,6 +123,8 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   const css = Object.entries(THEMES)
     .map(([theme, prefix]) => `${prefix} [data-chart=${id}] {\n${generateCssVars(theme)}\n}`)
     .join("\n");
+
+  console.log("cssw", css);
 
   return <style dangerouslySetInnerHTML={{ __html: css }} />;
 };
@@ -159,7 +161,7 @@ function axisValueToPercentFormatter(value: number) {
 }
 
 // Generate random loading data for skeleton/loading state
-export const getLoadingData = (points: number = 7) => {
+export const getLoadingData = (points: number = 10) => {
   return Array.from({ length: points }, () => ({
     loading: Math.floor(Math.random() * 10) + 1,
   }));

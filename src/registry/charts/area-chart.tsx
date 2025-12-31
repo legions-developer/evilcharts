@@ -9,15 +9,14 @@ import {
 } from "@/registry/ui/chart";
 import { Area, AreaChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from "recharts";
 import { ChartTooltip, ChartTooltipContent } from "@/registry/ui/tooltip";
+import { useEffect, useMemo, useState, type ComponentProps } from "react";
 import { ChartLegend, ChartLegendContent } from "@/registry/ui/legend";
-import { useMemo, useState, type ComponentProps } from "react";
 import { ChartDot, DotVariant } from "@/registry/ui/dot";
 
 // Constants
 const STROKE_WIDTH = 1;
 const LOADING_AREA_DATA_KEY = "loading";
-const LOADING_HATCH_WIDTH = 400;
-const LOADING_ANIMATION_DURATION = "2s"; // 2 seconds
+const LOADING_ANIMATION_DURATION = 2500; // in milliseconds CAUTION: must be more than 2000ms to match animation keyframes
 
 type ChartProps = ComponentProps<typeof AreaChart>;
 type XAxisProps = ComponentProps<typeof XAxis>;
@@ -90,8 +89,7 @@ export function EvilAreaChart<
   loadingPoints,
 }: EvilAreaChartProps<TData, TConfig>) {
   const [selectedDataKey, setSelectedDataKey] = useState<string | null>(defaultSelectedDataKey);
-
-  const loadingData = useMemo(() => getLoadingData(loadingPoints), [loadingPoints]);
+  const loadingData = useLoadingData(isLoading, loadingPoints, LOADING_ANIMATION_DURATION);
 
   const isExpanded = type === "expanded";
   const isStacked = type === "stacked" || type === "expanded";
@@ -225,10 +223,10 @@ export function EvilAreaChart<
           <Area
             type={areaType}
             dataKey={LOADING_AREA_DATA_KEY}
-            fillOpacity={0.1}
+            fillOpacity={0.05}
             fill="currentColor"
             stroke="currentColor"
-            strokeOpacity={0.6}
+            strokeOpacity={0.5}
             isAnimationActive={false}
             legendType="none"
             tooltipType="none"
@@ -515,52 +513,86 @@ const HatchedPatternStyle = ({ chartConfig }: { chartConfig: ChartConfig }) => {
   );
 };
 
+// Generate gradient stops with smooth easing for loading animation
+const generateEasedGradientStops = (
+  steps: number = 17,
+  minOpacity: number = 0.05,
+  maxOpacity: number = 0.9,
+) => {
+  return Array.from({ length: steps }, (_, i) => {
+    const t = i / (steps - 1); // 0 to 1
+    // Sine-based bell curve easing: peaks at center (t=0.5), smooth falloff at edges
+    const eased = Math.sin(t * Math.PI) ** 2;
+    const opacity = minOpacity + eased * (maxOpacity - minOpacity);
+    return { offset: `${(t * 100).toFixed(0)}%`, opacity: Number(opacity.toFixed(3)) };
+  });
+};
+
+// Hook to manage loading data with refresh intervals
+export function useLoadingData(
+  isLoading: boolean,
+  loadingPoints: number = 10,
+  loadingAnimationDuration: number = 4000,
+) {
+  const [loadingDataKey, setLoadingDataKey] = useState(false);
+
+  // Refresh loading data every 2 seconds when isLoading is true, with initial delay to match keyframes
+  useEffect(() => {
+    if (!isLoading) return;
+
+    let intervalId: NodeJS.Timeout | null = null;
+
+    // regular interval - must match animation duration for sync
+    intervalId = setInterval(() => {
+      setTimeout(() => {
+        setLoadingDataKey((prev) => !prev);
+      }, 800); // <--- Extra Delay to match animation keyframes
+    }, loadingAnimationDuration);
+
+    return () => {
+      // clearTimeout(timeoutId);
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [isLoading, loadingAnimationDuration]);
+
+  const loadingData = useMemo(
+    () => getLoadingData(loadingPoints),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- CAUTION: loadingDataKey intentionally triggers re-computation to match animation keyframes
+    [loadingPoints, loadingDataKey],
+  );
+
+  return loadingData;
+}
+
 // Loading area pattern with animated skeleton effect - uses mask to clip both fill AND stroke
 const LoadingAreaPatternStyle = () => {
-  const patternWidth = LOADING_HATCH_WIDTH * 2;
+  const width = LOADING_ANIMATION_DURATION / 1000;
+  const gradientStops = generateEasedGradientStops();
 
   return (
     <>
-      {/* Gradient for smooth fade: 0 → 1 → 0 opacity (bell curve distribution) */}
+      {/* Gradient for smooth fade: edges dim, middle bright for sweep effect */}
       <linearGradient id="evil-area-chart-loading-mask-gradient" x1="0" y1="0" x2="1" y2="0">
-        <stop offset="0%" stopColor="white" stopOpacity={0.05} />
-        <stop offset="8%" stopColor="white" stopOpacity={0.08} />
-        <stop offset="16%" stopColor="white" stopOpacity={0.1} />
-        <stop offset="24%" stopColor="white" stopOpacity={0.2} />
-        <stop offset="32%" stopColor="white" stopOpacity={0.35} />
-        <stop offset="40%" stopColor="white" stopOpacity={0.55} />
-        <stop offset="48%" stopColor="white" stopOpacity={0.9} />
-        <stop offset="50%" stopColor="white" stopOpacity={0.9} />
-        <stop offset="52%" stopColor="white" stopOpacity={0.9} />
-        <stop offset="60%" stopColor="white" stopOpacity={0.55} />
-        <stop offset="68%" stopColor="white" stopOpacity={0.35} />
-        <stop offset="76%" stopColor="white" stopOpacity={0.2} />
-        <stop offset="84%" stopColor="white" stopOpacity={0.1} />
-        <stop offset="92%" stopColor="white" stopOpacity={0.08} />
-        <stop offset="100%" stopColor="white" stopOpacity={0.05} />
+        {gradientStops.map(({ offset, opacity }) => (
+          <stop key={offset} offset={offset} stopColor="white" stopOpacity={opacity} />
+        ))}
       </linearGradient>
-      {/* Loading pattern animation */}
       <pattern
         id="evil-area-chart-loading-mask-pattern"
-        patternUnits="userSpaceOnUse"
-        width={patternWidth}
-        height="100%"
+        patternUnits="objectBoundingBox"
+        patternContentUnits="objectBoundingBox"
+        patternTransform="rotate(-25)"
+        width={width}
+        height="1"
         x="0"
         y="0"
-        patternTransform="rotate(35)"
       >
-        <rect
-          x="0"
-          y="0"
-          width={patternWidth}
-          height="100%"
-          fill="url(#evil-area-chart-loading-mask-gradient)"
-        />
+        <rect x="0" y="0" width="1" height="1" fill="url(#evil-area-chart-loading-mask-gradient)" />
         <animate
           attributeName="x"
-          values={`0;${patternWidth}`}
+          values={`0;${width}`}
           keyTimes="0;1"
-          dur={LOADING_ANIMATION_DURATION}
+          dur={`${LOADING_ANIMATION_DURATION}ms`}
           repeatCount="indefinite"
         />
       </pattern>
