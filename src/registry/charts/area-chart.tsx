@@ -4,6 +4,7 @@ import {
   axisValueToPercentFormatter,
   type ChartConfig,
   ChartContainer,
+  getColorsCount,
   getLoadingData,
   LoadingIndicator,
 } from "@/registry/ui/chart";
@@ -14,7 +15,7 @@ import { ChartLegend, ChartLegendContent } from "@/registry/ui/legend";
 import { ChartDot, DotVariant } from "@/registry/ui/dot";
 
 // Constants
-const STROKE_WIDTH = 1;
+const STROKE_WIDTH = 0.8;
 const LOADING_AREA_DATA_KEY = "loading";
 const LOADING_ANIMATION_DURATION = 2500; // in milliseconds CAUTION: must be more than 2000ms to match animation keyframes
 
@@ -179,7 +180,7 @@ export function EvilAreaChart<
                 fillOpacity={_opacity.fill}
                 strokeOpacity={_opacity.stroke}
                 fill={fillPattern}
-                stroke={`var(--color-${dataKey})`}
+                stroke={`url(#evil-area-chart-colors-${dataKey})`}
                 stackId={isStacked ? "evil-stacked" : undefined}
                 dot={
                   dotVariant ? (
@@ -238,6 +239,9 @@ export function EvilAreaChart<
         {/* ======== CHART STYLES ======== */}
         <defs>
           {isLoading && <LoadingAreaPatternStyle />}
+          {/* Shared horizontal color gradient - always rendered for stroke and all variants */}
+          <HorizontalColorGradientStyle chartConfig={chartConfig} />
+          {/* Variant-specific styles */}
           {areaVariant === "gradient" && <LinearGradientStyle chartConfig={chartConfig} />}
           {areaVariant === "gradient-reverse" && <ReverseGradientStyle chartConfig={chartConfig} />}
           {areaVariant === "lines" && <LinesPatternStyle chartConfig={chartConfig} />}
@@ -319,113 +323,248 @@ const AnimatedDashedStyle = () => {
   );
 };
 
-// Linear gradient for the area chart
+// Shared horizontal color gradient (left to right) - used by all variants and stroke
+// This is ALWAYS rendered so colors are available for any variant
+const HorizontalColorGradientStyle = ({ chartConfig }: { chartConfig: ChartConfig }) => {
+  return (
+    <>
+      {Object.entries(chartConfig).map(([dataKey, config]) => {
+        const colorsCount = getColorsCount(config);
+
+        return (
+          <linearGradient
+            key={`evil-area-chart-colors-${dataKey}`}
+            id={`evil-area-chart-colors-${dataKey}`}
+            x1="0"
+            y1="0"
+            x2="1"
+            y2="0"
+          >
+            {colorsCount === 1 ? (
+              // Single color: same color at start and end
+              <>
+                <stop offset="0%" stopColor={`var(--color-${dataKey}-0)`} />
+                <stop offset="100%" stopColor={`var(--color-${dataKey}-0)`} />
+              </>
+            ) : (
+              // Multiple colors: distribute evenly
+              // Fallback to first color if index doesn't exist in current theme
+              Array.from({ length: colorsCount }, (_, index) => (
+                <stop
+                  key={index}
+                  offset={`${(index / (colorsCount - 1)) * 100}%`}
+                  stopColor={`var(--color-${dataKey}-${index}, var(--color-${dataKey}-0))`}
+                />
+              ))
+            )}
+          </linearGradient>
+        );
+      })}
+    </>
+  );
+};
+
+// Linear gradient variant - adds vertical fade mask on top of the shared color gradient
 const LinearGradientStyle = ({ chartConfig }: { chartConfig: ChartConfig }) => {
   return (
     <>
+      {/* Vertical fade gradient for mask */}
+      <linearGradient id="evil-area-chart-vertical-fade" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stopColor="white" stopOpacity={0.1} />
+        <stop offset="100%" stopColor="white" stopOpacity={0} />
+      </linearGradient>
+
       {Object.keys(chartConfig).map((dataKey) => (
-        <linearGradient
-          key={`evil-area-chart-gradient-${dataKey}`}
-          id={`evil-area-chart-gradient-${dataKey}`}
-          x1="0"
-          y1="0"
-          x2="0"
-          y2="1"
-        >
-          <stop offset="0%" stopColor={`var(--color-${dataKey})`} stopOpacity={0.1} />
-          <stop offset="100%" stopColor={`var(--color-${dataKey})`} stopOpacity={0} />
-        </linearGradient>
+        <g key={`evil-area-chart-gradient-group-${dataKey}`}>
+          {/* Mask for vertical fade (top visible, bottom transparent) */}
+          <mask id={`evil-area-chart-gradient-mask-${dataKey}`}>
+            <rect width="100%" height="100%" fill="url(#evil-area-chart-vertical-fade)" />
+          </mask>
+
+          {/* Pattern combining shared color gradient + vertical mask */}
+          <pattern
+            id={`evil-area-chart-gradient-${dataKey}`}
+            patternUnits="userSpaceOnUse"
+            width="100%"
+            height="100%"
+          >
+            <rect
+              width="100%"
+              height="100%"
+              fill={`url(#evil-area-chart-colors-${dataKey})`}
+              mask={`url(#evil-area-chart-gradient-mask-${dataKey})`}
+            />
+          </pattern>
+        </g>
       ))}
     </>
   );
 };
 
-// Reverse gradient for the area chart
+// Reverse gradient for the area chart - vertical fade (top transparent, bottom visible)
 const ReverseGradientStyle = ({ chartConfig }: { chartConfig: ChartConfig }) => {
   return (
     <>
+      {/* Vertical reverse fade gradient for mask */}
+      <linearGradient id="evil-area-chart-vertical-fade-reverse" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stopColor="white" stopOpacity={0} />
+        <stop offset="100%" stopColor="white" stopOpacity={0.1} />
+      </linearGradient>
+
       {Object.keys(chartConfig).map((dataKey) => (
-        <linearGradient
-          key={`evil-area-chart-gradient-reverse-${dataKey}`}
-          id={`evil-area-chart-gradient-reverse-${dataKey}`}
-          x1="0"
-          y1="0"
-          x2="0"
-          y2="1"
-        >
-          <stop offset="10%" stopColor={`var(--color-${dataKey})`} stopOpacity={0} />
-          <stop offset="100%" stopColor={`var(--color-${dataKey})`} stopOpacity={0.1} />
-        </linearGradient>
+        <g key={`evil-area-chart-gradient-reverse-group-${dataKey}`}>
+          {/* Mask for reverse vertical fade */}
+          <mask id={`evil-area-chart-gradient-reverse-mask-${dataKey}`}>
+            <rect width="100%" height="100%" fill="url(#evil-area-chart-vertical-fade-reverse)" />
+          </mask>
+
+          {/* Pattern: horizontal gradient + reverse vertical mask */}
+          <pattern
+            id={`evil-area-chart-gradient-reverse-${dataKey}`}
+            patternUnits="userSpaceOnUse"
+            width="100%"
+            height="100%"
+          >
+            <rect
+              width="100%"
+              height="100%"
+              fill={`url(#evil-area-chart-colors-${dataKey})`}
+              mask={`url(#evil-area-chart-gradient-reverse-mask-${dataKey})`}
+            />
+          </pattern>
+        </g>
       ))}
     </>
   );
 };
 
-// Lines pattern for the area chart
+// Lines pattern for the area chart - diagonal lines with gradient
 const LinesPatternStyle = ({ chartConfig }: { chartConfig: ChartConfig }) => {
   return (
     <>
+      {/* Shared diagonal lines pattern for mask */}
+      <pattern
+        id="evil-area-chart-lines-mask-pattern"
+        patternUnits="userSpaceOnUse"
+        width="5"
+        height="5"
+        patternTransform="rotate(45)"
+      >
+        <line x1="0" y1="0" x2="0" y2="5" stroke="white" strokeWidth="1" />
+      </pattern>
+
       {Object.keys(chartConfig).map((dataKey) => (
-        <pattern
-          key={`evil-area-chart-lines-${dataKey}`}
-          id={`evil-area-chart-lines-${dataKey}`}
-          patternUnits="userSpaceOnUse"
-          width="5"
-          height="5"
-          patternTransform="rotate(45)"
-        >
-          <line
-            x1="0"
-            y1="0"
-            x2="0"
-            y2="5"
-            stroke={`var(--color-${dataKey})`}
-            strokeWidth="1"
-            strokeOpacity="0.3"
-          />
-        </pattern>
+        <g key={`evil-area-chart-lines-group-${dataKey}`}>
+          {/* Mask using diagonal lines */}
+          <mask id={`evil-area-chart-lines-mask-${dataKey}`}>
+            <rect
+              width="100%"
+              height="100%"
+              fill="url(#evil-area-chart-lines-mask-pattern)"
+              fillOpacity="0.3"
+            />
+          </mask>
+
+          {/* Pattern: gradient fill masked by diagonal lines */}
+          <pattern
+            id={`evil-area-chart-lines-${dataKey}`}
+            patternUnits="userSpaceOnUse"
+            width="100%"
+            height="100%"
+          >
+            <rect
+              width="100%"
+              height="100%"
+              fill={`url(#evil-area-chart-colors-${dataKey})`}
+              mask={`url(#evil-area-chart-lines-mask-${dataKey})`}
+            />
+          </pattern>
+        </g>
       ))}
     </>
   );
 };
 
-// Solid pattern for the area chart
+// Solid pattern for the area chart - uniform opacity with gradient
 const SolidPatternStyle = ({ chartConfig }: { chartConfig: ChartConfig }) => {
   return (
     <>
+      {/* Uniform opacity mask for solid fill */}
+      <linearGradient id="evil-area-chart-solid-mask-gradient" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stopColor="white" stopOpacity={0.1} />
+        <stop offset="100%" stopColor="white" stopOpacity={0.1} />
+      </linearGradient>
+
       {Object.keys(chartConfig).map((dataKey) => (
-        <linearGradient
-          key={`evil-area-chart-solid-${dataKey}`}
-          id={`evil-area-chart-solid-${dataKey}`}
-          x1="0"
-          y1="0"
-          x2="0"
-          y2="1"
-        >
-          <stop offset="0%" stopColor={`var(--color-${dataKey})`} stopOpacity={0.1} />
-          <stop offset="100%" stopColor={`var(--color-${dataKey})`} stopOpacity={0.1} />
-        </linearGradient>
+        <g key={`evil-area-chart-solid-group-${dataKey}`}>
+          {/* Mask for uniform opacity */}
+          <mask id={`evil-area-chart-solid-mask-${dataKey}`}>
+            <rect width="100%" height="100%" fill="url(#evil-area-chart-solid-mask-gradient)" />
+          </mask>
+
+          {/* Pattern: gradient fill with uniform opacity mask */}
+          <pattern
+            id={`evil-area-chart-solid-${dataKey}`}
+            patternUnits="userSpaceOnUse"
+            width="100%"
+            height="100%"
+          >
+            <rect
+              width="100%"
+              height="100%"
+              fill={`url(#evil-area-chart-colors-${dataKey})`}
+              mask={`url(#evil-area-chart-solid-mask-${dataKey})`}
+            />
+          </pattern>
+        </g>
       ))}
     </>
   );
 };
 
-// Dotted pattern for the area chart
+// Dotted pattern for the area chart - dots with gradient
 const DottedPatternStyle = ({ chartConfig }: { chartConfig: ChartConfig }) => {
   return (
     <>
+      {/* Shared dots pattern for mask */}
+      <pattern
+        id="evil-area-chart-dotted-mask-pattern"
+        x="0"
+        y="0"
+        width="6"
+        height="6"
+        patternUnits="userSpaceOnUse"
+      >
+        <circle cx="4" cy="4" r="0.5" fill="white" />
+      </pattern>
+
       {Object.keys(chartConfig).map((dataKey) => (
-        <pattern
-          key={`evil-area-chart-dotted-${dataKey}`}
-          id={`evil-area-chart-dotted-${dataKey}`}
-          x="0"
-          y="0"
-          width="6"
-          height="6"
-          patternUnits="userSpaceOnUse"
-        >
-          <circle cx="4" cy="4" r="0.5" fill={`var(--color-${dataKey})`} opacity={0.5} />
-        </pattern>
+        <g key={`evil-area-chart-dotted-group-${dataKey}`}>
+          {/* Mask using dots pattern */}
+          <mask id={`evil-area-chart-dotted-mask-${dataKey}`}>
+            <rect
+              width="100%"
+              height="100%"
+              fill="url(#evil-area-chart-dotted-mask-pattern)"
+              fillOpacity="0.5"
+            />
+          </mask>
+
+          {/* Pattern: gradient fill masked by dots */}
+          <pattern
+            id={`evil-area-chart-dotted-${dataKey}`}
+            patternUnits="userSpaceOnUse"
+            width="100%"
+            height="100%"
+          >
+            <rect
+              width="100%"
+              height="100%"
+              fill={`url(#evil-area-chart-colors-${dataKey})`}
+              mask={`url(#evil-area-chart-dotted-mask-${dataKey})`}
+            />
+          </pattern>
+        </g>
       ))}
     </>
   );
@@ -445,29 +584,48 @@ const UnselectedDiagonalPatternStyle = ({
 
   return (
     <>
+      {/* Shared diagonal lines pattern for mask (white lines) */}
+      <pattern
+        id="evil-area-chart-unselected-lines-mask-pattern"
+        patternUnits="userSpaceOnUse"
+        width="5"
+        height="5"
+        patternTransform="rotate(45)"
+      >
+        <line x1="0" y1="0" x2="0" y2="5" stroke="white" strokeWidth="1" />
+      </pattern>
+
       {Object.keys(chartConfig).map((dataKey) => {
         const isSelected = selectedDataKey === dataKey;
         if (isSelected) return null;
 
         return (
-          <pattern
-            key={`evil-area-chart-unselected-${dataKey}`}
-            id={`evil-area-chart-unselected-${dataKey}`}
-            patternUnits="userSpaceOnUse"
-            width="5"
-            height="5"
-            patternTransform="rotate(45)"
-          >
-            <line
-              x1="0"
-              y1="0"
-              x2="0"
-              y2="5"
-              stroke={`var(--color-${dataKey})`}
-              strokeWidth="1"
-              strokeOpacity="0.3"
-            />
-          </pattern>
+          <g key={`evil-area-chart-unselected-group-${dataKey}`}>
+            {/* Mask using diagonal lines pattern */}
+            <mask id={`evil-area-chart-unselected-mask-${dataKey}`}>
+              <rect
+                width="100%"
+                height="100%"
+                fill="url(#evil-area-chart-unselected-lines-mask-pattern)"
+                fillOpacity="0.3"
+              />
+            </mask>
+
+            {/* Pattern: gradient fill masked by diagonal lines */}
+            <pattern
+              id={`evil-area-chart-unselected-${dataKey}`}
+              patternUnits="userSpaceOnUse"
+              width="100%"
+              height="100%"
+            >
+              <rect
+                width="100%"
+                height="100%"
+                fill={`url(#evil-area-chart-colors-${dataKey})`}
+                mask={`url(#evil-area-chart-unselected-mask-${dataKey})`}
+              />
+            </pattern>
+          </g>
         );
       })}
     </>
@@ -478,33 +636,48 @@ const UnselectedDiagonalPatternStyle = ({
 const HatchedPatternStyle = ({ chartConfig }: { chartConfig: ChartConfig }) => {
   return (
     <>
+      {/* Shared hatched stripes mask pattern */}
+      <linearGradient id="evil-area-chart-hatched-stripe-gradient" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="50%" stopColor="white" stopOpacity={0.2} />
+        <stop offset="50%" stopColor="white" stopOpacity={1} />
+      </linearGradient>
+      <pattern
+        id="evil-area-chart-hatched-mask-pattern"
+        x="0"
+        y="0"
+        width="20"
+        height="10"
+        patternUnits="userSpaceOnUse"
+        overflow="visible"
+        patternTransform="rotate(20)"
+      >
+        <rect width="20" height="10" fill="url(#evil-area-chart-hatched-stripe-gradient)" />
+      </pattern>
+
       {Object.keys(chartConfig).map((dataKey) => (
         <g key={`evil-area-chart-hatched-group-${dataKey}`}>
-          <linearGradient
-            id={`evil-area-chart-hatched-gradient-${dataKey}`}
-            x1="0"
-            y1="0"
-            x2="1"
-            y2="0"
-          >
-            <stop offset="50%" stopColor={`var(--color-${dataKey})`} stopOpacity={0.2} />
-            <stop offset="50%" stopColor={`var(--color-${dataKey})`} />
-          </linearGradient>
+          {/* Mask using hatched stripes */}
+          <mask id={`evil-area-chart-hatched-mask-${dataKey}`}>
+            <rect
+              width="100%"
+              height="100%"
+              fill="url(#evil-area-chart-hatched-mask-pattern)"
+              fillOpacity="0.2"
+            />
+          </mask>
+
+          {/* Pattern: gradient fill masked by hatched stripes */}
           <pattern
             id={`evil-area-chart-hatched-pattern-${dataKey}`}
-            x="0"
-            y="0"
-            width="20"
-            height="10"
             patternUnits="userSpaceOnUse"
-            overflow="visible"
-            patternTransform="rotate(20)"
+            width="100%"
+            height="100%"
           >
             <rect
-              width="20"
-              height="10"
-              opacity="0.2"
-              fill={`url(#evil-area-chart-hatched-gradient-${dataKey})`}
+              width="100%"
+              height="100%"
+              fill={`url(#evil-area-chart-colors-${dataKey})`}
+              mask={`url(#evil-area-chart-hatched-mask-${dataKey})`}
             />
           </pattern>
         </g>
@@ -546,7 +719,7 @@ export function useLoadingData(
     intervalId = setInterval(() => {
       setTimeout(() => {
         setLoadingDataKey((prev) => !prev);
-      }, 800); // <--- Extra Delay to match animation keyframes
+      }, 1000); // <--- Extra Delay to match animation keyframes
     }, loadingAnimationDuration);
 
     return () => {
