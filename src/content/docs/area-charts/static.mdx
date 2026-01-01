@@ -24,7 +24,7 @@ links:
       <Step>
         <StepTitle>Install the following dependencies:</StepTitle>
         <StepContent>
-          <CommandBlock commands={["recharts"]} />
+          <CommandBlock commands={["recharts","motion"]} />
         </StepContent>
       </Step>
       <Step>
@@ -109,12 +109,12 @@ import { EvilAreaChart } from "@/components/evilcharts/charts/area-chart";
 
 ### Loading State
 
-<Alert variant="default"> 
-  <AlertContent>
-    The area chart supports loading state. You can pass the `isLoading` prop to the chart to show the loading state.
+<ComponentPreview className="mb-0" title="isLoading='true'" name="ex-loading-state-area-chart"  />
+<Alert > 
+  <AlertContent >
+    The area chart supports loading state. You can pass the `isLoading` prop to the chart to show the loading state. You can also pass `curveType` to customize the curve type of the loading state. Here, im using `curveType='bump'` to make the loading state more realistic.
   </AlertContent>
 </Alert>
-<ComponentPreview className="mb-0" title="isLoading='true'" name="ex-loading-state-area-chart"  />
 
 ## Examples
 

@@ -26,6 +26,7 @@ export function EvilExampleAreaChart() {
       isLoading
       isClickable
       className="h-full w-full p-4"
+      curveType="bump"
       xDataKey="month"
       yDataKey="desktop"
       stackType="stacked"

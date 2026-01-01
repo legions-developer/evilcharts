@@ -10,10 +10,10 @@ const alertVariants = cva(
     variants: {
       variant: {
         default: "text-primary dark:bg-primary-foreground bg-[#F5F5F5]",
-        warning: "text-amber-500 dark:bg-primary-foreground bg-amber-500/5",
-        info: "text-blue-500 dark:bg-primary-foreground bg-blue-500/5",
-        error: "text-red-500 dark:bg-primary-foreground bg-red-500/5",
-        success: "text-green-500 dark:bg-primary-foreground bg-green-500/5",
+        warning: "text-amber-500 dark:bg-primary-foreground bg-amber-500/10",
+        info: "text-blue-500 dark:bg-primary-foreground bg-blue-500/10",
+        error: "text-red-500 dark:bg-primary-foreground bg-red-500/10",
+        success: "text-green-500 dark:bg-primary-foreground bg-green-500/10",
       },
     },
     defaultVariants: {
@@ -23,7 +23,7 @@ const alertVariants = cva(
 );
 
 const descriptionVariants = cva(
-  "text-muted-foreground! bg-background flex w-full flex-col gap-1.5 rounded-[5px] border p-3 text-[13px] [&_p]:leading-relaxed [&_ul]:list-inside [&_ul]:list-disc [&_ul]:text-[13px]",
+  "text-muted-foreground! bg-background flex w-full flex-col gap-1.5 rounded-[5px] border p-3 text-[13px] [&_p]:leading-6 [&_ul]:list-inside [&_ul]:list-disc [&_ul]:text-[13px]",
   {
     variants: {
       variant: {

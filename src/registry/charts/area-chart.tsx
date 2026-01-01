@@ -8,16 +8,17 @@ import {
   getLoadingData,
   LoadingIndicator,
 } from "@/registry/ui/chart";
+import { useCallback, useId, useMemo, useRef, useState, type ComponentProps } from "react";
 import { Area, AreaChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from "recharts";
-import { useEffect, useId, useMemo, useState, type ComponentProps } from "react";
 import { ChartTooltip, ChartTooltipContent } from "@/registry/ui/tooltip";
 import { ChartLegend, ChartLegendContent } from "@/registry/ui/legend";
 import { ChartDot, DotVariant } from "@/registry/ui/dot";
+import { motion } from "motion/react";
 
 // Constants
 const STROKE_WIDTH = 0.8;
 const LOADING_AREA_DATA_KEY = "loading";
-const LOADING_ANIMATION_DURATION = 2500; // in milliseconds CAUTION: must be more than 2000ms to match animation keyframes
+const LOADING_ANIMATION_DURATION = 2000; // in milliseconds
 
 type ChartProps = ComponentProps<typeof AreaChart>;
 type XAxisProps = ComponentProps<typeof XAxis>;
@@ -94,7 +95,7 @@ export function EvilAreaChart<
   loadingPoints,
 }: EvilAreaChartProps<TData, TConfig>) {
   const [selectedDataKey, setSelectedDataKey] = useState<string | null>(defaultSelectedDataKey);
-  const loadingData = useLoadingData(isLoading, loadingPoints, LOADING_ANIMATION_DURATION);
+  const { loadingData, onShimmerExit } = useLoadingData(isLoading, loadingPoints);
   const chartId = useId().replace(/:/g, ""); // Remove colons for valid CSS selectors
 
   const isExpanded = stackType === "expanded";
@@ -241,6 +242,8 @@ export function EvilAreaChart<
             type={curveType}
             dataKey={LOADING_AREA_DATA_KEY}
             fillOpacity={0.05}
+            min={0}
+            max={100}
             fill="currentColor"
             stroke="currentColor"
             strokeOpacity={0.5}
@@ -254,7 +257,7 @@ export function EvilAreaChart<
         )}
         {/* ======== CHART STYLES ======== */}
         <defs>
-          {isLoading && <LoadingAreaPatternStyle chartId={chartId} />}
+          {isLoading && <LoadingAreaPatternStyle chartId={chartId} onShimmerExit={onShimmerExit} />}
           {/* Shared horizontal color gradient - always rendered for stroke and all variants */}
           <HorizontalColorGradientStyle chartConfig={chartConfig} chartId={chartId} />
           {/* Variant-specific styles */}
@@ -778,81 +781,69 @@ const generateEasedGradientStops = (
 /**
  * Hook to manage loading data with pixel-perfect shimmer synchronization.
  *
- * The shimmer animation works as follows:
- * - Pattern width = animationDuration / 1000 (e.g., 2.5 for 2500ms)
- * - The gradient (shimmer) itself has width = 1 within the pattern
- * - Animation: x goes from 0 to patternWidth over the duration
- * - The visible chart area is normalized to 0-1 in objectBoundingBox units
+ * Uses motion.dev's onAnimationComplete callback to ensure chart data
+ * is only regenerated when the shimmer has completely exited the visible area.
+ * This eliminates timing drift issues from setTimeout/setInterval.
  *
- * Timeline for a 2500ms animation with patternWidth = 2.5:
- * - t=0ms:     x=0, shimmer enters at left edge
- * - t=1000ms:  x=1, shimmer has fully exited the right edge
- * - t=2500ms:  x=2.5, animation cycle completes, next shimmer enters
- *
- * To ensure seamless transitions, we swap data exactly when the shimmer
- * has fully exited the visible area (x >= 1), which occurs at:
- * exitTime = (1 / patternWidth) * animationDuration
- *
- * For 2500ms with patternWidth=2.5: exitTime = (1/2.5) * 2500 = 1000ms
- *
- * The data swap timing:
- * - First swap: at exitTime (when first shimmer exits)
- * - Subsequent swaps: every animationDuration after the first swap
- *   (aligned to when each subsequent shimmer exits)
+ * The shimmer pattern has 200-300% width so that when the visible shimmer
+ * exits the chart container (at the 100% point), we can safely swap data
+ * while the invisible portion continues animating.
  */
-export function useLoadingData(
-  isLoading: boolean,
-  loadingPoints: number = 10,
-  loadingAnimationDuration: number = LOADING_ANIMATION_DURATION,
-) {
+export function useLoadingData(isLoading: boolean, loadingPoints: number = 14) {
   const [loadingDataKey, setLoadingDataKey] = useState(false);
 
-  useEffect(() => {
-    if (!isLoading) return;
-
-    let intervalId: ReturnType<typeof setInterval> | null = null;
-
-    // Calculate pattern width (same formula as LoadingAreaPatternStyle)
-    const patternWidth = loadingAnimationDuration / 1000;
-
-    // Calculate when shimmer fully exits the visible area (0-1 range)
-    // The gradient has width=1, so it fully exits when x >= 1
-    // Since x animates linearly from 0 to patternWidth over animationDuration:
-    // exitTime = (1 / patternWidth) * animationDuration = 1000ms (always)
-    const shimmerExitTime = (1 / patternWidth) * loadingAnimationDuration;
-
-    // First data swap happens when shimmer exits
-    const initialTimeoutId = setTimeout(() => {
+  // Callback fired by motion.dev when shimmer exits visible area
+  const onShimmerExit = useCallback(() => {
+    if (isLoading) {
       setLoadingDataKey((prev) => !prev);
-
-      // Start interval AFTER first swap, so subsequent swaps are perfectly aligned
-      // Each subsequent shimmer takes exactly animationDuration to complete its cycle
-      // We swap when it exits (at the same relative point in each cycle)
-      intervalId = setInterval(() => {
-        setLoadingDataKey((prev) => !prev);
-      }, loadingAnimationDuration);
-    }, shimmerExitTime);
-
-    return () => {
-      clearTimeout(initialTimeoutId);
-      if (intervalId) clearInterval(intervalId);
-    };
-  }, [isLoading, loadingAnimationDuration]);
+    }
+  }, [isLoading]);
 
   const loadingData = useMemo(
     () => getLoadingData(loadingPoints),
-    // loadingDataKey triggers re-computation when shimmer exits
+    // loadingDataKey toggle triggers re-computation when shimmer exits
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [loadingPoints, loadingDataKey],
   );
 
-  return loadingData;
+  return { loadingData, onShimmerExit };
 }
 
-// Loading area pattern with animated skeleton effect - uses mask to clip both fill AND stroke
-const LoadingAreaPatternStyle = ({ chartId }: { chartId: string }) => {
-  const width = LOADING_ANIMATION_DURATION / 1000;
+/**
+ * Loading area pattern with animated skeleton effect using motion.dev
+ *
+ * Key design for pixel-perfect sync:
+ * - Visible chart area is normalized to 0-1 in objectBoundingBox units
+ * - Shimmer gradient has width=1 (same as visible area)
+ * - Pattern width is 3x (300%) to provide buffer on both sides
+ * - Animation: x goes from -1 (off-screen left) to 2 (off-screen right)
+ * - At x=-1: shimmer is completely outside left edge
+ * - At x=0: shimmer starts entering from left
+ * - At x=1: shimmer has fully exited right edge
+ * - At x=2: shimmer is in the right buffer zone
+ * - onShimmerExit fires when x crosses 1 (shimmer fully exited visible area)
+ * - Data swaps happen while shimmer is outside visible area (x >= 1)
+ * - Loop continues infinitely
+ */
+const LoadingAreaPatternStyle = ({
+  chartId,
+  onShimmerExit,
+}: {
+  chartId: string;
+  onShimmerExit: () => void;
+}) => {
   const gradientStops = generateEasedGradientStops();
+
+  // Pattern width needs to accommodate: 1 (left buffer) + 1 (visible) + 1 (right buffer) = 3
+  const patternWidth = 3;
+
+  // Animation goes from -1 (left of visible) to 2 (right of visible)
+  // Total travel distance = 3, matching pattern width
+  const startX = -1;
+  const endX = 2;
+
+  // Track last x value to detect threshold crossing
+  const lastXRef = useRef(startX);
 
   return (
     <>
@@ -867,18 +858,38 @@ const LoadingAreaPatternStyle = ({ chartId }: { chartId: string }) => {
         patternUnits="objectBoundingBox"
         patternContentUnits="objectBoundingBox"
         patternTransform="rotate(25)"
-        width={width}
+        width={patternWidth}
         height="1"
         x="0"
         y="0"
       >
-        <rect x="0" y="0" width="1" height="1" fill={`url(#${chartId}-loading-mask-gradient)`} />
-        <animate
-          attributeName="x"
-          values={`0;${width}`}
-          keyTimes="0;1"
-          dur={`${LOADING_ANIMATION_DURATION}ms`}
-          repeatCount="indefinite"
+        {/* Use motion.rect with keyframe animation for precise timing */}
+        <motion.rect
+          y="0"
+          width="1"
+          height="1"
+          fill={`url(#${chartId}-loading-mask-gradient)`}
+          initial={{ x: startX }}
+          animate={{ x: endX }}
+          transition={{
+            duration: LOADING_ANIMATION_DURATION / 1000,
+            ease: "linear",
+            repeat: Infinity,
+            repeatType: "loop",
+          }}
+          // Use onUpdate to fire callback at precise exit point
+          onUpdate={(latest) => {
+            const xValue = typeof latest.x === "number" ? latest.x : startX;
+            const lastX = lastXRef.current;
+
+            // Fire when crossing the exit threshold (x >= 1 means shimmer fully exited right)
+            if (xValue >= 1 && lastX < 1) {
+              onShimmerExit();
+            }
+
+            // Update tracked value
+            lastXRef.current = xValue;
+          }}
         />
       </pattern>
       {/* Masking */}
