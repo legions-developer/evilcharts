@@ -214,31 +214,107 @@ html.dark [data-rehype-pretty-code-figure] code span,
   text-decoration: var(--shiki-dark-text-decoration) !important;
 }
 
-/* Code block line numbers */
-code[data-line-numbers] {
-  counter-reset: line;
+/* Make code lines stretch full width for highlights */
+pre:has([data-line]) {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
 }
 
-code[data-line-numbers] > [data-line]::before {
-  counter-increment: line;
-  content: counter(line);
+pre:has([data-line]) > code {
   display: inline-block;
-  width: 1rem;
-  margin-right: 1.5rem;
-  text-align: right;
-  color: var(--code-number);
-  user-select: none;
-  opacity: 50%;
+  min-width: 100%;
 }
 
-code[data-line-numbers-max-digits="2"] > [data-line]::before {
-  width: 1.5rem;
+pre:has([data-line]) > code > [data-line] {
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 1px;
+  padding-bottom: 1px;
+  margin-top: 2px;
+  margin-bottom: 2px;
 }
-code[data-line-numbers-max-digits="3"] > [data-line]::before {
-  width: 2rem;
+
+/* Highlighted lines via [!code highlight] */
+code [data-line].highlighted,
+code span.line.highlighted {
+  display: inline-block;
+  min-width: 100%;
+  background-color: var(--code-highlight);
+  border-left: 2px solid var(--ring);
+  padding-left: calc(1rem - 2px);
 }
-code[data-line-numbers-max-digits="4"] > [data-line]::before {
-  width: 2.5rem;
+
+/* Word highlight via [!code word:xxx] */
+code .highlighted-word {
+  background-color: color-mix(in srgb, var(--color-vesper-type) 10%, transparent);
+  padding: 0.125rem 0.375rem;
+  margin: -0.125rem -0.375rem;
+  border-radius: 4px;
+  border: 1px solid color-mix(in srgb, var(--color-vesper-type) 60%, transparent);
+  border-style: dashed;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-vesper-type) 10%, transparent);
+}
+
+/* Focus via [!code focus] - dim non-focused lines */
+code:has(.focused) [data-line]:not(.focused) {
+  opacity: 0.4;
+  filter: blur(1px);
+  transition:
+    opacity 0.2s,
+    filter 0.2s;
+}
+
+code:has(.focused):hover [data-line]:not(.focused) {
+  opacity: 1;
+  filter: none;
+}
+
+/* Diff styles via [!code ++] and [!code --] */
+code [data-line].diff {
+  position: relative;
+}
+
+code [data-line].diff.add {
+  background-color: oklch(80.961% 0.21402 145.13 / 0.15);
+  border-left: 2px solid oklch(0.6 0.2 145);
+  padding-left: calc(1rem - 2px);
+  display: inline-block;
+  min-width: 100%;
+}
+
+code [data-line].diff.add::before {
+  content: "+";
+  position: absolute;
+  left: 0.5rem;
+  color: oklch(0.6 0.2 145);
+}
+
+code [data-line].diff.remove {
+  background-color: oklch(51.558% 0.16512 22.312 / 0.2) !important;
+  border-left: 2px solid oklch(0.6 0.2 25);
+  padding-left: calc(1rem - 2px);
+  display: inline-block;
+  min-width: 100%;
+}
+
+code [data-line].diff.remove::before {
+  content: "-";
+  position: absolute;
+  left: 0.5rem;
+  color: oklch(0.6 0.2 25);
+}
+
+/* Error/Warning via [!code error] and [!code warning] */
+code [data-line].highlighted.error {
+  background-color: oklch(0.55 0.2 25 / 0.15);
+  border-left: 2px solid oklch(0.6 0.2 25);
+  padding-left: calc(1rem - 2px);
+}
+
+code [data-line].highlighted.warning {
+  background-color: oklch(0.7 0.15 85 / 0.2);
+  border-left: 2px solid oklch(0.75 0.15 85);
+  padding-left: calc(1rem - 2px);
 }
 
 svg:focus,

@@ -40,7 +40,7 @@ export async function CodeBlock({
         </div>
         <figure data-rehype-pretty-code-figure="">
           <div
-            className={cn("bg-background rounded-md border [&>pre]:px-4!", className)}
+            className={cn("bg-background rounded-md border", className)}
             dangerouslySetInnerHTML={{ __html: highlightedCode }}
           />
         </figure>
@@ -65,10 +65,7 @@ export async function CodeBlock({
           <CopyButton withBlurBg code={code} className="mt-2 mr-2" />
         </div>
       )}
-      <div
-        className={cn("[&>pre]:px-4!", className)}
-        dangerouslySetInnerHTML={{ __html: highlightedCode }}
-      />
+      <div className={cn("", className)} dangerouslySetInnerHTML={{ __html: highlightedCode }} />
     </figure>
   );
 }

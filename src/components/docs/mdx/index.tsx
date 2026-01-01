@@ -100,7 +100,7 @@ export const mdxComponents: MDXComponents = {
       <div className="dark:bg-primary-foreground relative mt-4 rounded-sm bg-[#F5F5F5] p-1">
         <pre
           className={cn(
-            "no-scrollbar bg-background min-w-0 overflow-x-auto rounded-sm border py-3.5 text-[.8125rem] outline-none has-data-highlighted-line:px-0 has-data-line-numbers:px-0 has-data-[slot=tabs]:p-0 [&>code]:px-4",
+            "no-scrollbar bg-background min-w-0 overflow-x-auto rounded-sm border py-3.5 text-[.8125rem] outline-none has-data-highlighted-line:px-0 has-data-line-numbers:px-0 has-data-[slot=tabs]:p-0 [&>code]:px-0!",
             className,
           )}
           {...props}

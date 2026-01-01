@@ -44,7 +44,8 @@ export function EvilExampleAreaChart() {
       stackType="stacked"
       strokeVariant="dashed"
       areaVariant="gradient"
-      activeDotVariant="default"
+      activeDotVariant="colored-border"
+      dotVariant="border"
       data={data} // if isLoading is true, pass empty array → i.e isLoading ? [] : data
       chartConfig={chartConfig}
       xAxisProps={{ tickFormatter: (value) => value.substring(0, 3) }} // Formatting first 3 characters eg: January → Jan
