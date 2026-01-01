@@ -4,6 +4,7 @@ import { MDXNavigation } from "@/components/docs/mdx/components/navigation";
 import { findNeighbour } from "fumadocs-core/page-tree";
 import { mdxComponents } from "@/components/docs/mdx";
 import { notFound } from "next/navigation";
+import { LinkIcon } from "lucide-react";
 import { source } from "@/lib/source";
 
 export function generateStaticParams() {
@@ -20,6 +21,7 @@ export default async function Page(props: { params: Promise<{ slug: string[] }> 
 
   const doc = page.data;
   const MDX = doc.body;
+  const links = doc.links;
   const neighbours = findNeighbour(source.pageTree, page.url);
 
   return (
@@ -31,6 +33,21 @@ export default async function Page(props: { params: Promise<{ slug: string[] }> 
           </h1>
           {doc.description && (
             <p className="text-muted-foreground text-[15px]">{doc.description}</p>
+          )}
+          {links && (
+            <div className="mt-3 flex flex-row gap-3">
+              {Object.entries(links).map(([key, value]) => (
+                <a
+                  className="text-muted-foreground bg-muted/50 hover:text-primary flex flex-row items-center gap-2 rounded-md px-2 py-0.5 text-[11px] capitalize"
+                  href={value}
+                  target="_blank"
+                  key={key}
+                >
+                  <LinkIcon className="size-2.5" />
+                  {key}
+                </a>
+              ))}
+            </div>
           )}
         </div>
         <div className="text-primary/80 mt-8 w-full flex-1 text-[14px] *:data-[slot=alert]:first:mt-0">

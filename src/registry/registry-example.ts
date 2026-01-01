@@ -13,6 +13,18 @@ export const examples: Registry["items"] = [
       },
     ],
   },
+  // Area Chart Loading State
+  {
+    name: "ex-loading-state-area-chart",
+    registryDependencies: ["@evilcharts/area-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-loading-state-area-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
   // Area Chart Types
   {
     name: "ex-default-type-area-chart",
@@ -77,6 +89,73 @@ export const examples: Registry["items"] = [
     files: [
       {
         path: "examples/ex-animated-dashed-stroke-area-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // Area Chart Area Variants
+  {
+    name: "ex-gradient-area-variant-area-chart",
+    registryDependencies: ["@evilcharts/area-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-gradient-area-variant-area-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-gradient-reverse-area-variant-area-chart",
+    registryDependencies: ["@evilcharts/area-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-gradient-reverse-area-variant-area-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-solid-area-variant-area-chart",
+    registryDependencies: ["@evilcharts/area-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-solid-area-variant-area-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-dotted-area-variant-area-chart",
+    registryDependencies: ["@evilcharts/area-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-dotted-area-variant-area-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-lines-area-variant-area-chart",
+    registryDependencies: ["@evilcharts/area-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-lines-area-variant-area-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-hatched-area-variant-area-chart",
+    registryDependencies: ["@evilcharts/area-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-hatched-area-variant-area-chart.tsx",
         type: "registry:block",
       },
     ],
