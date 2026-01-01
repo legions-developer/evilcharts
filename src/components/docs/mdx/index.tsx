@@ -12,6 +12,7 @@ import { Tabs, TabsList, TabsPanel, TabsTab } from "@/components/ui/tabs";
 import { ComponentPreview } from "../charts/component-preview";
 import { H1, H2, H3, H4, H5, H6 } from "./components/headings";
 import { ComponentSource } from "../charts/component-source";
+import { stripCodeAnnotations } from "@/lib/highlight-code";
 import { Description, P, Strong } from "./components/text";
 import { CommandBlock } from "./components/command-block";
 import { Alert, AlertContent } from "./components/alert";
@@ -136,16 +137,16 @@ export const mdxComponents: MDXComponents = {
     }
 
     // Default codeblock.
-    // prettier-ignore
-    const isSingleLine = __raw__ ? __raw__.split("\n").length === 1 : false;
+    const cleanedCode = __raw__ ? stripCodeAnnotations(__raw__) : "";
+    const isSingleLine = cleanedCode ? cleanedCode.split("\n").length === 1 : false;
 
     return (
       <>
-        {__raw__ && (
+        {cleanedCode && (
           <CopyButton
             withBlurBg
             className={cn("absolute top-2 right-2 z-10", isSingleLine && "top-4")}
-            code={__raw__}
+            code={cleanedCode}
           />
         )}
         <code {...props} />

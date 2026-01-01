@@ -23,8 +23,8 @@ const chartConfig = {
 export function EvilExampleAreaChart() {
   return (
     <EvilAreaChart
-      isLoading
       isClickable
+      isLoading={true} // [!code highlight]
       className="h-full w-full p-4"
       curveType="bump"
       xDataKey="month"

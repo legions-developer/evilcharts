@@ -22,8 +22,8 @@ const chartConfig = {
   desktop: {
     label: "Desktop",
     colors: {
-      light: ["red", "orange", "rosybrown", "purple", "blue"],
-      dark: ["red", "orange", "rosybrown", "purple", "blue"],
+      light: ["red", "orange", "rosybrown", "purple", "blue"], // [!code highlight]
+      dark: ["red", "orange", "rosybrown", "purple", "blue"], // [!code highlight]
     },
   },
   mobile: {

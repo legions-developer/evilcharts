@@ -44,7 +44,7 @@ export function EvilExampleAreaChart() {
       yDataKey="desktop"
       stackType="stacked"
       strokeVariant="dashed"
-      areaVariant="solid"
+      areaVariant="solid" // [!code highlight]
       activeDotVariant="default"
       data={data}
       chartConfig={chartConfig}

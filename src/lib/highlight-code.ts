@@ -8,18 +8,43 @@ import {
 import type { ShikiTransformer } from "shiki";
 import { codeToHtml } from "shiki";
 
+// Strip [!code ...] annotations from raw code for copying
+export function stripCodeAnnotations(code: string): string {
+  return code
+    .split("\n")
+    .map((line) => {
+      // Remove // [!code ...] comments
+      let cleaned = line.replace(/\s*\/\/\s*\[!code\s+[^\]]+\]\s*$/, "");
+      // Remove /* [!code ...] */ and {/* [!code ...] */} comments
+      cleaned = cleaned.replace(/\s*\{?\s*\/\*\s*\[!code\s+[^\]]+\]\s*\*\/\s*\}?\s*$/, "");
+      // Remove <!-- [!code ...] --> comments
+      cleaned = cleaned.replace(/\s*<!--\s*\[!code\s+[^\]]+\]\s*-->\s*$/, "");
+      return cleaned;
+    })
+    .filter((line, index) => {
+      const originalLine = code.split("\n")[index];
+      // Remove lines that were only [!code word:...] annotations
+      const isWordAnnotationLine = /^\s*(?:\/\/|\/\*|\{\/\*|<!--)\s*\[!code\s+word:/.test(
+        originalLine,
+      );
+      return !(isWordAnnotationLine && line.trim() === "");
+    })
+    .join("\n");
+}
+
 export const transformers = [
   {
     pre(node) {
       if (node.tagName === "pre") {
         const raw = this.source;
-        node.properties.__raw__ = raw;
+        node.properties.__raw__ = stripCodeAnnotations(raw);
       }
     },
     code(node) {
       if (node.tagName === "code") {
         const raw = this.source;
-        node.properties.__raw__ = raw;
+        const cleanedRaw = stripCodeAnnotations(raw);
+        node.properties.__raw__ = cleanedRaw;
 
         if (raw.startsWith("npm install")) {
           node.properties.__npm__ = raw;
@@ -60,8 +85,15 @@ export const transformers = [
         }
       }
     },
+    line(node) {
+      node.properties["data-line"] = "";
+    },
   },
+  transformerNotationHighlight(),
   transformerNotationWordHighlight(),
+  transformerNotationFocus(),
+  transformerNotationDiff(),
+  transformerNotationErrorLevel(),
 ] as ShikiTransformer[];
 
 export async function highlightCode(

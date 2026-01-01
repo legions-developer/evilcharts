@@ -43,7 +43,7 @@ export function EvilExampleAreaChart() {
       xDataKey="month"
       yDataKey="desktop"
       stackType="stacked"
-      strokeVariant="animated-dashed"
+      strokeVariant="animated-dashed" // [!code highlight]
       areaVariant="gradient"
       activeDotVariant="default"
       data={data}
