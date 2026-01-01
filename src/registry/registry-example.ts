@@ -13,6 +13,29 @@ export const examples: Registry["items"] = [
       },
     ],
   },
+  // Area Chart Gradient Color
+  {
+    name: "ex-gradient-colors-area-chart",
+    registryDependencies: ["@evilcharts/area-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-gradient-colors-area-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-gradient-colors-natural-area-chart",
+    registryDependencies: ["@evilcharts/area-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-gradient-colors-natural-area-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
   // Area Chart Loading State
   {
     name: "ex-loading-state-area-chart",

@@ -7,6 +7,7 @@ type ChartDotProps = {
   cx?: number;
   cy?: number;
   dataKey: string;
+  chartId: string;
   className?: string;
   fillOpacity?: number;
   type?: DotVariant;
@@ -16,12 +17,13 @@ const ChartDot = React.memo(function ChartDot({
   cx,
   cy,
   dataKey,
+  chartId,
   className,
   fillOpacity = 1,
   type = "default",
 }: ChartDotProps) {
   const dotId = React.useId().replace(/:/g, "");
-  const gradientUrl = `url(#evil-area-chart-colors-${String(dataKey)})`;
+  const gradientUrl = `url(#${chartId}-colors-${String(dataKey)})`;
 
   if (cx === undefined || cy === undefined) return null;
 
