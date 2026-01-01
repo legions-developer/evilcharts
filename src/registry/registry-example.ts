@@ -82,6 +82,40 @@ export const examples: Registry["items"] = [
       },
     ],
   },
+  // Area Chart Curve Types
+  {
+    name: "ex-bump-curve-type-area-chart",
+    registryDependencies: ["@evilcharts/area-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-bump-curve-type-area-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-step-curve-type-area-chart",
+    registryDependencies: ["@evilcharts/area-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-step-curve-type-area-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-monotoney-curve-type-area-chart",
+    registryDependencies: ["@evilcharts/area-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-monotoney-curve-type-area-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
   // Area Chart Stroke Variants
   {
     name: "ex-solid-stroke-area-chart",
