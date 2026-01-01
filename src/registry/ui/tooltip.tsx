@@ -1,8 +1,25 @@
+import { getPayloadConfigFromPayload, getColorsCount, useChart } from "@/registry/ui/chart";
 import type { NameType, ValueType } from "recharts/types/component/DefaultTooltipContent";
-import { getPayloadConfigFromPayload, useChart } from "@/registry/ui/chart";
 import * as RechartsPrimitive from "recharts";
 import { cn } from "@/lib/utils";
 import * as React from "react";
+
+// Generate CSS styles for tooltip color indicator
+// Single color: applies solid background color
+// Multiple colors: applies linear gradient background
+function getIndicatorColorStyle(dataKey: string, colorsCount: number): React.CSSProperties {
+  if (colorsCount <= 1) {
+    return { background: `var(--color-${dataKey}-0)` };
+  }
+
+  // Multiple colors: create linear gradient with evenly distributed stops
+  const stops = Array.from({ length: colorsCount }, (_, index) => {
+    const offset = (index / (colorsCount - 1)) * 100;
+    return `var(--color-${dataKey}-${index}) ${offset}%`;
+  }).join(", ");
+
+  return { background: `linear-gradient(to right, ${stops})` };
+}
 
 const ChartTooltip = RechartsPrimitive.Tooltip;
 
@@ -17,7 +34,6 @@ function ChartTooltipContent({
   labelFormatter,
   labelClassName,
   formatter,
-  color,
   nameKey,
   labelKey,
   selected,
@@ -79,7 +95,9 @@ function ChartTooltipContent({
           .map((item, index) => {
             const key = `${nameKey ?? item.name ?? item.dataKey ?? "value"}`;
             const itemConfig = getPayloadConfigFromPayload(config, item, key);
-            const indicatorColor = color ?? item.payload?.fill ?? item.color;
+
+            // Get colors count for this item to determine gradient vs solid
+            const colorsCount = itemConfig ? getColorsCount(itemConfig) : 1;
 
             return (
               <div
@@ -99,22 +117,14 @@ function ChartTooltipContent({
                     ) : (
                       !hideIndicator && (
                         <div
-                          className={cn(
-                            "shrink-0 rounded-[2px] border-(--color-border) bg-(--color-bg)",
-                            {
-                              "h-2.5 w-2.5": indicator === "dot",
-                              "w-1": indicator === "line",
-                              "w-0 border-[1.5px] border-dashed bg-transparent":
-                                indicator === "dashed",
-                              "my-0.5": nestLabel && indicator === "dashed",
-                            },
-                          )}
-                          style={
-                            {
-                              "--color-bg": indicatorColor,
-                              "--color-border": indicatorColor,
-                            } as React.CSSProperties
-                          }
+                          className={cn("shrink-0 rounded-[2px]", {
+                            "h-2.5 w-2.5": indicator === "dot",
+                            "w-1": indicator === "line",
+                            "w-0 border-[1.5px] border-dashed bg-transparent!":
+                              indicator === "dashed",
+                            "my-0.5": nestLabel && indicator === "dashed",
+                          })}
+                          style={getIndicatorColorStyle(key, colorsCount)}
                         />
                       )
                     )}

@@ -48,14 +48,16 @@ function Steps({ className, children, ...props }: StepsProps) {
 }
 
 const StepTitle = ({ className, children }: { className?: string; children: string }) => {
-  return <h3 className={cn(className, "pt-1 text-[15px]! font-normal! not-first:mt-2")}>{children}</h3>;
+  return (
+    <h3 className={cn(className, "pt-0.5 text-[15px]! font-normal! not-first:mt-2")}>{children}</h3>
+  );
 };
 
 function Step({ stepNumber, className, children, ...props }: StepProps & { stepNumber?: number }) {
   return (
     <div className={cn("pl-9", className)} {...props}>
       {/* Step number circle */}
-      <div className="bg-border text-primary jetbrains absolute top-0.5 left-0 flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold">
+      <div className="bg-border text-primary jetbrains absolute top-0.5 left-0 flex h-6 w-6 items-center justify-center rounded-md text-xs">
         {stepNumber}
       </div>
       <div>{children}</div>

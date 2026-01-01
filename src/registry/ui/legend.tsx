@@ -1,9 +1,31 @@
-import { getPayloadConfigFromPayload, useChart } from "@/registry/ui/chart";
+import { getPayloadConfigFromPayload, getColorsCount, useChart } from "@/registry/ui/chart";
 import * as RechartsPrimitive from "recharts";
 import { cn } from "@/lib/utils";
 import * as React from "react";
 
 const ChartLegend = RechartsPrimitive.Legend;
+
+// Generate CSS gradient string for legend color indicator
+// Single color: applies same color to start and end (appears solid)
+// Multiple colors: distributes colors evenly as gradient stops
+function getLegendColorStyle(dataKey: string, colorsCount: number): React.CSSProperties {
+  if (colorsCount <= 1) {
+    // Single color: use solid background via CSS variable
+    return {
+      backgroundColor: `var(--color-${dataKey}-0)`,
+    };
+  }
+
+  // Multiple colors: create linear gradient with evenly distributed stops
+  const stops = Array.from({ length: colorsCount }, (_, index) => {
+    const offset = (index / (colorsCount - 1)) * 100;
+    return `var(--color-${dataKey}-${index}) ${offset}%`;
+  }).join(", ");
+
+  return {
+    background: `linear-gradient(to right, ${stops})`,
+  };
+}
 
 function ChartLegendContent({
   className,
@@ -46,6 +68,9 @@ function ChartLegendContent({
           const itemConfig = getPayloadConfigFromPayload(config, item, key);
           const isSelected = selected === null || selected === item.value;
 
+          // Get colors count for this item to determine gradient vs solid
+          const colorsCount = itemConfig ? getColorsCount(itemConfig) : 1;
+
           return (
             <div
               key={item.value}
@@ -65,9 +90,7 @@ function ChartLegendContent({
               ) : (
                 <div
                   className="h-2 w-2 shrink-0 rounded-[2px]"
-                  style={{
-                    backgroundColor: item.color,
-                  }}
+                  style={getLegendColorStyle(key, colorsCount)}
                 />
               )}
               {itemConfig?.label}

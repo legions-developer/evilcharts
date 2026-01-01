@@ -21,12 +21,12 @@ const data = [
 const chartConfig = {
   desktop: {
     label: "Desktop",
-    colors: { light: ["#EC6142"], dark: ["red", "orange", "yellow", "green", "blue", "purple"] },
+    colors: { light: ["black"], dark: ["red", "orange", "pink", "purple", "blue"] },
   },
   mobile: {
     label: "Mobile",
     colors: {
-      light: ["red", "orange", "yellow", "green", "blue", "purple"],
+      light: ["red", "orange", "pink", "purple", "blue"],
       dark: ["gray"],
     },
   },
@@ -41,6 +41,7 @@ export function EvilExampleSimpleAreaChart() {
       type="stacked"
       strokeVariant="dashed"
       areaVariant="gradient"
+      dotVariant="colored-border"
       activeDotVariant="default"
       data={data} // if isLoading is true, pass empty array → i.e isLoading ? [] : data
       chartConfig={chartConfig}

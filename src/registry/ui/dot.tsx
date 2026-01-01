@@ -1,79 +1,168 @@
-import { ChartConfig, useChart } from "./chart";
-import * as RechartsPrimitive from "recharts";
 import { cn } from "@/lib/utils";
 import * as React from "react";
 
 export type DotVariant = "default" | "border" | "colored-border";
 
-type ChartDotProps = React.ComponentProps<typeof RechartsPrimitive.Dot> & {
-  dataKey: keyof ChartConfig;
+type ChartDotProps = {
+  cx?: number;
+  cy?: number;
+  dataKey: string;
+  className?: string;
+  fillOpacity?: number;
   type?: DotVariant;
 };
 
+// Dot component that uses gradient color based on x position
+// Instead of applying gradient to individual dots, we render a full-width gradient rectangle
+// and use clipPath to mask the dot shape at each position, showing the correct gradient color
 const ChartDot = React.memo(function ChartDot({
   cx,
   cy,
-  fill,
   dataKey,
   className,
   fillOpacity = 1,
   type = "default",
 }: ChartDotProps) {
-  const commonProps = {
-    cx,
-    cy,
-    fill,
-    dataKey,
-    fillOpacity,
-    className,
-  };
+  const dotId = React.useId().replace(/:/g, "");
+  const gradientUrl = `url(#evil-area-chart-colors-${String(dataKey)})`;
 
-  const { config } = useChart();
-  const baseColor = config[dataKey]?.color;
+  if (cx === undefined || cy === undefined) return null;
 
   switch (type) {
     case "border":
-      return <PrimaryBorderDot {...commonProps} fill={baseColor} />;
+      return (
+        <PrimaryBorderDot
+          cx={cx}
+          cy={cy}
+          dotId={dotId}
+          fillOpacity={fillOpacity}
+          gradientUrl={gradientUrl}
+          className={className}
+        />
+      );
     case "colored-border":
-      return <ColoredBorderDot {...commonProps} stroke={baseColor} />;
+      return (
+        <ColoredBorderDot
+          cx={cx}
+          cy={cy}
+          dotId={dotId}
+          fillOpacity={fillOpacity}
+          gradientUrl={gradientUrl}
+          className={className}
+        />
+      );
     default:
-      return <DefaultDot {...commonProps} fill={baseColor} />;
+      return (
+        <DefaultDot
+          cx={cx}
+          cy={cy}
+          dotId={dotId}
+          fillOpacity={fillOpacity}
+          gradientUrl={gradientUrl}
+          className={className}
+        />
+      );
   }
 });
 
-const DefaultDot = React.memo((props: ChartDotProps) => {
-  return <RechartsPrimitive.Dot {...props} r={3} />;
-});
+type DotVariantProps = {
+  cx: number;
+  cy: number;
+  dotId: string;
+  fillOpacity: number;
+  gradientUrl: string;
+  className?: string;
+};
+
+const DefaultDot = React.memo(
+  ({ cx, cy, dotId, fillOpacity, gradientUrl, className }: DotVariantProps) => {
+    const r = 3;
+    return (
+      <g className={className}>
+        <defs>
+          <clipPath id={`dot-clip-${dotId}`}>
+            <circle cx={cx} cy={cy} r={r} />
+          </clipPath>
+        </defs>
+        {/* Full-width gradient rectangle clipped to dot shape */}
+        <rect
+          x="0"
+          y={cy - r}
+          width="100%"
+          height={r * 2}
+          fill={gradientUrl}
+          fillOpacity={fillOpacity}
+          clipPath={`url(#dot-clip-${dotId})`}
+        />
+      </g>
+    );
+  },
+);
 
 DefaultDot.displayName = "DefaultDot";
 
-const PrimaryBorderDot = React.memo((props: ChartDotProps) => {
-  return (
-    <RechartsPrimitive.Dot
-      {...props}
-      r={4.5}
-      strokeWidth="3"
-      stroke="currentColor"
-      className={cn(props.className, "text-background")}
-    />
-  );
-});
+const PrimaryBorderDot = React.memo(
+  ({ cx, cy, dotId, fillOpacity, gradientUrl, className }: DotVariantProps) => {
+    const r = 6;
+    const strokeWidth = 5;
+    return (
+      <g className={cn(className, "text-background")}>
+        <defs>
+          <clipPath id={`dot-clip-${dotId}`}>
+            <circle cx={cx} cy={cy} r={r} />
+          </clipPath>
+        </defs>
+        {/* Background stroke (border) */}
+        <circle cx={cx} cy={cy} r={r} fill="currentColor" />
+        {/* Inner gradient circle clipped */}
+        <rect
+          x="0"
+          y={cy - (r - strokeWidth / 2)}
+          width="100%"
+          height={(r - strokeWidth / 2) * 2}
+          fill={gradientUrl}
+          fillOpacity={fillOpacity}
+          clipPath={`url(#dot-clip-inner-${dotId})`}
+        />
+        <defs>
+          <clipPath id={`dot-clip-inner-${dotId}`}>
+            <circle cx={cx} cy={cy} r={r - strokeWidth / 2} />
+          </clipPath>
+        </defs>
+      </g>
+    );
+  },
+);
 
 PrimaryBorderDot.displayName = "PrimaryBorderDot";
 
-const ColoredBorderDot = React.memo((props: ChartDotProps) => {
-  return (
-    <RechartsPrimitive.Dot
-      {...props}
-      r={3}
-      fill="currentColor"
-      strokeWidth="1"
-      fillOpacity="1"
-      strokeOpacity={props.fillOpacity}
-      className={cn(props.className, "text-background")}
-    />
-  );
-});
+const ColoredBorderDot = React.memo(
+  ({ cx, cy, dotId, fillOpacity, gradientUrl, className }: DotVariantProps) => {
+    const r = 3;
+    const strokeWidth = 1;
+    return (
+      <g className={cn(className, "text-background")}>
+        <defs>
+          <clipPath id={`dot-clip-${dotId}`}>
+            <circle cx={cx} cy={cy} r={r + strokeWidth / 2} />
+          </clipPath>
+        </defs>
+        {/* Gradient stroke (border) via clipped rect */}
+        <rect
+          x="0"
+          y={cy - r - strokeWidth / 2}
+          width="100%"
+          height={(r + strokeWidth / 2) * 2}
+          fill={gradientUrl}
+          fillOpacity={fillOpacity}
+          clipPath={`url(#dot-clip-${dotId})`}
+        />
+        {/* Inner solid fill */}
+        <circle cx={cx} cy={cy} r={r - strokeWidth / 2} fill="currentColor" />
+      </g>
+    );
+  },
+);
 
 ColoredBorderDot.displayName = "ColoredBorderDot";
 
