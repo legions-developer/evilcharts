@@ -8,18 +8,18 @@ import { cn } from "@/lib/utils";
 
 type PackageManager = "npm" | "yarn" | "bun" | "pnpm";
 
-interface CliBlockProps {
+interface CommandBlockProps {
   commands: string[];
 }
 
 const packageCommands: Record<PackageManager, string> = {
-  npm: "npx shadcn@latest add",
-  yarn: "yarn shadcn@latest add",
-  bun: "bunx --bun shadcn@latest add",
-  pnpm: "pnpm dlx shadcn@latest add",
+  npm: "npm install",
+  yarn: "yarn add",
+  bun: "bun add",
+  pnpm: "pnpm add",
 };
 
-function CliBlock({ commands }: CliBlockProps) {
+function CommandBlock({ commands }: CommandBlockProps) {
   const { packageManager, setConfig } = useConfig();
 
   return (
@@ -82,4 +82,4 @@ function CliBlock({ commands }: CliBlockProps) {
   );
 }
 
-export { CliBlock };
+export { CommandBlock };

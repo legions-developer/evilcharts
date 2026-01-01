@@ -21,13 +21,16 @@ const data = [
 const chartConfig = {
   desktop: {
     label: "Desktop",
-    colors: { light: ["black"], dark: ["red", "orange", "pink", "purple", "blue"] },
+    colors: {
+      light: ["#047857"],
+      dark: ["#10b981"],
+    },
   },
   mobile: {
     label: "Mobile",
     colors: {
-      light: ["red", "orange", "pink", "purple", "blue"],
-      dark: ["gray"],
+      light: ["#be123c"],
+      dark: ["#f43f5e"],
     },
   },
 } satisfies ChartConfig;
@@ -38,10 +41,10 @@ export function EvilExampleAreaChart() {
       isClickable
       className="h-full w-full p-4"
       xDataKey="month"
-      type="stacked"
+      yDataKey="desktop"
+      type="expanded"
       strokeVariant="dashed"
       areaVariant="gradient"
-      dotVariant="colored-border"
       activeDotVariant="default"
       data={data} // if isLoading is true, pass empty array → i.e isLoading ? [] : data
       chartConfig={chartConfig}

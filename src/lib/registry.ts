@@ -19,7 +19,9 @@ export async function getRegistryItem(name: string) {
 
   // Convert all file paths to object.
   // TODO: remove when we migrate to new registry.
-  item.files = item.files.map((file: unknown) => (typeof file === "string" ? { path: file } : file));
+  item.files = item.files.map((file: unknown) =>
+    typeof file === "string" ? { path: file } : file,
+  );
 
   // Type assertion for now - TODO: implement proper validation
   const typedItem = item as RegistryItem;
@@ -86,7 +88,11 @@ function getFileTarget(file: { path: string; type?: string; target?: string }) {
 
   if (!target || target === "") {
     const fileName = file.path.split("/").pop();
-    if (file.type === "registry:block" || file.type === "registry:component" || file.type === "registry:example") {
+    if (
+      file.type === "registry:block" ||
+      file.type === "registry:component" ||
+      file.type === "registry:example"
+    ) {
       target = `components/${fileName}`;
     }
 
@@ -147,7 +153,7 @@ export function fixImport(content: string) {
       return `@/components/${component}`;
     }
     if (type.endsWith("ui")) {
-      return `@/components/ui/${component}`;
+      return `@/components/evilcharts/ui/${component}`;
     }
     if (type.endsWith("hooks")) {
       return `@/hooks/${component}`;
@@ -171,7 +177,9 @@ export type FileTree = {
   children?: FileTree[];
 };
 
-export function createFileTreeForRegistryItemFiles(files: Array<{ path: string; target?: string }>) {
+export function createFileTreeForRegistryItemFiles(
+  files: Array<{ path: string; target?: string }>,
+) {
   const root: FileTree[] = [];
 
   for (const file of files) {

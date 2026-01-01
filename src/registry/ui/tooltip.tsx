@@ -4,25 +4,6 @@ import * as RechartsPrimitive from "recharts";
 import { cn } from "@/lib/utils";
 import * as React from "react";
 
-// Generate CSS styles for tooltip color indicator
-// Single color: applies solid background color
-// Multiple colors: applies linear gradient background
-function getIndicatorColorStyle(dataKey: string, colorsCount: number): React.CSSProperties {
-  if (colorsCount <= 1) {
-    return { background: `var(--color-${dataKey}-0)` };
-  }
-
-  // Multiple colors: create linear gradient with evenly distributed stops
-  const stops = Array.from({ length: colorsCount }, (_, index) => {
-    const offset = (index / (colorsCount - 1)) * 100;
-    return `var(--color-${dataKey}-${index}) ${offset}%`;
-  }).join(", ");
-
-  return { background: `linear-gradient(to right, ${stops})` };
-}
-
-const ChartTooltip = RechartsPrimitive.Tooltip;
-
 function ChartTooltipContent({
   active,
   payload,
@@ -157,5 +138,21 @@ function ChartTooltipContent({
     </div>
   );
 }
+
+function getIndicatorColorStyle(dataKey: string, colorsCount: number): React.CSSProperties {
+  if (colorsCount <= 1) {
+    return { background: `var(--color-${dataKey}-0)` };
+  }
+
+  // Multiple colors: create linear gradient with evenly distributed stops
+  const stops = Array.from({ length: colorsCount }, (_, index) => {
+    const offset = (index / (colorsCount - 1)) * 100;
+    return `var(--color-${dataKey}-${index}) ${offset}%`;
+  }).join(", ");
+
+  return { background: `linear-gradient(to right, ${stops})` };
+}
+
+const ChartTooltip = RechartsPrimitive.Tooltip;
 
 export { ChartTooltip, ChartTooltipContent };

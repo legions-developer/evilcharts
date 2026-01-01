@@ -58,7 +58,11 @@ export const transformers = [
   transformerNotationWordHighlight(),
 ] as ShikiTransformer[];
 
-export async function highlightCode(code: string, language = "tsx", options?: { showLineNumbers?: boolean }) {
+export async function highlightCode(
+  code: string,
+  language = "tsx",
+  options?: { showLineNumbers?: boolean },
+) {
   const { showLineNumbers = true } = options ?? {};
 
   const html = await codeToHtml(code, {

@@ -40,4 +40,16 @@ export const ui: Registry["items"] = [
       },
     ],
   },
+  {
+    name: "dot",
+    type: "registry:component",
+    dependencies: ["recharts"],
+    files: [
+      {
+        path: "ui/dot.tsx",
+        type: "registry:component",
+        target: TARGET_BASE_PATH + "/dot.tsx",
+      },
+    ],
+  },
 ];

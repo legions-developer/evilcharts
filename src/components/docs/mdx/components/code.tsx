@@ -26,7 +26,7 @@ export async function CodeBlock({
 
   if (withWrapper) {
     return (
-      <div className={cn("dark:bg-primary-foreground bg-muted-foreground/5 rounded-md p-1")}>
+      <div className={cn("dark:bg-primary-foreground rounded-md bg-[#F5F5F5] p-1")}>
         <div className="flex h-7 justify-between px-1">
           <figcaption
             className="text-muted-foreground/80 flex items-center gap-1.5 text-xs [&_svg]:size-3.5"

@@ -1,4 +1,3 @@
-// Thanks to @shadcn for creating chart component - Highly Modified by EvilCharts :D
 "use client";
 
 import * as RechartsPrimitive from "recharts";

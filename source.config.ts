@@ -32,6 +32,7 @@ export const docs = defineDocs({
         .object({
           api: z.string().optional(),
           doc: z.string().optional(),
+          github: z.string().optional(),
         })
         .optional(),
     }),

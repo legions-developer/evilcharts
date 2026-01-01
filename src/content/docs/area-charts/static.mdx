@@ -2,10 +2,12 @@
 title: Static
 description: Simple static & beauitfully designed area charts
 links:
-  doc: https://base-ui.com/react/components/accordion#api-reference
+  github: https://github.com/legions-developer/evilcharts/blob/main/src/registry/charts/area-chart.tsx
+  doc: https://recharts.github.io/en-US/examples/SimpleAreaChart/
+  api: https://recharts.github.io/en-US/api/AreaChart/
 ---
 
-<ComponentPreview title="Simple" name="ex-area-simple-chart" align="start" />
+<ComponentPreview title="Basic Chart" name="ex-area-chart"  />
 
 ## Installation
 
@@ -15,30 +17,116 @@ links:
     <TabsTab value="manual">Manual</TabsTab>
   </TabsList>
   <TabsPanel value="cli">
-    <CliBlock name="@coss/accordion" />
+    <CliBlock commands={["@evilcharts/area-chart"]} />
   </TabsPanel>
   <TabsPanel value="manual">
     <Steps>
       <Step>
         <StepTitle>Install the following dependencies:</StepTitle>
         <StepContent>
-          <CodeBlock
-            withWrapper
-            showLineNumbers={false}
-            code="npm install @base-ui/react"
-            language="bash"
-          />
+          <CommandBlock commands={["recharts"]} />
         </StepContent>
       </Step>
       <Step>
-        <StepTitle>Copy and paste the following code into your project.</StepTitle>
+        <StepTitle>Copy and paste the following code snippets into your project.</StepTitle>
+         <StepDescription>
+          To use the chart, first create the folder `evilcharts` and a subfolder called `charts` inside your `components` directory.
+          Then, copy the following base area-chart code into a new file in that folder.
+        </StepDescription>
         <StepContent>
           <ComponentSource
-            name="ex-area-simple-chart"
-            title="components/ui/accordion.tsx"
+            name="area-chart"
+            title="components/evilcharts/charts/area-chart.tsx"
+          />
+        </StepContent>
+      </Step>
+       <Step>
+        <StepTitle>Now, Let's add the chart component to your project.</StepTitle>
+        <StepDescription>
+          These Components are required by the chart component to render the chart. Make a folder called `ui` inside the `evilcharts` folder and paste the code there.
+
+          Below is main chart component.
+        </StepDescription>
+        <StepContent>
+          <ComponentSource
+            name="chart"
+            title="components/evilcharts/ui/chart.tsx"
+          />
+        </StepContent>
+      </Step>
+       <Step>
+        <StepTitle>Now, We need to add sub components.</StepTitle>
+        <StepDescription>
+          Create a file called `tooltip.tsx` inside the `evilcharts/ui` folder and paste the code there.
+        </StepDescription>
+        <StepContent>
+          <ComponentSource
+            name="tooltip"
+            title="components/evilcharts/ui/tooltip.tsx"
+          />
+        </StepContent>
+        <StepDescription>
+          Now, create another file called `legend.tsx` inside the `evilcharts/ui` folder and paste the code there.
+        </StepDescription>
+        <StepContent>
+          <ComponentSource
+            name="legend"
+            title="components/evilcharts/ui/legend.tsx"
+          />
+        </StepContent>
+        <StepDescription>
+          Finally, create last file called `dot.tsx` inside the `evilcharts/ui` folder and paste the code there.
+        </StepDescription>
+        <StepContent>
+          <ComponentSource
+            name="dot"
+            title="components/evilcharts/ui/dot.tsx"
           />
         </StepContent>
       </Step>
     </Steps>
   </TabsPanel>
 </CodeTabs>
+
+## Usage
+
+```tsx
+import { EvilAreaChart } from "@/components/evilcharts/charts/area-chart";
+```
+
+```tsx
+<EvilAreaChart  
+  xDataKey=""
+  type="stacked"
+  strokeVariant="dashed"
+  areaVariant="gradient"
+  activeDotVariant="default"
+  data={data}
+  chartConfig={chartConfig}
+/>
+```
+
+## Examples
+
+Below are some examples of the area chart with different `variants`. where you can change the `type`,`stroke variant` & `area variant`. 
+
+### Chart Types
+
+<ComponentPreview containerClassName="rounded-b-none!" className="mb-0 z-30" title="type='default'" name="ex-default-type-area-chart"  />
+<ComponentPreview containerClassName="rounded-none!" className="mb-0 -mt-1.5 z-20" title="type='stacked'" name="ex-stacked-type-area-chart"  />
+<ComponentPreview containerClassName="rounded-t-none!" className="z-10 -mt-1.5" title="type='expanded'" name="ex-expanded-type-area-chart"  />
+
+### Stroke Variants
+
+<ComponentPreview containerClassName="rounded-b-none!" className="mb-0 z-30" title="strokeVariant='solid'" name="ex-solid-stroke-area-chart"  />
+<ComponentPreview containerClassName="rounded-none!" className="mb-0 -mt-1.5 z-20" title="strokeVariant='dashed'" name="ex-dashed-stroke-area-chart"  />
+<ComponentPreview containerClassName="rounded-t-none!" className="z-10 -mt-1.5" title="strokeVariant='animated-dashed'" name="ex-animated-dashed-stroke-area-chart"  />
+
+### Area Variants
+
+<ComponentPreview containerClassName="rounded-b-none!" className="mb-0 z-30" title="areaVariant='gradient'" name="ex-gradient-area-variant-area-chart"  />
+<ComponentPreview containerClassName="rounded-none!" className="mb-0 -mt-1.5 z-20" title="areaVariant='gradient-reverse'" name="ex-gradient-reverse-area-variant-area-chart"  />
+<ComponentPreview containerClassName="rounded-t-none!" className="z-10 -mt-1.5" title="areaVariant='solid'" name="ex-solid-area-variant-area-chart"  />
+<ComponentPreview containerClassName="rounded-b-none!" className="mb-0 z-30" title="areaVariant='dotted'" name="ex-dotted-area-variant-area-chart"  />
+<ComponentPreview containerClassName="rounded-none!" className="mb-0 -mt-1.5 z-20" title="areaVariant='lines'" name="ex-lines-area-variant-area-chart"  />
+<ComponentPreview containerClassName="rounded-t-none!" className="z-10 -mt-1.5" title="areaVariant='hatched'" name="ex-hatched-area-variant-area-chart"  />

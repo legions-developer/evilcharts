@@ -6,13 +6,14 @@ import {
   AccordionTrigger,
   AccordionPanel,
 } from "@/components/ui/accordion";
+import { Step, Steps, StepTitle, StepContent, StepDescription } from "./components/steps";
 import { CodeCollapsibleWrapper } from "../charts/code-collapsible-wrapper";
 import { Tabs, TabsList, TabsPanel, TabsTab } from "@/components/ui/tabs";
-import { Step, Steps, StepTitle, StepContent } from "./components/steps";
 import { ComponentPreview } from "../charts/component-preview";
 import { H1, H2, H3, H4, H5, H6 } from "./components/headings";
 import { ComponentSource } from "../charts/component-source";
 import { Description, P, Strong } from "./components/text";
+import { CommandBlock } from "./components/command-block";
 import { Alert, AlertContent } from "./components/alert";
 import { Table, Tr, Th, Td } from "./components/table";
 import { LinkedCard } from "./components/linked-card";
@@ -53,11 +54,13 @@ export const mdxComponents: MDXComponents = {
   Steps,
   StepTitle,
   StepContent,
+  StepDescription,
   Image: MDXImage,
   Link: MDXLink,
   LinkedCard,
   Kbd,
   CliBlock,
+  CommandBlock,
   CodeBlock,
   Description,
   // shadcn code previews
@@ -94,7 +97,7 @@ export const mdxComponents: MDXComponents = {
   ),
   pre: ({ className, children, ...props }: React.ComponentProps<"pre">) => {
     return (
-      <div className="dark:bg-primary-foreground bg-muted-foreground/5 relative mt-4 rounded-sm p-1">
+      <div className="dark:bg-primary-foreground relative mt-4 rounded-sm bg-[#F5F5F5] p-1">
         <pre
           className={cn(
             "no-scrollbar bg-background min-w-0 overflow-x-auto rounded-sm border py-3.5 text-[.8125rem] outline-none has-data-highlighted-line:px-0 has-data-line-numbers:px-0 has-data-[slot=tabs]:p-0 [&>code]:px-4",
@@ -124,7 +127,7 @@ export const mdxComponents: MDXComponents = {
       return (
         <code
           className={cn(
-            "bg-background relative mx-1 rounded-md border px-[0.3rem] py-[0.2rem] font-mono text-[0.75rem] outline-none",
+            "bg-background relative mx-1 rounded-md border px-[0.3rem] py-[2px] font-mono text-[0.75rem] text-(--color-vesper-type) outline-none",
             className,
           )}
           {...props}

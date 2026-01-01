@@ -9,6 +9,7 @@ interface ComponentPreviewProps extends Omit<React.ComponentProps<"div">, "ref">
   description?: string;
   hideCode?: boolean;
   title?: string;
+  containerClassName?: string;
 }
 
 export function ComponentPreview({
@@ -17,6 +18,7 @@ export function ComponentPreview({
   align = "center",
   hideCode = false,
   title,
+  containerClassName,
   ...props
 }: ComponentPreviewProps) {
   const Component = Index[name]?.component;
@@ -24,9 +26,19 @@ export function ComponentPreview({
 
   if (!Component) {
     return (
-      <p className="text-muted-foreground text-sm">
-        Component <code className="bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm">{name}</code>{" "}
-        not found in registry.
+      <p className="text-muted-foreground mt-4 text-[13px] leading-6">
+        Component{" "}
+        <code className="bg-background relative mx-1 rounded-md border px-[0.3rem] py-1 font-mono text-[0.75rem] text-red-500 outline-none">
+          {name}
+        </code>{" "}
+        not found in registry. Contact the developer to add it.{" "}
+        <a
+          target="_blank"
+          href="https://github.com/legions-developer/evilcharts/issues"
+          className="text-primary hover:underline"
+        >
+          open an issue
+        </a>
       </p>
     );
   }
@@ -35,6 +47,7 @@ export function ComponentPreview({
     <ComponentPreviewTabs
       align={align}
       className={cn(metaClassName, className)}
+      containerClassName={containerClassName}
       component={<Component />}
       hideCode={hideCode}
       source={<ComponentSource collapsible={false} name={name} />}

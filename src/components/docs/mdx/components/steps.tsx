@@ -30,8 +30,8 @@ function Steps({ className, children, ...props }: StepsProps) {
           <div key={index} className="relative">
             <div
               className={cn(
-                "bg-border absolute top-[26px] left-[12px] h-[calc(100%-24px)] w-px",
-                isLastStep && "hidden",
+                "bg-border absolute top-[26px] left-[12px] h-full w-px",
+                isLastStep && "from-border via-border/50 bg-gradient-to-b to-transparent",
               )}
               aria-hidden="true"
             />
@@ -49,13 +49,28 @@ function Steps({ className, children, ...props }: StepsProps) {
 
 const StepTitle = ({ className, children }: { className?: string; children: string }) => {
   return (
-    <h3 className={cn(className, "pt-0.5 text-[15px]! font-normal! not-first:mt-2")}>{children}</h3>
+    <h3 className={cn(className, "text-primary pt-0.5 text-[15px]! font-medium not-first:mt-2")}>
+      {children}
+    </h3>
+  );
+};
+
+const StepDescription = ({ className, children }: { className?: string; children: string }) => {
+  return (
+    <div
+      className={cn(
+        className,
+        "text-muted-foreground text-sm font-normal not-first:mt-4 [&>p]:leading-relaxed",
+      )}
+    >
+      {children}
+    </div>
   );
 };
 
 function Step({ stepNumber, className, children, ...props }: StepProps & { stepNumber?: number }) {
   return (
-    <div className={cn("pl-9", className)} {...props}>
+    <div className={cn("mt-6 pl-9", className)} {...props}>
       {/* Step number circle */}
       <div className="bg-border text-primary jetbrains absolute top-0.5 left-0 flex h-6 w-6 items-center justify-center rounded-md text-xs">
         {stepNumber}
@@ -73,4 +88,4 @@ function StepContent({ children, ...props }: StepContentProps) {
   );
 }
 
-export { Steps, Step, StepTitle, StepContent };
+export { Steps, Step, StepTitle, StepContent, StepDescription };

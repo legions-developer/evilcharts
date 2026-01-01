@@ -3,30 +3,6 @@ import * as RechartsPrimitive from "recharts";
 import { cn } from "@/lib/utils";
 import * as React from "react";
 
-const ChartLegend = RechartsPrimitive.Legend;
-
-// Generate CSS gradient string for legend color indicator
-// Single color: applies same color to start and end (appears solid)
-// Multiple colors: distributes colors evenly as gradient stops
-function getLegendColorStyle(dataKey: string, colorsCount: number): React.CSSProperties {
-  if (colorsCount <= 1) {
-    // Single color: use solid background via CSS variable
-    return {
-      backgroundColor: `var(--color-${dataKey}-0)`,
-    };
-  }
-
-  // Multiple colors: create linear gradient with evenly distributed stops
-  const stops = Array.from({ length: colorsCount }, (_, index) => {
-    const offset = (index / (colorsCount - 1)) * 100;
-    return `var(--color-${dataKey}-${index}) ${offset}%`;
-  }).join(", ");
-
-  return {
-    background: `linear-gradient(to right, ${stops})`,
-  };
-}
-
 function ChartLegendContent({
   className,
   hideIcon = false,
@@ -100,5 +76,26 @@ function ChartLegendContent({
     </div>
   );
 }
+
+function getLegendColorStyle(dataKey: string, colorsCount: number): React.CSSProperties {
+  if (colorsCount <= 1) {
+    // Single color: use solid background via CSS variable
+    return {
+      backgroundColor: `var(--color-${dataKey}-0)`,
+    };
+  }
+
+  // Multiple colors: create linear gradient with evenly distributed stops
+  const stops = Array.from({ length: colorsCount }, (_, index) => {
+    const offset = (index / (colorsCount - 1)) * 100;
+    return `var(--color-${dataKey}-${index}) ${offset}%`;
+  }).join(", ");
+
+  return {
+    background: `linear-gradient(to right, ${stops})`,
+  };
+}
+
+const ChartLegend = RechartsPrimitive.Legend;
 
 export { ChartLegend, ChartLegendContent };

@@ -12,9 +12,6 @@ type ChartDotProps = {
   type?: DotVariant;
 };
 
-// Dot component that uses gradient color based on x position
-// Instead of applying gradient to individual dots, we render a full-width gradient rectangle
-// and use clipPath to mask the dot shape at each position, showing the correct gradient color
 const ChartDot = React.memo(function ChartDot({
   cx,
   cy,

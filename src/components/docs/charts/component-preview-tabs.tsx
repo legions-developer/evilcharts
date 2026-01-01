@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 
 export function ComponentPreviewTabs({
   className,
+  containerClassName,
   align = "center",
   hideCode = false,
   component,
@@ -15,6 +16,7 @@ export function ComponentPreviewTabs({
   title,
   ...props
 }: React.ComponentProps<"div"> & {
+  containerClassName?: string;
   align?: "center" | "start" | "end";
   hideCode?: boolean;
   component: React.ReactNode;
@@ -24,7 +26,12 @@ export function ComponentPreviewTabs({
   return (
     <div className={cn("group relative mt-4 mb-12", className)} {...props}>
       <Tabs defaultValue="preview" className="relative w-full">
-        <div className="dark:bg-primary-foreground bg-muted-foreground/5 flex flex-col rounded-[8px] p-1">
+        <div
+          className={cn(
+            "dark:bg-primary-foreground flex flex-col rounded-[8px] bg-[#F5F5F5] p-1",
+            containerClassName,
+          )}
+        >
           <div className="flex flex-row items-center justify-between px-2">
             <span className="text-muted-foreground/80 flex items-center gap-1.5 font-mono text-xs [&_svg]:size-3.5">
               {getIconForLanguageExtension("component")} {title}
