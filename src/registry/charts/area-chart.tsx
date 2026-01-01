@@ -51,6 +51,8 @@ type EvilAreaChartProps<
   type?: ChartType;
   dotVariant?: DotVariant;
   activeDotVariant?: DotVariant;
+  connectNulls?: boolean;
+  tickGap?: number;
   // Hide Stuffs
   hideTooltip?: boolean;
   hideCartesianGrid?: boolean;
@@ -81,6 +83,8 @@ export function EvilAreaChart<
   type = "default",
   dotVariant,
   activeDotVariant,
+  connectNulls = false,
+  tickGap = 8,
   hideTooltip = false,
   hideCartesianGrid = false,
   hideLegend = false,
@@ -127,6 +131,7 @@ export function EvilAreaChart<
             tickLine={false}
             axisLine={false}
             tickMargin={8}
+            minTickGap={tickGap}
             {...xAxisProps}
           />
         )}
@@ -136,6 +141,7 @@ export function EvilAreaChart<
             tickLine={false}
             axisLine={false}
             tickMargin={8}
+            minTickGap={tickGap}
             width="auto"
             tickFormatter={
               type === "expanded" ? axisValueToPercentFormatter : yAxisProps?.tickFormatter
@@ -180,6 +186,7 @@ export function EvilAreaChart<
                 type={areaType}
                 key={dataKey}
                 dataKey={dataKey}
+                connectNulls={connectNulls}
                 fillOpacity={_opacity.fill}
                 strokeOpacity={_opacity.stroke}
                 fill={fillPattern}

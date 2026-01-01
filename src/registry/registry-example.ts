@@ -26,12 +26,12 @@ export const examples: Registry["items"] = [
     ],
   },
   {
-    name: "ex-gradient-colors-natural-area-chart",
+    name: "ex-gradient-colors-bump-area-chart",
     registryDependencies: ["@evilcharts/area-chart"],
     type: "registry:block",
     files: [
       {
-        path: "examples/ex-gradient-colors-natural-area-chart.tsx",
+        path: "examples/ex-gradient-colors-bump-area-chart.tsx",
         type: "registry:block",
       },
     ],
