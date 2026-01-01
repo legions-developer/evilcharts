@@ -701,36 +701,74 @@ const generateEasedGradientStops = (
   });
 };
 
-// Hook to manage loading data with refresh intervals
+/**
+ * Hook to manage loading data with pixel-perfect shimmer synchronization.
+ *
+ * The shimmer animation works as follows:
+ * - Pattern width = animationDuration / 1000 (e.g., 2.5 for 2500ms)
+ * - The gradient (shimmer) itself has width = 1 within the pattern
+ * - Animation: x goes from 0 to patternWidth over the duration
+ * - The visible chart area is normalized to 0-1 in objectBoundingBox units
+ *
+ * Timeline for a 2500ms animation with patternWidth = 2.5:
+ * - t=0ms:     x=0, shimmer enters at left edge
+ * - t=1000ms:  x=1, shimmer has fully exited the right edge
+ * - t=2500ms:  x=2.5, animation cycle completes, next shimmer enters
+ *
+ * To ensure seamless transitions, we swap data exactly when the shimmer
+ * has fully exited the visible area (x >= 1), which occurs at:
+ * exitTime = (1 / patternWidth) * animationDuration
+ *
+ * For 2500ms with patternWidth=2.5: exitTime = (1/2.5) * 2500 = 1000ms
+ *
+ * The data swap timing:
+ * - First swap: at exitTime (when first shimmer exits)
+ * - Subsequent swaps: every animationDuration after the first swap
+ *   (aligned to when each subsequent shimmer exits)
+ */
 export function useLoadingData(
   isLoading: boolean,
   loadingPoints: number = 10,
-  loadingAnimationDuration: number = 4000,
+  loadingAnimationDuration: number = LOADING_ANIMATION_DURATION,
 ) {
   const [loadingDataKey, setLoadingDataKey] = useState(false);
 
-  // Refresh loading data every 2 seconds when isLoading is true, with initial delay to match keyframes
   useEffect(() => {
     if (!isLoading) return;
 
-    let intervalId: NodeJS.Timeout | null = null;
+    let intervalId: ReturnType<typeof setInterval> | null = null;
 
-    // regular interval - must match animation duration for sync
-    intervalId = setInterval(() => {
-      setTimeout(() => {
+    // Calculate pattern width (same formula as LoadingAreaPatternStyle)
+    const patternWidth = loadingAnimationDuration / 1000;
+
+    // Calculate when shimmer fully exits the visible area (0-1 range)
+    // The gradient has width=1, so it fully exits when x >= 1
+    // Since x animates linearly from 0 to patternWidth over animationDuration:
+    // exitTime = (1 / patternWidth) * animationDuration = 1000ms (always)
+    const shimmerExitTime = (1 / patternWidth) * loadingAnimationDuration;
+
+    // First data swap happens when shimmer exits
+    const initialTimeoutId = setTimeout(() => {
+      setLoadingDataKey((prev) => !prev);
+
+      // Start interval AFTER first swap, so subsequent swaps are perfectly aligned
+      // Each subsequent shimmer takes exactly animationDuration to complete its cycle
+      // We swap when it exits (at the same relative point in each cycle)
+      intervalId = setInterval(() => {
         setLoadingDataKey((prev) => !prev);
-      }, 1000); // <--- Extra Delay to match animation keyframes
-    }, loadingAnimationDuration);
+      }, loadingAnimationDuration);
+    }, shimmerExitTime);
 
     return () => {
-      // clearTimeout(timeoutId);
+      clearTimeout(initialTimeoutId);
       if (intervalId) clearInterval(intervalId);
     };
   }, [isLoading, loadingAnimationDuration]);
 
   const loadingData = useMemo(
     () => getLoadingData(loadingPoints),
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- CAUTION: loadingDataKey intentionally triggers re-computation to match animation keyframes
+    // loadingDataKey triggers re-computation when shimmer exits
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [loadingPoints, loadingDataKey],
   );
 
@@ -754,7 +792,7 @@ const LoadingAreaPatternStyle = () => {
         id="evil-area-chart-loading-mask-pattern"
         patternUnits="objectBoundingBox"
         patternContentUnits="objectBoundingBox"
-        patternTransform="rotate(-25)"
+        patternTransform="rotate(25)"
         width={width}
         height="1"
         x="0"
