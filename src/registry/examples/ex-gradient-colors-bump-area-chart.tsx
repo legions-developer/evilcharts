@@ -21,12 +21,15 @@ const data = [
 const chartConfig = {
   desktop: {
     label: "Desktop",
-    colors: { light: ["black"], dark: ["red", "orange", "pink", "purple", "blue"] },
+    colors: {
+      light: ["red", "orange", "rosybrown", "purple", "blue"],
+      dark: ["red", "orange", "rosybrown", "purple", "blue"],
+    },
   },
   mobile: {
     label: "Mobile",
     colors: {
-      light: ["red", "orange", "pink", "purple", "blue"],
+      light: ["gray"],
       dark: ["gray"],
     },
   },
