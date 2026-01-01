@@ -39,7 +39,7 @@ export const H2 = ({ className, ...props }: React.ComponentProps<"h2">) => {
 export const H3 = ({ className, ...props }: React.ComponentProps<"h3">) => (
   <h3
     className={cn(
-      "font-heading text-primary mt-8 scroll-m-12 text-base tracking-tight select-none [&+p]:mt-4! *:[code]:text-xl",
+      "font-heading text-primary mt-8 scroll-m-12 text-base font-medium tracking-tight select-none [&+p]:mt-4! *:[code]:text-xl",
       className,
     )}
     {...props}
