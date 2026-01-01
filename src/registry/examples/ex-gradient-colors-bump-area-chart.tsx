@@ -36,10 +36,10 @@ export function EvilExampleAreaChart() {
   return (
     <EvilAreaChart
       isClickable
-      areaType="bump"
+      curveType="bump"
       className="h-full w-full p-4"
       xDataKey="month"
-      type="stacked"
+      stackType="stacked"
       strokeVariant="dashed"
       areaVariant="gradient"
       dotVariant="colored-border"

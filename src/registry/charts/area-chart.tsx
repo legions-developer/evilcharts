@@ -25,7 +25,7 @@ type YAxisProps = ComponentProps<typeof YAxis>;
 type AreaType = ComponentProps<typeof Area>["type"];
 type AreaVariant = "gradient" | "gradient-reverse" | "solid" | "dotted" | "lines" | "hatched";
 type StrokeVariant = "solid" | "dashed" | "animated-dashed";
-type ChartType = "default" | "expanded" | "stacked";
+type StackType = "default" | "expanded" | "stacked";
 
 // Validating Tyes to make sure user have provided valid data according to chartConfig
 type ValidateConfigKeys<TData, TConfig> = {
@@ -45,10 +45,10 @@ type EvilAreaChartProps<
   xAxisProps?: XAxisProps;
   yAxisProps?: YAxisProps;
   defaultSelectedDataKey?: string | null;
-  areaType?: AreaType;
+  curveType?: AreaType;
   areaVariant?: AreaVariant;
   strokeVariant?: StrokeVariant;
-  type?: ChartType;
+  stackType?: StackType;
   dotVariant?: DotVariant;
   activeDotVariant?: DotVariant;
   connectNulls?: boolean;
@@ -77,10 +77,10 @@ export function EvilAreaChart<
   xAxisProps,
   yAxisProps,
   defaultSelectedDataKey = null,
-  areaType = "linear",
+  curveType = "linear",
   areaVariant = "gradient",
   strokeVariant = "dashed",
-  type = "default",
+  stackType = "default",
   dotVariant,
   activeDotVariant,
   connectNulls = false,
@@ -97,8 +97,8 @@ export function EvilAreaChart<
   const loadingData = useLoadingData(isLoading, loadingPoints, LOADING_ANIMATION_DURATION);
   const chartId = useId().replace(/:/g, ""); // Remove colons for valid CSS selectors
 
-  const isExpanded = type === "expanded";
-  const isStacked = type === "stacked" || type === "expanded";
+  const isExpanded = stackType === "expanded";
+  const isStacked = stackType === "stacked" || stackType === "expanded";
 
   return (
     <ChartContainer className={className} config={chartConfig}>
@@ -144,7 +144,7 @@ export function EvilAreaChart<
             minTickGap={tickGap}
             width="auto"
             tickFormatter={
-              type === "expanded" ? axisValueToPercentFormatter : yAxisProps?.tickFormatter
+              stackType === "expanded" ? axisValueToPercentFormatter : yAxisProps?.tickFormatter
             }
             {...yAxisProps}
           />
@@ -183,7 +183,7 @@ export function EvilAreaChart<
 
             return (
               <Area
-                type={areaType}
+                type={curveType}
                 key={dataKey}
                 dataKey={dataKey}
                 connectNulls={connectNulls}
@@ -238,7 +238,7 @@ export function EvilAreaChart<
         {/* ======== LOADING AREA ======== */}
         {isLoading && (
           <Area
-            type={areaType}
+            type={curveType}
             dataKey={LOADING_AREA_DATA_KEY}
             fillOpacity={0.05}
             fill="currentColor"

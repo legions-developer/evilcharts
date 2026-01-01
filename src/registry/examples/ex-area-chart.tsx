@@ -41,7 +41,7 @@ export function EvilExampleAreaChart() {
       isClickable
       className="h-full w-full p-4"
       xDataKey="month"
-      type="stacked"
+      stackType="stacked"
       strokeVariant="dashed"
       areaVariant="gradient"
       activeDotVariant="default"

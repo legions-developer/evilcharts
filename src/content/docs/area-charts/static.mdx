@@ -97,7 +97,8 @@ import { EvilAreaChart } from "@/components/evilcharts/charts/area-chart";
 ```tsx
 <EvilAreaChart  
   xDataKey=""
-  type="stacked"
+  stackType="stacked"
+  curveType="monotone"
   strokeVariant="dashed"
   areaVariant="gradient"
   activeDotVariant="default"
@@ -117,18 +118,18 @@ import { EvilAreaChart } from "@/components/evilcharts/charts/area-chart";
 
 ## Examples
 
-Below are some examples of the area chart with different `variants`. where you can change the `type`,`stroke variant` & `area variant`. 
+Below are some examples of the area chart with different `variants`. where you can change the `stackType`, `curveType`, `strokeVariant` & `areaVariant`. 
 
 ### Gradient Colors
 
 <ComponentPreview className="mb-0" title="gradient colors" name="ex-gradient-colors-area-chart"  />
 <ComponentPreview className="mb-0" title="gradient colors - bump" name="ex-gradient-colors-bump-area-chart"  />
 
-### Chart Types
+### Stack Types
 
-<ComponentPreview className="mb-0" title="type='default'" name="ex-default-type-area-chart"  />
-<ComponentPreview className="mb-0" title="type='stacked'" name="ex-stacked-type-area-chart"  />
-<ComponentPreview title="type='expanded'" name="ex-expanded-type-area-chart"  />
+<ComponentPreview className="mb-0" title="stackType='default'" name="ex-default-type-area-chart"  />
+<ComponentPreview className="mb-0" title="stackType='stacked'" name="ex-stacked-type-area-chart"  />
+<ComponentPreview title="stackType='expanded'" name="ex-expanded-type-area-chart"  />
 
 ### Stroke Variants
 

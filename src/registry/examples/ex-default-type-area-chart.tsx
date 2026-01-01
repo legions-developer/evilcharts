@@ -42,7 +42,7 @@ export function EvilExampleAreaChart() {
       className="h-full w-full p-4"
       xDataKey="month"
       yDataKey="desktop"
-      type="default"
+      stackType="default"
       strokeVariant="dashed"
       areaVariant="gradient"
       activeDotVariant="default"
