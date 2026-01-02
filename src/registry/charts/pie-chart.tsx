@@ -8,8 +8,13 @@ import {
 } from "@/registry/ui/chart";
 import { ChartTooltip, ChartTooltipContent } from "@/registry/ui/tooltip";
 import { ChartLegend, ChartLegendContent } from "@/registry/ui/legend";
+import { Cell, LabelList, Pie, PieChart, Sector } from "recharts";
 import { useId, useState, type ComponentProps } from "react";
-import { Cell, LabelList, Pie, PieChart } from "recharts";
+import { motion } from "motion/react";
+
+// Loading animation constants
+const LOADING_SECTORS = 5;
+const LOADING_ANIMATION_DURATION = 2000; // Full cycle duration in ms
 
 // Constants
 const DEFAULT_INNER_RADIUS = 0;
@@ -114,27 +119,28 @@ export function EvilPieChart<TData extends Record<string, unknown>>({
         {!hideTooltip && !isLoading && (
           <ChartTooltip content={<ChartTooltipContent nameKey={nameKey} hideLabel />} />
         )}
-        <Pie
-          data={isLoading ? getLoadingPieData() : preparedData}
-          dataKey={isLoading ? "value" : dataKey}
-          nameKey={isLoading ? "name" : nameKey}
-          innerRadius={innerRadius}
-          outerRadius={outerRadius}
-          cornerRadius={cornerRadius}
-          paddingAngle={paddingAngle}
-          startAngle={startAngle}
-          endAngle={endAngle}
-          strokeWidth={0}
-          style={isClickable ? { cursor: "pointer" } : undefined}
-          onClick={(_, index) => {
-            if (!isClickable || isLoading) return;
-            const clickedName = data[index]?.[nameKey] as string;
-            setSelectedSector(selectedSector === clickedName ? null : clickedName);
-          }}
-          {...pieProps}
-        >
-          {!isLoading &&
-            data.map((item, index) => {
+        {!isLoading && (
+          <Pie
+            data={preparedData}
+            dataKey={dataKey}
+            nameKey={nameKey}
+            innerRadius={innerRadius}
+            outerRadius={outerRadius}
+            cornerRadius={cornerRadius}
+            paddingAngle={paddingAngle}
+            startAngle={startAngle}
+            endAngle={endAngle}
+            strokeWidth={0}
+            isAnimationActive
+            style={isClickable ? { cursor: "pointer" } : undefined}
+            onClick={(_, index) => {
+              if (!isClickable) return;
+              const clickedName = data[index]?.[nameKey] as string;
+              setSelectedSector(selectedSector === clickedName ? null : clickedName);
+            }}
+            {...pieProps}
+          >
+            {data.map((item, index) => {
               const sectorName = item[nameKey] as string;
               const isGlowing = glowingSectors.includes(sectorName);
               const isNeon = neonSectors.includes(sectorName);
@@ -156,22 +162,38 @@ export function EvilPieChart<TData extends Record<string, unknown>>({
                 />
               );
             })}
-          {isLoading &&
-            getLoadingPieData().map((_, index) => (
-              <Cell key={`loading-cell-${index}`} fill="currentColor" fillOpacity={0.15} />
-            ))}
-          {showLabels && !isLoading && (
-            <LabelList
-              dataKey={labelKey ?? dataKey}
-              stroke="none"
-              fontSize={12}
-              fontWeight={500}
-              fill="currentColor"
-              className="fill-background"
-              {...labelListProps}
-            />
-          )}
-        </Pie>
+
+            {showLabels && (
+              <LabelList
+                dataKey={labelKey ?? dataKey}
+                stroke="none"
+                fontSize={12}
+                fontWeight={500}
+                fill="currentColor"
+                className="fill-background"
+                {...labelListProps}
+              />
+            )}
+          </Pie>
+        )}
+
+        {/* Animated loading overlay using custom shape */}
+        {isLoading && (
+          <Pie
+            data={LOADING_PIE_DATA}
+            dataKey="value"
+            nameKey="name"
+            innerRadius={innerRadius}
+            outerRadius={outerRadius}
+            cornerRadius={cornerRadius}
+            paddingAngle={paddingAngle}
+            startAngle={startAngle}
+            endAngle={endAngle}
+            strokeWidth={0}
+            isAnimationActive={false}
+            shape={(props) => <AnimatedLoadingSector {...props} />}
+          />
+        )}
 
         {/* ======== CHART STYLES ======== */}
         <defs>
@@ -197,14 +219,34 @@ export function EvilPieChart<TData extends Record<string, unknown>>({
 // LOADING STATE
 // ========================================
 
-function getLoadingPieData() {
-  return [
-    { name: "loading1", value: 25 },
-    { name: "loading2", value: 25 },
-    { name: "loading3", value: 25 },
-    { name: "loading4", value: 25 },
-  ];
-}
+// Fixed loading data - 5 equal sectors for circular pulsing animation
+const LOADING_PIE_DATA = Array.from({ length: LOADING_SECTORS }, (_, i) => ({
+  name: `loading${i}`,
+  value: 100 / LOADING_SECTORS,
+}));
+
+// Animated sector for loading state using motion.dev
+const AnimatedLoadingSector = (props: ComponentProps<typeof Sector> & { index?: number }) => {
+  const { index = 0, ...sectorProps } = props;
+
+  // Calculate delay for circular wave effect
+  const delay = (index / LOADING_SECTORS) * (LOADING_ANIMATION_DURATION / 1000);
+
+  return (
+    <motion.g
+      initial={{ opacity: 0.15 }}
+      animate={{ opacity: [0.15, 0.5, 0.15] }}
+      transition={{
+        duration: LOADING_ANIMATION_DURATION / 1000,
+        delay,
+        repeat: Infinity,
+        ease: "easeInOut",
+      }}
+    >
+      <Sector {...sectorProps} fill="currentColor" />
+    </motion.g>
+  );
+};
 
 // ========================================
 // GRADIENT STYLES
