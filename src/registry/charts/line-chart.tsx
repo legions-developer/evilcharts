@@ -30,6 +30,11 @@ type ValidateConfigKeys<TData, TConfig> = {
   [K in keyof TConfig]: K extends keyof TData ? ChartConfig[string] : never;
 };
 
+// Extract only keys from TData where the value is a number (not string, boolean, etc.)
+type NumericDataKeys<T> = {
+  [K in keyof T]: T[K] extends number ? K : never;
+}[keyof T];
+
 type EvilLineChartProps<
   TData extends Record<string, unknown>,
   TConfig extends Record<string, ChartConfig[string]>,
@@ -58,6 +63,9 @@ type EvilLineChartProps<
   isClickable?: boolean;
   isLoading?: boolean;
   loadingPoints?: number;
+  // Glow Effect
+  glowingLines?: NumericDataKeys<TData>[];
+  neonLines?: NumericDataKeys<TData>[];
 };
 
 export function EvilLineChart<
@@ -86,6 +94,8 @@ export function EvilLineChart<
   isClickable = false,
   isLoading = false,
   loadingPoints,
+  glowingLines = [],
+  neonLines = [],
 }: EvilLineChartProps<TData, TConfig>) {
   const [selectedDataKey, setSelectedDataKey] = useState<string | null>(defaultSelectedDataKey);
   const { loadingData, onShimmerExit } = useLoadingData(isLoading, loadingPoints);
@@ -157,6 +167,15 @@ export function EvilLineChart<
           Object.keys(chartConfig).map((dataKey) => {
             const _opacity = getOpacity(isClickable, selectedDataKey, dataKey);
             const hasSelection = selectedDataKey !== null;
+            const isGlowing = glowingLines.includes(dataKey as NumericDataKeys<TData>);
+            const isNeon = neonLines.includes(dataKey as NumericDataKeys<TData>);
+
+            // Determine which filter to apply (neon takes priority over glow)
+            const getFilter = () => {
+              if (isNeon) return `url(#${chartId}-line-neon-${dataKey})`;
+              if (isGlowing) return `url(#${chartId}-line-glow-${dataKey})`;
+              return undefined;
+            };
 
             return (
               <Line
@@ -166,6 +185,7 @@ export function EvilLineChart<
                 connectNulls={connectNulls}
                 strokeOpacity={_opacity.stroke}
                 stroke={`url(#${chartId}-colors-${dataKey})`}
+                filter={getFilter()}
                 dot={
                   dotVariant ? (
                     <ChartDot
@@ -232,6 +252,14 @@ export function EvilLineChart<
           {isLoading && <LoadingLinePatternStyle chartId={chartId} onShimmerExit={onShimmerExit} />}
           {/* Shared horizontal color gradient - always rendered for stroke */}
           <HorizontalColorGradientStyle chartConfig={chartConfig} chartId={chartId} />
+          {/* Glow filter for glowing lines */}
+          {glowingLines.length > 0 && (
+            <GlowFilterStyle chartId={chartId} glowingLines={glowingLines as string[]} />
+          )}
+          {/* Neon filter for neon lines */}
+          {neonLines.length > 0 && (
+            <NeonFilterStyle chartId={chartId} neonLines={neonLines as string[]} />
+          )}
         </defs>
       </LineChart>
     </ChartContainer>
@@ -310,6 +338,109 @@ const HorizontalColorGradientStyle = ({
           </linearGradient>
         );
       })}
+    </>
+  );
+};
+
+// Glow filter style for glowing lines - smooth outer neon glow
+const GlowFilterStyle = ({
+  chartId,
+  glowingLines,
+}: {
+  chartId: string;
+  glowingLines: string[];
+}) => {
+  return (
+    <>
+      {glowingLines.map((dataKey) => (
+        <filter
+          key={`${chartId}-line-glow-${dataKey}`}
+          id={`${chartId}-line-glow-${dataKey}`}
+          x="-50%"
+          y="-50%"
+          width="200%"
+          height="200%"
+        >
+          {/* Smooth outer glow with increased intensity */}
+          <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+          <feColorMatrix
+            in="blur"
+            type="matrix"
+            values="1 0 0 0 0
+                    0 1 0 0 0
+                    0 0 1 0 0
+                    0 0 0 2 0"
+            result="glow"
+          />
+          {/* Place original line on top of glow */}
+          <feMerge>
+            <feMergeNode in="glow" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      ))}
+    </>
+  );
+};
+
+// Neon filter style for neon lines - multi-layered glow with white inner core
+const NeonFilterStyle = ({ chartId, neonLines }: { chartId: string; neonLines: string[] }) => {
+  return (
+    <>
+      {neonLines.map((dataKey) => (
+        <filter
+          key={`${chartId}-line-neon-${dataKey}`}
+          id={`${chartId}-line-neon-${dataKey}`}
+          x="-100%"
+          y="-100%"
+          width="300%"
+          height="300%"
+        >
+          {/* Outer glow - large, soft, colored */}
+          <feGaussianBlur in="SourceGraphic" stdDeviation="20" result="outerBlur" />
+          <feColorMatrix
+            in="outerBlur"
+            type="matrix"
+            values="1 0 0 0 0
+                    0 1 0 0 0
+                    0 0 1 0 0
+                    0 0 0 1.5 0"
+            result="outerGlow"
+          />
+
+          {/* Middle glow - medium, brighter */}
+          <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="middleBlur" />
+          <feColorMatrix
+            in="middleBlur"
+            type="matrix"
+            values="1 0 0 0 0.1
+                    0 1 0 0 0.1
+                    0 0 1 0 0.1
+                    0 0 0 2 0"
+            result="middleGlow"
+          />
+
+          {/* White core - very tight, bright white center */}
+          <feGaussianBlur in="SourceGraphic" stdDeviation="0.2" result="coreBlur" />
+          <feColorMatrix
+            in="coreBlur"
+            type="matrix"
+            values="0 0 0 0 1
+                    0 0 0 0 1
+                    0 0 0 0 1
+                    0 0 0 2 0"
+            result="whiteCore"
+          />
+
+          {/* Merge all layers: outer -> middle -> inner -> white core -> original */}
+          <feMerge>
+            <feMergeNode in="outerGlow" />
+            <feMergeNode in="middleGlow" />
+            <feMergeNode in="whiteCore" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      ))}
     </>
   );
 };
