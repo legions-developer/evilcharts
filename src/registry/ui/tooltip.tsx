@@ -155,6 +155,11 @@ function getIndicatorColorStyle(dataKey: string, colorsCount: number): React.CSS
   return { background: `linear-gradient(to right, ${stops})` };
 }
 
-const ChartTooltip = RechartsPrimitive.Tooltip;
+const ChartTooltip = ({
+  animationDuration = 200,
+  ...props
+}: React.ComponentProps<typeof RechartsPrimitive.Tooltip>) => (
+  <RechartsPrimitive.Tooltip animationDuration={animationDuration} {...props} />
+);
 
 export { ChartTooltip, ChartTooltipContent };
