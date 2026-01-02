@@ -1,4 +1,12 @@
 {
   "root": true,
-  "pages": ["index", "installation", "components", "changelog", "area-charts", "line-charts"]
+  "pages": [
+    "index",
+    "installation",
+    "components",
+    "changelog",
+    "area-charts",
+    "line-charts",
+    "bar-charts"
+  ]
 }

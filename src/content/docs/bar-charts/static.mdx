@@ -1,0 +1,146 @@
+---
+title: Static
+description: Simple static & beautifully designed bar charts
+links:
+  github: https://github.com/legions-developer/evilcharts/blob/main/src/registry/charts/bar-chart.tsx
+  doc: https://recharts.github.io/en-US/examples/SimpleBarChart/
+  api: https://recharts.github.io/en-US/api/BarChart/
+---
+
+<ComponentPreview title="Basic Chart" name="ex-bar-chart"  />
+
+## Installation
+
+<CodeTabs>
+  <TabsList variant="underline">
+    <TabsTab value="cli">CLI</TabsTab>
+    <TabsTab value="manual">Manual</TabsTab>
+  </TabsList>
+  <TabsPanel value="cli">
+    <CliBlock commands={["@evilcharts/bar-chart"]} />
+  </TabsPanel>
+  <TabsPanel value="manual">
+    <Steps>
+      <Step>
+        <StepTitle>Install the following dependencies:</StepTitle>
+        <StepContent>
+          <CommandBlock commands={["recharts", "motion"]} />
+        </StepContent>
+      </Step>
+      <Step>
+        <StepTitle>Copy and paste the following code snippets into your project.</StepTitle>
+         <StepDescription>
+          To use the chart, first create the folder `evilcharts` and a subfolder called `charts` inside your `components` directory.
+          Then, copy the following base bar-chart code into a new file in that folder.
+        </StepDescription>
+        <StepContent>
+          <ComponentSource
+            name="bar-chart"
+            title="components/evilcharts/charts/bar-chart.tsx"
+          />
+        </StepContent>
+      </Step>
+       <Step>
+        <StepTitle>Now, Let's add the chart component to your project.</StepTitle>
+        <StepDescription>
+          These Components are required by the chart component to render the chart. Make a folder called `ui` inside the `evilcharts` folder and paste the code there.
+
+          Below is main chart component.
+        </StepDescription>
+        <StepContent>
+          <ComponentSource
+            name="chart"
+            title="components/evilcharts/ui/chart.tsx"
+          />
+        </StepContent>
+      </Step>
+       <Step>
+        <StepTitle>Now, We need to add sub components.</StepTitle>
+        <StepDescription>
+          Create a file called `tooltip.tsx` inside the `evilcharts/ui` folder and paste the code there.
+        </StepDescription>
+        <StepContent>
+          <ComponentSource
+            name="tooltip"
+            title="components/evilcharts/ui/tooltip.tsx"
+          />
+        </StepContent>
+        <StepDescription>
+          Now, create another file called `legend.tsx` inside the `evilcharts/ui` folder and paste the code there.
+        </StepDescription>
+        <StepContent>
+          <ComponentSource
+            name="legend"
+            title="components/evilcharts/ui/legend.tsx"
+          />
+        </StepContent>
+      </Step>
+    </Steps>
+  </TabsPanel>
+</CodeTabs>
+
+## Usage
+
+```tsx
+import { EvilBarChart } from "@/components/evilcharts/charts/bar-chart";
+```
+
+```tsx
+<EvilBarChart  
+  xDataKey="month"
+  barVariant="default"
+  stackType="default"
+  data={data} 
+  chartConfig={chartConfig}
+/>
+```
+
+### Loading State
+
+<ComponentPreview className="mb-0" title="isLoading='true'" name="ex-loading-state-bar-chart"  />
+<Alert > 
+  <AlertContent >
+    The bar chart supports loading state with a shimmer animation. You can pass the `isLoading` prop to the chart to show the loading state while your data is being fetched.
+  </AlertContent>
+</Alert>
+
+## Examples
+
+Below are some examples of the bar chart with different `variants`. You can customize the `barVariant`, `stackType`, and other properties.
+
+### Bar Variants
+
+<ComponentPreview className="mb-0" title="barVariant='default'" name="ex-default-variant-bar-chart"  />
+<ComponentPreview className="mb-0" title="barVariant='hatched'" name="ex-hatched-variant-bar-chart"  />
+<ComponentPreview className="mb-0" title="barVariant='duotone'" name="ex-duotone-variant-bar-chart"  />
+<ComponentPreview className="mb-0" title="barVariant='duotone-reverse'" name="ex-duotone-reverse-variant-bar-chart"  />
+<ComponentPreview className="mb-0" title="barVariant='gradient'" name="ex-gradient-variant-bar-chart"  />
+<ComponentPreview title="barVariant='stripped'" name="ex-stripped-variant-bar-chart"  />
+
+### Stack Types
+
+<ComponentPreview className="mb-0" title="stackType='stacked'" name="ex-stacked-type-bar-chart"  />
+<ComponentPreview title="stackType='percent'" name="ex-percent-type-bar-chart"  />
+
+### Hover Highlight
+
+<ComponentPreview className="mb-0" title="enableHoverHighlight={true}" name="ex-hover-highlight-bar-chart"  />
+<Alert> 
+  <AlertContent>
+    The hover highlight feature dims other bars when you hover over a bar, making it easier to focus on specific data points. Use the `enableHoverHighlight` prop to enable this feature.
+
+    When `enableHoverHighlight` is true, then `isClickable` prop will be ignored.
+  </AlertContent>
+</Alert>
+
+### Glowing Bars
+
+<ComponentPreview className="mb-0" title="glowingBars={['desktop']} - gradient colors" name="ex-glowing-desktop-bar-chart"  />
+<ComponentPreview title="glowingBars={['mobile']} - solid colors" name="ex-glowing-mobile-bar-chart"  />
+
+### Neon Bars
+
+<ComponentPreview className="mb-0" title="neonBars={['desktop']} - gradient colors" name="ex-neon-desktop-bar-chart"  />
+<ComponentPreview title="neonBars={['mobile']} - solid colors" name="ex-neon-mobile-bar-chart"  />
+
+## API Reference

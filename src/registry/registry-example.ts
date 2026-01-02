@@ -381,4 +381,179 @@ export const examples: Registry["items"] = [
       },
     ],
   },
+  // ========================================
+  // BAR CHART EXAMPLES
+  // ========================================
+  // Base Bar Chart
+  {
+    name: "ex-bar-chart",
+    registryDependencies: ["@evilcharts/bar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-bar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // Bar Chart Loading State
+  {
+    name: "ex-loading-state-bar-chart",
+    registryDependencies: ["@evilcharts/bar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-loading-state-bar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // Bar Chart Variants
+  {
+    name: "ex-default-variant-bar-chart",
+    registryDependencies: ["@evilcharts/bar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-default-variant-bar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-hatched-variant-bar-chart",
+    registryDependencies: ["@evilcharts/bar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-hatched-variant-bar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-duotone-variant-bar-chart",
+    registryDependencies: ["@evilcharts/bar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-duotone-variant-bar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-duotone-reverse-variant-bar-chart",
+    registryDependencies: ["@evilcharts/bar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-duotone-reverse-variant-bar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-gradient-variant-bar-chart",
+    registryDependencies: ["@evilcharts/bar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-gradient-variant-bar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-stripped-variant-bar-chart",
+    registryDependencies: ["@evilcharts/bar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-stripped-variant-bar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // Bar Chart Stack Types
+  {
+    name: "ex-stacked-type-bar-chart",
+    registryDependencies: ["@evilcharts/bar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-stacked-type-bar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-percent-type-bar-chart",
+    registryDependencies: ["@evilcharts/bar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-percent-type-bar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // Bar Chart Hover Highlight
+  {
+    name: "ex-hover-highlight-bar-chart",
+    registryDependencies: ["@evilcharts/bar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-hover-highlight-bar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // Bar Chart Glowing Bars
+  {
+    name: "ex-glowing-desktop-bar-chart",
+    registryDependencies: ["@evilcharts/bar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-glowing-desktop-bar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-glowing-mobile-bar-chart",
+    registryDependencies: ["@evilcharts/bar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-glowing-mobile-bar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // Bar Chart Neon Bars
+  {
+    name: "ex-neon-desktop-bar-chart",
+    registryDependencies: ["@evilcharts/bar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-neon-desktop-bar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-neon-mobile-bar-chart",
+    registryDependencies: ["@evilcharts/bar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-neon-mobile-bar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
 ];

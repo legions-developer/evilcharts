@@ -107,6 +107,46 @@ export function ChartStackedLineIcon({
   );
 }
 
+export function BarChartIcon({
+  fill = "currentColor",
+  secondaryfill,
+  width = "1em",
+  height = "1em",
+  ...props
+}: IconProps) {
+  secondaryfill = secondaryfill || fill;
+
+  return (
+    <svg
+      height={height}
+      width={width}
+      viewBox="0 0 18 18"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <g fill={fill}>
+        <path
+          d="m6.75,9h-3.5c-.9648,0-1.75.7852-1.75,1.75v3c0,.9648.7852,1.75,1.75,1.75h3.5c.4141,0,.75-.3359.75-.75v-5c0-.4141-.3359-.75-.75-.75Z"
+          fill={secondaryfill}
+          opacity=".4"
+          strokeWidth="0"
+        />
+        <path
+          d="m14.75,5.5h-3.5c-.4141,0-.75.3359-.75.75v8.5c0,.4141.3359.75.75.75h3.5c.9648,0,1.75-.7852,1.75-1.75v-6.5c0-.9648-.7852-1.75-1.75-1.75Z"
+          fill={secondaryfill}
+          opacity=".4"
+          strokeWidth="0"
+        />
+        <path
+          d="m10.25,2h-2.5c-.9648,0-1.75.7852-1.75,1.75v11c0,.4141.3359.75.75.75h4.5c.4141,0,.75-.3359.75-.75V3.75c0-.9648-.7852-1.75-1.75-1.75Z"
+          fill={fill}
+          strokeWidth="0"
+        />
+      </g>
+    </svg>
+  );
+}
+
 export function ShapesIcon({
   fill = "currentColor",
   secondaryfill,

@@ -31,4 +31,18 @@ export const charts: Registry["items"] = [
       },
     ],
   },
+  {
+    name: "bar-chart",
+    description: "Bar chart component",
+    registryDependencies: ["@evilcharts/chart", "@evilcharts/tooltip", "@evilcharts/legend"],
+    dependencies: ["recharts"],
+    type: "registry:component",
+    files: [
+      {
+        path: "charts/bar-chart.tsx",
+        type: "registry:component",
+        target: TARGET_BASE_PATH + "/bar-chart.tsx",
+      },
+    ],
+  },
 ];
