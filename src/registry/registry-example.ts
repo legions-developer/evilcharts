@@ -396,6 +396,18 @@ export const examples: Registry["items"] = [
       },
     ],
   },
+  // Bar Chart Gradient Colors
+  {
+    name: "ex-gradient-colors-bar-chart",
+    registryDependencies: ["@evilcharts/bar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-gradient-colors-bar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
   // Bar Chart Loading State
   {
     name: "ex-loading-state-bar-chart",

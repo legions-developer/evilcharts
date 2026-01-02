@@ -451,7 +451,7 @@ const VerticalColorGradientStyle = ({
   );
 };
 
-// Hatched pattern style for bars
+// Hatched pattern style for bars - uses mask to preserve gradient colors
 const HatchedPatternStyle = ({
   chartConfig,
   chartId,
@@ -461,26 +461,48 @@ const HatchedPatternStyle = ({
 }) => {
   return (
     <>
+      {/* Shared hatched stripes mask pattern */}
+      <pattern
+        id={`${chartId}-hatched-mask-pattern`}
+        x="0"
+        y="0"
+        width="5"
+        height="5"
+        patternUnits="userSpaceOnUse"
+        patternTransform="rotate(-45)"
+      >
+        <rect width="5" height="5" fill="white" fillOpacity={0.3} />
+        <rect width="1.5" height="5" fill="white" fillOpacity={1} />
+      </pattern>
+
       {Object.keys(chartConfig).map((dataKey) => (
-        <pattern
-          key={`${chartId}-hatched-${dataKey}`}
-          id={`${chartId}-hatched-${dataKey}`}
-          x="0"
-          y="0"
-          width="5"
-          height="5"
-          patternUnits="userSpaceOnUse"
-          patternTransform="rotate(-45)"
-        >
-          <rect width="5" height="5" fill={`var(--color-${dataKey}-0)`} fillOpacity={0.3} />
-          <rect width="1.5" height="5" fill={`var(--color-${dataKey}-0)`} />
-        </pattern>
+        <g key={`${chartId}-hatched-group-${dataKey}`}>
+          {/* Mask using hatched stripes */}
+          <mask id={`${chartId}-hatched-mask-${dataKey}`}>
+            <rect width="100%" height="100%" fill={`url(#${chartId}-hatched-mask-pattern)`} />
+          </mask>
+
+          {/* Pattern: gradient fill masked by hatched stripes */}
+          <pattern
+            id={`${chartId}-hatched-${dataKey}`}
+            patternUnits="userSpaceOnUse"
+            width="100%"
+            height="100%"
+          >
+            <rect
+              width="100%"
+              height="100%"
+              fill={`url(#${chartId}-colors-${dataKey})`}
+              mask={`url(#${chartId}-hatched-mask-${dataKey})`}
+            />
+          </pattern>
+        </g>
       ))}
     </>
   );
 };
 
-// Duotone pattern style for bars (half opacity, half full)
+// Duotone pattern style for bars (half opacity, half full) - uses objectBoundingBox for per-bar effect
 const DuotonePatternStyle = ({
   chartConfig,
   chartId,
@@ -490,24 +512,85 @@ const DuotonePatternStyle = ({
 }) => {
   return (
     <>
-      {Object.keys(chartConfig).map((dataKey) => (
-        <linearGradient
-          key={`${chartId}-duotone-${dataKey}`}
-          id={`${chartId}-duotone-${dataKey}`}
-          x1="0"
-          y1="0"
-          x2="1"
-          y2="0"
-        >
-          <stop offset="50%" stopColor={`var(--color-${dataKey}-0)`} stopOpacity={0.4} />
-          <stop offset="50%" stopColor={`var(--color-${dataKey}-0)`} stopOpacity={1} />
-        </linearGradient>
-      ))}
+      {Object.entries(chartConfig).map(([dataKey, config]) => {
+        const colorsCount = getColorsCount(config);
+
+        return (
+          <g key={`${chartId}-duotone-group-${dataKey}`}>
+            {/* Duotone mask gradient - applies to each bar's bounding box */}
+            <linearGradient
+              id={`${chartId}-duotone-mask-gradient-${dataKey}`}
+              gradientUnits="objectBoundingBox"
+              x1="0"
+              y1="0"
+              x2="1"
+              y2="0"
+            >
+              <stop offset="50%" stopColor="white" stopOpacity={0.4} />
+              <stop offset="50%" stopColor="white" stopOpacity={1} />
+            </linearGradient>
+
+            {/* Color gradient for this dataKey - applies to each bar's bounding box */}
+            <linearGradient
+              id={`${chartId}-duotone-colors-${dataKey}`}
+              gradientUnits="objectBoundingBox"
+              x1="0"
+              y1="0"
+              x2="0"
+              y2="1"
+            >
+              {colorsCount === 1 ? (
+                <>
+                  <stop offset="0%" stopColor={`var(--color-${dataKey}-0)`} />
+                  <stop offset="100%" stopColor={`var(--color-${dataKey}-0)`} />
+                </>
+              ) : (
+                Array.from({ length: colorsCount }, (_, index) => (
+                  <stop
+                    key={index}
+                    offset={`${(index / (colorsCount - 1)) * 100}%`}
+                    stopColor={`var(--color-${dataKey}-${index}, var(--color-${dataKey}-0))`}
+                  />
+                ))
+              )}
+            </linearGradient>
+
+            {/* Mask for duotone effect */}
+            <mask id={`${chartId}-duotone-mask-${dataKey}`} maskContentUnits="objectBoundingBox">
+              <rect
+                x="0"
+                y="0"
+                width="1"
+                height="1"
+                fill={`url(#${chartId}-duotone-mask-gradient-${dataKey})`}
+              />
+            </mask>
+
+            {/* Pattern: gradient fill with duotone mask */}
+            <pattern
+              id={`${chartId}-duotone-${dataKey}`}
+              patternUnits="objectBoundingBox"
+              patternContentUnits="objectBoundingBox"
+              width="1"
+              height="1"
+            >
+              <rect
+                x="0"
+                y="0"
+                width="1"
+                height="1"
+                fill={`url(#${chartId}-duotone-colors-${dataKey})`}
+                mask={`url(#${chartId}-duotone-mask-${dataKey})`}
+              />
+            </pattern>
+          </g>
+        );
+      })}
     </>
   );
 };
 
-// Duotone reverse pattern style for bars (full opacity first, then half)
+// Duotone reverse pattern style for bars (full opacity first, then half) - uses objectBoundingBox for per-bar effect
 const DuotoneReversePatternStyle = ({
   chartConfig,
   chartId,
@@ -517,24 +600,88 @@ const DuotoneReversePatternStyle = ({
 }) => {
   return (
     <>
-      {Object.keys(chartConfig).map((dataKey) => (
-        <linearGradient
-          key={`${chartId}-duotone-reverse-${dataKey}`}
-          id={`${chartId}-duotone-reverse-${dataKey}`}
-          x1="0"
-          y1="0"
-          x2="1"
-          y2="0"
-        >
-          <stop offset="50%" stopColor={`var(--color-${dataKey}-0)`} stopOpacity={1} />
-          <stop offset="50%" stopColor={`var(--color-${dataKey}-0)`} stopOpacity={0.4} />
-        </linearGradient>
-      ))}
+      {Object.entries(chartConfig).map(([dataKey, config]) => {
+        const colorsCount = getColorsCount(config);
+
+        return (
+          <g key={`${chartId}-duotone-reverse-group-${dataKey}`}>
+            {/* Duotone reverse mask gradient - applies to each bar's bounding box */}
+            <linearGradient
+              id={`${chartId}-duotone-reverse-mask-gradient-${dataKey}`}
+              gradientUnits="objectBoundingBox"
+              x1="0"
+              y1="0"
+              x2="1"
+              y2="0"
+            >
+              <stop offset="50%" stopColor="white" stopOpacity={1} />
+              <stop offset="50%" stopColor="white" stopOpacity={0.4} />
+            </linearGradient>
+
+            {/* Color gradient for this dataKey - applies to each bar's bounding box */}
+            <linearGradient
+              id={`${chartId}-duotone-reverse-colors-${dataKey}`}
+              gradientUnits="objectBoundingBox"
+              x1="0"
+              y1="0"
+              x2="0"
+              y2="1"
+            >
+              {colorsCount === 1 ? (
+                <>
+                  <stop offset="0%" stopColor={`var(--color-${dataKey}-0)`} />
+                  <stop offset="100%" stopColor={`var(--color-${dataKey}-0)`} />
+                </>
+              ) : (
+                Array.from({ length: colorsCount }, (_, index) => (
+                  <stop
+                    key={index}
+                    offset={`${(index / (colorsCount - 1)) * 100}%`}
+                    stopColor={`var(--color-${dataKey}-${index}, var(--color-${dataKey}-0))`}
+                  />
+                ))
+              )}
+            </linearGradient>
+
+            {/* Mask for duotone reverse effect */}
+            <mask
+              id={`${chartId}-duotone-reverse-mask-${dataKey}`}
+              maskContentUnits="objectBoundingBox"
+            >
+              <rect
+                x="0"
+                y="0"
+                width="1"
+                height="1"
+                fill={`url(#${chartId}-duotone-reverse-mask-gradient-${dataKey})`}
+              />
+            </mask>
+
+            {/* Pattern: gradient fill with duotone reverse mask */}
+            <pattern
+              id={`${chartId}-duotone-reverse-${dataKey}`}
+              patternUnits="objectBoundingBox"
+              patternContentUnits="objectBoundingBox"
+              width="1"
+              height="1"
+            >
+              <rect
+                x="0"
+                y="0"
+                width="1"
+                height="1"
+                fill={`url(#${chartId}-duotone-reverse-colors-${dataKey})`}
+                mask={`url(#${chartId}-duotone-reverse-mask-${dataKey})`}
+              />
+            </pattern>
+          </g>
+        );
+      })}
     </>
   );
 };
 
-// Gradient pattern style for bars (top to bottom fade)
+// Gradient pattern style for bars (top to bottom fade) - uses mask to preserve gradient colors
 const GradientPatternStyle = ({
   chartConfig,
   chartId,
@@ -544,24 +691,40 @@ const GradientPatternStyle = ({
 }) => {
   return (
     <>
+      {/* Shared vertical fade gradient for mask */}
+      <linearGradient id={`${chartId}-gradient-mask-gradient`} x1="0" y1="0" x2="0" y2="1">
+        <stop offset="20%" stopColor="white" stopOpacity={1} />
+        <stop offset="90%" stopColor="white" stopOpacity={0} />
+      </linearGradient>
+
       {Object.keys(chartConfig).map((dataKey) => (
-        <linearGradient
-          key={`${chartId}-gradient-${dataKey}`}
-          id={`${chartId}-gradient-${dataKey}`}
-          x1="0"
-          y1="0"
-          x2="0"
-          y2="1"
-        >
-          <stop offset="0%" stopColor={`var(--color-${dataKey}-0)`} stopOpacity={0.8} />
-          <stop offset="100%" stopColor={`var(--color-${dataKey}-0)`} stopOpacity={0.1} />
-        </linearGradient>
+        <g key={`${chartId}-gradient-group-${dataKey}`}>
+          {/* Mask for vertical fade */}
+          <mask id={`${chartId}-gradient-mask-${dataKey}`}>
+            <rect width="100%" height="100%" fill={`url(#${chartId}-gradient-mask-gradient)`} />
+          </mask>
+
+          {/* Pattern: gradient fill with vertical fade mask */}
+          <pattern
+            id={`${chartId}-gradient-${dataKey}`}
+            patternUnits="userSpaceOnUse"
+            width="100%"
+            height="100%"
+          >
+            <rect
+              width="100%"
+              height="100%"
+              fill={`url(#${chartId}-colors-${dataKey})`}
+              mask={`url(#${chartId}-gradient-mask-${dataKey})`}
+            />
+          </pattern>
+        </g>
       ))}
     </>
   );
 };
 
-// Stripped pattern style for bars (low opacity body with full opacity top)
+// Stripped pattern style for bars (low opacity body with full opacity top) - uses mask to preserve gradient colors
 const StrippedPatternStyle = ({
   chartConfig,
   chartId,
@@ -571,18 +734,34 @@ const StrippedPatternStyle = ({
 }) => {
   return (
     <>
+      {/* Shared stripped fade gradient for mask */}
+      <linearGradient id={`${chartId}-stripped-mask-gradient`} x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stopColor="white" stopOpacity={0.4} />
+        <stop offset="100%" stopColor="white" stopOpacity={0.1} />
+      </linearGradient>
+
       {Object.keys(chartConfig).map((dataKey) => (
-        <linearGradient
-          key={`${chartId}-stripped-${dataKey}`}
-          id={`${chartId}-stripped-${dataKey}`}
-          x1="0"
-          y1="0"
-          x2="0"
-          y2="1"
-        >
-          <stop offset="0%" stopColor={`var(--color-${dataKey}-0)`} stopOpacity={0.3} />
-          <stop offset="100%" stopColor={`var(--color-${dataKey}-0)`} stopOpacity={0.1} />
-        </linearGradient>
+        <g key={`${chartId}-stripped-group-${dataKey}`}>
+          {/* Mask for stripped fade */}
+          <mask id={`${chartId}-stripped-mask-${dataKey}`}>
+            <rect width="100%" height="100%" fill={`url(#${chartId}-stripped-mask-gradient)`} />
+          </mask>
+
+          {/* Pattern: gradient fill with stripped fade mask */}
+          <pattern
+            id={`${chartId}-stripped-${dataKey}`}
+            patternUnits="userSpaceOnUse"
+            width="100%"
+            height="100%"
+          >
+            <rect
+              width="100%"
+              height="100%"
+              fill={`url(#${chartId}-colors-${dataKey})`}
+              mask={`url(#${chartId}-stripped-mask-${dataKey})`}
+            />
+          </pattern>
+        </g>
       ))}
     </>
   );
