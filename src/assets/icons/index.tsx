@@ -147,6 +147,42 @@ export function BarChartIcon({
   );
 }
 
+export function ComposedChartIcon({
+  fill = "currentColor",
+  secondaryfill,
+  width = "1em",
+  height = "1em",
+  ...props
+}: IconProps) {
+  secondaryfill = secondaryfill || fill;
+
+  return (
+    <svg
+      height={height}
+      width={width}
+      viewBox="0 0 18 18"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <g fill={fill}>
+        {/* Bar chart bars - narrower */}
+        <rect x="2.5" y="9" width="4" height="6.5" rx="1.5" fill={secondaryfill} opacity="0.4" />
+        <rect x="7.5" y="4" width="4" height="11.5" rx="1.5" fill={secondaryfill} opacity="0.4" />
+        <rect x="12.5" y="6" width="4" height="9.5" rx="1.5" fill={secondaryfill} opacity="0.4" />
+        {/* Line chart line overlay */}
+        <path
+          d="M2 10.5 L5 13.5L9 8.5L13 10.5L17 7.5"
+          fill="none"
+          stroke={fill}
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </g>
+    </svg>
+  );
+}
+
 export function ShapesIcon({
   fill = "currentColor",
   secondaryfill,
