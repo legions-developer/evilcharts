@@ -510,6 +510,18 @@ export const examples: Registry["items"] = [
       },
     ],
   },
+  // Bar Chart Layout
+  {
+    name: "ex-horizontal-layout-bar-chart",
+    registryDependencies: ["@evilcharts/bar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-horizontal-layout-bar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
   // Bar Chart Hover Highlight
   {
     name: "ex-hover-highlight-bar-chart",
@@ -564,6 +576,173 @@ export const examples: Registry["items"] = [
     files: [
       {
         path: "examples/ex-neon-mobile-bar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // ========================================
+  // COMPOSED CHART EXAMPLES
+  // ========================================
+  // Base Composed Chart
+  {
+    name: "ex-composed-chart",
+    registryDependencies: ["@evilcharts/composed-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-composed-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // Composed Chart Gradient Colors
+  {
+    name: "ex-gradient-colors-composed-chart",
+    registryDependencies: ["@evilcharts/composed-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-gradient-colors-composed-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // Composed Chart Loading State
+  {
+    name: "ex-loading-state-composed-chart",
+    registryDependencies: ["@evilcharts/composed-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-loading-state-composed-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // Composed Chart Bar Variants
+  {
+    name: "ex-hatched-variant-composed-chart",
+    registryDependencies: ["@evilcharts/composed-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-hatched-variant-composed-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-duotone-variant-composed-chart",
+    registryDependencies: ["@evilcharts/composed-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-duotone-variant-composed-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-gradient-variant-composed-chart",
+    registryDependencies: ["@evilcharts/composed-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-gradient-variant-composed-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-stripped-variant-composed-chart",
+    registryDependencies: ["@evilcharts/composed-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-stripped-variant-composed-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // Composed Chart Line Stroke Variants
+  {
+    name: "ex-dashed-stroke-composed-chart",
+    registryDependencies: ["@evilcharts/composed-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-dashed-stroke-composed-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-animated-dashed-stroke-composed-chart",
+    registryDependencies: ["@evilcharts/composed-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-animated-dashed-stroke-composed-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // Composed Chart Curve Type
+  {
+    name: "ex-bump-curve-composed-chart",
+    registryDependencies: ["@evilcharts/composed-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-bump-curve-composed-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // Composed Chart Dots
+  {
+    name: "ex-dots-composed-chart",
+    registryDependencies: ["@evilcharts/composed-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-dots-composed-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // Composed Chart Hover Highlight
+  {
+    name: "ex-hover-highlight-composed-chart",
+    registryDependencies: ["@evilcharts/composed-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-hover-highlight-composed-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // Composed Chart Glowing
+  {
+    name: "ex-glowing-composed-chart",
+    registryDependencies: ["@evilcharts/composed-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-glowing-composed-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // Composed Chart Neon
+  {
+    name: "ex-neon-composed-chart",
+    registryDependencies: ["@evilcharts/composed-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-neon-composed-chart.tsx",
         type: "registry:block",
       },
     ],

@@ -126,14 +126,21 @@ Below are some examples of the bar chart with different `variants`. You can cust
 <ComponentPreview className="mb-0" title="stackType='stacked'" name="ex-stacked-type-bar-chart"  />
 <ComponentPreview title="stackType='percent'" name="ex-percent-type-bar-chart"  />
 
+### Horizontal Layout
+
+<ComponentPreview className="mb-0" title="layout='horizontal'" name="ex-horizontal-layout-bar-chart"  />
+<Alert> 
+  <AlertContent>
+    Use `layout="horizontal"` to display bars horizontally. In horizontal mode, the Y-axis shows categories while the X-axis shows values. Use `yAxisProps` for category formatting.
+  </AlertContent>
+</Alert>
+
 ### Hover Highlight
 
 <ComponentPreview className="mb-0" title="enableHoverHighlight={true}" name="ex-hover-highlight-bar-chart"  />
 <Alert> 
   <AlertContent>
     The hover highlight feature dims other bars when you hover over a bar, making it easier to focus on specific data points. Use the `enableHoverHighlight` prop to enable this feature.
-
-    When `enableHoverHighlight` is true, then `isClickable` prop will be ignored.
   </AlertContent>
 </Alert>
 

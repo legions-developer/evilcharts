@@ -1,0 +1,189 @@
+---
+title: Static
+description: Simple static & beautifully designed composed charts combining bars and lines
+links:
+  github: https://github.com/legions-developer/evilcharts/blob/main/src/registry/charts/composed-chart.tsx
+  doc: https://recharts.github.io/en-US/examples/SimpleLineChart/
+  api: https://recharts.github.io/en-US/api/ComposedChart/
+---
+
+<ComponentPreview title="Basic Chart" name="ex-composed-chart"  />
+
+## Installation
+
+<CodeTabs>
+  <TabsList variant="underline">
+    <TabsTab value="cli">CLI</TabsTab>
+    <TabsTab value="manual">Manual</TabsTab>
+  </TabsList>
+  <TabsPanel value="cli">
+    <CliBlock commands={["@evilcharts/composed-chart"]} />
+  </TabsPanel>
+  <TabsPanel value="manual">
+    <Steps>
+      <Step>
+        <StepTitle>Install the following dependencies:</StepTitle>
+        <StepContent>
+          <CommandBlock commands={["recharts", "motion"]} />
+        </StepContent>
+      </Step>
+      <Step>
+        <StepTitle>Copy and paste the following code snippets into your project.</StepTitle>
+         <StepDescription>
+          To use the chart, first create the folder `evilcharts` and a subfolder called `charts` inside your `components` directory.
+          Then, copy the following base composed-chart code into a new file in that folder.
+        </StepDescription>
+        <StepContent>
+          <ComponentSource
+            name="composed-chart"
+            title="components/evilcharts/charts/composed-chart.tsx"
+          />
+        </StepContent>
+      </Step>
+       <Step>
+        <StepTitle>Now, Let's add the chart component to your project.</StepTitle>
+        <StepDescription>
+          These Components are required by the chart component to render the chart. Make a folder called `ui` inside the `evilcharts` folder and paste the code there.
+
+          Below is main chart component.
+        </StepDescription>
+        <StepContent>
+          <ComponentSource
+            name="chart"
+            title="components/evilcharts/ui/chart.tsx"
+          />
+        </StepContent>
+      </Step>
+       <Step>
+        <StepTitle>Now, We need to add sub components.</StepTitle>
+        <StepDescription>
+          Create a file called `tooltip.tsx` inside the `evilcharts/ui` folder and paste the code there.
+        </StepDescription>
+        <StepContent>
+          <ComponentSource
+            name="tooltip"
+            title="components/evilcharts/ui/tooltip.tsx"
+          />
+        </StepContent>
+        <StepDescription>
+          Now, create another file called `legend.tsx` inside the `evilcharts/ui` folder and paste the code there.
+        </StepDescription>
+        <StepContent>
+          <ComponentSource
+            name="legend"
+            title="components/evilcharts/ui/legend.tsx"
+          />
+        </StepContent>
+        <StepDescription>
+          Finally, create a file called `dot.tsx` inside the `evilcharts/ui` folder and paste the code there.
+        </StepDescription>
+        <StepContent>
+          <ComponentSource
+            name="dot"
+            title="components/evilcharts/ui/dot.tsx"
+          />
+        </StepContent>
+      </Step>
+    </Steps>
+  </TabsPanel>
+</CodeTabs>
+
+## Usage
+
+```tsx
+import { EvilComposedChart } from "@/components/evilcharts/charts/composed-chart";
+```
+
+```tsx
+const barConfig = {
+  revenue: {
+    label: "Revenue",
+    colors: { light: ["#3b82f6"], dark: ["#6A5ACD"] },
+  },
+} satisfies ChartConfig;
+
+const lineConfig = {
+  profit: {
+    label: "Profit",
+    colors: { light: ["#10b981"], dark: ["#34d399"] },
+  },
+} satisfies ChartConfig;
+
+<EvilComposedChart  
+  xDataKey="month"
+  data={data} 
+  barConfig={barConfig}
+  lineConfig={lineConfig}
+/>
+```
+
+### Loading State
+
+<ComponentPreview className="mb-0" title="isLoading='true'" name="ex-loading-state-composed-chart"  />
+<Alert > 
+  <AlertContent >
+    The composed chart supports loading state with a shimmer animation. You can pass the `isLoading` prop to the chart to show the loading state while your data is being fetched.
+  </AlertContent>
+</Alert>
+
+## Examples
+
+Below are some examples of the composed chart with different `variants`. You can customize the `barVariant`, `strokeVariant`, `curveType`, and other properties.
+
+### Gradient Colors
+
+<ComponentPreview title="gradient colors" name="ex-gradient-colors-composed-chart"  />
+
+### Bar Variants
+
+<ComponentPreview className="mb-0" title="barVariant='hatched'" name="ex-hatched-variant-composed-chart"  />
+<ComponentPreview className="mb-0" title="barVariant='duotone'" name="ex-duotone-variant-composed-chart"  />
+<ComponentPreview className="mb-0" title="barVariant='gradient'" name="ex-gradient-variant-composed-chart"  />
+<ComponentPreview title="barVariant='stripped'" name="ex-stripped-variant-composed-chart"  />
+
+### Line Stroke Variants
+
+<ComponentPreview className="mb-0" title="strokeVariant='dashed'" name="ex-dashed-stroke-composed-chart"  />
+<ComponentPreview title="strokeVariant='animated-dashed'" name="ex-animated-dashed-stroke-composed-chart"  />
+
+### Curve Types
+
+<ComponentPreview title="curveType='bump'" name="ex-bump-curve-composed-chart"  />
+
+### Line Dots
+
+<ComponentPreview className="mb-0" title="dotVariant='default' activeDotVariant='border'" name="ex-dots-composed-chart"  />
+<Alert> 
+  <AlertContent>
+    The composed chart supports dots on lines. Use `dotVariant` for regular dots and `activeDotVariant` for the dot that appears when hovering. Available variants: `default`, `border`, `colored-border`.
+  </AlertContent>
+</Alert>
+
+### Hover Highlight
+
+<ComponentPreview className="mb-0" title="enableHoverHighlight={true}" name="ex-hover-highlight-composed-chart"  />
+<Alert> 
+  <AlertContent>
+    The hover highlight feature dims other bars when you hover over a bar, making it easier to focus on specific data points. Use the `enableHoverHighlight` prop to enable this feature.
+  </AlertContent>
+</Alert>
+
+### Glowing Effects
+
+<ComponentPreview className="mb-0" title="glowingBars={['revenue']} glowingLines={['profit']}" name="ex-glowing-composed-chart"  />
+<Alert> 
+  <AlertContent>
+    Add a subtle glow effect to your bars and lines using `glowingBars` and `glowingLines` props. Pass an array of data keys to specify which elements should glow.
+  </AlertContent>
+</Alert>
+
+### Neon Effects
+
+<ComponentPreview className="mb-0" title="neonBars={['revenue']} neonLines={['profit']}" name="ex-neon-composed-chart"  />
+<Alert> 
+  <AlertContent>
+    Add an intense neon glow effect to your bars and lines using `neonBars` and `neonLines` props. This creates a more dramatic visual effect than the regular glow.
+  </AlertContent>
+</Alert>
+
+## API Reference

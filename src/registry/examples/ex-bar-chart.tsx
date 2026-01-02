@@ -38,7 +38,6 @@ const chartConfig = {
 export function EvilExampleBarChart() {
   return (
     <EvilBarChart
-      enableHoverHighlight
       isClickable
       className="h-full w-full p-4"
       xDataKey="month"

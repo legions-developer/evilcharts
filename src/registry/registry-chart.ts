@@ -45,4 +45,23 @@ export const charts: Registry["items"] = [
       },
     ],
   },
+  {
+    name: "composed-chart",
+    description: "Composed chart component combining bar and line charts",
+    registryDependencies: [
+      "@evilcharts/chart",
+      "@evilcharts/tooltip",
+      "@evilcharts/legend",
+      "@evilcharts/dot",
+    ],
+    dependencies: ["recharts", "motion"],
+    type: "registry:component",
+    files: [
+      {
+        path: "charts/composed-chart.tsx",
+        type: "registry:component",
+        target: TARGET_BASE_PATH + "/composed-chart.tsx",
+      },
+    ],
+  },
 ];
