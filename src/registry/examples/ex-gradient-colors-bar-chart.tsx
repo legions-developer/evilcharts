@@ -22,14 +22,14 @@ const chartConfig = {
   desktop: {
     label: "Desktop",
     colors: {
-      light: ["#f43f5e", "#ec4899", "#a855f7", "#6366f1", "#3b82f6"], // [!code highlight]
+      light: ["#a855f7", "#6366f1", "#3b82f6"], // [!code highlight]
       dark: ["#f43f5e", "#ec4899", "#a855f7", "#6366f1", "#3b82f6"], // [!code highlight]
     },
   },
   mobile: {
     label: "Mobile",
     colors: {
-      light: ["#10b981", "#14b8a6", "#06b6d4"], // [!code highlight]
+      light: ["#10b981", "#34d399", "#6ee7b7"], // [!code highlight]
       dark: ["#10b981", "#14b8a6", "#06b6d4"], // [!code highlight]
     },
   },
