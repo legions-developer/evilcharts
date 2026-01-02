@@ -1,4 +1,10 @@
-import { BarChartIcon, ChartStackedAreaIcon, ChartStackedLineIcon, ComposedChartIcon } from "@/assets/icons";
+import {
+  BarChartIcon,
+  ChartStackedAreaIcon,
+  ChartStackedLineIcon,
+  ComposedChartIcon,
+  PieChartIcon,
+} from "@/assets/icons";
 
 // Custom icons for each item in the sidebar of MDX files
 export function getNavItemIcon(tag?: string) {
@@ -11,6 +17,8 @@ export function getNavItemIcon(tag?: string) {
       return <BarChartIcon />;
     case "root:composed-charts":
       return <ComposedChartIcon />;
+    case "root:pie-charts":
+      return <PieChartIcon />;
     default:
       return null;
   }

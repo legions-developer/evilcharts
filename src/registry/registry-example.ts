@@ -747,4 +747,103 @@ export const examples: Registry["items"] = [
       },
     ],
   },
+  // ========================================
+  // PIE CHART EXAMPLES
+  // ========================================
+  // Base Pie Chart
+  {
+    name: "ex-pie-chart",
+    registryDependencies: ["@evilcharts/pie-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-pie-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // Pie Chart Gradient Colors
+  {
+    name: "ex-gradient-colors-pie-chart",
+    registryDependencies: ["@evilcharts/pie-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-gradient-colors-pie-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // Pie Chart Donut
+  {
+    name: "ex-donut-pie-chart",
+    registryDependencies: ["@evilcharts/pie-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-donut-pie-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // Pie Chart Padded
+  {
+    name: "ex-padded-pie-chart",
+    registryDependencies: ["@evilcharts/pie-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-padded-pie-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // Pie Chart Labels
+  {
+    name: "ex-labels-pie-chart",
+    registryDependencies: ["@evilcharts/pie-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-labels-pie-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // Pie Chart Loading State
+  {
+    name: "ex-loading-state-pie-chart",
+    registryDependencies: ["@evilcharts/pie-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-loading-state-pie-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // Pie Chart Glowing
+  {
+    name: "ex-glowing-pie-chart",
+    registryDependencies: ["@evilcharts/pie-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-glowing-pie-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // Pie Chart Neon
+  {
+    name: "ex-neon-pie-chart",
+    registryDependencies: ["@evilcharts/pie-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-neon-pie-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
 ];

@@ -178,55 +178,75 @@ export function EvilLineChart<
             };
 
             return (
-              <Line
-                type={curveType}
-                key={dataKey}
-                dataKey={dataKey}
-                connectNulls={connectNulls}
-                strokeOpacity={_opacity.stroke}
-                stroke={`url(#${chartId}-colors-${dataKey})`}
-                filter={getFilter()}
-                dot={
-                  dotVariant ? (
-                    <ChartDot
-                      fillOpacity={_opacity.dot}
-                      type={dotVariant}
-                      dataKey={dataKey}
-                      chartId={chartId}
-                    />
-                  ) : (
-                    false
-                  )
-                }
-                activeDot={
-                  activeDotVariant ? (
-                    <ChartDot
-                      fillOpacity={_opacity.dot}
-                      type={activeDotVariant}
-                      dataKey={dataKey}
-                      chartId={chartId}
-                    />
-                  ) : (
-                    false
-                  )
-                }
-                strokeWidth={STROKE_WIDTH}
-                strokeDasharray={
-                  strokeVariant === "dashed"
-                    ? "5 5"
-                    : strokeVariant === "animated-dashed"
+              <g key={dataKey}>
+                {/* Transparent hit area for easier clicking */}
+                {isClickable && (
+                  <Line
+                    type={curveType}
+                    dataKey={dataKey}
+                    connectNulls={connectNulls}
+                    stroke="transparent"
+                    strokeWidth={15}
+                    dot={false}
+                    activeDot={false}
+                    legendType="none"
+                    tooltipType="none"
+                    style={{ cursor: "pointer" }}
+                    onClick={() => {
+                      setSelectedDataKey(selectedDataKey === dataKey ? null : dataKey);
+                    }}
+                  />
+                )}
+                {/* Visible line */}
+                <Line
+                  type={curveType}
+                  dataKey={dataKey}
+                  connectNulls={connectNulls}
+                  strokeOpacity={_opacity.stroke}
+                  stroke={`url(#${chartId}-colors-${dataKey})`}
+                  filter={getFilter()}
+                  dot={
+                    dotVariant ? (
+                      <ChartDot
+                        fillOpacity={_opacity.dot}
+                        type={dotVariant}
+                        dataKey={dataKey}
+                        chartId={chartId}
+                      />
+                    ) : (
+                      false
+                    )
+                  }
+                  activeDot={
+                    activeDotVariant ? (
+                      <ChartDot
+                        fillOpacity={_opacity.dot}
+                        type={activeDotVariant}
+                        dataKey={dataKey}
+                        chartId={chartId}
+                      />
+                    ) : (
+                      false
+                    )
+                  }
+                  strokeWidth={STROKE_WIDTH}
+                  strokeDasharray={
+                    strokeVariant === "dashed"
                       ? "5 5"
-                      : undefined
-                }
-                style={isClickable ? { cursor: "pointer" } : undefined}
-                onClick={() => {
-                  if (!isClickable) return;
-                  // Toggle: if already selected, unselect; otherwise select
-                  setSelectedDataKey(selectedDataKey === dataKey ? null : dataKey);
-                }}
-              >
-                {strokeVariant === "animated-dashed" && !hasSelection && <AnimatedDashedStyle />}
-              </Line>
+                      : strokeVariant === "animated-dashed"
+                        ? "5 5"
+                        : undefined
+                  }
+                  style={isClickable ? { cursor: "pointer" } : undefined}
+                  onClick={() => {
+                    if (!isClickable) return;
+                    // Toggle: if already selected, unselect; otherwise select
+                    setSelectedDataKey(selectedDataKey === dataKey ? null : dataKey);
+                  }}
+                >
+                  {strokeVariant === "animated-dashed" && !hasSelection && <AnimatedDashedStyle />}
+                </Line>
+              </g>
             );
           })}
         {/* ======== LOADING LINE ======== */}

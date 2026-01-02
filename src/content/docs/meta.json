@@ -8,6 +8,7 @@
     "area-charts",
     "line-charts",
     "bar-charts",
-    "composed-charts"
+    "composed-charts",
+    "pie-charts"
   ]
 }

@@ -74,7 +74,9 @@ function ChartTooltipContent({
         {payload
           .filter((item) => item.type !== "none")
           .map((item, index) => {
-            const key = `${nameKey ?? item.name ?? item.dataKey ?? "value"}`;
+            // For pie charts, item.name contains the sector name (e.g., "chrome")
+            // For other charts, item.name or item.dataKey contains the series name
+            const key = `${item.name ?? item.dataKey ?? "value"}`;
             const itemConfig = getPayloadConfigFromPayload(config, item, key);
 
             // Get colors count for this item to determine gradient vs solid
@@ -86,7 +88,7 @@ function ChartTooltipContent({
                 className={cn(
                   "[&>svg]:text-muted-foreground flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5",
                   indicator === "dot" && "items-center",
-                  selected !== null && selected !== item.dataKey && "opacity-30",
+                  selected != null && selected !== item.dataKey && "opacity-30",
                 )}
               >
                 {formatter && item?.value !== undefined && item.name ? (

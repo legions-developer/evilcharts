@@ -64,4 +64,18 @@ export const charts: Registry["items"] = [
       },
     ],
   },
+  {
+    name: "pie-chart",
+    description: "Pie chart component with donut, gradient, and glow effects",
+    registryDependencies: ["@evilcharts/chart", "@evilcharts/tooltip", "@evilcharts/legend"],
+    dependencies: ["recharts"],
+    type: "registry:component",
+    files: [
+      {
+        path: "charts/pie-chart.tsx",
+        type: "registry:component",
+        target: TARGET_BASE_PATH + "/pie-chart.tsx",
+      },
+    ],
+  },
 ];

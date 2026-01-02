@@ -40,7 +40,10 @@ function ChartLegendContent({
       {payload
         .filter((item) => item.type !== "none")
         .map((item) => {
-          const key = `${nameKey ?? item.dataKey ?? "value"}`;
+          // For pie charts, item.value contains the sector name (e.g., "chrome")
+          // For other charts, item.dataKey contains the series name (e.g., "desktop")
+          // We use item.value first (for pie), then fall back to dataKey (for bar/line/area)
+          const key = `${item.value ?? item.dataKey ?? "value"}`;
           const itemConfig = getPayloadConfigFromPayload(config, item, key);
           const isSelected = selected === null || selected === item.value;
 
