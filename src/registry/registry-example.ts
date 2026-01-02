@@ -909,4 +909,79 @@ export const examples: Registry["items"] = [
       },
     ],
   },
+  // ========================================
+  // RADAR CHART EXAMPLES
+  // ========================================
+  // Base Radar Chart
+  {
+    name: "ex-radar-chart",
+    registryDependencies: ["@evilcharts/radar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-radar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // Radar Chart Lines Variant
+  {
+    name: "ex-lines-variant-radar-chart",
+    registryDependencies: ["@evilcharts/radar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-lines-variant-radar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // Radar Chart Circle Grid
+  {
+    name: "ex-circle-grid-radar-chart",
+    registryDependencies: ["@evilcharts/radar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-circle-grid-radar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // Radar Chart Gradient Colors
+  {
+    name: "ex-gradient-colors-radar-chart",
+    registryDependencies: ["@evilcharts/radar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-gradient-colors-radar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // Radar Chart Loading State
+  {
+    name: "ex-loading-state-radar-chart",
+    registryDependencies: ["@evilcharts/radar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-loading-state-radar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // Radar Chart Glowing
+  {
+    name: "ex-glowing-radar-chart",
+    registryDependencies: ["@evilcharts/radar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-glowing-radar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
 ];

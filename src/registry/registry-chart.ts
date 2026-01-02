@@ -92,4 +92,18 @@ export const charts: Registry["items"] = [
       },
     ],
   },
+  {
+    name: "radar-chart",
+    description: "Radar chart component with filled and lines variants",
+    registryDependencies: ["@evilcharts/chart", "@evilcharts/tooltip", "@evilcharts/legend"],
+    dependencies: ["recharts"],
+    type: "registry:component",
+    files: [
+      {
+        path: "charts/radar-chart.tsx",
+        type: "registry:component",
+        target: TARGET_BASE_PATH + "/radar-chart.tsx",
+      },
+    ],
+  },
 ];

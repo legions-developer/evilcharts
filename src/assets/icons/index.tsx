@@ -260,6 +260,60 @@ export function RadialChartIcon({
   );
 }
 
+export function RadarChartIcon({
+  fill = "currentColor",
+  secondaryfill,
+  width = "1em",
+  height = "1em",
+  ...props
+}: IconProps) {
+  secondaryfill = secondaryfill || fill;
+
+  return (
+    <svg
+      height={height}
+      width={width}
+      viewBox="0 0 18 18"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <g fill={fill}>
+        {/* Hexagon grid */}
+        <path
+          d="M9 1L16 5V13L9 17L2 13V5L9 1Z"
+          fill="none"
+          stroke={secondaryfill}
+          strokeOpacity="0.3"
+          strokeWidth="1"
+        />
+        <path
+          d="M9 3.5L13.5 6.25V11.75L9 14.5L4.5 11.75V6.25L9 3.5Z"
+          fill="none"
+          stroke={secondaryfill}
+          strokeOpacity="0.3"
+          strokeWidth="1"
+        />
+        <path
+          d="M9 6L11.5 7.5V10.5L9 12L6.5 10.5V7.5L9 6Z"
+          fill="none"
+          stroke={secondaryfill}
+          strokeOpacity="0.3"
+          strokeWidth="1"
+        />
+        {/* Radar shape */}
+        <path
+          d="M9 2L14 5.5L12 11L6 11L4 5.5L9 2Z"
+          fill={fill}
+          fillOpacity="0.3"
+          stroke={fill}
+          strokeWidth="1"
+          strokeLinejoin="round"
+        />
+      </g>
+    </svg>
+  );
+}
+
 export function ShapesIcon({
   fill = "currentColor",
   secondaryfill,
