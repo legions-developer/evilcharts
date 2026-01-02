@@ -1,0 +1,153 @@
+---
+title: Default
+description: Beautiful radial bar charts with full and semi-circle variants, gradient colors, and glow effects
+links:
+  github: https://github.com/legions-developer/evilcharts/blob/main/src/registry/charts/radial-chart.tsx
+  doc: https://recharts.org/en-US/examples/SimpleRadialBarChart
+  api: https://recharts.org/en-US/api/RadialBarChart
+---
+
+<ComponentPreview title="Basic Chart" name="ex-radial-chart"  />
+
+## Installation
+
+<CodeTabs>
+  <TabsList variant="underline">
+    <TabsTab value="cli">CLI</TabsTab>
+    <TabsTab value="manual">Manual</TabsTab>
+  </TabsList>
+  <TabsPanel value="cli">
+    <CliBlock commands={["@evilcharts/radial-chart"]} />
+  </TabsPanel>
+  <TabsPanel value="manual">
+    <Steps>
+      <Step>
+        <StepTitle>Install the following dependencies:</StepTitle>
+        <StepContent>
+          <CommandBlock commands={["recharts"]} />
+        </StepContent>
+      </Step>
+      <Step>
+        <StepTitle>Copy and paste the following code snippets into your project.</StepTitle>
+         <StepDescription>
+          To use the chart, first create the folder `evilcharts` and a subfolder called `charts` inside your `components` directory.
+          Then, copy the following base radial-chart code into a new file in that folder.
+        </StepDescription>
+        <StepContent>
+          <ComponentSource
+            name="radial-chart"
+            title="components/evilcharts/charts/radial-chart.tsx"
+          />
+        </StepContent>
+      </Step>
+       <Step>
+        <StepTitle>Now, Let's add the chart component to your project.</StepTitle>
+        <StepDescription>
+          These Components are required by the chart component to render the chart. Make a folder called `ui` inside the `evilcharts` folder and paste the code there.
+
+          Below is main chart component.
+        </StepDescription>
+        <StepContent>
+          <ComponentSource
+            name="chart"
+            title="components/evilcharts/ui/chart.tsx"
+          />
+        </StepContent>
+      </Step>
+       <Step>
+        <StepTitle>Now, We need to add sub components.</StepTitle>
+        <StepDescription>
+          Create a file called `tooltip.tsx` inside the `evilcharts/ui` folder and paste the code there.
+        </StepDescription>
+        <StepContent>
+          <ComponentSource
+            name="tooltip"
+            title="components/evilcharts/ui/tooltip.tsx"
+          />
+        </StepContent>
+        <StepDescription>
+          Now, create another file called `legend.tsx` inside the `evilcharts/ui` folder and paste the code there.
+        </StepDescription>
+        <StepContent>
+          <ComponentSource
+            name="legend"
+            title="components/evilcharts/ui/legend.tsx"
+          />
+        </StepContent>
+      </Step>
+    </Steps>
+  </TabsPanel>
+</CodeTabs>
+
+## Usage
+
+```tsx
+import { EvilRadialChart } from "@/components/evilcharts/charts/radial-chart";
+```
+
+```tsx
+const data = [
+  { browser: "chrome", visitors: 275 },
+  { browser: "safari", visitors: 200 },
+  { browser: "firefox", visitors: 187 },
+];
+
+const chartConfig = {
+  chrome: {
+    label: "Chrome",
+    colors: { light: ["#3b82f6"], dark: ["#60a5fa"] },
+  },
+  safari: {
+    label: "Safari",
+    colors: { light: ["#10b981"], dark: ["#34d399"] },
+  },
+  firefox: {
+    label: "Firefox",
+    colors: { light: ["#f59e0b"], dark: ["#fbbf24"] },
+  },
+} satisfies ChartConfig;
+
+<EvilRadialChart  
+  data={data}
+  dataKey="visitors"
+  nameKey="browser"
+  chartConfig={chartConfig}
+/>
+```
+
+### Loading State
+
+<ComponentPreview className="mb-0" title="isLoading='true'" name="ex-loading-state-radial-chart"  />
+<Alert > 
+  <AlertContent >
+    The radial chart supports loading state with a placeholder animation. You can pass the `isLoading` prop to the chart to show the loading state while your data is being fetched.
+  </AlertContent>
+</Alert>
+
+## Examples
+
+Below are some examples of the radial chart with different configurations. You can customize the `variant`, `innerRadius`, `outerRadius`, and other properties.
+
+### Semi-Circle Variant
+
+<ComponentPreview className="mb-0" title="variant='semi'" name="ex-semi-variant-radial-chart"  />
+<Alert> 
+  <AlertContent>
+    Set `variant="semi"` to create a half-circle radial chart. This is useful for displaying progress or gauges in a more compact space.
+  </AlertContent>
+</Alert>
+
+### Gradient Colors
+
+<ComponentPreview title="gradient colors" name="ex-gradient-colors-radial-chart"  />
+
+### Glowing Bars
+
+<ComponentPreview className="mb-0" title="glowingBars={['chrome', 'safari']}" name="ex-glowing-radial-chart"  />
+<Alert> 
+  <AlertContent>
+    Add a subtle glow effect to specific bars using `glowingBars` prop. Pass an array of bar names (the values from your `nameKey` field) to specify which bars should glow.
+  </AlertContent>
+</Alert>
+
+## API Reference

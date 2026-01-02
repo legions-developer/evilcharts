@@ -846,4 +846,67 @@ export const examples: Registry["items"] = [
       },
     ],
   },
+  // ========================================
+  // RADIAL CHART EXAMPLES
+  // ========================================
+  // Base Radial Chart (Full Circle)
+  {
+    name: "ex-radial-chart",
+    registryDependencies: ["@evilcharts/radial-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-radial-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // Radial Chart Semi-Circle Variant
+  {
+    name: "ex-semi-variant-radial-chart",
+    registryDependencies: ["@evilcharts/radial-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-semi-variant-radial-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // Radial Chart Gradient Colors
+  {
+    name: "ex-gradient-colors-radial-chart",
+    registryDependencies: ["@evilcharts/radial-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-gradient-colors-radial-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // Radial Chart Loading State
+  {
+    name: "ex-loading-state-radial-chart",
+    registryDependencies: ["@evilcharts/radial-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-loading-state-radial-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // Radial Chart Glowing
+  {
+    name: "ex-glowing-radial-chart",
+    registryDependencies: ["@evilcharts/radial-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-glowing-radial-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
 ];

@@ -15,6 +15,7 @@ function ChartTooltipContent({
   labelFormatter,
   labelClassName,
   formatter,
+  nameKey,
   labelKey,
   selected,
 }: React.ComponentProps<typeof RechartsPrimitive.Tooltip> &
@@ -75,8 +76,13 @@ function ChartTooltipContent({
           .filter((item) => item.type !== "none")
           .map((item, index) => {
             // For pie charts, item.name contains the sector name (e.g., "chrome")
+            // For radial charts, the name is in item.payload[nameKey]
             // For other charts, item.name or item.dataKey contains the series name
-            const key = `${item.name ?? item.dataKey ?? "value"}`;
+            const payloadName =
+              nameKey && item.payload
+                ? (item.payload as Record<string, unknown>)[nameKey]
+                : undefined;
+            const key = `${payloadName ?? item.name ?? item.dataKey ?? "value"}`;
             const itemConfig = getPayloadConfigFromPayload(config, item, key);
 
             // Get colors count for this item to determine gradient vs solid

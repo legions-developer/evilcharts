@@ -1,0 +1,389 @@
+"use client";
+
+import {
+  type ChartConfig,
+  ChartContainer,
+  getColorsCount,
+  LoadingIndicator,
+} from "@/registry/ui/chart";
+import { useEffect, useId, useMemo, useState, type ComponentProps } from "react";
+import { ChartTooltip, ChartTooltipContent } from "@/registry/ui/tooltip";
+import { ChartLegend, ChartLegendContent } from "@/registry/ui/legend";
+import { Cell, RadialBar, RadialBarChart } from "recharts";
+
+// Loading animation constants
+const LOADING_BARS = 5;
+const LOADING_ANIMATION_DURATION = 1500; // Duration between data changes in ms
+
+// Constants
+const DEFAULT_INNER_RADIUS = "30%";
+const DEFAULT_OUTER_RADIUS = "100%";
+const DEFAULT_CORNER_RADIUS = 5;
+const DEFAULT_BAR_GAP = 4;
+
+type ChartProps = ComponentProps<typeof RadialBarChart>;
+type RadialBarProps = ComponentProps<typeof RadialBar>;
+
+type RadialVariant = "full" | "semi";
+
+type EvilRadialChartProps<TData extends Record<string, unknown>> = {
+  // Data
+  data: TData[];
+  dataKey: keyof TData & string;
+  nameKey: keyof TData & string;
+  chartConfig: ChartConfig;
+  className?: string;
+  chartProps?: ChartProps;
+  radialBarProps?: Omit<RadialBarProps, "dataKey">;
+
+  // Variant
+  variant?: RadialVariant;
+
+  // Radial Shape
+  innerRadius?: number | string;
+  outerRadius?: number | string;
+  cornerRadius?: number;
+  barGap?: number;
+
+  // Hide Stuffs
+  hideTooltip?: boolean;
+  hideLegend?: boolean;
+  hideBackground?: boolean;
+
+  // Interactive Stuffs
+  isClickable?: boolean;
+  isLoading?: boolean;
+
+  // Glow Effects
+  glowingBars?: string[];
+  neonBars?: string[];
+};
+
+export function EvilRadialChart<TData extends Record<string, unknown>>({
+  data,
+  dataKey,
+  nameKey,
+  chartConfig,
+  className,
+  chartProps,
+  radialBarProps,
+  variant = "full",
+  innerRadius = DEFAULT_INNER_RADIUS,
+  outerRadius = DEFAULT_OUTER_RADIUS,
+  cornerRadius = DEFAULT_CORNER_RADIUS,
+  barGap = DEFAULT_BAR_GAP,
+  hideTooltip = false,
+  hideLegend = false,
+  hideBackground = false,
+  isClickable = false,
+  isLoading = false,
+  glowingBars = [],
+  neonBars = [],
+}: EvilRadialChartProps<TData>) {
+  const [selectedBar, setSelectedBar] = useState<string | null>(null);
+  const chartId = useId().replace(/:/g, "");
+  const loadingData = useLoadingData(isLoading);
+
+  // Variant-specific settings
+  const variantConfig = getVariantConfig(variant);
+
+  // Prepare data with fill colors referencing gradients
+  const preparedData = data.map((item) => {
+    const barName = item[nameKey] as string;
+    return {
+      ...item,
+      fill: `url(#${chartId}-radial-colors-${barName})`,
+    };
+  });
+
+  return (
+    <ChartContainer className={className} config={chartConfig}>
+      <LoadingIndicator isLoading={isLoading} />
+      <RadialBarChart
+        id="evil-charts-radial-chart"
+        data={isLoading ? loadingData : preparedData}
+        innerRadius={innerRadius}
+        outerRadius={outerRadius}
+        startAngle={variantConfig.startAngle}
+        endAngle={variantConfig.endAngle}
+        cx={variantConfig.cx}
+        cy={variantConfig.cy}
+        barGap={barGap}
+        {...chartProps}
+      >
+        {!hideLegend && !isLoading && (
+          <ChartLegend
+            verticalAlign={variant === "semi" ? "bottom" : "bottom"}
+            align="center"
+            content={
+              <ChartLegendContent
+                selected={selectedBar}
+                onSelectChange={setSelectedBar}
+                isClickable={isClickable}
+                nameKey={nameKey}
+              />
+            }
+          />
+        )}
+        {!hideTooltip && !isLoading && (
+          <ChartTooltip
+            cursor={false}
+            content={<ChartTooltipContent nameKey={nameKey} hideLabel />}
+          />
+        )}
+
+        {/* Main radial bar */}
+        {!isLoading && (
+          <RadialBar
+            dataKey={dataKey}
+            cornerRadius={cornerRadius}
+            background={!hideBackground}
+            className="drop-shadow-sm"
+            style={isClickable ? { cursor: "pointer" } : undefined}
+            onClick={(_, index) => {
+              if (!isClickable) return;
+              const clickedName = data[index]?.[nameKey] as string;
+              setSelectedBar(selectedBar === clickedName ? null : clickedName);
+            }}
+            {...radialBarProps}
+          >
+            {data.map((item, index) => {
+              const barName = item[nameKey] as string;
+              const isGlowing = glowingBars.includes(barName);
+              const isNeon = neonBars.includes(barName);
+              const isSelected = selectedBar === null || selectedBar === barName;
+
+              const getFilter = () => {
+                if (isNeon) return `url(#${chartId}-radial-neon-${barName})`;
+                if (isGlowing) return `url(#${chartId}-radial-glow-${barName})`;
+                return undefined;
+              };
+
+              return (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={`url(#${chartId}-radial-colors-${barName})`}
+                  filter={getFilter()}
+                  opacity={isClickable && !isSelected ? 0.3 : 1}
+                  className="transition-opacity duration-200"
+                />
+              );
+            })}
+          </RadialBar>
+        )}
+
+        {/* Loading state with animated data */}
+        {isLoading && (
+          <RadialBar
+            dataKey="value"
+            cornerRadius={cornerRadius}
+            background
+            isAnimationActive
+            animationDuration={LOADING_ANIMATION_DURATION}
+            animationEasing="ease-in-out"
+          >
+            {loadingData.map((_, index) => (
+              <Cell key={`loading-cell-${index}`} fill="currentColor" fillOpacity={0.25} />
+            ))}
+          </RadialBar>
+        )}
+
+        {/* ======== CHART STYLES ======== */}
+        <defs>
+          {/* Color gradients for each bar */}
+          <ColorGradientStyle chartConfig={chartConfig} chartId={chartId} />
+
+          {/* Glow filters */}
+          {glowingBars.length > 0 && (
+            <GlowFilterStyle chartId={chartId} glowingBars={glowingBars} />
+          )}
+
+          {/* Neon filters */}
+          {neonBars.length > 0 && <NeonFilterStyle chartId={chartId} neonBars={neonBars} />}
+        </defs>
+      </RadialBarChart>
+    </ChartContainer>
+  );
+}
+
+// ========================================
+// VARIANT CONFIG
+// ========================================
+
+function getVariantConfig(variant: RadialVariant) {
+  switch (variant) {
+    case "semi":
+      return {
+        startAngle: 180,
+        endAngle: 0,
+        cx: "50%",
+        cy: "70%",
+      };
+    case "full":
+    default:
+      return {
+        startAngle: 90,
+        endAngle: -270,
+        cx: "50%",
+        cy: "50%",
+      };
+  }
+}
+
+// ========================================
+// LOADING STATE
+// ========================================
+
+// Generate random loading data
+function generateLoadingData() {
+  return Array.from({ length: LOADING_BARS }, (_, i) => ({
+    name: `loading${i}`,
+    value: 40 + Math.random() * 60, // Random values between 40-100
+  }));
+}
+
+// Hook to animate loading data at intervals
+function useLoadingData(isLoading: boolean) {
+  const [dataKey, setDataKey] = useState(0);
+
+  useEffect(() => {
+    if (!isLoading) return;
+
+    const interval = setInterval(() => {
+      setDataKey((prev) => prev + 1);
+    }, LOADING_ANIMATION_DURATION);
+
+    return () => clearInterval(interval);
+  }, [isLoading]);
+
+  // Regenerate data when dataKey changes
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const loadingData = useMemo(() => generateLoadingData(), [dataKey]);
+
+  return loadingData;
+}
+
+// ========================================
+// GRADIENT STYLES
+// ========================================
+
+// Color gradient for radial bars (horizontal gradient following the arc)
+const ColorGradientStyle = ({
+  chartConfig,
+  chartId,
+}: {
+  chartConfig: ChartConfig;
+  chartId: string;
+}) => {
+  return (
+    <>
+      {Object.entries(chartConfig).map(([dataKey, config]) => {
+        const colorsCount = getColorsCount(config);
+
+        return (
+          <linearGradient
+            key={`${chartId}-radial-colors-${dataKey}`}
+            id={`${chartId}-radial-colors-${dataKey}`}
+            x1="0"
+            y1="0"
+            x2="1"
+            y2="1"
+          >
+            {colorsCount === 1 ? (
+              <>
+                <stop offset="0%" stopColor={`var(--color-${dataKey}-0)`} />
+                <stop offset="100%" stopColor={`var(--color-${dataKey}-0)`} />
+              </>
+            ) : (
+              Array.from({ length: colorsCount }, (_, index) => (
+                <stop
+                  key={index}
+                  offset={`${(index / (colorsCount - 1)) * 100}%`}
+                  stopColor={`var(--color-${dataKey}-${index}, var(--color-${dataKey}-0))`}
+                />
+              ))
+            )}
+          </linearGradient>
+        );
+      })}
+    </>
+  );
+};
+
+// ========================================
+// GLOW/NEON FILTER STYLES
+// ========================================
+
+const GlowFilterStyle = ({ chartId, glowingBars }: { chartId: string; glowingBars: string[] }) => {
+  return (
+    <>
+      {glowingBars.map((barName) => (
+        <filter
+          key={`${chartId}-radial-glow-${barName}`}
+          id={`${chartId}-radial-glow-${barName}`}
+          x="-100%"
+          y="-100%"
+          width="300%"
+          height="300%"
+        >
+          <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur" />
+          <feColorMatrix
+            in="blur"
+            type="matrix"
+            values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.6 0"
+            result="glow"
+          />
+          <feMerge>
+            <feMergeNode in="glow" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      ))}
+    </>
+  );
+};
+
+const NeonFilterStyle = ({ chartId, neonBars }: { chartId: string; neonBars: string[] }) => {
+  return (
+    <>
+      {neonBars.map((barName) => (
+        <filter
+          key={`${chartId}-radial-neon-${barName}`}
+          id={`${chartId}-radial-neon-${barName}`}
+          x="-100%"
+          y="-100%"
+          width="300%"
+          height="300%"
+        >
+          <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="outerBlur" />
+          <feColorMatrix
+            in="outerBlur"
+            type="matrix"
+            values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.8 0"
+            result="outerGlow"
+          />
+          <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="middleBlur" />
+          <feColorMatrix
+            in="middleBlur"
+            type="matrix"
+            values="1 0 0 0 0.05  0 1 0 0 0.05  0 0 1 0 0.05  0 0 0 1.2 0"
+            result="middleGlow"
+          />
+          <feGaussianBlur in="SourceGraphic" stdDeviation="1" result="coreBlur" />
+          <feColorMatrix
+            in="coreBlur"
+            type="matrix"
+            values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1 0"
+            result="whiteCore"
+          />
+          <feMerge>
+            <feMergeNode in="outerGlow" />
+            <feMergeNode in="middleGlow" />
+            <feMergeNode in="whiteCore" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      ))}
+    </>
+  );
+};

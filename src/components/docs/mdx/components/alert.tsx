@@ -57,7 +57,7 @@ function Alert({
       className={cn(alertVariants({ variant }), className)}
       {...props}
     >
-      <div className="flex items-center gap-2 px-1.5 py-1">
+      <div className="flex items-center gap-2 px-1.5 py-1 select-none">
         <span>{getAlertIcon(variant)}</span>
         <span className="text-[13px]">{title ? title : getAlertTitle(variant)}</span>
       </div>

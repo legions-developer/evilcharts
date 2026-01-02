@@ -9,6 +9,7 @@
     "line-charts",
     "bar-charts",
     "composed-charts",
-    "pie-charts"
+    "pie-charts",
+    "radial-charts"
   ]
 }

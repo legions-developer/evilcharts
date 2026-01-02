@@ -4,6 +4,7 @@ import {
   ChartStackedLineIcon,
   ComposedChartIcon,
   PieChartIcon,
+  RadialChartIcon,
 } from "@/assets/icons";
 
 // Custom icons for each item in the sidebar of MDX files
@@ -19,6 +20,8 @@ export function getNavItemIcon(tag?: string) {
       return <ComposedChartIcon />;
     case "root:pie-charts":
       return <PieChartIcon />;
+    case "root:radial-charts":
+      return <RadialChartIcon />;
     default:
       return null;
   }
