@@ -335,4 +335,50 @@ export const examples: Registry["items"] = [
       },
     ],
   },
+  // Line Chart Glowing Lines
+  {
+    name: "ex-glowing-desktop-line-chart",
+    registryDependencies: ["@evilcharts/line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-glowing-desktop-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-glowing-mobile-line-chart",
+    registryDependencies: ["@evilcharts/line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-glowing-mobile-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // Line Chart Neon Lines
+  {
+    name: "ex-neon-desktop-line-chart",
+    registryDependencies: ["@evilcharts/line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-neon-desktop-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-neon-mobile-line-chart",
+    registryDependencies: ["@evilcharts/line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-neon-mobile-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
 ];
