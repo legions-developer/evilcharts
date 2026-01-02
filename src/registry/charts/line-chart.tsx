@@ -1,0 +1,452 @@
+"use client";
+
+import {
+  type ChartConfig,
+  ChartContainer,
+  getColorsCount,
+  getLoadingData,
+  LoadingIndicator,
+} from "@/registry/ui/chart";
+import { useCallback, useId, useMemo, useRef, useState, type ComponentProps } from "react";
+import { CartesianGrid, Line, LineChart, ReferenceLine, XAxis, YAxis } from "recharts";
+import { ChartTooltip, ChartTooltipContent } from "@/registry/ui/tooltip";
+import { ChartLegend, ChartLegendContent } from "@/registry/ui/legend";
+import { ChartDot, DotVariant } from "@/registry/ui/dot";
+import { motion } from "motion/react";
+
+// Constants
+const STROKE_WIDTH = 1;
+const LOADING_LINE_DATA_KEY = "loading";
+const LOADING_ANIMATION_DURATION = 2000; // in milliseconds
+
+type ChartProps = ComponentProps<typeof LineChart>;
+type XAxisProps = ComponentProps<typeof XAxis>;
+type YAxisProps = ComponentProps<typeof YAxis>;
+type LineType = ComponentProps<typeof Line>["type"];
+type StrokeVariant = "solid" | "dashed" | "animated-dashed";
+
+// Validating Types to make sure user have provided valid data according to chartConfig
+type ValidateConfigKeys<TData, TConfig> = {
+  [K in keyof TConfig]: K extends keyof TData ? ChartConfig[string] : never;
+};
+
+type EvilLineChartProps<
+  TData extends Record<string, unknown>,
+  TConfig extends Record<string, ChartConfig[string]>,
+> = {
+  chartConfig: TConfig & ValidateConfigKeys<TData, TConfig>;
+  data: TData[];
+  xDataKey?: keyof TData & string;
+  yDataKey?: keyof TData & string;
+  className?: string;
+  chartProps?: ChartProps;
+  xAxisProps?: XAxisProps;
+  yAxisProps?: YAxisProps;
+  defaultSelectedDataKey?: string | null;
+  curveType?: LineType;
+  strokeVariant?: StrokeVariant;
+  dotVariant?: DotVariant;
+  activeDotVariant?: DotVariant;
+  connectNulls?: boolean;
+  tickGap?: number;
+  // Hide Stuffs
+  hideTooltip?: boolean;
+  hideCartesianGrid?: boolean;
+  hideLegend?: boolean;
+  hideCursorLine?: boolean;
+  // Interactive Stuffs
+  isClickable?: boolean;
+  isLoading?: boolean;
+  loadingPoints?: number;
+};
+
+export function EvilLineChart<
+  TData extends Record<string, unknown>,
+  TConfig extends Record<string, ChartConfig[string]>,
+>({
+  chartConfig,
+  data,
+  xDataKey,
+  yDataKey,
+  className,
+  chartProps,
+  xAxisProps,
+  yAxisProps,
+  defaultSelectedDataKey = null,
+  curveType = "linear",
+  strokeVariant = "solid",
+  dotVariant,
+  activeDotVariant,
+  connectNulls = false,
+  tickGap = 8,
+  hideTooltip = false,
+  hideCartesianGrid = false,
+  hideLegend = false,
+  hideCursorLine = false,
+  isClickable = false,
+  isLoading = false,
+  loadingPoints,
+}: EvilLineChartProps<TData, TConfig>) {
+  const [selectedDataKey, setSelectedDataKey] = useState<string | null>(defaultSelectedDataKey);
+  const { loadingData, onShimmerExit } = useLoadingData(isLoading, loadingPoints);
+  const chartId = useId().replace(/:/g, ""); // Remove colons for valid CSS selectors
+
+  return (
+    <ChartContainer className={className} config={chartConfig}>
+      <LoadingIndicator isLoading={isLoading} />
+      <LineChart
+        id="evil-charts-line-chart"
+        accessibilityLayer
+        data={isLoading ? loadingData : data}
+        {...chartProps}
+      >
+        <ReferenceLine color="white" />
+        {!hideCartesianGrid && <CartesianGrid vertical={false} strokeDasharray="3 3" />}
+        {!hideLegend && (
+          <ChartLegend
+            verticalAlign="top"
+            align="right"
+            content={
+              <ChartLegendContent
+                selected={selectedDataKey}
+                onSelectChange={setSelectedDataKey}
+                isClickable={isClickable}
+              />
+            }
+          />
+        )}
+        {xDataKey && !isLoading && (
+          <XAxis
+            dataKey={xDataKey}
+            tickLine={false}
+            axisLine={false}
+            tickMargin={8}
+            minTickGap={tickGap}
+            {...xAxisProps}
+          />
+        )}
+        {yDataKey && !isLoading && (
+          <YAxis
+            dataKey={yDataKey}
+            tickLine={false}
+            axisLine={false}
+            tickMargin={8}
+            minTickGap={tickGap}
+            width="auto"
+            tickFormatter={yAxisProps?.tickFormatter}
+            {...yAxisProps}
+          />
+        )}
+        {!hideTooltip && !isLoading && (
+          <ChartTooltip
+            cursor={
+              hideCursorLine
+                ? false
+                : {
+                    strokeDasharray:
+                      strokeVariant === "dashed" || strokeVariant === "animated-dashed"
+                        ? "3 3"
+                        : undefined,
+                    strokeWidth: STROKE_WIDTH,
+                  }
+            }
+            content={<ChartTooltipContent selected={selectedDataKey} />}
+          />
+        )}
+        {!isLoading &&
+          Object.keys(chartConfig).map((dataKey) => {
+            const _opacity = getOpacity(isClickable, selectedDataKey, dataKey);
+            const hasSelection = selectedDataKey !== null;
+
+            return (
+              <Line
+                type={curveType}
+                key={dataKey}
+                dataKey={dataKey}
+                connectNulls={connectNulls}
+                strokeOpacity={_opacity.stroke}
+                stroke={`url(#${chartId}-colors-${dataKey})`}
+                dot={
+                  dotVariant ? (
+                    <ChartDot
+                      fillOpacity={_opacity.dot}
+                      type={dotVariant}
+                      dataKey={dataKey}
+                      chartId={chartId}
+                    />
+                  ) : (
+                    false
+                  )
+                }
+                activeDot={
+                  activeDotVariant ? (
+                    <ChartDot
+                      fillOpacity={_opacity.dot}
+                      type={activeDotVariant}
+                      dataKey={dataKey}
+                      chartId={chartId}
+                    />
+                  ) : (
+                    false
+                  )
+                }
+                strokeWidth={STROKE_WIDTH}
+                strokeDasharray={
+                  strokeVariant === "dashed"
+                    ? "5 5"
+                    : strokeVariant === "animated-dashed"
+                      ? "5 5"
+                      : undefined
+                }
+                style={isClickable ? { cursor: "pointer" } : undefined}
+                onClick={() => {
+                  if (!isClickable) return;
+                  // Toggle: if already selected, unselect; otherwise select
+                  setSelectedDataKey(selectedDataKey === dataKey ? null : dataKey);
+                }}
+              >
+                {strokeVariant === "animated-dashed" && !hasSelection && <AnimatedDashedStyle />}
+              </Line>
+            );
+          })}
+        {/* ======== LOADING LINE ======== */}
+        {isLoading && (
+          <Line
+            type={curveType}
+            dataKey={LOADING_LINE_DATA_KEY}
+            min={0}
+            max={100}
+            stroke="currentColor"
+            strokeOpacity={0.5}
+            isAnimationActive={false}
+            legendType="none"
+            tooltipType="none"
+            activeDot={false}
+            dot={false}
+            strokeWidth={STROKE_WIDTH}
+            style={{ mask: `url(#${chartId}-loading-mask)` }}
+          />
+        )}
+        {/* ======== CHART STYLES ======== */}
+        <defs>
+          {isLoading && <LoadingLinePatternStyle chartId={chartId} onShimmerExit={onShimmerExit} />}
+          {/* Shared horizontal color gradient - always rendered for stroke */}
+          <HorizontalColorGradientStyle chartConfig={chartConfig} chartId={chartId} />
+        </defs>
+      </LineChart>
+    </ChartContainer>
+  );
+}
+
+// Returns opacity object for stroke and dot
+const getOpacity = (isClickable: boolean, selectedDataKey: string | null, dataKey: string) => {
+  if (!isClickable || selectedDataKey === null) {
+    return { stroke: 1, dot: 1 };
+  }
+  return selectedDataKey === dataKey ? { stroke: 1, dot: 1 } : { stroke: 0.3, dot: 0.3 };
+};
+
+// Animated dashed-stroke style for the line chart
+const AnimatedDashedStyle = () => {
+  return (
+    <>
+      <animate
+        attributeName="stroke-dasharray"
+        values="5 5; 0 5; 5 5"
+        dur="1s"
+        repeatCount="indefinite"
+        keyTimes="0;0.5;1"
+      />
+      <animate
+        attributeName="stroke-dashoffset"
+        values="0; -10"
+        dur="1s"
+        repeatCount="indefinite"
+        keyTimes="0;1"
+      />
+    </>
+  );
+};
+
+// Shared horizontal color gradient (left to right) - used for stroke
+const HorizontalColorGradientStyle = ({
+  chartConfig,
+  chartId,
+}: {
+  chartConfig: ChartConfig;
+  chartId: string;
+}) => {
+  return (
+    <>
+      {Object.entries(chartConfig).map(([dataKey, config]) => {
+        const colorsCount = getColorsCount(config);
+
+        return (
+          <linearGradient
+            key={`${chartId}-colors-${dataKey}`}
+            id={`${chartId}-colors-${dataKey}`}
+            x1="0"
+            y1="0"
+            x2="1"
+            y2="0"
+          >
+            {colorsCount === 1 ? (
+              // Single color: same color at start and end
+              <>
+                <stop offset="0%" stopColor={`var(--color-${dataKey}-0)`} />
+                <stop offset="100%" stopColor={`var(--color-${dataKey}-0)`} />
+              </>
+            ) : (
+              // Multiple colors: distribute evenly
+              // Fallback to first color if index doesn't exist in current theme
+              Array.from({ length: colorsCount }, (_, index) => (
+                <stop
+                  key={index}
+                  offset={`${(index / (colorsCount - 1)) * 100}%`}
+                  stopColor={`var(--color-${dataKey}-${index}, var(--color-${dataKey}-0))`}
+                />
+              ))
+            )}
+          </linearGradient>
+        );
+      })}
+    </>
+  );
+};
+
+// Generate gradient stops with smooth easing for loading animation
+const generateEasedGradientStops = (
+  steps: number = 17,
+  minOpacity: number = 0.05,
+  maxOpacity: number = 0.9,
+) => {
+  return Array.from({ length: steps }, (_, i) => {
+    const t = i / (steps - 1); // 0 to 1
+    // Sine-based bell curve easing: peaks at center (t=0.5), smooth falloff at edges
+    const eased = Math.sin(t * Math.PI) ** 2;
+    const opacity = minOpacity + eased * (maxOpacity - minOpacity);
+    return { offset: `${(t * 100).toFixed(0)}%`, opacity: Number(opacity.toFixed(3)) };
+  });
+};
+
+/**
+ * Hook to manage loading data with pixel-perfect shimmer synchronization.
+ *
+ * Uses motion.dev's onAnimationComplete callback to ensure chart data
+ * is only regenerated when the shimmer has completely exited the visible area.
+ * This eliminates timing drift issues from setTimeout/setInterval.
+ *
+ * The shimmer pattern has 200-300% width so that when the visible shimmer
+ * exits the chart container (at the 100% point), we can safely swap data
+ * while the invisible portion continues animating.
+ */
+export function useLoadingData(isLoading: boolean, loadingPoints: number = 14) {
+  const [loadingDataKey, setLoadingDataKey] = useState(false);
+
+  // Callback fired by motion.dev when shimmer exits visible area
+  const onShimmerExit = useCallback(() => {
+    if (isLoading) {
+      setLoadingDataKey((prev) => !prev);
+    }
+  }, [isLoading]);
+
+  const loadingData = useMemo(
+    () => getLoadingData(loadingPoints),
+    // loadingDataKey toggle triggers re-computation when shimmer exits
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [loadingPoints, loadingDataKey],
+  );
+
+  return { loadingData, onShimmerExit };
+}
+
+/**
+ * Loading line pattern with animated skeleton effect using motion.dev
+ *
+ * Key design for pixel-perfect sync:
+ * - Visible chart area is normalized to 0-1 in objectBoundingBox units
+ * - Shimmer gradient has width=1 (same as visible area)
+ * - Pattern width is 3x (300%) to provide buffer on both sides
+ * - Animation: x goes from -1 (off-screen left) to 2 (off-screen right)
+ * - At x=-1: shimmer is completely outside left edge
+ * - At x=0: shimmer starts entering from left
+ * - At x=1: shimmer has fully exited right edge
+ * - At x=2: shimmer is in the right buffer zone
+ * - onShimmerExit fires when x crosses 1 (shimmer fully exited visible area)
+ * - Data swaps happen while shimmer is outside visible area (x >= 1)
+ * - Loop continues infinitely
+ */
+const LoadingLinePatternStyle = ({
+  chartId,
+  onShimmerExit,
+}: {
+  chartId: string;
+  onShimmerExit: () => void;
+}) => {
+  const gradientStops = generateEasedGradientStops();
+
+  // Pattern width needs to accommodate: 1 (left buffer) + 1 (visible) + 1 (right buffer) = 3
+  const patternWidth = 3;
+
+  // Animation goes from -1 (left of visible) to 2 (right of visible)
+  // Total travel distance = 3, matching pattern width
+  const startX = -1;
+  const endX = 2;
+
+  // Track last x value to detect threshold crossing
+  const lastXRef = useRef(startX);
+
+  return (
+    <>
+      {/* Gradient for smooth fade: edges dim, middle bright for sweep effect */}
+      <linearGradient id={`${chartId}-loading-mask-gradient`} x1="0" y1="0" x2="1" y2="0">
+        {gradientStops.map(({ offset, opacity }) => (
+          <stop key={offset} offset={offset} stopColor="white" stopOpacity={opacity} />
+        ))}
+      </linearGradient>
+      <pattern
+        id={`${chartId}-loading-mask-pattern`}
+        patternUnits="objectBoundingBox"
+        patternContentUnits="objectBoundingBox"
+        patternTransform="rotate(25)"
+        width={patternWidth}
+        height="1"
+        x="0"
+        y="0"
+      >
+        {/* Use motion.rect with keyframe animation for precise timing */}
+        <motion.rect
+          y="0"
+          width="1"
+          height="1"
+          fill={`url(#${chartId}-loading-mask-gradient)`}
+          initial={{ x: startX }}
+          animate={{ x: endX }}
+          transition={{
+            duration: LOADING_ANIMATION_DURATION / 1000,
+            ease: "linear",
+            repeat: Infinity,
+            repeatType: "loop",
+          }}
+          // Use onUpdate to fire callback at precise exit point
+          onUpdate={(latest) => {
+            const xValue = typeof latest.x === "number" ? latest.x : startX;
+            const lastX = lastXRef.current;
+
+            // Fire when crossing the exit threshold (x >= 1 means shimmer fully exited right)
+            if (xValue >= 1 && lastX < 1) {
+              onShimmerExit();
+            }
+
+            // Update tracked value
+            lastXRef.current = xValue;
+          }}
+        />
+      </pattern>
+      {/* Masking */}
+      <mask id={`${chartId}-loading-mask`} maskUnits="userSpaceOnUse">
+        <rect width="100%" height="100%" fill={`url(#${chartId}-loading-mask-pattern)`} />
+      </mask>
+    </>
+  );
+};
