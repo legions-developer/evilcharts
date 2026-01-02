@@ -15,7 +15,6 @@ function ChartTooltipContent({
   labelFormatter,
   labelClassName,
   formatter,
-  nameKey,
   labelKey,
   selected,
 }: React.ComponentProps<typeof RechartsPrimitive.Tooltip> &
@@ -57,7 +56,8 @@ function ChartTooltipContent({
   }, [label, labelFormatter, payload, hideLabel, labelClassName, config, labelKey]);
 
   if (!active || !payload?.length) {
-    return null;
+    // Empty tooltip - to prevent position getting 0.0 so it doesnt animate tooltip every time from 0.0 origin
+    return <span className="p-4" />;
   }
 
   const nestLabel = payload.length === 1 && indicator !== "dot";
