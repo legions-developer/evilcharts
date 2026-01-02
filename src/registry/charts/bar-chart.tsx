@@ -169,9 +169,11 @@ export function EvilBarChart<
         )}
         {!isLoading &&
           Object.keys(chartConfig).map((dataKey) => {
-            const _opacity = getOpacity(isClickable, selectedDataKey, dataKey);
             const isGlowing = glowingBars.includes(dataKey as NumericDataKeys<TData>);
             const isNeon = neonBars.includes(dataKey as NumericDataKeys<TData>);
+
+            // Check if this dataKey is selected (for click selection)
+            const isSelectedDataKey = selectedDataKey === null || selectedDataKey === dataKey;
 
             // Determine which filter to apply (neon takes priority over glow)
             const getFilter = () => {
@@ -192,14 +194,22 @@ export function EvilBarChart<
                   const barProps = props as BarShapeProps;
                   const index = barProps.index as number;
 
-                  // Calculate opacity based on hover and click state
-                  const barOpacity = enableHoverHighlight
-                    ? hoveredIndex === null
-                      ? _opacity.fill
-                      : hoveredIndex === index
-                        ? 1
-                        : 0.3
-                    : _opacity.fill;
+                  // Calculate opacity based on both hover and click state
+                  const getBarOpacity = () => {
+                    // Base opacity from click selection
+                    const clickOpacity =
+                      isClickable && selectedDataKey !== null ? (isSelectedDataKey ? 1 : 0.3) : 1;
+
+                    // If hover highlight is enabled and something is hovered
+                    if (enableHoverHighlight && hoveredIndex !== null) {
+                      const isHovered = hoveredIndex === index;
+                      // Combine: if this bar is hovered, show full opacity (respecting click selection)
+                      // If not hovered, dim it further
+                      return isHovered ? clickOpacity : clickOpacity * 0.3;
+                    }
+
+                    return clickOpacity;
+                  };
 
                   return (
                     <CustomBar
@@ -209,7 +219,7 @@ export function EvilBarChart<
                       barVariant={barVariant}
                       barRadius={barRadius}
                       filter={getFilter()}
-                      fillOpacity={barOpacity}
+                      fillOpacity={getBarOpacity()}
                       isClickable={isClickable}
                       enableHoverHighlight={enableHoverHighlight}
                       onClick={() => {
@@ -398,14 +408,6 @@ const CustomBar = ({
       )}
     </g>
   );
-};
-
-// Returns opacity object for fill
-const getOpacity = (isClickable: boolean, selectedDataKey: string | null, dataKey: string) => {
-  if (!isClickable || selectedDataKey === null) {
-    return { fill: 1 };
-  }
-  return selectedDataKey === dataKey ? { fill: 1 } : { fill: 0.3 };
 };
 
 // Shared vertical color gradient (top to bottom) - used for bar fill
