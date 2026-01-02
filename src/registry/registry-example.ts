@@ -217,4 +217,122 @@ export const examples: Registry["items"] = [
       },
     ],
   },
+  // ========================================
+  // LINE CHART EXAMPLES
+  // ========================================
+  // Base Line Chart
+  {
+    name: "ex-line-chart",
+    registryDependencies: ["@evilcharts/line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // Line Chart Gradient Color
+  {
+    name: "ex-gradient-colors-line-chart",
+    registryDependencies: ["@evilcharts/line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-gradient-colors-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-gradient-colors-bump-line-chart",
+    registryDependencies: ["@evilcharts/line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-gradient-colors-bump-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // Line Chart Loading State
+  {
+    name: "ex-loading-state-line-chart",
+    registryDependencies: ["@evilcharts/line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-loading-state-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // Line Chart Curve Types
+  {
+    name: "ex-bump-curve-type-line-chart",
+    registryDependencies: ["@evilcharts/line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-bump-curve-type-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-step-curve-type-line-chart",
+    registryDependencies: ["@evilcharts/line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-step-curve-type-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-monotoney-curve-type-line-chart",
+    registryDependencies: ["@evilcharts/line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-monotoney-curve-type-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // Line Chart Stroke Variants
+  {
+    name: "ex-solid-stroke-line-chart",
+    registryDependencies: ["@evilcharts/line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-solid-stroke-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-dashed-stroke-line-chart",
+    registryDependencies: ["@evilcharts/line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-dashed-stroke-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-animated-dashed-stroke-line-chart",
+    registryDependencies: ["@evilcharts/line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-animated-dashed-stroke-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
 ];

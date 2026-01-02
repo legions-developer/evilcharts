@@ -17,4 +17,18 @@ export const charts: Registry["items"] = [
       },
     ],
   },
+  {
+    name: "line-chart",
+    description: "Line chart component",
+    registryDependencies: ["@evilcharts/chart", "@evilcharts/tooltip", "@evilcharts/legend"],
+    dependencies: ["recharts"],
+    type: "registry:component",
+    files: [
+      {
+        path: "charts/line-chart.tsx",
+        type: "registry:component",
+        target: TARGET_BASE_PATH + "/line-chart.tsx",
+      },
+    ],
+  },
 ];
