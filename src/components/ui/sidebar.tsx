@@ -254,7 +254,7 @@ function SidebarTrigger({ className, onClick, ...props }: React.ComponentProps<t
       }}
       {...props}
     >
-      <SidebarLeft className="text-muted-foreground" />
+      {/* <SidebarLeft className="text-muted-foreground/50" /> */}
       <span className="sr-only">Toggle Sidebar</span>
     </Button>
   );

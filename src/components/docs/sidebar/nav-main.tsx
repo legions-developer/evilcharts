@@ -32,8 +32,19 @@ function TreeIndicator({
   const activeIndex = activeTrigger.index;
 
   return (
-    <svg className={cn("text-muted pointer-events-none absolute z-10 ml-[5px] flex h-full w-5! duration-200")}>
-      <ellipse className="text-path" cx="50%" cy="calc(100% - 15px)" rx="2" ry="2" fill="currentColor" />
+    <svg
+      className={cn(
+        "text-muted pointer-events-none absolute z-10 ml-[5px] flex h-full w-5! duration-200",
+      )}
+    >
+      <ellipse
+        className="text-path"
+        cx="50%"
+        cy="calc(100% - 15px)"
+        rx="2"
+        ry="2"
+        fill="currentColor"
+      />
       <line
         className="text-path"
         x1="50%"
@@ -106,7 +117,9 @@ interface ActiveTriggerProps {
   id?: string;
 }
 
-export function NavMain({ tree }: React.ComponentProps<typeof Sidebar> & { tree: typeof source.pageTree }) {
+export function NavMain({
+  tree,
+}: React.ComponentProps<typeof Sidebar> & { tree: typeof source.pageTree }) {
   const pathname = usePathname();
 
   // Derive activeTrigger from pathname - automatically resets when navigating away
@@ -117,7 +130,9 @@ export function NavMain({ tree }: React.ComponentProps<typeof Sidebar> & { tree:
 
     for (const item of tree.children) {
       if (item.type === "folder") {
-        const foundIndex = item.children.findIndex((child) => child.type === "page" && child.url === pathname);
+        const foundIndex = item.children.findIndex(
+          (child) => child.type === "page" && child.url === pathname,
+        );
         if (foundIndex !== -1) {
           childIndex = foundIndex;
           const child = item.children[foundIndex];
@@ -158,21 +173,35 @@ export function NavMain({ tree }: React.ComponentProps<typeof Sidebar> & { tree:
           );
 
           return (
-            <Collapsible key={item.$id} asChild className="group/collapsible" defaultOpen={hasActiveChild}>
+            <Collapsible
+              key={item.$id}
+              asChild
+              className="group/collapsible"
+              defaultOpen={hasActiveChild}
+            >
               <SidebarMenuItem>
                 <CollapsibleTrigger asChild>
                   <SidebarMenuButton
-                    className={!hasActiveChild ? "text-muted-foreground hover:text-primary" : ""}
+                    className={!hasActiveChild ? "text-muted-foreground/80 hover:text-primary" : ""}
                     isActive={hasActiveChild}
                   >
                     {getNavItemIcon(item.$id)}
                     <span className="capitalize">{item.name}</span>
-                    <CaretRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                    <CaretRight
+                      className={cn(
+                        "ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90",
+                        !hasActiveChild ? "opacity-60" : "opacity-100",
+                      )}
+                    />
                   </SidebarMenuButton>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                   <SidebarMenuSub>
-                    <TreeIndicator activeTrigger={activeTrigger} hasActiveChild={hasActiveChild} key={item.$id} />
+                    <TreeIndicator
+                      activeTrigger={activeTrigger}
+                      hasActiveChild={hasActiveChild}
+                      key={item.$id}
+                    />
                     {item.children.map((subItem) => {
                       if (subItem.type !== "page") return null;
                       if (EXCLUDED_PAGES.includes(subItem.url)) return null;
@@ -180,7 +209,10 @@ export function NavMain({ tree }: React.ComponentProps<typeof Sidebar> & { tree:
                       const isActive = activeTrigger.url === subItem.url;
 
                       return (
-                        <SidebarMenuSubItem key={subItem.$id} className={cn("relative flex w-full")}>
+                        <SidebarMenuSubItem
+                          key={subItem.$id}
+                          className={cn("relative flex w-full")}
+                        >
                           <SidebarMenuSubButton
                             className={cn("w-full pl-8", !isActive && "text-muted-foreground")}
                             asChild
