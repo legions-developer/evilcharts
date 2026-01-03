@@ -5,13 +5,13 @@
     "installation",
     "components",
     "changelog",
-    "area-charts",
-    "line-charts",
-    "bar-charts",
-    "composed-charts",
-    "radar-charts",
-    "pie-charts",
-    "radial-charts",
-    "sankey-charts"
+    "area-chart",
+    "line-chart",
+    "bar-chart",
+    "composed-chart",
+    "radar-chart",
+    "pie-chart",
+    "radial-chart",
+    "sankey-chart"
   ]
 }
