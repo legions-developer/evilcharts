@@ -241,7 +241,13 @@ export function EvilSankeyChart({
 
       {/* Loading state */}
       {isLoading && (
-        <svg width="100%" height="100%" className="absolute inset-0">
+        <svg
+          viewBox="0 0 500 250"
+          preserveAspectRatio="xMidYMid meet"
+          width="100%"
+          height="100%"
+          className="absolute inset-0"
+        >
           <LoadingSankey />
         </svg>
       )}
@@ -564,81 +570,94 @@ const CustomLink = ({
 // ========================================
 
 const LoadingSankey = () => {
-  // Simple loading animation with placeholder nodes and links
+  // Full-width loading skeleton with 3 columns of nodes (with padding from edges)
   const nodes = [
-    { x: 20, y: 40, width: 15, height: 80 },
-    { x: 20, y: 150, width: 15, height: 60 },
-    { x: 150, y: 60, width: 15, height: 100 },
-    { x: 150, y: 180, width: 15, height: 40 },
-    { x: 280, y: 80, width: 15, height: 120 },
+    // Column 1 (left side with padding)
+    { x: 30, y: 25, width: 12, height: 65, delay: 0 },
+    { x: 30, y: 110, width: 12, height: 50, delay: 0.3 },
+    { x: 30, y: 180, width: 12, height: 45, delay: 0.15 },
+    // Column 2 (center)
+    { x: 244, y: 20, width: 12, height: 55, delay: 0.45 },
+    { x: 244, y: 95, width: 12, height: 75, delay: 0.6 },
+    { x: 244, y: 190, width: 12, height: 40, delay: 0.25 },
+    // Column 3 (right side with padding)
+    { x: 458, y: 35, width: 12, height: 80, delay: 0.5 },
+    { x: 458, y: 135, width: 12, height: 90, delay: 0.1 },
   ];
+
+  // Links with unique delays for varied animation timing
+  const links = [
+    // Column 1 -> Column 2
+    { from: 0, to: 3, width: 26, delay: 0.2 },
+    { from: 0, to: 4, width: 18, delay: 0.7 },
+    { from: 1, to: 4, width: 24, delay: 0.4 },
+    { from: 1, to: 5, width: 12, delay: 0.9 },
+    { from: 2, to: 4, width: 16, delay: 0.1 },
+    { from: 2, to: 5, width: 14, delay: 0.55 },
+    // Column 2 -> Column 3
+    { from: 3, to: 6, width: 22, delay: 0.35 },
+    { from: 3, to: 7, width: 18, delay: 0.8 },
+    { from: 4, to: 6, width: 28, delay: 0.05 },
+    { from: 4, to: 7, width: 32, delay: 0.65 },
+    { from: 5, to: 7, width: 16, delay: 0.45 },
+  ];
+
+  // Generate bezier path between two nodes
+  const getLinkPath = (fromIdx: number, toIdx: number) => {
+    const from = nodes[fromIdx];
+    const to = nodes[toIdx];
+    const startX = from.x + from.width;
+    const startY = from.y + from.height / 2;
+    const endX = to.x;
+    const endY = to.y + to.height / 2;
+    const controlX1 = startX + (endX - startX) * 0.4;
+    const controlX2 = startX + (endX - startX) * 0.6;
+    return `M${startX},${startY} C${controlX1},${startY} ${controlX2},${endY} ${endX},${endY}`;
+  };
+
+  const baseDuration = LOADING_ANIMATION_DURATION / 1000;
 
   return (
     <>
-      {/* Loading nodes */}
-      {nodes.map((node, i) => (
-        <motion.rect
-          key={`loading-node-${i}`}
-          x={`${node.x}px`}
-          y={`${node.y}px`}
-          width={`${node.width}px`}
-          height={`${node.height}px`}
-          rx={2}
-          fill="currentColor"
-          initial={{ opacity: 0.1 }}
-          animate={{ opacity: [0.1, 0.3, 0.1] }}
+      {/* Loading links */}
+      {links.map((link, i) => (
+        <motion.path
+          key={`loading-link-${i}`}
+          d={getLinkPath(link.from, link.to)}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={link.width}
+          initial={{ opacity: 0.04 }}
+          animate={{ opacity: [0.04, 0.14, 0.04] }}
           transition={{
-            duration: LOADING_ANIMATION_DURATION / 1000,
-            delay: (i / nodes.length) * (LOADING_ANIMATION_DURATION / 1000),
+            duration: baseDuration * (0.8 + (i % 3) * 0.2),
+            delay: link.delay,
             repeat: Infinity,
             ease: "easeInOut",
           }}
         />
       ))}
 
-      {/* Loading links (simplified bezier curves) */}
-      <motion.path
-        d="M35,80 C90,80 90,110 165,110"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={30}
-        initial={{ opacity: 0.05 }}
-        animate={{ opacity: [0.05, 0.15, 0.05] }}
-        transition={{
-          duration: LOADING_ANIMATION_DURATION / 1000,
-          delay: 0.2,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
-      <motion.path
-        d="M35,180 C90,180 90,200 165,200"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={20}
-        initial={{ opacity: 0.05 }}
-        animate={{ opacity: [0.05, 0.15, 0.05] }}
-        transition={{
-          duration: LOADING_ANIMATION_DURATION / 1000,
-          delay: 0.4,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
-      <motion.path
-        d="M165,110 C220,110 220,140 295,140"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={40}
-        initial={{ opacity: 0.05 }}
-        animate={{ opacity: [0.05, 0.15, 0.05] }}
-        transition={{
-          duration: LOADING_ANIMATION_DURATION / 1000,
-          delay: 0.6,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
+      {/* Loading nodes */}
+      {nodes.map((node, i) => (
+        <motion.rect
+          key={`loading-node-${i}`}
+          x={node.x}
+          y={node.y}
+          width={node.width}
+          height={node.height}
+          rx={2}
+          fill="currentColor"
+          initial={{ opacity: 0.15 }}
+          animate={{ opacity: [0.15, 0.4, 0.15] }}
+          transition={{
+            duration: baseDuration * (0.9 + (i % 4) * 0.1),
+            delay: node.delay,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+      ))}
     </>
   );
 };

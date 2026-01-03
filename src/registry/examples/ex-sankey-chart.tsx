@@ -93,6 +93,8 @@ export function EvilExampleSankeyChart() {
       isClickable
       className="h-full w-full p-4"
       data={data}
+      showNodeLabels="outside"
+      showNodeValues={true}
       chartConfig={chartConfig}
       linkVariant="source"
     />
