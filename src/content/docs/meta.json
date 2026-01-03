@@ -3,8 +3,7 @@
   "pages": [
     "index",
     "installation",
-    "components",
-    "changelog",
+    "components", 
     "area-chart",
     "line-chart",
     "bar-chart",
