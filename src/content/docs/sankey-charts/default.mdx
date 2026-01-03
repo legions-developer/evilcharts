@@ -117,9 +117,36 @@ Below are some examples of the sankey chart with different configurations. You c
 
 <ComponentPreview title="gradient colors" name="ex-gradient-colors-sankey-chart"  />
 
+
+### Labeled Nodes
+
+<Alert>
+  <AlertContent>
+    Display labels and values on nodes using the `showNodeLabels` prop.
+  </AlertContent>
+</Alert>
+
+#### Inside Labels
+
+<ComponentPreview className="mb-0" title="showNodeLabels='inside'" name="ex-labeled-nodes-sankey-chart"  />
+<ComponentPreview className="mb-0" title="showNodeLabels='inside' - solid colors" name="ex-solid-labeled-nodes-sankey-chart"  />
+<Alert> 
+  <AlertContent>
+    Use a larger `nodeWidth` (e.g., 80) to accommodate the text. You can also use `linkVerticalPadding` to add padding where links connect to nodes.
+  </AlertContent>
+</Alert>  
+
+#### Outside Labels
+
+<ComponentPreview className="mb-0" title="showNodeLabels='outside'" name="ex-outside-labels-sankey-chart"  />
+
 ### Link Variants
 
-The sankey chart supports different link coloring strategies through the `linkVariant` prop.
+<Alert>
+  <AlertContent>
+    The sankey chart supports different link coloring strategies through the `linkVariant` prop.
+  </AlertContent>
+</Alert>
 
 #### Solid Links
 
@@ -147,5 +174,6 @@ The sankey chart supports different link coloring strategies through the `linkVa
     Add a subtle glow effect to specific nodes using `glowingNodes` prop. Pass an array of node names to specify which nodes should glow.
   </AlertContent>
 </Alert>
+
 
 ## API Reference

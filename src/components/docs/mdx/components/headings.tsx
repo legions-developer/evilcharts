@@ -49,7 +49,7 @@ export const H3 = ({ className, ...props }: React.ComponentProps<"h3">) => (
 export const H4 = ({ className, ...props }: React.ComponentProps<"h4">) => (
   <h4
     className={cn(
-      "font-heading mt-8 scroll-m-12 text-base font-medium tracking-tight select-none",
+      "font-heading text-primary mt-8 scroll-m-12 text-base font-medium tracking-tight select-none",
       className,
     )}
     {...props}
@@ -58,14 +58,20 @@ export const H4 = ({ className, ...props }: React.ComponentProps<"h4">) => (
 
 export const H5 = ({ className, ...props }: React.ComponentProps<"h5">) => (
   <h5
-    className={cn("mt-8 scroll-m-12 text-base font-medium tracking-tight select-none", className)}
+    className={cn(
+      "text-primary mt-8 scroll-m-12 text-base font-medium tracking-tight select-none",
+      className,
+    )}
     {...props}
   />
 );
 
 export const H6 = ({ className, ...props }: React.ComponentProps<"h6">) => (
   <h6
-    className={cn("mt-8 scroll-m-12 text-base font-medium tracking-tight select-none", className)}
+    className={cn(
+      "text-primary mt-8 scroll-m-12 text-base font-medium tracking-tight select-none",
+      className,
+    )}
     {...props}
   />
 );

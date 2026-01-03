@@ -1058,4 +1058,40 @@ export const examples: Registry["items"] = [
       },
     ],
   },
+  // Sankey Chart Labeled Nodes
+  {
+    name: "ex-labeled-nodes-sankey-chart",
+    registryDependencies: ["@evilcharts/sankey-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-labeled-nodes-sankey-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // Sankey Chart Outside Labels
+  {
+    name: "ex-outside-labels-sankey-chart",
+    registryDependencies: ["@evilcharts/sankey-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-outside-labels-sankey-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // Sankey Chart Solid Labeled Nodes
+  {
+    name: "ex-solid-labeled-nodes-sankey-chart",
+    registryDependencies: ["@evilcharts/sankey-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-solid-labeled-nodes-sankey-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
 ];

@@ -6,8 +6,8 @@ import {
   getColorsCount,
   LoadingIndicator,
 } from "@/registry/ui/chart";
-import { Sankey, Rectangle, Layer, Tooltip } from "recharts";
-import { useId, useState, type ComponentProps } from "react";
+import { useId, useState, type ComponentProps, type ReactNode } from "react";
+import { Sankey, Layer, Tooltip } from "recharts";
 import { motion } from "motion/react";
 
 // Loading animation constants
@@ -24,6 +24,7 @@ type SankeyProps = ComponentProps<typeof Sankey>;
 // Sankey node data structure
 export type SankeyNode = {
   name: string;
+  icon?: ReactNode;
 };
 
 // Sankey link data structure
@@ -40,6 +41,9 @@ export type SankeyData = {
 };
 
 type LinkVariant = "gradient" | "solid" | "source" | "target";
+
+// Node label position type
+type NodeLabelPosition = "inside" | "outside" | "none";
 
 type EvilSankeyChartProps = {
   // Data
@@ -60,6 +64,12 @@ type EvilSankeyChartProps = {
   // Styling
   linkVariant?: LinkVariant;
   nodeRadius?: number;
+  linkVerticalPadding?: number;
+
+  // Node Labels
+  showNodeLabels?: NodeLabelPosition;
+  showNodeValues?: boolean;
+  nodeValueFormatter?: (value: number) => string;
 
   // Hide Stuffs
   hideTooltip?: boolean;
@@ -89,6 +99,10 @@ export function EvilSankeyChart({
   verticalAlign = "justify",
   linkVariant = "gradient",
   nodeRadius = 0,
+  linkVerticalPadding = 0,
+  showNodeLabels = "none",
+  showNodeValues = false,
+  nodeValueFormatter = (value: number) => value.toLocaleString(),
   hideTooltip = false,
   isClickable = false,
   isLoading = false,
@@ -122,6 +136,9 @@ export function EvilSankeyChart({
               selectedNode={selectedNode}
               isClickable={isClickable}
               nodeRadius={nodeRadius}
+              showNodeLabels={showNodeLabels}
+              showNodeValues={showNodeValues}
+              nodeValueFormatter={nodeValueFormatter}
               glowingNodes={glowingNodes}
               neonNodes={neonNodes}
               onNodeClick={(name: string) => {
@@ -137,6 +154,7 @@ export function EvilSankeyChart({
               chartConfig={chartConfig}
               selectedNode={selectedNode}
               linkVariant={linkVariant}
+              linkVerticalPadding={linkVerticalPadding}
               glowingLinks={glowingLinks}
               neonLinks={neonLinks}
             />
@@ -251,6 +269,9 @@ type CustomNodeProps = SankeyNodeProps & {
   selectedNode: string | null;
   isClickable: boolean;
   nodeRadius: number;
+  showNodeLabels: NodeLabelPosition;
+  showNodeValues: boolean;
+  nodeValueFormatter: (value: number) => string;
   glowingNodes: string[];
   neonNodes: string[];
   onNodeClick: (name: string) => void;
@@ -267,16 +288,22 @@ const CustomNode = ({
   selectedNode,
   isClickable,
   nodeRadius,
+  showNodeLabels,
+  showNodeValues,
+  nodeValueFormatter,
   glowingNodes,
   neonNodes,
   onNodeClick,
 }: CustomNodeProps) => {
   const nodeName = payload?.name ?? "";
+  const nodeValue = payload?.value ?? 0;
+  const nodeIcon = payload?.icon;
   const isSelected = selectedNode === null || selectedNode === nodeName;
   const isGlowing = glowingNodes.includes(nodeName);
   const isNeon = neonNodes.includes(nodeName);
 
   const hasConfigColor = nodeName in chartConfig;
+  const configLabel = chartConfig[nodeName]?.label ?? nodeName;
 
   const getFilter = () => {
     if (isNeon) return `url(#${chartId}-node-neon-${nodeName})`;
@@ -284,9 +311,19 @@ const CustomNode = ({
     return undefined;
   };
 
+  // Calculate positions for inside labels
+  const labelX = x + width / 2;
+  const labelY = showNodeValues ? y + height / 2 - 8 : y + height / 2;
+  const valueY = y + height / 2 + 8;
+
+  // Calculate positions for outside labels (to the right of the node)
+  const outsideLabelX = x + width + 8;
+  const outsideLabelY = y + height / 2;
+
   return (
     <Layer>
-      <Rectangle
+      {/* Main node rectangle - using native rect for proper rx/ry support */}
+      <rect
         x={x}
         y={y}
         width={width}
@@ -300,6 +337,91 @@ const CustomNode = ({
         style={isClickable ? { cursor: "pointer" } : undefined}
         onClick={() => onNodeClick(nodeName)}
       />
+
+      {/* Inside labels */}
+      {showNodeLabels === "inside" && (
+        <>
+          {/* Dark background for label readability */}
+          <rect
+            x={x + 2}
+            y={y + 2}
+            width={width - 4}
+            height={height - 4}
+            rx={Math.max(0, nodeRadius - 2)}
+            ry={Math.max(0, nodeRadius - 2)}
+            fill="rgba(0, 0, 0, 0.6)"
+            style={{ pointerEvents: "none" }}
+          />
+
+          {/* Icon if provided */}
+          {nodeIcon && (
+            <foreignObject
+              x={labelX - 8}
+              y={labelY - 30}
+              width={16}
+              height={16}
+              style={{ pointerEvents: "none" }}
+            >
+              <div className="flex items-center justify-center text-white/80">{nodeIcon}</div>
+            </foreignObject>
+          )}
+
+          {/* Label text */}
+          <text
+            x={labelX}
+            y={nodeIcon ? labelY - 4 : labelY}
+            textAnchor="middle"
+            dominantBaseline="middle"
+            className="fill-white text-[10px] font-medium"
+            style={{ pointerEvents: "none" }}
+          >
+            {configLabel}
+          </text>
+
+          {/* Value text */}
+          {showNodeValues && (
+            <text
+              x={labelX}
+              y={valueY}
+              textAnchor="middle"
+              dominantBaseline="middle"
+              className="fill-white text-xs font-bold tabular-nums"
+              style={{ pointerEvents: "none", fontFamily: "monospace" }}
+            >
+              {nodeValueFormatter(nodeValue)}
+            </text>
+          )}
+        </>
+      )}
+
+      {/* Outside labels (to the side of nodes) */}
+      {showNodeLabels === "outside" && (
+        <>
+          <text
+            x={outsideLabelX}
+            y={outsideLabelY - (showNodeValues ? 8 : 0)}
+            textAnchor="start"
+            dominantBaseline="middle"
+            className="fill-foreground text-xs font-medium"
+            style={{ pointerEvents: "none" }}
+          >
+            {configLabel}
+          </text>
+
+          {showNodeValues && (
+            <text
+              x={outsideLabelX}
+              y={outsideLabelY + 8}
+              textAnchor="start"
+              dominantBaseline="middle"
+              className="fill-muted-foreground text-xs tabular-nums"
+              style={{ pointerEvents: "none" }}
+            >
+              {nodeValueFormatter(nodeValue)}
+            </text>
+          )}
+        </>
+      )}
     </Layer>
   );
 };
@@ -326,6 +448,7 @@ type CustomLinkProps = SankeyLinkProps & {
   chartConfig: ChartConfig;
   selectedNode: string | null;
   linkVariant: LinkVariant;
+  linkVerticalPadding: number;
   glowingLinks: number[];
   neonLinks: number[];
 };
@@ -344,6 +467,7 @@ const CustomLink = ({
   chartConfig,
   selectedNode,
   linkVariant,
+  linkVerticalPadding,
   glowingLinks,
   neonLinks,
 }: CustomLinkProps) => {
@@ -384,6 +508,9 @@ const CustomLink = ({
     }
   };
 
+  // Apply vertical padding to the link width (reduces stroke width to create padding effect)
+  const paddedLinkWidth = Math.max(1, linkWidth - linkVerticalPadding);
+
   // Build the bezier path for the link
   const path = `
     M${sourceX},${sourceY}
@@ -423,7 +550,7 @@ const CustomLink = ({
         d={path}
         fill="none"
         stroke={getLinkFill()}
-        strokeWidth={linkWidth}
+        strokeWidth={paddedLinkWidth}
         strokeOpacity={isConnected ? 0.4 : 0.1}
         filter={getFilter()}
         className="transition-opacity duration-200"
