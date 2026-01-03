@@ -1,0 +1,63 @@
+import React from "react";
+
+export const BarPreview = () => {
+  return (
+    <svg
+      className="text-primary relative z-10 h-full w-full"
+      viewBox="0 0 900 480"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M227 236C227 230.477 231.477 226 237 226H297C302.523 226 307 230.477 307 236V414H227V236Z"
+        fill="currentColor"
+        fillOpacity="0.3"
+      />
+      <path
+        d="M407 278V280H412C413.088 280 414.121 280.216 415.062 280.606L415.827 278.76C418.271 279.773 420.225 281.728 421.239 284.172L419.394 284.938C419.784 285.879 420 286.912 420 288V293.25H422V303.75H420V314.25H422V324.75H420V335.25H422V345.75H420V356.25H422V366.75H420V377.25H422V387.75H420V398.25H422V408.75H420V412H417V414H407V412H397V414H387V412H377V414H367V412H357V414H347V412H344V408.75H342V398.25H344V387.75H342V377.25H344V366.75H342V356.25H344V345.75H342V335.25H344V324.75H342V314.25H344V303.75H342V293.25H344V288C344 286.912 344.216 285.879 344.606 284.938L342.76 284.172C343.773 281.728 345.728 279.773 348.172 278.76L348.938 280.606C349.879 280.216 350.912 280 352 280H357V278H367V280H377V278H387V280H397V278H407Z"
+        fill="currentColor"
+        stroke="currentColor"
+        fillOpacity="0.3"
+        strokeOpacity="0.3"
+      />
+      <path
+        d="M457 135C457 129.477 461.477 125 467 125H527C532.523 125 537 129.477 537 135V414H457V135Z"
+        fill="var(--color-vesper-type)"
+      />
+      <path
+        d="M638.25 325V327H642C643.088 327 644.121 327.216 645.062 327.606L645.827 325.76C648.271 326.773 650.225 328.728 651.239 331.172L649.394 331.938C649.784 332.879 650 333.912 650 335V338.95H652V346.85H650V354.75H652V362.65H650V370.55H652V378.45H650V386.35H652V394.25H650V402.15H652V410.05H650V412H648V414H640V412H632V414H624V412H616V414H608V412H600V414H592V412H584V414H576V412H574V410.05H572V402.15H574V394.25H572V386.35H574V378.45H572V370.55H574V362.65H572V354.75H574V346.85H572V338.95H574V335C574 333.912 574.216 332.879 574.606 331.938L572.76 331.172C573.773 328.728 575.728 326.773 578.172 325.76L578.938 327.606C579.879 327.216 580.912 327 582 327H585.75V325H593.25V327H600.75V325H608.25V327H615.75V325H623.25V327H630.75V325H638.25Z"
+        fill="currentColor"
+        stroke="currentColor"
+        fillOpacity="0.3"
+        strokeOpacity="0.3"
+      />
+      <line
+        x1="125"
+        y1="418"
+        x2="769"
+        y2="418"
+        stroke="currentColor"
+        strokeOpacity="0.3"
+        strokeWidth="8"
+      />
+      <circle
+        className="text-background"
+        cx="497"
+        cy="125"
+        r="13"
+        fill="var(--color-vesper-type)"
+        stroke="currentColor"
+        strokeWidth="6"
+      />
+      <circle
+        className="text-background"
+        cx="267"
+        cy="226"
+        r="13"
+        fill="var(--color-vesper-type)"
+        stroke="currentColor"
+        strokeWidth="6"
+      />
+    </svg>
+  );
+};

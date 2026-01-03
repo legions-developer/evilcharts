@@ -26,7 +26,7 @@ export const H2 = ({ className, ...props }: React.ComponentProps<"h2">) => {
       <h2
         id={headingId}
         className={cn(
-          "font-heading [&+]*:[code]:text-xl mt-10 scroll-m-12 text-xl font-medium tracking-tight select-none first:mt-0 lg:mt-16 [&+.steps]:mt-0! [&+.steps>h3]:mt-4! [&+h3]:mt-6! [&+p]:mt-4!",
+          "font-heading [&+]*:[code]:text-xl mt-10 scroll-m-12 text-xl font-medium tracking-tight select-none first:mt-0 [&+.steps]:mt-0! [&+.steps>h3]:mt-4! [&+h3]:mt-6! [&+p]:mt-4!",
           className,
         )}
         {...props}
