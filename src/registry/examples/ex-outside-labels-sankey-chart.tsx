@@ -97,8 +97,8 @@ export function EvilExampleOutsideLabelsSankeyChart() {
       nodePadding={20}
       nodeRadius={4}
       linkVariant="source"
-      showNodeLabels="outside"
-      showNodeValues={true}
+      showNodeLabels="outside" // [!code highlight]
+      showNodeValues={true} // [!code highlight]
       nodeValueFormatter={(value) => value.toLocaleString()}
       isClickable
     />

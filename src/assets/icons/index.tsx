@@ -342,6 +342,9 @@ export function SankeyChartIcon({
       <path
         d="M3.5 8.5H1.5V1.5H3.5V5.5M3.5 8.5C4.5 8.5 6.5 8.5 9 10C12.4567 12.074 12 12 14.5 12M3.5 8.5V5.5M14.5 12V13.5H16.5V8.5H14.5M14.5 12V8.5M14.5 8.5C12.5 8.5 11.1 7.8 9.5 7C7.9 6.2 6.5 5.5 3.5 5.5"
         stroke={fill}
+        fill={fill}
+        strokeOpacity="0.7"
+        fillOpacity="0.7"
       />
     </svg>
   );

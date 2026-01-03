@@ -109,8 +109,8 @@ export function EvilExampleLabeledNodesSankeyChart() {
       nodeRadius={4}
       linkVariant="gradient"
       linkVerticalPadding={8}
-      showNodeLabels="inside"
-      showNodeValues={true}
+      showNodeLabels="inside" // [!code highlight]
+      showNodeValues={true} // [!code highlight]
       nodeValueFormatter={(value) => value.toLocaleString()}
       isClickable
     />
