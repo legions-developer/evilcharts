@@ -124,16 +124,30 @@ export function TocIndicator({ toc, activeIndex, className }: TocIndicatorProps)
     <div className={cn("text-path pointer-events-none absolute h-full w-full", className)}>
       <svg className="h-full w-full" overflow="visible">
         <defs>
-          <marker id="toc-end-circle" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+          <marker
+            id="toc-end-circle"
+            markerWidth="6"
+            markerHeight="6"
+            refX="3"
+            refY="3"
+            orient="auto"
+          >
             <circle cx="3" cy="3" r="2" fill="currentColor" />
           </marker>
         </defs>
-        <path d={path} stroke="currentColor" strokeWidth="1" fill="none" markerEnd="url(#toc-end-circle)" />
+        <path
+          d={path}
+          stroke="currentColor"
+          strokeWidth="1"
+          fill="none"
+          markerEnd="url(#toc-end-circle)"
+        />
         <motion.path
           className="text-primary"
           d={path}
           stroke="currentColor"
           strokeWidth="1"
+          strokeOpacity="0.5"
           fill="none"
           strokeDasharray={totalLength}
           style={{ strokeDashoffset: strokeDashOffset }}

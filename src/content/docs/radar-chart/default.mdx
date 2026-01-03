@@ -157,3 +157,260 @@ Below are some examples of the radar chart with different configurations.
 </Alert>
 
 ## API Reference
+
+<ApiReferenceWrapper>
+  <ApiReference>
+    <ApiHeader
+      propName="data"
+      isRequired 
+    />
+    <ApiContent>
+      Data used to display the chart. An array of objects where each object represents a data point on the radar.
+      
+      type: `TData[]` where `TData extends Record<string, unknown>`
+    </ApiContent>
+  </ApiReference>
+  
+  <ApiReference>
+    <ApiHeader
+      propName="dataKey"
+      isRequired
+    />
+    <ApiContent>
+      The key from your data objects to use for the polar angle axis labels (e.g., categories, skills, months).
+      
+      type: `keyof TData & string`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="chartConfig"
+      isRequired
+    />
+    <ApiContent>
+      Configuration object that defines the chart's radar series. Each key should match a data key in your data array (the numeric values), with corresponding colors.
+      
+      type: `Record<string, ChartConfig[string]>`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="className"
+    />
+    <ApiContent>
+      Additional CSS classes to apply to the chart container.
+      
+      type: `string`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="variant"
+    />
+    <ApiContent>
+      The visual style variant for the radar. `"filled"` shows filled areas, `"lines"` shows only the outline.
+      
+      type: `"filled" | "lines"`
+      
+      default: `"filled"`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="fillOpacity"
+    />
+    <ApiContent>
+      The opacity of the filled area when using `variant="filled"`.
+      
+      type: `number`
+      
+      default: `0.3`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="hideAngleAxis"
+    />
+    <ApiContent>
+      Whether to hide the polar angle axis (the labels around the perimeter).
+      
+      type: `boolean`
+      
+      default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="hideRadiusAxis"
+    />
+    <ApiContent>
+      Whether to hide the polar radius axis (the scale values from center outward).
+      
+      type: `boolean`
+      
+      default: `true`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="hideGrid"
+    />
+    <ApiContent>
+      Whether to hide the polar grid lines.
+      
+      type: `boolean`
+      
+      default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="gridType"
+    />
+    <ApiContent>
+      The shape of the grid lines. `"polygon"` creates angular grid lines, `"circle"` creates circular grid lines.
+      
+      type: `"polygon" | "circle"`
+      
+      default: `"polygon"`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="hideTooltip"
+    />
+    <ApiContent>
+      Whether to hide the tooltip on hover.
+      
+      type: `boolean`
+      
+      default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="hideLegend"
+    />
+    <ApiContent>
+      Whether to hide the chart legend.
+      
+      type: `boolean`
+      
+      default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="hideDots"
+    />
+    <ApiContent>
+      Whether to hide the dots at each data point on the radar.
+      
+      type: `boolean`
+      
+      default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="isClickable"
+    />
+    <ApiContent>
+      Enables interactive clicking on radar areas to select/deselect them. When a radar is selected, unselected radars become semi-transparent.
+      
+      type: `boolean`
+      
+      default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="isLoading"
+    />
+    <ApiContent>
+      Shows a loading animation with animated data when data is being fetched.
+      
+      type: `boolean`
+      
+      default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="glowingRadars"
+    />
+    <ApiContent>
+      Array of data keys that should have a glowing effect applied. Creates a smooth outer glow around the specified radar areas.
+      
+      type: `NumericDataKeys<TData>[]` (array of keys where the value is a number)
+      
+      default: `[]`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="neonRadars"
+    />
+    <ApiContent>
+      Array of data keys that should have a neon effect applied. Creates a multi-layered glow with a bright white core for the specified radar areas. Neon effect takes priority over glow effect.
+      
+      type: `NumericDataKeys<TData>[]` (array of keys where the value is a number)
+      
+      default: `[]`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="chartProps"
+    />
+    <ApiContent>
+      Additional props to pass to the underlying Recharts RadarChart component.
+      
+      type: `ComponentProps<typeof RadarChart>`
+      
+      Read the <Link href="https://recharts.github.io/en-US/api/RadarChart/" _blank>Recharts RadarChart documentation</Link> for available props.
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="radarProps"
+    />
+    <ApiContent>
+      Additional props to pass to the underlying Recharts Radar component.
+      
+      type: `Omit<ComponentProps<typeof Radar>, "dataKey">`
+      
+      Read the <Link href="https://recharts.github.io/en-US/api/Radar/" _blank>Recharts Radar documentation</Link> for available props.
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="polarGridProps"
+    />
+    <ApiContent>
+      Additional props to pass to the underlying Recharts PolarGrid component.
+      
+      type: `ComponentProps<typeof PolarGrid>`
+      
+      Read the <Link href="https://recharts.github.io/en-US/api/PolarGrid/" _blank>Recharts PolarGrid documentation</Link> for available props.
+    </ApiContent>
+  </ApiReference>
+</ApiReferenceWrapper>

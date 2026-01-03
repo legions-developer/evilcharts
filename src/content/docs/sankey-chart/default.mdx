@@ -177,3 +177,315 @@ Below are some examples of the sankey chart with different configurations. You c
 
 
 ## API Reference
+
+<ApiReferenceWrapper>
+  <ApiReference>
+    <ApiHeader
+      propName="data"
+      isRequired 
+    />
+    <ApiContent>
+      Sankey diagram data containing nodes and links. Nodes represent entities, and links represent flows between them.
+      
+      type: `SankeyData` which is `{ nodes: SankeyNode[]; links: SankeyLink[] }`
+      
+      where `SankeyNode = { name: string; icon?: ReactNode }` and `SankeyLink = { source: number; target: number; value: number }`
+    </ApiContent>
+  </ApiReference>
+  
+  <ApiReference>
+    <ApiHeader
+      propName="chartConfig"
+      isRequired
+    />
+    <ApiContent>
+      Configuration object that defines the chart's nodes. Each key should match a node name from your data, with corresponding colors.
+      
+      type: `ChartConfig`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="className"
+    />
+    <ApiContent>
+      Additional CSS classes to apply to the chart container.
+      
+      type: `string`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="nodeWidth"
+    />
+    <ApiContent>
+      The width of each node in pixels.
+      
+      type: `number`
+      
+      default: `10`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="nodePadding"
+    />
+    <ApiContent>
+      The vertical padding between nodes in pixels.
+      
+      type: `number`
+      
+      default: `10`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="linkCurvature"
+    />
+    <ApiContent>
+      The curvature of links between nodes. Value between 0 (straight) and 1 (maximum curve).
+      
+      type: `number`
+      
+      default: `0.5`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="iterations"
+    />
+    <ApiContent>
+      Number of iterations for the Sankey layout algorithm. Higher values produce better layouts but take more time.
+      
+      type: `number`
+      
+      default: `32`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="sort"
+    />
+    <ApiContent>
+      Whether to sort nodes automatically for optimal layout.
+      
+      type: `boolean`
+      
+      default: `true`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="align"
+    />
+    <ApiContent>
+      Horizontal alignment strategy for nodes. `"left"` aligns nodes to the left, `"justify"` spreads them across the width.
+      
+      type: `"left" | "justify"`
+      
+      default: `"justify"`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="verticalAlign"
+    />
+    <ApiContent>
+      Vertical alignment strategy for nodes. `"top"` aligns to top, `"justify"` distributes vertically.
+      
+      type: `"justify" | "top"`
+      
+      default: `"justify"`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="linkVariant"
+    />
+    <ApiContent>
+      The coloring strategy for links. `"gradient"` uses gradient from source to target, `"solid"` uses a single color, `"source"` uses source node color, `"target"` uses target node color.
+      
+      type: `"gradient" | "solid" | "source" | "target"`
+      
+      default: `"gradient"`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="nodeRadius"
+    />
+    <ApiContent>
+      The border radius of nodes in pixels. Set to 0 for square nodes.
+      
+      type: `number`
+      
+      default: `0`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="linkVerticalPadding"
+    />
+    <ApiContent>
+      Vertical padding where links connect to nodes in pixels. Useful when using node labels.
+      
+      type: `number`
+      
+      default: `0`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="showNodeLabels"
+    />
+    <ApiContent>
+      Position of node labels. `"inside"` shows labels inside nodes, `"outside"` shows labels beside nodes, `"none"` hides labels.
+      
+      type: `"inside" | "outside" | "none"`
+      
+      default: `"none"`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="showNodeValues"
+    />
+    <ApiContent>
+      Whether to display the total flow value on each node label.
+      
+      type: `boolean`
+      
+      default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="nodeValueFormatter"
+    />
+    <ApiContent>
+      Function to format node values when `showNodeValues` is enabled.
+      
+      type: `(value: number) => string`
+      
+      default: `(value) => value.toLocaleString()`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="hideTooltip"
+    />
+    <ApiContent>
+      Whether to hide the tooltip on hover.
+      
+      type: `boolean`
+      
+      default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="isClickable"
+    />
+    <ApiContent>
+      Enables interactive clicking on nodes to select/deselect them. Selected nodes become highlighted while unselected nodes and their links dim.
+      
+      type: `boolean`
+      
+      default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="isLoading"
+    />
+    <ApiContent>
+      Shows a loading placeholder animation when data is being fetched.
+      
+      type: `boolean`
+      
+      default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="glowingNodes"
+    />
+    <ApiContent>
+      Array of node names that should have a glowing effect applied. Creates a smooth outer glow around the specified nodes.
+      
+      type: `string[]`
+      
+      default: `[]`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="neonNodes"
+    />
+    <ApiContent>
+      Array of node names that should have a neon effect applied. Creates a multi-layered glow with a bright white core. Neon effect takes priority over glow effect.
+      
+      type: `string[]`
+      
+      default: `[]`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="glowingLinks"
+    />
+    <ApiContent>
+      Array of link indices that should have a glowing effect applied. Creates a smooth outer glow around the specified links.
+      
+      type: `number[]`
+      
+      default: `[]`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="neonLinks"
+    />
+    <ApiContent>
+      Array of link indices that should have a neon effect applied. Creates a multi-layered glow with a bright white core. Neon effect takes priority over glow effect.
+      
+      type: `number[]`
+      
+      default: `[]`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="sankeyProps"
+    />
+    <ApiContent>
+      Additional props to pass to the underlying Recharts Sankey component.
+      
+      type: `Omit<ComponentProps<typeof Sankey>, "data">`
+      
+      Read the <Link href="https://recharts.github.io/en-US/api/Sankey/" _blank>Recharts Sankey documentation</Link> for available props.
+    </ApiContent>
+  </ApiReference>
+</ApiReferenceWrapper>

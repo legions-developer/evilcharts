@@ -155,3 +155,316 @@ Below are some examples of the bar chart with different `variants`. You can cust
 <ComponentPreview title="neonBars={['mobile']} - solid colors" name="ex-neon-mobile-bar-chart"  />
 
 ## API Reference
+
+<ApiReferenceWrapper>
+  <ApiReference>
+    <ApiHeader
+      propName="data"
+      isRequired 
+    />
+    <ApiContent>
+      Data used to display the chart. An array of objects where each object represents a data point.
+      
+      type: `TData[]` where `TData extends Record<string, unknown>`
+    </ApiContent>
+  </ApiReference>
+  
+  <ApiReference>
+    <ApiHeader
+      propName="chartConfig"
+      isRequired
+    />
+    <ApiContent>
+      Configuration object that defines the chart's series. Each key should match a data key in your data array, with a corresponding color or color array.
+      
+      type: `Record<string, ChartConfig[string]>`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="xDataKey"
+    />
+    <ApiContent>
+      The key from your data objects to use for the X-axis values.
+      
+      type: `keyof TData & string`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="yDataKey"
+    />
+    <ApiContent>
+      The key from your data objects to use for the Y-axis values.
+      
+      type: `keyof TData & string`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="className"
+    />
+    <ApiContent>
+      Additional CSS classes to apply to the chart container.
+      
+      type: `string`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="barVariant"
+    />
+    <ApiContent>
+      The visual style variant for the bars.
+      
+      type: `"default" | "hatched" | "duotone" | "duotone-reverse" | "gradient" | "stripped"`
+      
+      default: `"default"`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="stackType"
+    />
+    <ApiContent>
+      Controls how multiple bars are stacked. `"default"` renders bars side by side, `"stacked"` stacks them on top of each other, and `"percent"` shows percentage distribution.
+      
+      type: `"default" | "stacked" | "percent"`
+      
+      default: `"default"`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="layout"
+    />
+    <ApiContent>
+      The orientation of the bars. `"vertical"` displays bars vertically (default), `"horizontal"` displays bars horizontally.
+      
+      type: `"vertical" | "horizontal"`
+      
+      default: `"vertical"`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="barRadius"
+    />
+    <ApiContent>
+      The border radius of the bars in pixels.
+      
+      type: `number`
+      
+      default: `2`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="barGap"
+    />
+    <ApiContent>
+      The gap between bars in the same category (when using multiple series).
+      
+      type: `number`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="barCategoryGap"
+    />
+    <ApiContent>
+      The gap between different categories of bars.
+      
+      type: `number`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="tickGap"
+    />
+    <ApiContent>
+      Minimum gap in pixels between axis ticks.
+      
+      type: `number`
+      
+      default: `8`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="hideTooltip"
+    />
+    <ApiContent>
+      Whether to hide the tooltip on hover.
+      
+      type: `boolean`
+      
+      default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="hideCartesianGrid"
+    />
+    <ApiContent>
+      Whether to hide the background grid lines.
+      
+      type: `boolean`
+      
+      default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="hideLegend"
+    />
+    <ApiContent>
+      Whether to hide the chart legend.
+      
+      type: `boolean`
+      
+      default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="isClickable"
+    />
+    <ApiContent>
+      Enables interactive clicking on bars to select/deselect them. When a bar is selected, unselected bars become semi-transparent.
+      
+      type: `boolean`
+      
+      default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="defaultSelectedDataKey"
+    />
+    <ApiContent>
+      The data key that should be selected by default when `isClickable` is enabled.
+      
+      type: `string | null`
+      
+      default: `null`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="enableHoverHighlight"
+    />
+    <ApiContent>
+      When enabled, hovering over a bar dims all other bars, making it easier to focus on specific data points.
+      
+      type: `boolean`
+      
+      default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="isLoading"
+    />
+    <ApiContent>
+      Shows a loading skeleton animation with shimmer effect when data is being fetched.
+      
+      type: `boolean`
+      
+      default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="loadingBars"
+    />
+    <ApiContent>
+      Number of bars to display in the loading skeleton.
+      
+      type: `number`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="glowingBars"
+    />
+    <ApiContent>
+      Array of data keys that should have a glowing effect applied. Creates a smooth outer neon glow around the specified bars.
+      
+      type: `NumericDataKeys<TData>[]` (array of keys where the value is a number)
+      
+      default: `[]`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="neonBars"
+    />
+    <ApiContent>
+      Array of data keys that should have a neon effect applied. Creates a multi-layered glow with a bright white core for the specified bars. Neon effect takes priority over glow effect.
+      
+      type: `NumericDataKeys<TData>[]` (array of keys where the value is a number)
+      
+      default: `[]`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="chartProps"
+    />
+    <ApiContent>
+      Additional props to pass to the underlying Recharts BarChart component.
+      
+      type: `ComponentProps<typeof BarChart>`
+      
+      Read the <Link href="https://recharts.github.io/en-US/api/BarChart/" _blank>Recharts BarChart documentation</Link> for available props.
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="xAxisProps"
+    />
+    <ApiContent>
+      Additional props to pass to the Recharts XAxis component.
+      
+      type: `ComponentProps<typeof XAxis>`
+      
+      Read the <Link href="https://recharts.github.io/en-US/api/XAxis/" _blank>Recharts XAxis documentation</Link> for available props.
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="yAxisProps"
+    />
+    <ApiContent>
+      Additional props to pass to the Recharts YAxis component.
+      
+      type: `ComponentProps<typeof YAxis>`
+      
+      Read the <Link href="https://recharts.github.io/en-US/api/YAxis/" _blank>Recharts YAxis documentation</Link> for available props.
+    </ApiContent>
+  </ApiReference>
+</ApiReferenceWrapper>

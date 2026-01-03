@@ -61,6 +61,7 @@ export default async function Page(props: { params: Promise<{ slug: string[] }> 
             <div>
               {neighbours.previous ? (
                 <MDXNavigation
+                  $id={neighbours.previous.$id}
                   type="previous"
                   title={neighbours.previous.name}
                   url={neighbours.previous.url}
@@ -73,6 +74,7 @@ export default async function Page(props: { params: Promise<{ slug: string[] }> 
             <div>
               {neighbours.next ? (
                 <MDXNavigation
+                  $id={neighbours.next.$id}
                   type="next"
                   title={neighbours.next.name}
                   url={neighbours.next.url}

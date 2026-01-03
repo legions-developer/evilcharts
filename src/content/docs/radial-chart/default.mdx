@@ -151,3 +151,246 @@ Below are some examples of the radial chart with different configurations. You c
 </Alert>
 
 ## API Reference
+
+<ApiReferenceWrapper>
+  <ApiReference>
+    <ApiHeader
+      propName="data"
+      isRequired 
+    />
+    <ApiContent>
+      Data used to display the chart. An array of objects where each object represents a radial bar.
+      
+      type: `TData[]` where `TData extends Record<string, unknown>`
+    </ApiContent>
+  </ApiReference>
+  
+  <ApiReference>
+    <ApiHeader
+      propName="dataKey"
+      isRequired
+    />
+    <ApiContent>
+      The key from your data objects to use for bar values (typically numeric values that determine bar size).
+      
+      type: `keyof TData & string`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="nameKey"
+      isRequired
+    />
+    <ApiContent>
+      The key from your data objects to use for bar names (typically string values used for labels and legend).
+      
+      type: `keyof TData & string`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="chartConfig"
+      isRequired
+    />
+    <ApiContent>
+      Configuration object that defines the chart's bars. Each key should match a value from your `nameKey` field, with corresponding colors.
+      
+      type: `ChartConfig`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="className"
+    />
+    <ApiContent>
+      Additional CSS classes to apply to the chart container.
+      
+      type: `string`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="variant"
+    />
+    <ApiContent>
+      The visual variant of the radial chart. `"full"` displays a full circle (360°), `"semi"` displays a half circle (180°).
+      
+      type: `"full" | "semi"`
+      
+      default: `"full"`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="innerRadius"
+    />
+    <ApiContent>
+      The inner radius of the radial bars. Can be a number (pixels) or percentage string.
+      
+      type: `number | string`
+      
+      default: `"30%"`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="outerRadius"
+    />
+    <ApiContent>
+      The outer radius of the radial bars. Can be a number (pixels) or percentage string.
+      
+      type: `number | string`
+      
+      default: `"100%"`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="cornerRadius"
+    />
+    <ApiContent>
+      The border radius for the corners of each bar in pixels.
+      
+      type: `number`
+      
+      default: `5`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="barSize"
+    />
+    <ApiContent>
+      The thickness of each radial bar in pixels.
+      
+      type: `number`
+      
+      default: `14`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="hideTooltip"
+    />
+    <ApiContent>
+      Whether to hide the tooltip on hover.
+      
+      type: `boolean`
+      
+      default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="hideLegend"
+    />
+    <ApiContent>
+      Whether to hide the chart legend.
+      
+      type: `boolean`
+      
+      default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="hideBackground"
+    />
+    <ApiContent>
+      Whether to hide the background bars (the unfilled portion of each bar).
+      
+      type: `boolean`
+      
+      default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="isClickable"
+    />
+    <ApiContent>
+      Enables interactive clicking on bars to select/deselect them. Selected bars expand slightly and unselected bars dim.
+      
+      type: `boolean`
+      
+      default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="isLoading"
+    />
+    <ApiContent>
+      Shows a loading placeholder animation when data is being fetched.
+      
+      type: `boolean`
+      
+      default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="glowingBars"
+    />
+    <ApiContent>
+      Array of bar names (values from your `nameKey` field) that should have a glowing effect applied. Creates a smooth outer glow around the specified bars.
+      
+      type: `string[]`
+      
+      default: `[]`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="neonBars"
+    />
+    <ApiContent>
+      Array of bar names (values from your `nameKey` field) that should have a neon effect applied. Creates a multi-layered glow with a bright white core. Neon effect takes priority over glow effect.
+      
+      type: `string[]`
+      
+      default: `[]`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="chartProps"
+    />
+    <ApiContent>
+      Additional props to pass to the underlying Recharts RadialBarChart component.
+      
+      type: `ComponentProps<typeof RadialBarChart>`
+      
+      Read the <Link href="https://recharts.github.io/en-US/api/RadialBarChart/" _blank>Recharts RadialBarChart documentation</Link> for available props.
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="radialBarProps"
+    />
+    <ApiContent>
+      Additional props to pass to the underlying Recharts RadialBar component.
+      
+      type: `Omit<ComponentProps<typeof RadialBar>, "dataKey">`
+      
+      Read the <Link href="https://recharts.github.io/en-US/api/RadialBar/" _blank>Recharts RadialBar documentation</Link> for available props.
+    </ApiContent>
+  </ApiReference>
+</ApiReferenceWrapper>

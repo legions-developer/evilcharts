@@ -20,12 +20,16 @@ export const MDXLink = ({
   _blank?: boolean;
 }) => {
   return (
-    <Link href={href} target={_blank ? "_blank" : "_self"} className={cn(className, "hover:text-primary group")}>
+    <Link
+      href={href}
+      target={_blank ? "_blank" : "_self"}
+      className={cn(className, "hover:text-primary group")}
+    >
       <span className="relative">
-        <span className="bg-primary/50 group-hover:bg-primary absolute -bottom-[0.5px] h-px w-full rounded transition-all duration-300 group-hover:w-full"></span>
+        <span className="bg-primary/50 group-hover:bg-primary absolute -bottom-[0.5px] h-px w-full rounded transition-all duration-100 group-hover:w-full"></span>
         {children}
       </span>
-      <LinkIcon className="group-hover:text-primary text-muted-foreground mb-0.5 ml-0.5 inline size-2.5 duration-200" />
+      <LinkIcon className="group-hover:text-primary text-muted-foreground mb-0.5 ml-0.5 inline size-2.5 duration-100" />
     </Link>
   );
 };

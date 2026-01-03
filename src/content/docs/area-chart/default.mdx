@@ -153,3 +153,305 @@ Below are some examples of the area chart with different `variants`. where you c
 <ComponentPreview title="areaVariant='hatched'" name="ex-hatched-area-variant-area-chart"  />
 
 ## API Reference
+
+<ApiReferenceWrapper>
+  <ApiReference>
+    <ApiHeader
+      propName="data"
+      isRequired 
+    />
+    <ApiContent>
+      Data used to display the chart. An array of objects where each object represents a data point.
+      
+      type: `TData[]` where `TData extends Record<string, unknown>`
+    </ApiContent>
+  </ApiReference>
+  
+  <ApiReference>
+    <ApiHeader
+      propName="chartConfig"
+      isRequired
+    />
+    <ApiContent>
+      Configuration object that defines the chart's series. Each key should match a data key in your data array, with a corresponding color or color array.
+      
+      type: `Record<string, ChartConfig[string]>`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="xDataKey"
+    />
+    <ApiContent>
+      The key from your data objects to use for the X-axis values.
+      
+      type: `keyof TData & string`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="yDataKey"
+    />
+    <ApiContent>
+      The key from your data objects to use for the Y-axis values.
+      
+      type: `keyof TData & string`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="className"
+    />
+    <ApiContent>
+      Additional CSS classes to apply to the chart container.
+      
+      type: `string`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="curveType"
+    />
+    <ApiContent>
+      The type of curve interpolation for the area lines. Determines how points are connected.
+      
+      type: `"basis" | "basisClosed" | "basisOpen" | "bumpX" | "bumpY" | "bump" | "linear" | "linearClosed" | "natural" | "monotoneX" | "monotoneY" | "monotone" | "step" | "stepBefore" | "stepAfter"`
+      
+      default: `"linear"`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="areaVariant"
+    />
+    <ApiContent>
+      The visual style variant for the area fill.
+      
+      type: `"gradient" | "gradient-reverse" | "solid" | "dotted" | "lines" | "hatched"`
+      
+      default: `"gradient"`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="strokeVariant"
+    />
+    <ApiContent>
+      The visual style for the area stroke lines.
+      
+      type: `"solid" | "dashed" | "animated-dashed"`
+      
+      default: `"dashed"`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="stackType"
+    />
+    <ApiContent>
+      Controls how multiple areas are stacked. `"default"` renders areas independently, `"stacked"` stacks them on top of each other, and `"expanded"` normalizes them to show percentage distribution.
+      
+      type: `"default" | "expanded" | "stacked"`
+      
+      default: `"default"`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="dotVariant"
+    />
+    <ApiContent>
+      The visual style for dots at data points on the area lines.
+      
+      type: `"default" | "border" | "colored-border"`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="activeDotVariant"
+    />
+    <ApiContent>
+      The visual style for the active/hovered dot at data points.
+      
+      type: `"default" | "border" | "colored-border"`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="connectNulls"
+    />
+    <ApiContent>
+      Whether to connect line segments when there are null values in the data.
+      
+      type: `boolean`
+      
+      default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="tickGap"
+    />
+    <ApiContent>
+      Minimum gap in pixels between axis ticks.
+      
+      type: `number`
+      
+      default: `8`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="hideTooltip"
+    />
+    <ApiContent>
+      Whether to hide the tooltip on hover.
+      
+      type: `boolean`
+      
+      default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="hideCartesianGrid"
+    />
+    <ApiContent>
+      Whether to hide the background grid lines.
+      
+      type: `boolean`
+      
+      default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="hideLegend"
+    />
+    <ApiContent>
+      Whether to hide the chart legend.
+      
+      type: `boolean`
+      
+      default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="hideCursorLine"
+    />
+    <ApiContent>
+      Whether to hide the vertical cursor line that appears on hover.
+      
+      type: `boolean`
+      
+      default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="isClickable"
+    />
+    <ApiContent>
+      Enables interactive clicking on areas to select/deselect them. When an area is selected, unselected areas become semi-transparent.
+      
+      type: `boolean`
+      
+      default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="defaultSelectedDataKey"
+    />
+    <ApiContent>
+      The data key that should be selected by default when `isClickable` is enabled.
+      
+      type: `string | null`
+      
+      default: `null`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="isLoading"
+    />
+    <ApiContent>
+      Shows a loading skeleton animation with shimmer effect when data is being fetched.
+      
+      type: `boolean`
+      
+      default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="loadingPoints"
+    />
+    <ApiContent>
+      Number of data points to display in the loading skeleton.
+      
+      type: `number`
+      
+      default: `14`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="chartProps"
+    />
+    <ApiContent>
+      Additional props to pass to the underlying Recharts AreaChart component.
+      
+      type: `ComponentProps<typeof AreaChart>`
+      
+      Read the <Link href="https://recharts.github.io/en-US/api/AreaChart/#layout" _blank>Recharts AreaChart documentation</Link> for available props.
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="xAxisProps"
+    />
+    <ApiContent>
+      Additional props to pass to the Recharts XAxis component.
+      
+      type: `ComponentProps<typeof XAxis>`
+      
+      Read the <Link href="https://recharts.github.io/en-US/api/XAxis/" _blank>Recharts XAxis documentation</Link> for available props.
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="yAxisProps"
+    />
+    <ApiContent>
+      Additional props to pass to the Recharts YAxis component.
+      
+      type: `ComponentProps<typeof YAxis>`
+      
+      Read the <Link href="https://recharts.github.io/en-US/api/YAxis/" _blank>Recharts YAxis documentation</Link> for available props.
+    </ApiContent>
+  </ApiReference>
+</ApiReferenceWrapper>

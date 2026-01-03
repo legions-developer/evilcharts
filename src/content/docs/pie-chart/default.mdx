@@ -178,3 +178,283 @@ Below are some examples of the pie chart with different configurations. You can 
 </Alert>
 
 ## API Reference
+
+<ApiReferenceWrapper>
+  <ApiReference>
+    <ApiHeader
+      propName="data"
+      isRequired 
+    />
+    <ApiContent>
+      Data used to display the chart. An array of objects where each object represents a sector.
+      
+      type: `TData[]` where `TData extends Record<string, unknown>`
+    </ApiContent>
+  </ApiReference>
+  
+  <ApiReference>
+    <ApiHeader
+      propName="dataKey"
+      isRequired
+    />
+    <ApiContent>
+      The key from your data objects to use for sector values (typically numeric values that determine sector size).
+      
+      type: `keyof TData & string`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="nameKey"
+      isRequired
+    />
+    <ApiContent>
+      The key from your data objects to use for sector names (typically string values used for labels and legend).
+      
+      type: `keyof TData & string`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="chartConfig"
+      isRequired
+    />
+    <ApiContent>
+      Configuration object that defines the chart's sectors. Each key should match a value from your `nameKey` field, with corresponding colors.
+      
+      type: `ChartConfig`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="className"
+    />
+    <ApiContent>
+      Additional CSS classes to apply to the chart container.
+      
+      type: `string`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="innerRadius"
+    />
+    <ApiContent>
+      The inner radius of the pie. Set to a value greater than 0 to create a donut chart. Can be a number (pixels) or percentage string.
+      
+      type: `number | string`
+      
+      default: `0`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="outerRadius"
+    />
+    <ApiContent>
+      The outer radius of the pie. Can be a number (pixels) or percentage string.
+      
+      type: `number | string`
+      
+      default: `"80%"`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="cornerRadius"
+    />
+    <ApiContent>
+      The border radius for the corners of each sector in pixels.
+      
+      type: `number`
+      
+      default: `0`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="paddingAngle"
+    />
+    <ApiContent>
+      The angle of padding between sectors in degrees.
+      
+      type: `number`
+      
+      default: `0`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="startAngle"
+    />
+    <ApiContent>
+      The starting angle of the pie chart in degrees (0 is 3 o'clock, 90 is 12 o'clock).
+      
+      type: `number`
+      
+      default: `0`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="endAngle"
+    />
+    <ApiContent>
+      The ending angle of the pie chart in degrees. Set to less than 360 for a partial pie.
+      
+      type: `number`
+      
+      default: `360`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="showLabels"
+    />
+    <ApiContent>
+      Whether to display labels on each sector.
+      
+      type: `boolean`
+      
+      default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="labelKey"
+    />
+    <ApiContent>
+      The key from your data objects to use for label text when `showLabels` is enabled. If not provided, uses the `dataKey` value.
+      
+      type: `keyof TData & string`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="labelListProps"
+    />
+    <ApiContent>
+      Additional props to customize the label list appearance and behavior.
+      
+      type: `Omit<ComponentProps<typeof LabelList>, "dataKey">`
+      
+      Read the <Link href="https://recharts.github.io/en-US/api/LabelList/" _blank>Recharts LabelList documentation</Link> for available props.
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="hideTooltip"
+    />
+    <ApiContent>
+      Whether to hide the tooltip on hover.
+      
+      type: `boolean`
+      
+      default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="hideLegend"
+    />
+    <ApiContent>
+      Whether to hide the chart legend.
+      
+      type: `boolean`
+      
+      default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="isClickable"
+    />
+    <ApiContent>
+      Enables interactive clicking on sectors to select/deselect them. Selected sectors expand slightly and unselected sectors dim.
+      
+      type: `boolean`
+      
+      default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="isLoading"
+    />
+    <ApiContent>
+      Shows a loading placeholder animation when data is being fetched.
+      
+      type: `boolean`
+      
+      default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="glowingSectors"
+    />
+    <ApiContent>
+      Array of sector names (values from your `nameKey` field) that should have a glowing effect applied. Creates a smooth outer glow around the specified sectors.
+      
+      type: `string[]`
+      
+      default: `[]`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="neonSectors"
+    />
+    <ApiContent>
+      Array of sector names (values from your `nameKey` field) that should have a neon effect applied. Creates a multi-layered glow with a bright white core. Neon effect takes priority over glow effect.
+      
+      type: `string[]`
+      
+      default: `[]`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="chartProps"
+    />
+    <ApiContent>
+      Additional props to pass to the underlying Recharts PieChart component.
+      
+      type: `ComponentProps<typeof PieChart>`
+      
+      Read the <Link href="https://recharts.github.io/en-US/api/PieChart/" _blank>Recharts PieChart documentation</Link> for available props.
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="pieProps"
+    />
+    <ApiContent>
+      Additional props to pass to the underlying Recharts Pie component.
+      
+      type: `Omit<ComponentProps<typeof Pie>, "data" | "dataKey" | "nameKey">`
+      
+      Read the <Link href="https://recharts.github.io/en-US/api/Pie/" _blank>Recharts Pie documentation</Link> for available props.
+    </ApiContent>
+  </ApiReference>
+</ApiReferenceWrapper>
