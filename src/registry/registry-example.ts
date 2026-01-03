@@ -984,4 +984,78 @@ export const examples: Registry["items"] = [
       },
     ],
   },
+  // ========================================
+  // SANKEY CHART EXAMPLES
+  // ========================================
+  // Base Sankey Chart
+  {
+    name: "ex-sankey-chart",
+    registryDependencies: ["@evilcharts/sankey-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-sankey-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // Sankey Chart Gradient Colors
+  {
+    name: "ex-gradient-colors-sankey-chart",
+    registryDependencies: ["@evilcharts/sankey-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-gradient-colors-sankey-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // Sankey Chart Loading State
+  {
+    name: "ex-loading-state-sankey-chart",
+    registryDependencies: ["@evilcharts/sankey-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-loading-state-sankey-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // Sankey Chart Link Variants
+  {
+    name: "ex-solid-link-variant-sankey-chart",
+    registryDependencies: ["@evilcharts/sankey-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-solid-link-variant-sankey-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-source-link-variant-sankey-chart",
+    registryDependencies: ["@evilcharts/sankey-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-source-link-variant-sankey-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // Sankey Chart Glowing
+  {
+    name: "ex-glowing-sankey-chart",
+    registryDependencies: ["@evilcharts/sankey-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-glowing-sankey-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
 ];

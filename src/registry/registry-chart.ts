@@ -106,4 +106,18 @@ export const charts: Registry["items"] = [
       },
     ],
   },
+  {
+    name: "sankey-chart",
+    description: "Sankey chart component for visualizing flow data with nodes and links",
+    registryDependencies: ["@evilcharts/chart"],
+    dependencies: ["recharts", "motion"],
+    type: "registry:component",
+    files: [
+      {
+        path: "charts/sankey-chart.tsx",
+        type: "registry:component",
+        target: TARGET_BASE_PATH + "/sankey-chart.tsx",
+      },
+    ],
+  },
 ];

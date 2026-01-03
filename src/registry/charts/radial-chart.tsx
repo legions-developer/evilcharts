@@ -19,7 +19,7 @@ const LOADING_ANIMATION_DURATION = 1500; // Duration between data changes in ms
 const DEFAULT_INNER_RADIUS = "30%";
 const DEFAULT_OUTER_RADIUS = "100%";
 const DEFAULT_CORNER_RADIUS = 5;
-const DEFAULT_BAR_GAP = 4;
+const DEFAULT_BAR_SIZE = 14;
 
 type ChartProps = ComponentProps<typeof RadialBarChart>;
 type RadialBarProps = ComponentProps<typeof RadialBar>;
@@ -43,7 +43,7 @@ type EvilRadialChartProps<TData extends Record<string, unknown>> = {
   innerRadius?: number | string;
   outerRadius?: number | string;
   cornerRadius?: number;
-  barGap?: number;
+  barSize?: number;
 
   // Hide Stuffs
   hideTooltip?: boolean;
@@ -71,7 +71,7 @@ export function EvilRadialChart<TData extends Record<string, unknown>>({
   innerRadius = DEFAULT_INNER_RADIUS,
   outerRadius = DEFAULT_OUTER_RADIUS,
   cornerRadius = DEFAULT_CORNER_RADIUS,
-  barGap = DEFAULT_BAR_GAP,
+  barSize = DEFAULT_BAR_SIZE,
   hideTooltip = false,
   hideLegend = false,
   hideBackground = false,
@@ -108,7 +108,6 @@ export function EvilRadialChart<TData extends Record<string, unknown>>({
         endAngle={variantConfig.endAngle}
         cx={variantConfig.cx}
         cy={variantConfig.cy}
-        barGap={barGap}
         {...chartProps}
       >
         {!hideLegend && !isLoading && (
@@ -137,6 +136,7 @@ export function EvilRadialChart<TData extends Record<string, unknown>>({
           <RadialBar
             dataKey={dataKey}
             cornerRadius={cornerRadius}
+            barSize={barSize}
             background={!hideBackground}
             className="drop-shadow-sm"
             style={isClickable ? { cursor: "pointer" } : undefined}
@@ -177,6 +177,7 @@ export function EvilRadialChart<TData extends Record<string, unknown>>({
           <RadialBar
             dataKey="value"
             cornerRadius={cornerRadius}
+            barSize={barSize}
             background
             isAnimationActive
             animationDuration={LOADING_ANIMATION_DURATION}

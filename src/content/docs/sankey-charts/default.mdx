@@ -1,0 +1,151 @@
+---
+title: Default
+description: Sankey charts for visualizing flow data with nodes and links, featuring gradient colors and glow effects
+links:
+  github: https://github.com/legions-developer/evilcharts/blob/main/src/registry/charts/sankey-chart.tsx
+  doc: https://recharts.github.io/en-US/examples/SimpleSankey/
+  api: https://recharts.github.io/en-US/api/Sankey/
+---
+
+<ComponentPreview title="Basic Chart" name="ex-sankey-chart"  />
+
+## Installation
+
+<CodeTabs>
+  <TabsList variant="underline">
+    <TabsTab value="cli">CLI</TabsTab>
+    <TabsTab value="manual">Manual</TabsTab>
+  </TabsList>
+  <TabsPanel value="cli">
+    <CliBlock commands={["@evilcharts/sankey-chart"]} />
+  </TabsPanel>
+  <TabsPanel value="manual">
+    <Steps>
+      <Step>
+        <StepTitle>Install the following dependencies:</StepTitle>
+        <StepContent>
+          <CommandBlock commands={["recharts motion"]} />
+        </StepContent>
+      </Step>
+      <Step>
+        <StepTitle>Copy and paste the following code snippets into your project.</StepTitle>
+         <StepDescription>
+          To use the chart, first create the folder `evilcharts` and a subfolder called `charts` inside your `components` directory.
+          Then, copy the following base sankey-chart code into a new file in that folder.
+        </StepDescription>
+        <StepContent>
+          <ComponentSource
+            name="sankey-chart"
+            title="components/evilcharts/charts/sankey-chart.tsx"
+          />
+        </StepContent>
+      </Step>
+       <Step>
+        <StepTitle>Now, Let's add the chart component to your project.</StepTitle>
+        <StepDescription>
+          These Components are required by the chart component to render the chart. Make a folder called `ui` inside the `evilcharts` folder and paste the code there.
+
+          Below is main chart component.
+        </StepDescription>
+        <StepContent>
+          <ComponentSource
+            name="chart"
+            title="components/evilcharts/ui/chart.tsx"
+          />
+        </StepContent>
+      </Step>
+    </Steps>
+  </TabsPanel>
+</CodeTabs>
+
+## Usage
+
+```tsx
+import { EvilSankeyChart, type SankeyData } from "@/components/evilcharts/charts/sankey-chart";
+```
+
+```tsx
+const data: SankeyData = {
+  nodes: [
+    { name: "Visit" },
+    { name: "Direct-Favourite" },
+    { name: "Page-Click" },
+    { name: "Detail-Favourite" },
+    { name: "Lost" },
+  ],
+  links: [
+    { source: 0, target: 1, value: 3728 },
+    { source: 0, target: 2, value: 354170 },
+    { source: 2, target: 3, value: 62429 },
+    { source: 2, target: 4, value: 291741 },
+  ],
+};
+
+const chartConfig = {
+  Visit: {
+    label: "Visit",
+    colors: { light: ["#3b82f6"], dark: ["#60a5fa"] },
+  },
+  "Page-Click": {
+    label: "Page Click",
+    colors: { light: ["#f59e0b"], dark: ["#fbbf24"] },
+  },
+  // ... more node configs
+} satisfies ChartConfig;
+
+<EvilSankeyChart
+  data={data}
+  chartConfig={chartConfig}
+  isClickable
+/>
+```
+
+### Loading State
+
+<ComponentPreview className="mb-0" title="isLoading='true'" name="ex-loading-state-sankey-chart"  />
+<Alert > 
+  <AlertContent >
+    The sankey chart supports loading state with a placeholder animation showing nodes and links. You can pass the `isLoading` prop to the chart to show the loading state while your data is being fetched.
+  </AlertContent>
+</Alert>
+
+## Examples
+
+Below are some examples of the sankey chart with different configurations. You can customize the `linkVariant`, `nodeWidth`, `nodePadding`, and other properties.
+
+### Gradient Colors
+
+<ComponentPreview title="gradient colors" name="ex-gradient-colors-sankey-chart"  />
+
+### Link Variants
+
+The sankey chart supports different link coloring strategies through the `linkVariant` prop.
+
+#### Solid Links
+
+<ComponentPreview className="mb-0" title="linkVariant='solid'" name="ex-solid-link-variant-sankey-chart"  />
+<Alert> 
+  <AlertContent>
+    Set `linkVariant` to `"solid"` to use a single color for all links. This creates a clean, minimal look.
+  </AlertContent>
+</Alert>
+
+#### Source-colored Links
+
+<ComponentPreview className="mb-0" title="linkVariant='source'" name="ex-source-link-variant-sankey-chart"  />
+<Alert> 
+  <AlertContent>
+    Set `linkVariant` to `"source"` to color links based on their source node. This helps trace where flows originate.
+  </AlertContent>
+</Alert>
+
+### Glowing Nodes
+
+<ComponentPreview className="mb-0" title="glowingNodes={['Visit', 'Page-Click']}" name="ex-glowing-sankey-chart"  />
+<Alert> 
+  <AlertContent>
+    Add a subtle glow effect to specific nodes using `glowingNodes` prop. Pass an array of node names to specify which nodes should glow.
+  </AlertContent>
+</Alert>
+
+## API Reference

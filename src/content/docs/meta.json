@@ -11,6 +11,7 @@
     "composed-charts",
     "radar-charts",
     "pie-charts",
-    "radial-charts"
+    "radial-charts",
+    "sankey-charts"
   ]
 }

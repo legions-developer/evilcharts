@@ -14,7 +14,7 @@ import { ChartLegend, ChartLegendContent } from "@/registry/ui/legend";
 import { motion } from "motion/react";
 
 // Constants
-const DEFAULT_BAR_RADIUS = 4;
+const DEFAULT_BAR_RADIUS = 2;
 const LOADING_BAR_DATA_KEY = "loading";
 const LOADING_ANIMATION_DURATION = 2000; // in milliseconds
 
@@ -362,8 +362,28 @@ const CustomBar = ({
       <g style={cursorStyle} onClick={onClick}>
         {/* Visible bar */}
         <g filter={filter} opacity={fillOpacity} className="transition-opacity duration-200">
-          <rect x={x} y={y} width={width} height={height} fill={getFill()} />
-          <rect x={x} y={y} width={width} height={2} fill={`url(#${chartId}-colors-${dataKey})`} />
+          {/* To set only the top-left corner radius to 2, use a path instead of rect */}
+          <path
+            d={`
+              M ${x + 2} ${y}
+              H ${x + width - 2}
+              Q ${x + width} ${y} ${x + width} ${y + 2}
+              V ${y + height}
+              H ${x}
+              V ${y + 2}
+              Q ${x} ${y} ${x + 2} ${y}
+              Z
+            `}
+            fill={getFill()}
+          />
+          <rect
+            x={x}
+            y={y - 4}
+            width={width}
+            rx={1}
+            height={2}
+            fill={`url(#${chartId}-colors-${dataKey})`}
+          />
         </g>
         {/* Hit area for hover - covers full column height */}
         {enableHoverHighlight && (
@@ -387,7 +407,7 @@ const CustomBar = ({
         x={x}
         y={y}
         width={width}
-        height={height}
+        height={height - 3}
         rx={barRadius}
         ry={barRadius}
         fill={getFill()}
@@ -738,8 +758,8 @@ const StrippedPatternStyle = ({
     <>
       {/* Shared stripped fade gradient for mask */}
       <linearGradient id={`${chartId}-stripped-mask-gradient`} x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stopColor="white" stopOpacity={0.4} />
-        <stop offset="100%" stopColor="white" stopOpacity={0.1} />
+        <stop offset="0%" stopColor="white" stopOpacity={0.2} />
+        <stop offset="100%" stopColor="white" stopOpacity={0.2} />
       </linearGradient>
 
       {Object.keys(chartConfig).map((dataKey) => (

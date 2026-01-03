@@ -111,6 +111,7 @@ export function EvilRadarChart<
             gridType={gridType}
             stroke="currentColor"
             strokeOpacity={0.2}
+            strokeDasharray="3 4"
             {...polarGridProps}
           />
         )}
