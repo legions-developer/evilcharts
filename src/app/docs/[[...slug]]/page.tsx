@@ -57,7 +57,7 @@ export default async function Page(props: { params: Promise<{ slug: string[] }> 
           <div className="flex flex-row items-center justify-between">
             <FeedbackButtons />
           </div>
-          <div className="grid grid-cols-2 gap-8">
+          <div className="grid grid-cols-2 gap-4 sm:gap-8">
             <div>
               {neighbours.previous ? (
                 <MDXNavigation

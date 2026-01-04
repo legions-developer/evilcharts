@@ -36,12 +36,12 @@ export const MDXNavigation = ({ type, $id, title, url, description }: MDXNavigat
         )}
       >
         <div className="bg-background group-hover:border-primary/20 flex flex-1 flex-col gap-0.5 rounded-md border p-3 duration-200">
-          <span className="group-hover:text-primary text-[13px] capitalize duration-200">
+          <span className="group-hover:text-primary line-clamp-1 text-[13px] capitalize duration-200">
             {title}
           </span>
           <span className="text-muted-foreground/70 line-clamp-1 text-xs">{description}</span>
         </div>
-        <div className="group-hover:text-primary flex items-center px-2 duration-200">
+        <div className="group-hover:text-primary flex items-center duration-200 sm:px-2">
           {type === "previous" ? (
             <ChevronLeft strokeWidth="1.5" className="size-5" />
           ) : (
