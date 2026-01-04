@@ -259,7 +259,11 @@ export function EvilAreaChart<
         <defs>
           {isLoading && <LoadingAreaPatternStyle chartId={chartId} onShimmerExit={onShimmerExit} />}
           {/* Shared horizontal color gradient - always rendered for stroke and all variants */}
-          <HorizontalColorGradientStyle chartConfig={chartConfig} chartId={chartId} />
+          <HorizontalColorGradientStyle
+            chartConfig={chartConfig}
+            chartId={chartId}
+            isExpanded={isExpanded}
+          />
           {/* Variant-specific styles */}
           {areaVariant === "gradient" && (
             <LinearGradientStyle chartConfig={chartConfig} chartId={chartId} />
@@ -361,9 +365,11 @@ const AnimatedDashedStyle = () => {
 const HorizontalColorGradientStyle = ({
   chartConfig,
   chartId,
+  isExpanded = false,
 }: {
   chartConfig: ChartConfig;
   chartId: string;
+  isExpanded?: boolean;
 }) => {
   return (
     <>
@@ -378,6 +384,7 @@ const HorizontalColorGradientStyle = ({
             y1="0"
             x2="1"
             y2="0"
+            gradientUnits={isExpanded ? "userSpaceOnUse" : "objectBoundingBox"}
           >
             {colorsCount === 1 ? (
               // Single color: same color at start and end
