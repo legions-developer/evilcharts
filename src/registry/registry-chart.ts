@@ -7,7 +7,7 @@ export const charts: Registry["items"] = [
     name: "area-chart",
     description: "Area chart component",
     registryDependencies: ["@evilcharts/chart", "@evilcharts/tooltip", "@evilcharts/legend"],
-    dependencies: ["recharts"],
+    dependencies: ["recharts", "motion"],
     type: "registry:component",
     files: [
       {
@@ -21,7 +21,7 @@ export const charts: Registry["items"] = [
     name: "line-chart",
     description: "Line chart component",
     registryDependencies: ["@evilcharts/chart", "@evilcharts/tooltip", "@evilcharts/legend"],
-    dependencies: ["recharts"],
+    dependencies: ["recharts", "motion"],
     type: "registry:component",
     files: [
       {
@@ -35,7 +35,7 @@ export const charts: Registry["items"] = [
     name: "bar-chart",
     description: "Bar chart component",
     registryDependencies: ["@evilcharts/chart", "@evilcharts/tooltip", "@evilcharts/legend"],
-    dependencies: ["recharts"],
+    dependencies: ["recharts", "motion"],
     type: "registry:component",
     files: [
       {
@@ -82,7 +82,7 @@ export const charts: Registry["items"] = [
     name: "radial-chart",
     description: "Radial bar chart component with full and semi-circle variants",
     registryDependencies: ["@evilcharts/chart", "@evilcharts/tooltip", "@evilcharts/legend"],
-    dependencies: ["recharts"],
+    dependencies: ["recharts", "motion"],
     type: "registry:component",
     files: [
       {
@@ -96,7 +96,7 @@ export const charts: Registry["items"] = [
     name: "radar-chart",
     description: "Radar chart component with filled and lines variants",
     registryDependencies: ["@evilcharts/chart", "@evilcharts/tooltip", "@evilcharts/legend"],
-    dependencies: ["recharts"],
+    dependencies: ["recharts", "motion"],
     type: "registry:component",
     files: [
       {

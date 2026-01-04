@@ -69,7 +69,7 @@ function TreeIndicator({
               opacity: 0,
             }}
             animate={{
-              y2: activeIndex === 0 ? 11 : activeIndex * 34 + 11,
+              y2: activeIndex === 0 ? 11 : activeIndex * 29.5 + 11,
               opacity: 1,
             }}
             transition={{
@@ -96,7 +96,7 @@ function TreeIndicator({
               opacity: 0,
             }}
             animate={{
-              y: activeIndex === 0 ? 11 : activeIndex * 34 + 11,
+              y: activeIndex === 0 ? 11 : activeIndex * 29.5 + 11,
               opacity: 1,
             }}
             transition={{
