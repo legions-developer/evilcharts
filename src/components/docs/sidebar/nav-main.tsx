@@ -10,6 +10,7 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { getNavItemIcon } from "@/globals/functions/getNavItemIcon";
@@ -121,6 +122,13 @@ export function NavMain({
   tree,
 }: React.ComponentProps<typeof Sidebar> & { tree: typeof source.pageTree }) {
   const pathname = usePathname();
+  const { isMobile, setOpenMobile } = useSidebar();
+
+  const handleLinkClick = () => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
 
   // Derive activeTrigger from pathname - automatically resets when navigating away
   const activeTrigger = useMemo<ActiveTriggerProps>(() => {
@@ -217,7 +225,7 @@ export function NavMain({
                             className={cn("w-full pl-8", !isActive && "text-muted-foreground")}
                             asChild
                           >
-                            <Link href={subItem.url}>
+                            <Link href={subItem.url} onClick={handleLinkClick}>
                               <span>{subItem.name}</span>
                             </Link>
                           </SidebarMenuSubButton>
