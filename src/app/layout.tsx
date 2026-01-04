@@ -1,5 +1,5 @@
-import { JetBrains_Mono, Geist, Google_Sans, Inter } from "next/font/google";
 import { Analytics as VercelAnalytics } from "@vercel/analytics/next";
+import { JetBrains_Mono, Geist, Inter } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import type { Metadata } from "next";
 import { cn } from "@/lib/utils";
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   title: "EvilCharts V2",
   description: "EvilCharts is a library for creating charts and graphs.",
   icons: {
-    icon: "/web/logo.svg",
+    icon: "/web/favicon.svg",
   },
 };
 
@@ -37,7 +37,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={cn(geist.variable, jetbrainsMono.variable, inter.variable, "font-inter antialiased")}>
+      <body
+        className={cn(
+          geist.variable,
+          jetbrainsMono.variable,
+          inter.variable,
+          "font-inter antialiased",
+        )}
+      >
         <ThemeProvider defaultTheme="system" attribute="class">
           <VercelAnalytics />
           {children}
