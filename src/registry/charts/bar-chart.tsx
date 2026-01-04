@@ -7,7 +7,15 @@ import {
   getLoadingData,
   LoadingIndicator,
 } from "@/registry/ui/chart";
-import { useCallback, useId, useMemo, useRef, useState, type ComponentProps } from "react";
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+  type ComponentProps,
+} from "react";
 import { Bar, BarChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from "recharts";
 import { ChartTooltip, ChartTooltipContent } from "@/registry/ui/tooltip";
 import { ChartLegend, ChartLegendContent } from "@/registry/ui/legend";
@@ -101,14 +109,43 @@ export function EvilBarChart<
 }: EvilBarChartProps<TData, TConfig>) {
   const [selectedDataKey, setSelectedDataKey] = useState<string | null>(defaultSelectedDataKey);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [isMouseInChart, setIsMouseInChart] = useState(false);
   const { loadingData, onShimmerExit } = useLoadingData(isLoading, loadingBars);
   const chartId = useId().replace(/:/g, ""); // Remove colons for valid CSS selectors
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const isStacked = stackType === "stacked" || stackType === "percent";
   const isHorizontal = layout === "horizontal";
 
+  // Track mouse inside/outside chart for tooltip and hover highlight
+  useEffect(() => {
+    // Only run when there's something to clear (hover or tooltip showing)
+    if (!isMouseInChart && hoveredIndex === null) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const container = containerRef.current;
+      if (!container) return;
+
+      const rect = container.getBoundingClientRect();
+      const isInside =
+        e.clientX >= rect.left &&
+        e.clientX <= rect.right &&
+        e.clientY >= rect.top &&
+        e.clientY <= rect.bottom;
+
+      if (!isInside) {
+        setHoveredIndex(null);
+        setIsMouseInChart(false);
+      }
+    };
+
+    // Use capture phase to catch events before they reach other elements
+    document.addEventListener("mousemove", handleMouseMove, true);
+    return () => document.removeEventListener("mousemove", handleMouseMove, true);
+  }, [isMouseInChart, hoveredIndex]);
+
   return (
-    <ChartContainer className={className} config={chartConfig}>
+    <ChartContainer ref={containerRef} className={className} config={chartConfig}>
       <LoadingIndicator isLoading={isLoading} />
       <BarChart
         id="evil-charts-bar-chart"
@@ -118,7 +155,11 @@ export function EvilBarChart<
         barGap={barGap}
         barCategoryGap={barCategoryGap}
         stackOffset={stackType === "percent" ? "expand" : undefined}
-        onMouseLeave={() => enableHoverHighlight && setHoveredIndex(null)}
+        onMouseEnter={() => setIsMouseInChart(true)}
+        onMouseLeave={() => {
+          setIsMouseInChart(false);
+          if (enableHoverHighlight) setHoveredIndex(null);
+        }}
         {...chartProps}
       >
         <ReferenceLine color="white" />
@@ -164,6 +205,7 @@ export function EvilBarChart<
         {!hideTooltip && !isLoading && (
           <ChartTooltip
             cursor={false}
+            active={isMouseInChart ? undefined : false}
             content={<ChartTooltipContent selected={selectedDataKey} />}
           />
         )}
@@ -221,7 +263,7 @@ export function EvilBarChart<
                       filter={getFilter()}
                       fillOpacity={getBarOpacity()}
                       isClickable={isClickable}
-                      enableHoverHighlight={enableHoverHighlight}
+                      showHitArea={enableHoverHighlight}
                       onClick={() => {
                         if (!isClickable) return;
                         setSelectedDataKey(selectedDataKey === dataKey ? null : dataKey);
@@ -308,7 +350,7 @@ type CustomBarProps = {
   barRadius: number;
   filter?: string;
   isClickable?: boolean;
-  enableHoverHighlight?: boolean;
+  showHitArea?: boolean;
   onClick?: () => void;
   onMouseEnter?: () => void;
 } & BarShapeProps;
@@ -327,7 +369,7 @@ const CustomBar = ({
   barRadius,
   filter,
   isClickable,
-  enableHoverHighlight,
+  showHitArea,
   onClick,
   onMouseEnter,
 }: CustomBarProps) => {
@@ -348,9 +390,9 @@ const CustomBar = ({
     }
   };
 
-  const cursorStyle = isClickable || enableHoverHighlight ? { cursor: "pointer" } : undefined;
+  const cursorStyle = isClickable || showHitArea ? { cursor: "pointer" } : undefined;
 
-  // Use background dimensions for hit area (full column height) when hover highlight is enabled
+  // Hit area dimensions - full column height from background
   const hitAreaX = background?.x ?? x;
   const hitAreaY = background?.y ?? y;
   const hitAreaWidth = background?.width ?? width;
@@ -361,7 +403,7 @@ const CustomBar = ({
     return (
       <g style={cursorStyle} onClick={onClick}>
         {/* Visible bar */}
-        <g filter={filter} opacity={fillOpacity} className="transition-opacity duration-200">
+        <g filter={filter} opacity={fillOpacity} style={{ transition: "opacity 0.2s ease-out" }}>
           {/* To set only the top-left corner radius to 2, use a path instead of rect */}
           <path
             d={`
@@ -385,15 +427,17 @@ const CustomBar = ({
             fill={`url(#${chartId}-colors-${dataKey})`}
           />
         </g>
-        {/* Hit area for hover - covers full column height */}
-        {enableHoverHighlight && (
+        {/* Hit area for full column height hover and click */}
+        {showHitArea && (
           <rect
             x={hitAreaX}
             y={hitAreaY}
             width={hitAreaWidth}
             height={hitAreaHeight}
             fill="transparent"
+            style={{ pointerEvents: "all" }}
             onMouseEnter={onMouseEnter}
+            onClick={onClick}
           />
         )}
       </g>
@@ -413,17 +457,19 @@ const CustomBar = ({
         fill={getFill()}
         opacity={fillOpacity}
         filter={filter}
-        className="transition-opacity duration-200"
+        style={{ transition: "opacity 0.2s ease-out" }}
       />
-      {/* Hit area for hover - covers full column height */}
-      {enableHoverHighlight && (
+      {/* Hit area for full column height hover and click */}
+      {showHitArea && (
         <rect
           x={hitAreaX}
           y={hitAreaY}
           width={hitAreaWidth}
           height={hitAreaHeight}
           fill="transparent"
+          style={{ pointerEvents: "all" }}
           onMouseEnter={onMouseEnter}
+          onClick={onClick}
         />
       )}
     </g>
