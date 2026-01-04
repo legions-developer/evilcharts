@@ -46,14 +46,13 @@ function TreeIndicator({
         ry="2"
         fill="currentColor"
       />
-      <line
+      <rect
         className="text-path"
-        x1="50%"
-        y1="0%"
-        x2="50%"
-        y2="calc(100% - 15px)"
-        stroke="currentColor"
-        strokeWidth="1"
+        x="9.5"
+        y="0"
+        width="1"
+        height="calc(100% - 15px)"
+        fill="currentColor"
       />
       {hasActiveChild && (
         <>

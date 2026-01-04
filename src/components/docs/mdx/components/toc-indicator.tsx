@@ -147,7 +147,7 @@ export function TocIndicator({ toc, activeIndex, className }: TocIndicatorProps)
           d={path}
           stroke="currentColor"
           strokeWidth="1"
-          strokeOpacity="0.5"
+          strokeOpacity="0.8"
           fill="none"
           strokeDasharray={totalLength}
           style={{ strokeDashoffset: strokeDashOffset }}

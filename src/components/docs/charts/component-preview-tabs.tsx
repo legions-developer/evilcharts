@@ -4,6 +4,7 @@ import * as React from "react";
 
 import { Tabs, TabsList, TabsPanel, TabsTab } from "@/components/ui/tabs";
 import { getIconForLanguageExtension } from "@/assets/language/icons";
+import { useBreakpoint } from "@/hooks/use-breakpoint";
 import { cn } from "@/lib/utils";
 
 export function ComponentPreviewTabs({
@@ -23,6 +24,12 @@ export function ComponentPreviewTabs({
   source: React.ReactNode;
   title?: string;
 }) {
+  const isMobile = useBreakpoint(768);
+
+  if (title?.includes("=") && isMobile) {
+    title = title.split("=")[0];
+  }
+
   return (
     <div className={cn("group relative mt-4 mb-12", className)} {...props}>
       <Tabs defaultValue="preview" className="relative w-full">
@@ -34,7 +41,8 @@ export function ComponentPreviewTabs({
         >
           <div className="flex flex-row items-center justify-between px-2">
             <span className="text-muted-foreground flex items-center gap-1.5 font-mono text-xs [&_svg]:size-3.5">
-              {getIconForLanguageExtension("component")} {title}
+              {getIconForLanguageExtension("component")}{" "}
+              <span className="line-clamp-1">{title}</span>
             </span>
             {!hideCode && (
               <TabsList variant="underline">
