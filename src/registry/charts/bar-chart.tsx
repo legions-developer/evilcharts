@@ -329,26 +329,14 @@ const CustomBar = (props: CustomBarProps) => {
     }
   };
 
-  // Calculate opacity based on both hover and click state
-  const getBarOpacity = () => {
-    // Check if this dataKey is selected (for click selection)
-    const isSelectedDataKey = selectedDataKey === null || selectedDataKey === dataKey;
-
-    // Base opacity from click selection
-    const clickOpacity =
-      isClickable && selectedDataKey !== null ? (isSelectedDataKey ? 1 : 0.3) : 1;
-
-    // If hover highlight is enabled and mouse is in chart
-    if (enableHoverHighlight && isMouseInChart) {
-      // Combine: if this bar is active/hovered, show full opacity (respecting click selection)
-      // If not hovered, dim it further
-      return isActive ? clickOpacity : clickOpacity * 0.3;
-    }
-
-    return clickOpacity;
-  };
-
-  const fillOpacity = getBarOpacity();
+  const fillOpacity = getBarOpacity({
+    isClickable,
+    selectedDataKey,
+    dataKey,
+    enableHoverHighlight,
+    isMouseInChart,
+    isActive,
+  });
   const cursorStyle = isClickable || enableHoverHighlight ? { cursor: "pointer" } : undefined;
 
   // For stripped: top corners rounded, bottom flat [topLeft, topRight, bottomRight, bottomLeft]
@@ -934,4 +922,38 @@ const LoadingBarPatternStyle = ({
       </mask>
     </>
   );
+};
+
+/**
+ * Calculate bar opacity based on click selection and hover highlight state
+ */
+const getBarOpacity = ({
+  isClickable,
+  selectedDataKey,
+  dataKey,
+  enableHoverHighlight,
+  isMouseInChart,
+  isActive,
+}: {
+  isClickable?: boolean;
+  selectedDataKey?: string | null;
+  dataKey: string;
+  enableHoverHighlight?: boolean;
+  isMouseInChart?: boolean;
+  isActive?: boolean;
+}) => {
+  // Check if this dataKey is selected (for click selection)
+  const isSelectedDataKey = selectedDataKey === null || selectedDataKey === dataKey;
+
+  // Base opacity from click selection
+  const clickOpacity = isClickable && selectedDataKey !== null ? (isSelectedDataKey ? 1 : 0.3) : 1;
+
+  // If hover highlight is enabled and mouse is in chart
+  if (enableHoverHighlight && isMouseInChart) {
+    // Combine: if this bar is active/hovered, show full opacity (respecting click selection)
+    // If not hovered, dim it further
+    return isActive ? clickOpacity : clickOpacity * 0.3;
+  }
+
+  return clickOpacity;
 };
