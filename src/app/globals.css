@@ -236,26 +236,13 @@ pre:has([data-line]) > code > [data-line] {
 code [data-line].highlighted::before {
   content: "";
   position: absolute;
-  left: 0.5rem;
+  left: 0.35rem;
   top: 50%;
   transform: translateY(-50%);
   width: 4px;
   height: 4px;
   background-color: var(--color-vesper-type);
   border-radius: 50%;
-}
-
-code [data-line].highlighted::after {
-  content: "";
-  position: absolute;
-  left: 0.5rem;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 4px;
-  height: 4px;
-  background-color: var(--color-vesper-type);
-  border-radius: 50%;
-  animation: ping-dot 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
 }
 
 code [data-line].highlighted,

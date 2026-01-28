@@ -3,9 +3,7 @@
 import { type ChartConfig, ChartContainer } from "@/registry/ui/chart";
 import { motion, AnimatePresence } from "motion/react";
 import { JetBrains_Mono } from "next/font/google";
-import { Bar, BarChart, XAxis } from "recharts";
-import { SVGProps } from "react";
-import * as React from "react";
+import { Bar, BarChart, Rectangle, XAxis } from "recharts";
 
 const jetBrainsMono = JetBrains_Mono({
   subsets: ["latin"],
@@ -50,26 +48,9 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export function EvilMonospaceBarChart() {
-  const [activeIndex, setActiveIndex] = React.useState<number | undefined>(undefined);
-  const leaveTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-
-  const handleMouseEnter = (index: number) => {
-    if (leaveTimeoutRef.current) {
-      clearTimeout(leaveTimeoutRef.current);
-      leaveTimeoutRef.current = undefined;
-    }
-    setActiveIndex(index);
-  };
-
-  const handleMouseLeave = () => {
-    leaveTimeoutRef.current = setTimeout(() => {
-      setActiveIndex(undefined);
-    }, 50);
-  };
-
   return (
     <ChartContainer config={chartConfig} className="h-full w-full p-4">
-      <BarChart accessibilityLayer data={chartData} onMouseLeave={handleMouseLeave}>
+      <BarChart accessibilityLayer data={chartData}>
         <XAxis
           dataKey="month"
           tickLine={false}
@@ -80,81 +61,64 @@ export function EvilMonospaceBarChart() {
         <Bar
           dataKey="desktop"
           fill="var(--color-desktop-0)"
-          shape={<CustomBar handleBarEnter={handleMouseEnter} activeIndex={activeIndex} />}
+          shape={BarShape}
+          activeBar={BarShape}
         />
       </BarChart>
     </ChartContainer>
   );
 }
 
-interface CustomBarProps extends SVGProps<SVGSVGElement> {
-  handleBarEnter: (index: number) => void;
+interface BarProps {
   index?: number;
-  activeIndex?: number;
-  value?: string;
-  background?: {
-    x?: number;
-    y?: number;
-    width?: number;
-    height?: number;
-  };
+  value?: number | [number, number];
+  x?: number;
+  y?: number;
+  width?: number;
+  height?: number;
+  fill?: string;
+  isActive?: boolean;
 }
 
-const CustomBar = (props: CustomBarProps) => {
-  const { fill, x, y, width, height, index, activeIndex, value, background, handleBarEnter } =
-    props;
+// Scale factor: collapsed = thin line, expanded = full width
+const COLLAPSED_SCALE = 0.1; // [!code highlight]
+
+const BarShape = (props: BarProps) => {
+  const { fill, x, y, width, height, index, value, isActive } = props;
 
   const xPos = Number(x || 0);
   const yPos = Number(y || 0);
   const realWidth = Number(width || 0);
   const realHeight = Number(height || 0);
-  const isActive = index === activeIndex;
 
   // Center position for the bar
   const centerX = xPos + realWidth / 2;
   const centerY = yPos + realHeight / 2;
 
-  // Scale factor: collapsed = thin line, expanded = full width
-  const collapsedScale = 0.05;
-
-  // Hit area dimensions - use background for full column height, fallback to bar dimensions
-  const hitAreaX = background?.x ?? xPos;
-  const hitAreaY = background?.y ?? yPos;
-  const hitAreaWidth = background?.width ?? realWidth;
-  const hitAreaHeight = background?.height ?? realHeight;
-
   return (
-    <g>
-      {/* Invisible hit area for easier hover targeting */}
-      <rect
-        x={hitAreaX}
-        y={hitAreaY}
-        width={hitAreaWidth}
-        height={hitAreaHeight}
-        fill="transparent"
-        style={{ cursor: "pointer" }}
-        onMouseEnter={() => handleBarEnter(index!)}
-      />
-      {/* Render bar with scaleX animation from center */}
-      <motion.rect
-        key={`bar-${index}`}
-        x={xPos}
-        y={y}
-        width={realWidth}
-        height={height}
-        fill={fill}
-        initial={{ scaleX: collapsedScale }}
-        animate={{ scaleX: isActive ? 1 : collapsedScale }}
-        transition={{ type: "spring", stiffness: 200, damping: 25 }}
-        style={{
-          transformOrigin: `${centerX}px ${centerY}px`,
-          transformBox: "fill-box",
-          pointerEvents: "none",
-        }}
-      />
-      {/* Render value text on top of bar */}
+    <>
+      <Rectangle {...props} fill="transparent" />
+
       <AnimatePresence>
-        {isActive && (
+        <motion.rect
+          key={`bar-${index}`}
+          x={xPos}
+          y={yPos}
+          width={realWidth}
+          height={realHeight}
+          fill={fill}
+          initial={{ scaleX: isActive ? COLLAPSED_SCALE : 1 }}
+          animate={{ scaleX: isActive ? 1 : COLLAPSED_SCALE }}
+          exit={{ scaleX: COLLAPSED_SCALE }}
+          transition={{ type: "spring", stiffness: 200, damping: 25 }}
+          style={{
+            transformOrigin: `${centerX}px ${centerY}px`,
+            transformBox: "fill-box",
+          }}
+        />
+      </AnimatePresence>
+      {isActive && (
+        <AnimatePresence>
           <motion.text
             key={`text-${index}`}
             className={jetBrainsMono.className}
@@ -170,8 +134,8 @@ const CustomBar = (props: CustomBarProps) => {
           >
             {value}
           </motion.text>
-        )}
-      </AnimatePresence>
-    </g>
+        </AnimatePresence>
+      )}
+    </>
   );
 };
