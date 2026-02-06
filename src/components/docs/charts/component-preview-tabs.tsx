@@ -25,10 +25,7 @@ export function ComponentPreviewTabs({
   title?: string;
 }) {
   const isMobile = useBreakpoint(768);
-
-  if (title?.includes("=") && isMobile) {
-    title = title.split("=")[0];
-  }
+  const displayTitle = title?.includes("=") && isMobile ? title.split("=")[0] : title;
 
   return (
     <div className={cn("group relative mt-4 mb-12", className)} {...props}>
@@ -42,7 +39,7 @@ export function ComponentPreviewTabs({
           <div className="flex flex-row items-center justify-between px-2">
             <span className="text-muted-foreground dark:text-muted-foreground/80 flex items-center gap-1.5 font-mono text-xs [&_svg]:size-3.5">
               {getIconForLanguageExtension("component")}{" "}
-              <span className="line-clamp-1">{title}</span>
+              <span className="line-clamp-1">{displayTitle}</span>
             </span>
             {!hideCode && (
               <TabsList variant="underline">
