@@ -30,7 +30,7 @@ const Grid = () => {
           x2="877.175"
           y2="204.279"
           stroke="currentColor"
-          strokeOpacity="0.04"
+          strokeOpacity="0.03"
           strokeWidth="2"
         />
         <line
@@ -39,7 +39,7 @@ const Grid = () => {
           x2="877.175"
           y2="272.039"
           stroke="currentColor"
-          strokeOpacity="0.04"
+          strokeOpacity="0.03"
           strokeWidth="2"
         />
         <line
@@ -48,7 +48,7 @@ const Grid = () => {
           x2="877.175"
           y2="339.799"
           stroke="currentColor"
-          strokeOpacity="0.04"
+          strokeOpacity="0.03"
           strokeWidth="2"
         />
         <line
@@ -57,7 +57,7 @@ const Grid = () => {
           x2="877.175"
           y2="407.559"
           stroke="currentColor"
-          strokeOpacity="0.04"
+          strokeOpacity="0.03"
           strokeWidth="2"
         />
         <line
@@ -66,7 +66,7 @@ const Grid = () => {
           x2="877.175"
           y2="68.7598"
           stroke="currentColor"
-          strokeOpacity="0.04"
+          strokeOpacity="0.03"
           strokeWidth="2"
         />
         <line
@@ -75,7 +75,7 @@ const Grid = () => {
           x2="877.175"
           y2="136.519"
           stroke="currentColor"
-          strokeOpacity="0.04"
+          strokeOpacity="0.03"
           strokeWidth="2"
         />
         <line
@@ -84,7 +84,7 @@ const Grid = () => {
           x2="426.558"
           y2="477.022"
           stroke="currentColor"
-          strokeOpacity="0.04"
+          strokeOpacity="0.03"
           strokeWidth="2"
         />
         <line
@@ -93,7 +93,7 @@ const Grid = () => {
           x2="533.491"
           y2="477.022"
           stroke="currentColor"
-          strokeOpacity="0.04"
+          strokeOpacity="0.03"
           strokeWidth="2"
         />
         <line
@@ -102,7 +102,7 @@ const Grid = () => {
           x2="639.366"
           y2="477.022"
           stroke="currentColor"
-          strokeOpacity="0.04"
+          strokeOpacity="0.03"
           strokeWidth="2"
         />
         <line
@@ -111,7 +111,7 @@ const Grid = () => {
           x2="747.358"
           y2="477.022"
           stroke="currentColor"
-          strokeOpacity="0.04"
+          strokeOpacity="0.03"
           strokeWidth="2"
         />
         <line
@@ -120,7 +120,7 @@ const Grid = () => {
           x2="101.874"
           y2="477.022"
           stroke="currentColor"
-          strokeOpacity="0.04"
+          strokeOpacity="0.03"
           strokeWidth="2"
         />
         <line
@@ -129,7 +129,7 @@ const Grid = () => {
           x2="209.867"
           y2="477.022"
           stroke="currentColor"
-          strokeOpacity="0.04"
+          strokeOpacity="0.03"
           strokeWidth="2"
         />
         <line
@@ -138,7 +138,7 @@ const Grid = () => {
           x2="322.094"
           y2="477.022"
           stroke="currentColor"
-          strokeOpacity="0.04"
+          strokeOpacity="0.03"
           strokeWidth="2"
         />
       </g>

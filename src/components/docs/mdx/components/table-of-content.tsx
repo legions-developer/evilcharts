@@ -8,9 +8,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Menu02Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import { Button } from "@/components/ui/button";
-import { TocIndicator } from "./toc-indicator";
-import { BookIcon } from "@/assets/icons";
+import { TocIndicator } from "./toc-indicator"; 
 import { cn } from "@/lib/utils";
 import * as React from "react";
 
@@ -101,11 +102,13 @@ export function DocsTableOfContents({
   return (
     <div className={cn("flex flex-col px-4 pt-0 text-sm", className)}>
       <div className="flex h-6 flex-row items-center gap-[5px]">
-        <BookIcon
+        <HugeiconsIcon
+          size="14"
           className={cn(
-            "duration-200",
+            "text-muted-foreground duration-200",
             activeIndex >= 0 ? "text-primary" : "text-muted-foreground",
           )}
+          icon={Menu02Icon}
         />
         <p className="text-muted-foreground bg-background sticky top-0 text-xs">On This Page</p>
       </div>

@@ -25,10 +25,10 @@ export default async function Page(props: { params: Promise<{ slug: string[] }> 
   const neighbours = findNeighbour(source.pageTree, page.url);
 
   return (
-    <div className="relative flex">
+    <div className="relative mt-10 flex sm:mt-0">
       <div className="docs-container flex flex-col py-12 pb-32">
         <div className="flex flex-col gap-1">
-          <h1 className="scroll-m-20 text-4xl font-semibold tracking-tight sm:text-3xl xl:text-4xl">
+          <h1 className="scroll-m-20 text-3xl font-semibold tracking-tight xl:text-4xl">
             {doc.title}
           </h1>
           {doc.description && (

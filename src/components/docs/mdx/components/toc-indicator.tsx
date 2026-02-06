@@ -14,6 +14,8 @@ const CENTER_OFFSET = 6.5;
 
 const SPRING_CONFIG = { stiffness: 180, damping: 20 };
 
+const GRADIENT_HEIGHT = ITEM_HEIGHT * 4;
+
 interface TocItem {
   title?: React.ReactNode;
   url: string;
@@ -118,6 +120,11 @@ export function TocIndicator({ toc, activeIndex, className }: TocIndicatorProps)
     totalLength > 0 ? `${(v / totalLength) * 100}%` : "0%",
   );
 
+  // Calculate gradient Y positions (gradient moves with progress but has fixed height)
+  const startY = INITIAL_OFFSET - STARTING_MARGIN;
+  const gradientY2 = useTransform(animatedDistance, (v) => startY + v);
+  const gradientY1 = useTransform(gradientY2, (y2) => Math.max(0, y2 - GRADIENT_HEIGHT));
+
   const cssOffsetPath = `path('${path}')`;
 
   return (
@@ -134,6 +141,17 @@ export function TocIndicator({ toc, activeIndex, className }: TocIndicatorProps)
           >
             <circle cx="3" cy="3" r="2" fill="currentColor" />
           </marker>
+          <motion.linearGradient
+            id="toc-progress-gradient"
+            gradientUnits="userSpaceOnUse"
+            x1="0"
+            x2="0"
+            y1={gradientY1}
+            y2={gradientY2}
+          >
+            <stop offset="0%" stopColor="var(--primary)" stopOpacity="0" />
+            <stop offset="100%" stopColor="var(--primary)" stopOpacity="1" />
+          </motion.linearGradient>
         </defs>
         <path
           d={path}
@@ -143,11 +161,9 @@ export function TocIndicator({ toc, activeIndex, className }: TocIndicatorProps)
           markerEnd="url(#toc-end-circle)"
         />
         <motion.path
-          className="text-primary"
           d={path}
-          stroke="currentColor"
+          stroke="url(#toc-progress-gradient)"
           strokeWidth="1"
-          strokeOpacity="0.8"
           fill="none"
           strokeDasharray={totalLength}
           style={{ strokeDashoffset: strokeDashOffset }}
