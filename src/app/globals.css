@@ -63,7 +63,7 @@
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(15% 0 0);
   --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
+  --muted-foreground: oklch(0.4 0 0);
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(15% 0 0);
   --destructive: oklch(59.579% 0.21554 24.733);
@@ -157,7 +157,6 @@
 body,
 html {
   scroll-behavior: smooth;
-  background-color: var(--sidebar);
 }
 
 ::selection {
