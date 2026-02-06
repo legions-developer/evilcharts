@@ -30,7 +30,7 @@ export async function CodeBlock({
       <div className={cn("dark:bg-primary-foreground rounded-md bg-[#F5F5F5] p-1")}>
         <div className="flex h-7 justify-between px-1">
           <figcaption
-            className="text-muted-foreground flex items-center gap-1.5 text-xs [&_svg]:size-3.5"
+            className="text-muted-foreground dark:text-muted-foreground/80 flex items-center gap-1.5 text-xs [&_svg]:size-3.5"
             data-language={language}
             data-rehype-pretty-code-title=""
           >

@@ -1,14 +1,8 @@
 "use client";
 
 import { type ChartConfig, ChartContainer } from "@/registry/ui/chart";
-import { motion, AnimatePresence } from "motion/react";
-import { JetBrains_Mono } from "next/font/google";
 import { Bar, BarChart, Rectangle, XAxis } from "recharts";
-
-const jetBrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
+import { motion, AnimatePresence } from "motion/react";
 
 const chartData = [
   { month: "January", desktop: 342 },
@@ -120,8 +114,8 @@ const BarShape = (props: BarProps) => {
       {isActive && (
         <AnimatePresence>
           <motion.text
+            className="font-mono"
             key={`text-${index}`}
-            className={jetBrainsMono.className}
             initial={{ opacity: 0, y: -10, filter: "blur(3px)" }}
             animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             exit={{ opacity: 0, y: -10, filter: "blur(3px)" }}
