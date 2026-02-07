@@ -315,7 +315,7 @@ function ChartZoomer({
 
       {/* Selected region – draggable to pan */}
       <motion.div
-        className="absolute inset-y-0 cursor-grab touch-none rounded-md border active:cursor-grabbing"
+        className="absolute inset-y-0 cursor-grab touch-none rounded-sm border active:cursor-grabbing"
         animate={{ left: `${leftPct}%`, width: `${rightPct - leftPct}%` }}
         transition={transition}
         {...bind("middle")}
