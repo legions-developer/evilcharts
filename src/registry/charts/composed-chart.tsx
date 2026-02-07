@@ -193,7 +193,7 @@ export function EvilComposedChart<
             xDataKey={xDataKey}
             variant={zoomerVariant ?? "area"}
             curveType={curveType}
-            strokeVariant={strokeVariant}
+            strokeVariant={strokeVariant === "animated-dashed" ? "dashed" : strokeVariant}
             connectNulls={connectNulls}
             barRadius={barRadius}
             height={zoomerHeight}

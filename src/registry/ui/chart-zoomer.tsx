@@ -303,12 +303,14 @@ function ChartZoomer({
       {/* Dim overlay – left */}
       <motion.div
         className="bg-background/70 pointer-events-none absolute inset-y-0 left-0 rounded-l-md"
+        initial={false}
         animate={{ width: `${leftPct}%` }}
         transition={transition}
       />
       {/* Dim overlay – right */}
       <motion.div
         className="bg-background/70 pointer-events-none absolute inset-y-0 right-0 rounded-r-md"
+        initial={false}
         animate={{ width: `${100 - rightPct}%` }}
         transition={transition}
       />
@@ -316,6 +318,7 @@ function ChartZoomer({
       {/* Selected region – draggable to pan */}
       <motion.div
         className="absolute inset-y-0 cursor-grab touch-none rounded-sm border active:cursor-grabbing"
+        initial={false}
         animate={{ left: `${leftPct}%`, width: `${rightPct - leftPct}%` }}
         transition={transition}
         {...bind("middle")}
@@ -366,6 +369,7 @@ function ZoomerHandle({
   return (
     <motion.div
       className="absolute inset-y-0 z-10"
+      initial={false}
       animate={{ left: `${percent}%` }}
       transition={transition}
     >
@@ -595,15 +599,9 @@ function useChartZoom<TData extends Record<string, unknown>>({
   });
 
   React.useEffect(() => {
-    setRange((prev) => {
-      const maxIdx = Math.max(0, data.length - 1);
-      if (prev.startIndex > maxIdx || prev.endIndex > maxIdx) {
-        return {
-          startIndex: Math.min(prev.startIndex, maxIdx),
-          endIndex: Math.min(prev.endIndex, maxIdx),
-        };
-      }
-      return prev;
+    setRange({
+      startIndex: 0,
+      endIndex: Math.max(0, data.length - 1),
     });
   }, [data.length]);
 

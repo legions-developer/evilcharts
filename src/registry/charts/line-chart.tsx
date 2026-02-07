@@ -158,7 +158,7 @@ export function EvilLineChart<
             xDataKey={xDataKey}
             variant={zoomerVariant ?? "line"}
             curveType={curveType}
-            strokeVariant={strokeVariant}
+            strokeVariant={strokeVariant === "animated-dashed" ? "dashed" : strokeVariant}
             connectNulls={connectNulls}
             height={zoomerHeight}
             formatLabel={zoomerFormatLabel}

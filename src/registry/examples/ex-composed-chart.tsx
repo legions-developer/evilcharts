@@ -49,6 +49,8 @@ export function EvilExampleComposedChart() {
       barConfig={barConfig}
       lineConfig={lineConfig}
       xAxisProps={{ tickFormatter: (value) => value.substring(0, 3) }}
+      showZoomer
+      zoomerFormatLabel={(value) => String(value).substring(0, 3)}
     />
   );
 }
