@@ -240,10 +240,7 @@ export function EvilRadialChart<TData extends Record<string, unknown>>({
   );
 }
 
-// ========================================
-// VARIANT CONFIG
-// ========================================
-
+// Get angle and position configuration based on chart variant (full/semi)
 function getVariantConfig(variant: RadialVariant) {
   switch (variant) {
     case "semi":
@@ -264,11 +261,7 @@ function getVariantConfig(variant: RadialVariant) {
   }
 }
 
-// ========================================
-// LOADING STATE
-// ========================================
-
-// Generate random loading data
+// Generate random loading data with values between 40-100
 function generateLoadingData() {
   return Array.from({ length: LOADING_BARS }, (_, i) => ({
     name: `loading${i}`,
@@ -297,11 +290,7 @@ function useLoadingData(isLoading: boolean) {
   return loadingData;
 }
 
-// ========================================
-// GRADIENT STYLES
-// ========================================
-
-// Color gradient for radial bars (horizontal gradient following the arc)
+// Create horizontal color gradient for radial bars following the arc
 const ColorGradientStyle = ({
   chartConfig,
   chartId,
@@ -344,10 +333,7 @@ const ColorGradientStyle = ({
   );
 };
 
-// ========================================
-// GLOW/NEON FILTER STYLES
-// ========================================
-
+// Apply soft glow filter effect to radial bars using SVG filters
 const GlowFilterStyle = ({ chartId, glowingBars }: { chartId: string; glowingBars: string[] }) => {
   return (
     <>

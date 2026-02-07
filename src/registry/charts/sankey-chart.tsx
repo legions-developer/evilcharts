@@ -277,10 +277,7 @@ export function EvilSankeyChart({
   );
 }
 
-// ========================================
-// CUSTOM NODE COMPONENT
-// ========================================
-
+// Custom node component with labels, icons, and glow effects
 type CustomNodeProps = SankeyNodeProps & {
   chartId: string;
   chartConfig: ChartConfig;
@@ -444,10 +441,7 @@ const CustomNode = ({
   );
 };
 
-// ========================================
-// CUSTOM LINK COMPONENT
-// ========================================
-
+// Custom link component with gradient variants and connection highlighting
 type CustomLinkProps = SankeyLinkProps & {
   chartId: string;
   chartConfig: ChartConfig;
@@ -562,10 +556,7 @@ const CustomLink = ({
   );
 };
 
-// ========================================
-// LOADING STATE
-// ========================================
-
+// Animated skeleton loading state with nodes and links
 const LoadingSankey = () => {
   // Full-width loading skeleton with 3 columns of nodes (with padding from edges)
   const nodes = [
@@ -659,11 +650,7 @@ const LoadingSankey = () => {
   );
 };
 
-// ========================================
-// GRADIENT STYLES
-// ========================================
-
-// Vertical color gradient for sankey nodes
+// Create vertical color gradient for sankey nodes
 const NodeColorGradientStyle = ({
   chartConfig,
   chartId,
@@ -706,10 +693,7 @@ const NodeColorGradientStyle = ({
   );
 };
 
-// ========================================
-// GLOW/NEON FILTER STYLES
-// ========================================
-
+// Apply soft glow filter effect to nodes or links using SVG filters
 const GlowFilterStyle = ({
   chartId,
   glowingNodes,

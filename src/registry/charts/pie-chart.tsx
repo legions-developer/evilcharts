@@ -248,11 +248,7 @@ export function EvilPieChart<TData extends Record<string, unknown>>({
   );
 }
 
-// ========================================
-// LOADING STATE
-// ========================================
-
-// Fixed loading data - 5 equal sectors for circular pulsing animation
+// Generate fixed loading data with equal sectors for circular pulsing animation
 const LOADING_PIE_DATA = Array.from({ length: LOADING_SECTORS }, (_, i) => ({
   name: `loading${i}`,
   value: 100 / LOADING_SECTORS,
@@ -281,11 +277,7 @@ const AnimatedLoadingSector = (props: ComponentProps<typeof Sector> & { index?: 
   );
 };
 
-// ========================================
-// GRADIENT STYLES
-// ========================================
-
-// Radial color gradient for pie sectors
+// Create radial color gradient for pie sectors
 const RadialColorGradientStyle = ({
   chartConfig,
   chartId,
@@ -328,10 +320,7 @@ const RadialColorGradientStyle = ({
   );
 };
 
-// ========================================
-// GLOW/NEON FILTER STYLES
-// ========================================
-
+// Apply soft glow filter effect to pie sectors using SVG filters
 const GlowFilterStyle = ({
   chartId,
   glowingSectors,

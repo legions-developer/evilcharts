@@ -6,8 +6,8 @@ import {
   getColorsCount,
   LoadingIndicator,
 } from "@/registry/ui/chart";
-import { PolarAngleAxis, PolarGrid, PolarRadiusAxis, Radar, RadarChart } from "recharts";
 import { useCallback, useEffect, useId, useMemo, useState, type ComponentProps } from "react";
+import { PolarAngleAxis, PolarGrid, PolarRadiusAxis, Radar, RadarChart } from "recharts";
 import { ChartTooltip, ChartTooltipContent } from "@/registry/ui/tooltip";
 import { ChartLegend, ChartLegendContent } from "@/registry/ui/legend";
 
@@ -248,10 +248,7 @@ export function EvilRadarChart<
   );
 }
 
-// ========================================
-// LOADING STATE
-// ========================================
-
+// Generate random loading data for radar chart animation
 function generateLoadingData(dataKey: string) {
   const categories = ["A", "B", "C", "D", "E", "F"];
   return categories.slice(0, LOADING_POINTS).map((cat) => ({
@@ -279,10 +276,7 @@ function useLoadingData(isLoading: boolean, dataKey: string) {
   return loadingData;
 }
 
-// ========================================
-// GRADIENT STYLES
-// ========================================
-
+// Create stroke and fill gradients for radar chart paths
 const RadarGradientStyle = ({
   chartConfig,
   chartId,
@@ -340,10 +334,7 @@ const RadarGradientStyle = ({
   );
 };
 
-// ========================================
-// GLOW/NEON FILTER STYLES
-// ========================================
-
+// Apply soft glow filter effect to radar areas using SVG filters
 const GlowFilterStyle = ({
   chartId,
   glowingRadars,

@@ -434,10 +434,7 @@ export function EvilComposedChart<
   );
 }
 
-// ========================================
-// HELPER FUNCTIONS & COMPONENTS
-// ========================================
-
+// Calculate opacity values for stroke and dot based on selection state
 const getOpacity = (isClickable: boolean, selectedDataKey: string | null, dataKey: string) => {
   if (!isClickable || selectedDataKey === null) {
     return { stroke: 1, dot: 1 };
@@ -467,10 +464,7 @@ const AnimatedDashedStyle = () => {
   );
 };
 
-// ========================================
-// BAR COMPONENTS
-// ========================================
-
+// Custom bar shape component with support for variants, glow effects, and interactions
 type BarShapeProps = {
   x?: number;
   y?: number;
@@ -596,11 +590,7 @@ const CustomBar = ({
   );
 };
 
-// ========================================
-// GRADIENT STYLES
-// ========================================
-
-// Vertical color gradient for bars (top to bottom)
+// Create vertical color gradient for bars (top to bottom)
 const VerticalColorGradientStyle = ({
   chartConfig,
   chartId,
@@ -690,10 +680,7 @@ const HorizontalColorGradientStyle = ({
   );
 };
 
-// ========================================
-// BAR PATTERN STYLES
-// ========================================
-
+// Create hatched diagonal pattern style for bars using SVG masks
 const HatchedPatternStyle = ({
   chartConfig,
   chartId,
@@ -985,10 +972,7 @@ const StrippedPatternStyle = ({
   );
 };
 
-// ========================================
-// GLOW/NEON FILTER STYLES
-// ========================================
-
+// Apply soft glow filter effect to bars using SVG filters
 const BarGlowFilterStyle = ({
   chartId,
   glowingBars,
@@ -1149,10 +1133,7 @@ const LineNeonFilterStyle = ({ chartId, neonLines }: { chartId: string; neonLine
   );
 };
 
-// ========================================
-// LOADING STATE
-// ========================================
-
+// Generate gradient stops with smooth sine-based easing for loading animation
 const generateEasedGradientStops = (
   steps: number = 17,
   minOpacity: number = 0.05,
