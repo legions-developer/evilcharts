@@ -60,13 +60,27 @@ type EvilLineChartProps<
   hideLegend?: boolean;
   hideCursorLine?: boolean;
   // Interactive Stuffs
-  isClickable?: boolean;
   isLoading?: boolean;
   loadingPoints?: number;
   // Glow Effect
   glowingLines?: NumericDataKeys<TData>[];
   neonLines?: NumericDataKeys<TData>[];
 };
+
+type EvilLineChartClickable = {
+  isClickable: true;
+  onSelectionChange?: (selectedDataKey: string | null) => void;
+};
+
+type EvilLineChartNotClickable = {
+  isClickable?: false;
+  onSelectionChange?: never;
+};
+
+type EvilLineChartPropsWithCallback<
+  TData extends Record<string, unknown>,
+  TConfig extends Record<string, ChartConfig[string]>,
+> = EvilLineChartProps<TData, TConfig> & (EvilLineChartClickable | EvilLineChartNotClickable);
 
 export function EvilLineChart<
   TData extends Record<string, unknown>,
@@ -96,10 +110,22 @@ export function EvilLineChart<
   loadingPoints,
   glowingLines = [],
   neonLines = [],
-}: EvilLineChartProps<TData, TConfig>) {
+  onSelectionChange,
+}: EvilLineChartPropsWithCallback<TData, TConfig>) {
   const [selectedDataKey, setSelectedDataKey] = useState<string | null>(defaultSelectedDataKey);
   const { loadingData, onShimmerExit } = useLoadingData(isLoading, loadingPoints);
   const chartId = useId().replace(/:/g, ""); // Remove colons for valid CSS selectors
+
+  // Wrapper function to update state and call parent callback
+  const handleSelectionChange = useCallback(
+    (newSelectedDataKey: string | null) => {
+      setSelectedDataKey(newSelectedDataKey);
+      if (isClickable && onSelectionChange) {
+        onSelectionChange(newSelectedDataKey);
+      }
+    },
+    [onSelectionChange, isClickable],
+  );
 
   return (
     <ChartContainer className={className} config={chartConfig}>
@@ -119,7 +145,7 @@ export function EvilLineChart<
             content={
               <ChartLegendContent
                 selected={selectedDataKey}
-                onSelectChange={setSelectedDataKey}
+                onSelectChange={handleSelectionChange}
                 isClickable={isClickable}
               />
             }
@@ -193,7 +219,7 @@ export function EvilLineChart<
                     tooltipType="none"
                     style={{ cursor: "pointer" }}
                     onClick={() => {
-                      setSelectedDataKey(selectedDataKey === dataKey ? null : dataKey);
+                      handleSelectionChange(selectedDataKey === dataKey ? null : dataKey);
                     }}
                   />
                 )}

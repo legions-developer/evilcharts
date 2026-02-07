@@ -100,6 +100,25 @@ const chartConfig = {
 />
 ```
 
+### Interactive Selection
+
+When `isClickable` is enabled, you can use the `onSelectionChange` callback to handle selection events:
+
+```tsx
+<EvilSankeyChart
+  data={data}
+  chartConfig={chartConfig}
+  isClickable={true}
+  onSelectionChange={(selection) => {
+    if (selection) {
+      console.log("Selected:", selection.dataKey, "Value:", selection.value);
+    } else {
+      console.log("Deselected");
+    }
+  }}
+/>
+```
+
 ### Loading State
 
 <ComponentPreview className="mb-0" title="isLoading='true'" name="ex-loading-state-sankey-chart"  />
@@ -408,6 +427,19 @@ Below are some examples of the sankey chart with different configurations. You c
       type: `boolean`
       
       default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="onSelectionChange"
+    />
+    <ApiContent>
+      Callback function that is called when a node is selected or deselected. Receives an object with `dataKey` (node name) and `value` (node value calculated from links), or `null` when deselected.
+      
+      **Note:** This prop is only available when `isClickable` is set to `true`.
+      
+      type: `(selection: { dataKey: string; value: number } | null) => void`
     </ApiContent>
   </ApiReference>
 

@@ -9,7 +9,7 @@ import {
 import { ChartTooltip, ChartTooltipContent } from "@/registry/ui/tooltip";
 import { ChartLegend, ChartLegendContent } from "@/registry/ui/legend";
 import { Cell, LabelList, Pie, PieChart, Sector } from "recharts";
-import { useId, useState, type ComponentProps } from "react";
+import { useCallback, useId, useState, type ComponentProps } from "react";
 import { motion } from "motion/react";
 
 // Loading animation constants
@@ -54,13 +54,25 @@ type EvilPieChartProps<TData extends Record<string, unknown>> = {
   hideLegend?: boolean;
 
   // Interactive Stuffs
-  isClickable?: boolean;
   isLoading?: boolean;
 
   // Glow Effects
   glowingSectors?: string[];
   neonSectors?: string[];
 };
+
+type EvilPieChartClickable = {
+  isClickable: true;
+  onSelectionChange?: (selection: { dataKey: string; value: number } | null) => void;
+};
+
+type EvilPieChartNotClickable = {
+  isClickable?: false;
+  onSelectionChange?: never;
+};
+
+type EvilPieChartPropsWithCallback<TData extends Record<string, unknown>> =
+  EvilPieChartProps<TData> & (EvilPieChartClickable | EvilPieChartNotClickable);
 
 export function EvilPieChart<TData extends Record<string, unknown>>({
   data,
@@ -85,9 +97,30 @@ export function EvilPieChart<TData extends Record<string, unknown>>({
   isLoading = false,
   glowingSectors = [],
   neonSectors = [],
-}: EvilPieChartProps<TData>) {
+  onSelectionChange,
+}: EvilPieChartPropsWithCallback<TData>) {
   const [selectedSector, setSelectedSector] = useState<string | null>(null);
   const chartId = useId().replace(/:/g, "");
+
+  // Handler to update selection and call callback
+  const handleSelectionChange = useCallback(
+    (sectorName: string | null) => {
+      setSelectedSector(sectorName);
+      if (isClickable && onSelectionChange) {
+        if (sectorName === null) {
+          onSelectionChange(null);
+        } else {
+          // Find the data item and get its value
+          const selectedItem = data.find((item) => (item[nameKey] as string) === sectorName);
+          if (selectedItem) {
+            const value = selectedItem[dataKey] as number;
+            onSelectionChange({ dataKey: sectorName, value });
+          }
+        }
+      }
+    },
+    [isClickable, onSelectionChange, data, nameKey, dataKey],
+  );
 
   // Prepare data with fill colors referencing gradients
   const preparedData = data.map((item) => {
@@ -109,7 +142,7 @@ export function EvilPieChart<TData extends Record<string, unknown>>({
             content={
               <ChartLegendContent
                 selected={selectedSector}
-                onSelectChange={setSelectedSector}
+                onSelectChange={handleSelectionChange}
                 isClickable={isClickable}
                 nameKey={nameKey}
               />
@@ -136,7 +169,7 @@ export function EvilPieChart<TData extends Record<string, unknown>>({
             onClick={(_, index) => {
               if (!isClickable) return;
               const clickedName = data[index]?.[nameKey] as string;
-              setSelectedSector(selectedSector === clickedName ? null : clickedName);
+              handleSelectionChange(selectedSector === clickedName ? null : clickedName);
             }}
             {...pieProps}
           >

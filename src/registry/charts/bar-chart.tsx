@@ -61,7 +61,6 @@ type EvilBarChartProps<
   hideCartesianGrid?: boolean;
   hideLegend?: boolean;
   // Interactive Stuffs
-  isClickable?: boolean;
   enableHoverHighlight?: boolean;
   isLoading?: boolean;
   loadingBars?: number;
@@ -69,6 +68,21 @@ type EvilBarChartProps<
   glowingBars?: NumericDataKeys<TData>[];
   neonBars?: NumericDataKeys<TData>[];
 };
+
+type EvilBarChartClickable = {
+  isClickable: true;
+  onSelectionChange?: (selectedDataKey: string | null) => void;
+};
+
+type EvilBarChartNotClickable = {
+  isClickable?: false;
+  onSelectionChange?: never;
+};
+
+type EvilBarChartPropsWithCallback<
+  TData extends Record<string, unknown>,
+  TConfig extends Record<string, ChartConfig[string]>,
+> = EvilBarChartProps<TData, TConfig> & (EvilBarChartClickable | EvilBarChartNotClickable);
 
 export function EvilBarChart<
   TData extends Record<string, unknown>,
@@ -99,11 +113,23 @@ export function EvilBarChart<
   loadingBars,
   glowingBars = [],
   neonBars = [],
-}: EvilBarChartProps<TData, TConfig>) {
+  onSelectionChange,
+}: EvilBarChartPropsWithCallback<TData, TConfig>) {
   const [selectedDataKey, setSelectedDataKey] = useState<string | null>(defaultSelectedDataKey);
   const [isMouseInChart, setIsMouseInChart] = useState(false);
   const { loadingData, onShimmerExit } = useLoadingData(isLoading, loadingBars);
   const chartId = useId().replace(/:/g, ""); // Remove colons for valid CSS selectors
+
+  // Wrapper function to update state and call parent callback
+  const handleSelectionChange = useCallback(
+    (newSelectedDataKey: string | null) => {
+      setSelectedDataKey(newSelectedDataKey);
+      if (isClickable && onSelectionChange) {
+        onSelectionChange(newSelectedDataKey);
+      }
+    },
+    [onSelectionChange, isClickable],
+  );
 
   const isStacked = stackType === "stacked" || stackType === "percent";
   const isHorizontal = layout === "horizontal";
@@ -134,7 +160,7 @@ export function EvilBarChart<
             content={
               <ChartLegendContent
                 selected={selectedDataKey}
-                onSelectChange={setSelectedDataKey}
+                onSelectChange={handleSelectionChange}
                 isClickable={isClickable}
               />
             }
@@ -195,7 +221,7 @@ export function EvilBarChart<
               selectedDataKey,
               onClick: () => {
                 if (!isClickable) return;
-                setSelectedDataKey(selectedDataKey === dataKey ? null : dataKey);
+                handleSelectionChange(selectedDataKey === dataKey ? null : dataKey);
               },
             };
 

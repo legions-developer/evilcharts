@@ -80,10 +80,26 @@ type EvilComposedChartProps<
   hideCursorLine?: boolean;
 
   // Interactive Stuffs
-  isClickable?: boolean;
   isLoading?: boolean;
   loadingBars?: number;
 };
+
+type EvilComposedChartClickable = {
+  isClickable: true;
+  onSelectionChange?: (selectedDataKey: string | null) => void;
+};
+
+type EvilComposedChartNotClickable = {
+  isClickable?: false;
+  onSelectionChange?: never;
+};
+
+type EvilComposedChartPropsWithCallback<
+  TData extends Record<string, unknown>,
+  TBarConfig extends Record<string, ChartConfig[string]>,
+  TLineConfig extends Record<string, ChartConfig[string]>,
+> = EvilComposedChartProps<TData, TBarConfig, TLineConfig> &
+  (EvilComposedChartClickable | EvilComposedChartNotClickable);
 
 export function EvilComposedChart<
   TData extends Record<string, unknown>,
@@ -125,11 +141,23 @@ export function EvilComposedChart<
   isClickable = false,
   isLoading = false,
   loadingBars,
-}: EvilComposedChartProps<TData, TBarConfig, TLineConfig>) {
+  onSelectionChange,
+}: EvilComposedChartPropsWithCallback<TData, TBarConfig, TLineConfig>) {
   const [selectedDataKey, setSelectedDataKey] = useState<string | null>(defaultSelectedDataKey);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const { loadingData, onShimmerExit } = useLoadingData(isLoading, loadingBars);
   const chartId = useId().replace(/:/g, "");
+
+  // Wrapper function to update state and call parent callback
+  const handleSelectionChange = useCallback(
+    (newSelectedDataKey: string | null) => {
+      setSelectedDataKey(newSelectedDataKey);
+      if (isClickable && onSelectionChange) {
+        onSelectionChange(newSelectedDataKey);
+      }
+    },
+    [onSelectionChange, isClickable],
+  );
 
   // Combined config for legend and tooltip
   const combinedConfig = { ...barConfig, ...lineConfig };
@@ -155,7 +183,7 @@ export function EvilComposedChart<
             content={
               <ChartLegendContent
                 selected={selectedDataKey}
-                onSelectChange={setSelectedDataKey}
+                onSelectChange={handleSelectionChange}
                 isClickable={isClickable}
               />
             }
@@ -248,7 +276,7 @@ export function EvilComposedChart<
                       enableHoverHighlight={enableHoverHighlight}
                       onClick={() => {
                         if (!isClickable) return;
-                        setSelectedDataKey(selectedDataKey === dataKey ? null : dataKey);
+                        handleSelectionChange(selectedDataKey === dataKey ? null : dataKey);
                       }}
                       onMouseEnter={() => {
                         if (enableHoverHighlight) setHoveredIndex(index);

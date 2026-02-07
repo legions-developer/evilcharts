@@ -107,6 +107,25 @@ import { EvilAreaChart } from "@/components/evilcharts/charts/area-chart";
 />
 ```
 
+### Interactive Selection
+
+When `isClickable` is enabled, you can use the `onSelectionChange` callback to handle selection events:
+
+```tsx
+<EvilAreaChart
+  data={data}
+  chartConfig={chartConfig}
+  isClickable={true}
+  onSelectionChange={(selectedDataKey) => {
+    if (selectedDataKey) {
+      console.log("Selected:", selectedDataKey);
+    } else {
+      console.log("Deselected");
+    }
+  }}
+/>
+```
+
 ### Loading State
 
 <ComponentPreview className="mb-0" title="isLoading='true'" name="ex-loading-state-area-chart"  />
@@ -387,6 +406,19 @@ Below are some examples of the area chart with different `variants`. where you c
       type: `string | null`
       
       default: `null`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="onSelectionChange"
+    />
+    <ApiContent>
+      Callback function that is called when a chart area is selected or deselected. Receives the selected data key as a parameter, or `null` when deselected.
+      
+      **Note:** This prop is only available when `isClickable` is set to `true`.
+      
+      type: `(selectedDataKey: string | null) => void`
     </ApiContent>
   </ApiReference>
 

@@ -106,7 +106,30 @@ const chartConfig = {
     colors: { light: ["#f59e0b"], dark: ["#fbbf24"] },
   },
 } satisfies ChartConfig;
+```
 
+### Interactive Selection
+
+When `isClickable` is enabled, you can use the `onSelectionChange` callback to handle selection events:
+
+```tsx
+<EvilPieChart
+  data={data}
+  dataKey="visitors"
+  nameKey="browser"
+  chartConfig={chartConfig}
+  isClickable={true}
+  onSelectionChange={(selection) => {
+    if (selection) {
+      console.log("Selected:", selection.dataKey, "Value:", selection.value);
+    } else {
+      console.log("Deselected");
+    }
+  }}
+/>
+```
+
+```tsx
 <EvilPieChart  
   data={data}
   dataKey="visitors"
@@ -390,6 +413,19 @@ Below are some examples of the pie chart with different configurations. You can 
       type: `boolean`
       
       default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="onSelectionChange"
+    />
+    <ApiContent>
+      Callback function that is called when a sector is selected or deselected. Receives an object with `dataKey` (sector name) and `value` (sector value), or `null` when deselected.
+      
+      **Note:** This prop is only available when `isClickable` is set to `true`.
+      
+      type: `(selection: { dataKey: string; value: number } | null) => void`
     </ApiContent>
   </ApiReference>
 

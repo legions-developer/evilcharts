@@ -6,7 +6,7 @@ import {
   getColorsCount,
   LoadingIndicator,
 } from "@/registry/ui/chart";
-import { useId, useState, type ComponentProps, type ReactNode } from "react";
+import { useCallback, useId, useState, type ComponentProps, type ReactNode } from "react";
 import { Sankey, Layer, Tooltip } from "recharts";
 import { motion } from "motion/react";
 
@@ -75,7 +75,6 @@ type EvilSankeyChartProps = {
   hideTooltip?: boolean;
 
   // Interactive Stuffs
-  isClickable?: boolean;
   isLoading?: boolean;
 
   // Glow Effects
@@ -84,6 +83,19 @@ type EvilSankeyChartProps = {
   glowingLinks?: number[];
   neonLinks?: number[];
 };
+
+type EvilSankeyChartClickable = {
+  isClickable: true;
+  onSelectionChange?: (selection: { dataKey: string; value: number } | null) => void;
+};
+
+type EvilSankeyChartNotClickable = {
+  isClickable?: false;
+  onSelectionChange?: never;
+};
+
+type EvilSankeyChartPropsWithCallback = EvilSankeyChartProps &
+  (EvilSankeyChartClickable | EvilSankeyChartNotClickable);
 
 export function EvilSankeyChart({
   data,
@@ -110,9 +122,39 @@ export function EvilSankeyChart({
   neonNodes = [],
   glowingLinks = [],
   neonLinks = [],
-}: EvilSankeyChartProps) {
+  onSelectionChange,
+}: EvilSankeyChartPropsWithCallback) {
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
   const chartId = useId().replace(/:/g, "");
+
+  // Handler to update selection and call callback
+  const handleNodeClick = useCallback(
+    (nodeName: string | null) => {
+      setSelectedNode(nodeName);
+      if (isClickable && onSelectionChange) {
+        if (nodeName === null) {
+          onSelectionChange(null);
+        } else {
+          // Calculate node value: sum of all outgoing links (or incoming if no outgoing)
+          const nodeIndex = data.nodes.findIndex((node) => node.name === nodeName);
+          if (nodeIndex !== -1) {
+            // Sum of outgoing links
+            const outgoingValue = data.links
+              .filter((link) => link.source === nodeIndex)
+              .reduce((sum, link) => sum + link.value, 0);
+            // Sum of incoming links (if no outgoing)
+            const incomingValue = data.links
+              .filter((link) => link.target === nodeIndex)
+              .reduce((sum, link) => sum + link.value, 0);
+            // Use outgoing value if available, otherwise incoming
+            const value = outgoingValue > 0 ? outgoingValue : incomingValue;
+            onSelectionChange({ dataKey: nodeName, value });
+          }
+        }
+      }
+    },
+    [isClickable, onSelectionChange, data],
+  );
 
   return (
     <ChartContainer className={className} config={chartConfig}>
@@ -143,7 +185,7 @@ export function EvilSankeyChart({
               neonNodes={neonNodes}
               onNodeClick={(name: string) => {
                 if (!isClickable) return;
-                setSelectedNode(selectedNode === name ? null : name);
+                handleNodeClick(selectedNode === name ? null : name);
               }}
             />
           )}

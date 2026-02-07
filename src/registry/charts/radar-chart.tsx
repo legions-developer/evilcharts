@@ -7,7 +7,7 @@ import {
   LoadingIndicator,
 } from "@/registry/ui/chart";
 import { PolarAngleAxis, PolarGrid, PolarRadiusAxis, Radar, RadarChart } from "recharts";
-import { useEffect, useId, useMemo, useState, type ComponentProps } from "react";
+import { useCallback, useEffect, useId, useMemo, useState, type ComponentProps } from "react";
 import { ChartTooltip, ChartTooltipContent } from "@/registry/ui/tooltip";
 import { ChartLegend, ChartLegendContent } from "@/registry/ui/legend";
 
@@ -58,13 +58,27 @@ type EvilRadarChartProps<
   hideDots?: boolean;
 
   // Interactive Stuffs
-  isClickable?: boolean;
   isLoading?: boolean;
 
   // Glow Effects
   glowingRadars?: NumericDataKeys<TData>[];
   neonRadars?: NumericDataKeys<TData>[];
 };
+
+type EvilRadarChartClickable = {
+  isClickable: true;
+  onSelectionChange?: (selectedDataKey: string | null) => void;
+};
+
+type EvilRadarChartNotClickable = {
+  isClickable?: false;
+  onSelectionChange?: never;
+};
+
+type EvilRadarChartPropsWithCallback<
+  TData extends Record<string, unknown>,
+  TConfig extends Record<string, ChartConfig[string]>,
+> = EvilRadarChartProps<TData, TConfig> & (EvilRadarChartClickable | EvilRadarChartNotClickable);
 
 export function EvilRadarChart<
   TData extends Record<string, unknown>,
@@ -90,10 +104,22 @@ export function EvilRadarChart<
   isLoading = false,
   glowingRadars = [],
   neonRadars = [],
-}: EvilRadarChartProps<TData, TConfig>) {
+  onSelectionChange,
+}: EvilRadarChartPropsWithCallback<TData, TConfig>) {
   const [selectedRadar, setSelectedRadar] = useState<string | null>(null);
   const chartId = useId().replace(/:/g, "");
   const loadingData = useLoadingData(isLoading, dataKey);
+
+  // Wrapper function to update state and call parent callback
+  const handleSelectionChange = useCallback(
+    (newSelectedRadar: string | null) => {
+      setSelectedRadar(newSelectedRadar);
+      if (isClickable && onSelectionChange) {
+        onSelectionChange(newSelectedRadar);
+      }
+    },
+    [onSelectionChange, isClickable],
+  );
 
   // Get radar data keys from chartConfig
   const radarDataKeys = Object.keys(chartConfig);
@@ -139,7 +165,7 @@ export function EvilRadarChart<
             content={
               <ChartLegendContent
                 selected={selectedRadar}
-                onSelectChange={setSelectedRadar}
+                onSelectChange={handleSelectionChange}
                 isClickable={isClickable}
               />
             }
@@ -178,7 +204,7 @@ export function EvilRadarChart<
                 style={isClickable ? { cursor: "pointer" } : undefined}
                 onClick={() => {
                   if (!isClickable) return;
-                  setSelectedRadar(selectedRadar === radarKey ? null : radarKey);
+                  handleSelectionChange(selectedRadar === radarKey ? null : radarKey);
                 }}
                 className="transition-opacity duration-200"
                 {...radarProps}

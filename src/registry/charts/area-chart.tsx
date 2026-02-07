@@ -33,7 +33,7 @@ type ValidateConfigKeys<TData, TConfig> = {
   [K in keyof TConfig]: K extends keyof TData ? ChartConfig[string] : never;
 };
 
-type EvilAreaChartProps<
+type BaseEvilAreaChartProps<
   TData extends Record<string, unknown>,
   TConfig extends Record<string, ChartConfig[string]>,
 > = {
@@ -59,11 +59,25 @@ type EvilAreaChartProps<
   hideCartesianGrid?: boolean;
   hideLegend?: boolean;
   hideCursorLine?: boolean;
-  // Interactive Stuffs
-  isClickable?: boolean;
   isLoading?: boolean;
   loadingPoints?: number;
 };
+
+type EvilAreaChartClickable = {
+  isClickable: true;
+  onSelectionChange?: (selectedDataKey: string | null) => void;
+};
+
+type EvilAreaChartNotClickable = {
+  isClickable?: false;
+  onSelectionChange?: never;
+};
+
+type EvilAreaChartProps<
+  TData extends Record<string, unknown>,
+  TConfig extends Record<string, ChartConfig[string]>,
+> = BaseEvilAreaChartProps<TData, TConfig> &
+  (EvilAreaChartClickable | EvilAreaChartNotClickable);
 
 export function EvilAreaChart<
   TData extends Record<string, unknown>,
@@ -93,10 +107,23 @@ export function EvilAreaChart<
   isClickable = false,
   isLoading = false,
   loadingPoints,
+  onSelectionChange,
 }: EvilAreaChartProps<TData, TConfig>) {
   const [selectedDataKey, setSelectedDataKey] = useState<string | null>(defaultSelectedDataKey);
   const { loadingData, onShimmerExit } = useLoadingData(isLoading, loadingPoints);
   const chartId = useId().replace(/:/g, ""); // Remove colons for valid CSS selectors
+
+  // Wrapper function to update state and call parent callback
+  // Only call callback when isClickable is true
+  const handleSelectionChange = useCallback(
+    (newSelectedDataKey: string | null) => {
+      setSelectedDataKey(newSelectedDataKey);
+      if (isClickable && onSelectionChange) {
+        onSelectionChange(newSelectedDataKey);
+      }
+    },
+    [onSelectionChange, isClickable],
+  );
 
   const isExpanded = stackType === "expanded";
   const isStacked = stackType === "stacked" || stackType === "expanded";
@@ -120,7 +147,7 @@ export function EvilAreaChart<
             content={
               <ChartLegendContent
                 selected={selectedDataKey}
-                onSelectChange={setSelectedDataKey}
+                onSelectChange={handleSelectionChange}
                 isClickable={isClickable}
               />
             }
@@ -229,7 +256,7 @@ export function EvilAreaChart<
                 onClick={() => {
                   if (!isClickable) return;
                   // Toggle: if already selected, unselect; otherwise select
-                  setSelectedDataKey(selectedDataKey === dataKey ? null : dataKey);
+                  handleSelectionChange(selectedDataKey === dataKey ? null : dataKey);
                 }}
               >
                 {strokeVariant === "animated-dashed" && !hasSelection && <AnimatedDashedStyle />}

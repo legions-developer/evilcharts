@@ -6,7 +6,7 @@ import {
   getColorsCount,
   LoadingIndicator,
 } from "@/registry/ui/chart";
-import { useEffect, useId, useMemo, useState, type ComponentProps } from "react";
+import { useCallback, useEffect, useId, useMemo, useState, type ComponentProps } from "react";
 import { ChartTooltip, ChartTooltipContent } from "@/registry/ui/tooltip";
 import { ChartLegend, ChartLegendContent } from "@/registry/ui/legend";
 import { Cell, RadialBar, RadialBarChart } from "recharts";
@@ -51,13 +51,25 @@ type EvilRadialChartProps<TData extends Record<string, unknown>> = {
   hideBackground?: boolean;
 
   // Interactive Stuffs
-  isClickable?: boolean;
   isLoading?: boolean;
 
   // Glow Effects
   glowingBars?: string[];
   neonBars?: string[];
 };
+
+type EvilRadialChartClickable = {
+  isClickable: true;
+  onSelectionChange?: (selection: { dataKey: string; value: number } | null) => void;
+};
+
+type EvilRadialChartNotClickable = {
+  isClickable?: false;
+  onSelectionChange?: never;
+};
+
+type EvilRadialChartPropsWithCallback<TData extends Record<string, unknown>> =
+  EvilRadialChartProps<TData> & (EvilRadialChartClickable | EvilRadialChartNotClickable);
 
 export function EvilRadialChart<TData extends Record<string, unknown>>({
   data,
@@ -79,10 +91,31 @@ export function EvilRadialChart<TData extends Record<string, unknown>>({
   isLoading = false,
   glowingBars = [],
   neonBars = [],
-}: EvilRadialChartProps<TData>) {
+  onSelectionChange,
+}: EvilRadialChartPropsWithCallback<TData>) {
   const [selectedBar, setSelectedBar] = useState<string | null>(null);
   const chartId = useId().replace(/:/g, "");
   const loadingData = useLoadingData(isLoading);
+
+  // Handler to update selection and call callback
+  const handleSelectionChange = useCallback(
+    (barName: string | null) => {
+      setSelectedBar(barName);
+      if (isClickable && onSelectionChange) {
+        if (barName === null) {
+          onSelectionChange(null);
+        } else {
+          // Find the data item and get its value
+          const selectedItem = data.find((item) => (item[nameKey] as string) === barName);
+          if (selectedItem) {
+            const value = selectedItem[dataKey] as number;
+            onSelectionChange({ dataKey: barName, value });
+          }
+        }
+      }
+    },
+    [isClickable, onSelectionChange, data, nameKey, dataKey],
+  );
 
   // Variant-specific settings
   const variantConfig = getVariantConfig(variant);
@@ -117,7 +150,7 @@ export function EvilRadialChart<TData extends Record<string, unknown>>({
             content={
               <ChartLegendContent
                 selected={selectedBar}
-                onSelectChange={setSelectedBar}
+                onSelectChange={handleSelectionChange}
                 isClickable={isClickable}
                 nameKey={nameKey}
               />
@@ -143,7 +176,7 @@ export function EvilRadialChart<TData extends Record<string, unknown>>({
             onClick={(_, index) => {
               if (!isClickable) return;
               const clickedName = data[index]?.[nameKey] as string;
-              setSelectedBar(selectedBar === clickedName ? null : clickedName);
+              handleSelectionChange(selectedBar === clickedName ? null : clickedName);
             }}
             {...radialBarProps}
           >

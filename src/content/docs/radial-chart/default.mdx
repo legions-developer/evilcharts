@@ -106,7 +106,30 @@ const chartConfig = {
     colors: { light: ["#f59e0b"], dark: ["#fbbf24"] },
   },
 } satisfies ChartConfig;
+```
 
+### Interactive Selection
+
+When `isClickable` is enabled, you can use the `onSelectionChange` callback to handle selection events:
+
+```tsx
+<EvilRadialChart
+  data={data}
+  dataKey="visitors"
+  nameKey="browser"
+  chartConfig={chartConfig}
+  isClickable={true}
+  onSelectionChange={(selection) => {
+    if (selection) {
+      console.log("Selected:", selection.dataKey, "Value:", selection.value);
+    } else {
+      console.log("Deselected");
+    }
+  }}
+/>
+```
+
+```tsx
 <EvilRadialChart  
   data={data}
   dataKey="visitors"
@@ -326,6 +349,19 @@ Below are some examples of the radial chart with different configurations. You c
       type: `boolean`
       
       default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="onSelectionChange"
+    />
+    <ApiContent>
+      Callback function that is called when a bar is selected or deselected. Receives an object with `dataKey` (bar name) and `value` (bar value), or `null` when deselected.
+      
+      **Note:** This prop is only available when `isClickable` is set to `true`.
+      
+      type: `(selection: { dataKey: string; value: number } | null) => void`
     </ApiContent>
   </ApiReference>
 
