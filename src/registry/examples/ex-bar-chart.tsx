@@ -45,6 +45,8 @@ export function EvilExampleBarChart() {
       data={data}
       chartConfig={chartConfig}
       xAxisProps={{ tickFormatter: (value) => value.substring(0, 3) }}
+      showZoomer
+      zoomerFormatLabel={(value) => String(value).substring(0, 3)}
     />
   );
 }

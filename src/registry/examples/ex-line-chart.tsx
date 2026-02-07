@@ -47,6 +47,8 @@ export function EvilExampleLineChart() {
       data={data} // if isLoading is true, pass empty array → i.e isLoading ? [] : data
       chartConfig={chartConfig}
       xAxisProps={{ tickFormatter: (value) => value.substring(0, 3) }} // Formatting first 3 characters eg: January → Jan
+      showZoomer
+      zoomerFormatLabel={(value) => String(value).substring(0, 3)}
     />
   );
 }
