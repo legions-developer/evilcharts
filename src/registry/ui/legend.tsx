@@ -3,6 +3,15 @@ import * as RechartsPrimitive from "recharts";
 import { cn } from "@/lib/utils";
 import * as React from "react";
 
+type ChartLegendVariant =
+  | "square"
+  | "circle"
+  | "circle-outline"
+  | "rounded-square"
+  | "rounded-square-outline"
+  | "vertical-bar"
+  | "horizontal-bar";
+
 function ChartLegendContent({
   className,
   hideIcon = false,
@@ -13,12 +22,14 @@ function ChartLegendContent({
   selected,
   onSelectChange,
   isClickable,
+  variant = "rounded-square",
 }: React.ComponentProps<"div"> & {
   hideIcon?: boolean;
   nameKey?: string;
   selected?: string | null;
   isClickable?: boolean;
   onSelectChange?: (selected: string | null) => void;
+  variant?: ChartLegendVariant;
 } & RechartsPrimitive.DefaultLegendContentProps) {
   const { config } = useChart();
 
@@ -71,9 +82,10 @@ function ChartLegendContent({
               {itemConfig?.icon && !hideIcon ? (
                 <itemConfig.icon />
               ) : (
-                <div
-                  className="h-2 w-2 shrink-0 rounded-[2px]"
-                  style={getLegendColorStyle(key, colorsCount)}
+                <LegendIndicator
+                  variant={variant}
+                  dataKey={key}
+                  colorsCount={colorsCount}
                 />
               )}
               {itemConfig?.label}
@@ -84,22 +96,106 @@ function ChartLegendContent({
   );
 }
 
-function getLegendColorStyle(dataKey: string, colorsCount: number): React.CSSProperties {
+// ---------------------------------------------------------------------------
+// Legend indicator — each variant gets its own branch so future variants
+// can diverge freely in markup & style.
+// ---------------------------------------------------------------------------
+
+function LegendIndicator({
+  variant,
+  dataKey,
+  colorsCount,
+}: {
+  variant: ChartLegendVariant;
+  dataKey: string;
+  colorsCount: number;
+}) {
+  const fillStyle = getLegendFillStyle(dataKey, colorsCount);
+  const outlineStyle = getLegendOutlineStyle(dataKey, colorsCount);
+
+  switch (variant) {
+    case "square":
+      return <div className="h-2 w-2 shrink-0" style={fillStyle} />;
+
+    case "circle":
+      return <div className="h-2 w-2 shrink-0 rounded-full" style={fillStyle} />;
+
+    case "circle-outline":
+      return (
+        <div
+          className="h-2.5 w-2.5 shrink-0 rounded-full p-[1.5px]"
+          style={outlineStyle}
+        />
+      );
+
+    case "vertical-bar":
+      return <div className="h-3 w-1 shrink-0 rounded-[2px]" style={fillStyle} />;
+
+    case "horizontal-bar":
+      return <div className="h-1 w-3 shrink-0 rounded-[2px]" style={fillStyle} />;
+
+    case "rounded-square-outline":
+      return (
+        <div
+          className="h-2.5 w-2.5 shrink-0 rounded-[3px] p-[1.5px]"
+          style={outlineStyle}
+        />
+      );
+
+    case "rounded-square":
+    default:
+      return <div className="h-2 w-2 shrink-0 rounded-[2px]" style={fillStyle} />;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Style helpers
+// ---------------------------------------------------------------------------
+
+/** Solid fill / gradient background for filled variants. */
+function getLegendFillStyle(dataKey: string, colorsCount: number): React.CSSProperties {
   if (colorsCount <= 1) {
-    // Single color: use solid background via CSS variable
+    return { backgroundColor: `var(--color-${dataKey}-0)` };
+  }
+
+  const stops = Array.from({ length: colorsCount }, (_, i) => {
+    const offset = (i / (colorsCount - 1)) * 100;
+    return `var(--color-${dataKey}-${i}) ${offset}%`;
+  }).join(", ");
+
+  return { background: `linear-gradient(to right, ${stops})` };
+}
+
+/**
+ * Outline style for stroke variants.
+ * Uses background + mask-composite to punch out the center, leaving only the
+ * "border" visible. Works with both solid colors and gradients, and respects
+ * border-radius — unlike plain `border-color`.
+ */
+function getLegendOutlineStyle(dataKey: string, colorsCount: number): React.CSSProperties {
+  const maskStyle: React.CSSProperties = {
+    WebkitMask:
+      "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+    WebkitMaskComposite: "xor",
+    mask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
+    maskComposite: "exclude",
+  };
+
+  if (colorsCount <= 1) {
     return {
       backgroundColor: `var(--color-${dataKey}-0)`,
+      ...maskStyle,
     };
   }
 
-  // Multiple colors: create linear gradient with evenly distributed stops
-  const stops = Array.from({ length: colorsCount }, (_, index) => {
-    const offset = (index / (colorsCount - 1)) * 100;
-    return `var(--color-${dataKey}-${index}) ${offset}%`;
+  const stops = Array.from({ length: colorsCount }, (_, i) => {
+    const offset = (i / (colorsCount - 1)) * 100;
+    return `var(--color-${dataKey}-${i}) ${offset}%`;
   }).join(", ");
 
   return {
     background: `linear-gradient(to right, ${stops})`,
+    ...maskStyle,
   };
 }
 
