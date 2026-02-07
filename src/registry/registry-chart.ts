@@ -6,7 +6,7 @@ export const charts: Registry["items"] = [
   {
     name: "area-chart",
     description: "Area chart component",
-    registryDependencies: ["@evilcharts/chart", "@evilcharts/tooltip", "@evilcharts/legend"],
+    registryDependencies: ["@evilcharts/chart", "@evilcharts/tooltip", "@evilcharts/legend", "@evilcharts/zoomer"],
     dependencies: ["recharts", "motion"],
     type: "registry:component",
     files: [
@@ -20,7 +20,7 @@ export const charts: Registry["items"] = [
   {
     name: "line-chart",
     description: "Line chart component",
-    registryDependencies: ["@evilcharts/chart", "@evilcharts/tooltip", "@evilcharts/legend"],
+    registryDependencies: ["@evilcharts/chart", "@evilcharts/tooltip", "@evilcharts/legend", "@evilcharts/zoomer"],
     dependencies: ["recharts", "motion"],
     type: "registry:component",
     files: [
@@ -34,7 +34,7 @@ export const charts: Registry["items"] = [
   {
     name: "bar-chart",
     description: "Bar chart component",
-    registryDependencies: ["@evilcharts/chart", "@evilcharts/tooltip", "@evilcharts/legend"],
+    registryDependencies: ["@evilcharts/chart", "@evilcharts/tooltip", "@evilcharts/legend", "@evilcharts/zoomer"],
     dependencies: ["recharts", "motion"],
     type: "registry:component",
     files: [
@@ -53,6 +53,7 @@ export const charts: Registry["items"] = [
       "@evilcharts/tooltip",
       "@evilcharts/legend",
       "@evilcharts/dot",
+      "@evilcharts/zoomer",
     ],
     dependencies: ["recharts", "motion"],
     type: "registry:component",

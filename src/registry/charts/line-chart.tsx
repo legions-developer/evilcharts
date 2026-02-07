@@ -12,6 +12,7 @@ import { CartesianGrid, Line, LineChart, ReferenceLine, XAxis, YAxis } from "rec
 import { ChartTooltip, ChartTooltipContent } from "@/registry/ui/tooltip";
 import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/legend";
 import { ChartDot, DotVariant } from "@/registry/ui/dot";
+import { ChartZoomer, useChartZoom, type ChartZoomerVariant, type ChartZoomerRange } from "@/registry/ui/chart-zoomer";
 import { motion } from "motion/react";
 
 // Constants
@@ -66,6 +67,12 @@ type EvilLineChartProps<
   // Glow Effect
   glowingLines?: NumericDataKeys<TData>[];
   neonLines?: NumericDataKeys<TData>[];
+  // Zoomer
+  showZoomer?: boolean;
+  zoomerVariant?: ChartZoomerVariant;
+  zoomerHeight?: number;
+  zoomerFormatLabel?: (value: unknown, index: number) => string;
+  onZoomChange?: (range: ChartZoomerRange) => void;
 };
 
 type EvilLineChartClickable = {
@@ -112,11 +119,20 @@ export function EvilLineChart<
   loadingPoints,
   glowingLines = [],
   neonLines = [],
+  showZoomer = false,
+  zoomerVariant,
+  zoomerHeight,
+  zoomerFormatLabel,
+  onZoomChange,
   onSelectionChange,
 }: EvilLineChartPropsWithCallback<TData, TConfig>) {
   const [selectedDataKey, setSelectedDataKey] = useState<string | null>(defaultSelectedDataKey);
   const { loadingData, onShimmerExit } = useLoadingData(isLoading, loadingPoints);
   const chartId = useId().replace(/:/g, ""); // Remove colons for valid CSS selectors
+
+  // ── Zoom state ──────────────────────────────────────────────────────────
+  const { visibleData, zoomerProps } = useChartZoom({ data });
+  const displayData = showZoomer && !isLoading ? visibleData : data;
 
   // Wrapper function to update state and call parent callback
   const handleSelectionChange = useCallback(
@@ -130,12 +146,38 @@ export function EvilLineChart<
   );
 
   return (
-    <ChartContainer className={className} config={chartConfig}>
+    <ChartContainer
+      className={className}
+      config={chartConfig}
+      footer={
+        showZoomer &&
+        !isLoading && (
+          <ChartZoomer
+            data={data}
+            chartConfig={chartConfig}
+            xDataKey={xDataKey}
+            variant={zoomerVariant ?? "line"}
+            curveType={curveType}
+            strokeVariant={strokeVariant}
+            connectNulls={connectNulls}
+            height={zoomerHeight}
+            formatLabel={zoomerFormatLabel}
+            skipStyle
+            className="mt-1"
+            {...zoomerProps}
+            onChange={(range) => {
+              zoomerProps.onChange(range);
+              onZoomChange?.(range);
+            }}
+          />
+        )
+      }
+    >
       <LoadingIndicator isLoading={isLoading} />
       <LineChart
         id="evil-charts-line-chart"
         accessibilityLayer
-        data={isLoading ? loadingData : data}
+        data={isLoading ? loadingData : displayData}
         {...chartProps}
       >
         <ReferenceLine color="white" />

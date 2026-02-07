@@ -13,6 +13,7 @@ import { Area, AreaChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from "rec
 import { ChartTooltip, ChartTooltipContent } from "@/registry/ui/tooltip";
 import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/legend";
 import { ChartDot, DotVariant } from "@/registry/ui/dot";
+import { ChartZoomer, useChartZoom, type ChartZoomerVariant, type ChartZoomerRange } from "@/registry/ui/chart-zoomer";
 import { motion } from "motion/react";
 
 // Constants
@@ -62,6 +63,12 @@ type BaseEvilAreaChartProps<
   hideCursorLine?: boolean;
   isLoading?: boolean;
   loadingPoints?: number;
+  // Zoomer
+  showZoomer?: boolean;
+  zoomerVariant?: ChartZoomerVariant;
+  zoomerHeight?: number;
+  zoomerFormatLabel?: (value: unknown, index: number) => string;
+  onZoomChange?: (range: ChartZoomerRange) => void;
 };
 
 type EvilAreaChartClickable = {
@@ -108,11 +115,20 @@ export function EvilAreaChart<
   isClickable = false,
   isLoading = false,
   loadingPoints,
+  showZoomer = false,
+  zoomerVariant,
+  zoomerHeight,
+  zoomerFormatLabel,
+  onZoomChange,
   onSelectionChange,
 }: EvilAreaChartProps<TData, TConfig>) {
   const [selectedDataKey, setSelectedDataKey] = useState<string | null>(defaultSelectedDataKey);
   const { loadingData, onShimmerExit } = useLoadingData(isLoading, loadingPoints);
   const chartId = useId().replace(/:/g, ""); // Remove colons for valid CSS selectors
+
+  // ── Zoom state ──────────────────────────────────────────────────────────
+  const { visibleData, zoomerProps } = useChartZoom({ data });
+  const displayData = showZoomer && !isLoading ? visibleData : data;
 
   // Wrapper function to update state and call parent callback
   // Only call callback when isClickable is true
@@ -130,13 +146,40 @@ export function EvilAreaChart<
   const isStacked = stackType === "stacked" || stackType === "expanded";
 
   return (
-    <ChartContainer className={className} config={chartConfig}>
+    <ChartContainer
+      className={className}
+      config={chartConfig}
+      footer={
+        showZoomer &&
+        !isLoading && (
+          <ChartZoomer
+            data={data}
+            chartConfig={chartConfig}
+            xDataKey={xDataKey}
+            variant={zoomerVariant ?? "area"}
+            curveType={curveType}
+            strokeVariant={strokeVariant}
+            connectNulls={connectNulls}
+            height={zoomerHeight}
+            formatLabel={zoomerFormatLabel}
+            stacked={isStacked}
+            skipStyle
+            className="mt-1"
+            {...zoomerProps}
+            onChange={(range) => {
+              zoomerProps.onChange(range);
+              onZoomChange?.(range);
+            }}
+          />
+        )
+      }
+    >
       <LoadingIndicator isLoading={isLoading} />
       <AreaChart
         id="evil-charts-area-chart"
         accessibilityLayer
         stackOffset={isExpanded ? "expand" : undefined}
-        data={isLoading ? loadingData : data}
+        data={isLoading ? loadingData : displayData}
         {...chartProps}
       >
         <ReferenceLine color="white" />

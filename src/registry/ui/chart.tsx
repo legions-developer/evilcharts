@@ -83,6 +83,8 @@ interface ChartContainerProps
   innerResponsiveContainerStyle?: React.ComponentProps<
     typeof RechartsPrimitive.ResponsiveContainer
   >["style"];
+  /** Optional content rendered below the chart (e.g. ChartZoomer) */
+  footer?: React.ReactNode;
 }
 
 function ChartContainer({
@@ -91,6 +93,7 @@ function ChartContainer({
   initialDimension = { width: 320, height: 200 },
   className,
   children,
+  footer,
   ...props
 }: Readonly<ChartContainerProps>) {
   const uniqueId = React.useId();
@@ -106,18 +109,20 @@ function ChartContainer({
         data-chart={chartId}
         className={cn(
           "min-h-0 w-full flex-1",
-          "[&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border relative flex aspect-video justify-center text-xs [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-hidden [&_.recharts-sector]:outline-hidden [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-surface]:outline-hidden",
+          "[&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border relative flex flex-col justify-center text-xs [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-hidden [&_.recharts-sector]:outline-hidden [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-surface]:outline-hidden",
+          !footer && "aspect-video",
           className,
         )}
         {...props}
       >
         <ChartStyle id={chartId} config={config} />
         <RechartsPrimitive.ResponsiveContainer
-          className="h-full w-full"
+          className="min-h-0 w-full flex-1"
           initialDimension={initialDimension}
         >
           {children}
         </RechartsPrimitive.ResponsiveContainer>
+        {footer}
       </div>
     </ChartContext.Provider>
   );

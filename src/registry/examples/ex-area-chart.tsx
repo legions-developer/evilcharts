@@ -38,6 +38,7 @@ const chartConfig = {
 export function EvilExampleAreaChart() {
   return (
     <EvilAreaChart
+      showZoomer
       isClickable
       className="h-full w-full p-4"
       xDataKey="month"
@@ -46,9 +47,10 @@ export function EvilExampleAreaChart() {
       areaVariant="gradient"
       activeDotVariant="colored-border"
       dotVariant="border"
-      data={data} // if isLoading is true, pass empty array → i.e isLoading ? [] : data
+      data={data}
       chartConfig={chartConfig}
-      xAxisProps={{ tickFormatter: (value) => value.substring(0, 3) }} // Formatting first 3 characters eg: January → Jan
+      zoomerFormatLabel={(value) => String(value).substring(0, 3)}
+      xAxisProps={{ tickFormatter: (value: string) => value.substring(0, 3) }}
     />
   );
 }

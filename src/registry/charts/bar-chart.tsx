@@ -12,6 +12,7 @@ import { useCallback, useId, useMemo, useRef, useState, type ComponentProps } fr
 import { ChartTooltip, ChartTooltipContent } from "@/registry/ui/tooltip";
 import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/legend";
 import { RectRadius } from "recharts/types/shape/Rectangle";
+import { ChartZoomer, useChartZoom, type ChartZoomerVariant, type ChartZoomerRange } from "@/registry/ui/chart-zoomer";
 import { motion } from "motion/react";
 
 // Constants
@@ -68,6 +69,12 @@ type EvilBarChartProps<
   // Glow Effects
   glowingBars?: NumericDataKeys<TData>[];
   neonBars?: NumericDataKeys<TData>[];
+  // Zoomer
+  showZoomer?: boolean;
+  zoomerVariant?: ChartZoomerVariant;
+  zoomerHeight?: number;
+  zoomerFormatLabel?: (value: unknown, index: number) => string;
+  onZoomChange?: (range: ChartZoomerRange) => void;
 };
 
 type EvilBarChartClickable = {
@@ -115,12 +122,21 @@ export function EvilBarChart<
   loadingBars,
   glowingBars = [],
   neonBars = [],
+  showZoomer = false,
+  zoomerVariant,
+  zoomerHeight,
+  zoomerFormatLabel,
+  onZoomChange,
   onSelectionChange,
 }: EvilBarChartPropsWithCallback<TData, TConfig>) {
   const [selectedDataKey, setSelectedDataKey] = useState<string | null>(defaultSelectedDataKey);
   const [isMouseInChart, setIsMouseInChart] = useState(false);
   const { loadingData, onShimmerExit } = useLoadingData(isLoading, loadingBars);
   const chartId = useId().replace(/:/g, ""); // Remove colons for valid CSS selectors
+
+  // ── Zoom state ──────────────────────────────────────────────────────────
+  const { visibleData, zoomerProps } = useChartZoom({ data });
+  const displayData = showZoomer && !isLoading ? visibleData : data;
 
   // Wrapper function to update state and call parent callback
   const handleSelectionChange = useCallback(
@@ -137,13 +153,38 @@ export function EvilBarChart<
   const isHorizontal = layout === "horizontal";
 
   return (
-    <ChartContainer className={className} config={chartConfig}>
+    <ChartContainer
+      className={className}
+      config={chartConfig}
+      footer={
+        showZoomer &&
+        !isLoading && (
+          <ChartZoomer
+            data={data}
+            chartConfig={chartConfig}
+            xDataKey={xDataKey}
+            variant={zoomerVariant ?? "bar"}
+            barRadius={barRadius}
+            height={zoomerHeight}
+            formatLabel={zoomerFormatLabel}
+            stacked={isStacked}
+            skipStyle
+            className="mt-1"
+            {...zoomerProps}
+            onChange={(range) => {
+              zoomerProps.onChange(range);
+              onZoomChange?.(range);
+            }}
+          />
+        )
+      }
+    >
       <LoadingIndicator isLoading={isLoading} />
       <BarChart
         id="evil-charts-bar-chart"
         accessibilityLayer
         layout={isHorizontal ? "vertical" : "horizontal"}
-        data={isLoading ? loadingData : data}
+        data={isLoading ? loadingData : displayData}
         barGap={barGap}
         barCategoryGap={barCategoryGap}
         stackOffset={stackType === "percent" ? "expand" : undefined}

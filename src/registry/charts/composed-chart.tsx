@@ -12,6 +12,7 @@ import { useCallback, useId, useMemo, useRef, useState, type ComponentProps } fr
 import { ChartTooltip, ChartTooltipContent } from "@/registry/ui/tooltip";
 import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/legend";
 import { ChartDot, DotVariant } from "@/registry/ui/dot";
+import { ChartZoomer, useChartZoom, type ChartZoomerVariant, type ChartZoomerRange } from "@/registry/ui/chart-zoomer";
 import { motion } from "motion/react";
 
 // Constants
@@ -83,6 +84,12 @@ type EvilComposedChartProps<
   // Interactive Stuffs
   isLoading?: boolean;
   loadingBars?: number;
+  // Zoomer
+  showZoomer?: boolean;
+  zoomerVariant?: ChartZoomerVariant;
+  zoomerHeight?: number;
+  zoomerFormatLabel?: (value: unknown, index: number) => string;
+  onZoomChange?: (range: ChartZoomerRange) => void;
 };
 
 type EvilComposedChartClickable = {
@@ -143,12 +150,21 @@ export function EvilComposedChart<
   isClickable = false,
   isLoading = false,
   loadingBars,
+  showZoomer = false,
+  zoomerVariant,
+  zoomerHeight,
+  zoomerFormatLabel,
+  onZoomChange,
   onSelectionChange,
 }: EvilComposedChartPropsWithCallback<TData, TBarConfig, TLineConfig>) {
   const [selectedDataKey, setSelectedDataKey] = useState<string | null>(defaultSelectedDataKey);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const { loadingData, onShimmerExit } = useLoadingData(isLoading, loadingBars);
   const chartId = useId().replace(/:/g, "");
+
+  // ── Zoom state ──────────────────────────────────────────────────────────
+  const { visibleData, zoomerProps } = useChartZoom({ data });
+  const displayData = showZoomer && !isLoading ? visibleData : data;
 
   // Wrapper function to update state and call parent callback
   const handleSelectionChange = useCallback(
@@ -165,12 +181,39 @@ export function EvilComposedChart<
   const combinedConfig = { ...barConfig, ...lineConfig };
 
   return (
-    <ChartContainer className={className} config={combinedConfig}>
+    <ChartContainer
+      className={className}
+      config={combinedConfig}
+      footer={
+        showZoomer &&
+        !isLoading && (
+          <ChartZoomer
+            data={data}
+            chartConfig={combinedConfig}
+            xDataKey={xDataKey}
+            variant={zoomerVariant ?? "area"}
+            curveType={curveType}
+            strokeVariant={strokeVariant}
+            connectNulls={connectNulls}
+            barRadius={barRadius}
+            height={zoomerHeight}
+            formatLabel={zoomerFormatLabel}
+            skipStyle
+            className="mt-1"
+            {...zoomerProps}
+            onChange={(range) => {
+              zoomerProps.onChange(range);
+              onZoomChange?.(range);
+            }}
+          />
+        )
+      }
+    >
       <LoadingIndicator isLoading={isLoading} />
       <ComposedChart
         id="evil-charts-composed-chart"
         accessibilityLayer
-        data={isLoading ? loadingData : data}
+        data={isLoading ? loadingData : displayData}
         barGap={barGap}
         barCategoryGap={barCategoryGap}
         onMouseLeave={() => enableHoverHighlight && setHoveredIndex(null)}
