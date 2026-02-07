@@ -76,8 +76,7 @@ type EvilAreaChartNotClickable = {
 type EvilAreaChartProps<
   TData extends Record<string, unknown>,
   TConfig extends Record<string, ChartConfig[string]>,
-> = BaseEvilAreaChartProps<TData, TConfig> &
-  (EvilAreaChartClickable | EvilAreaChartNotClickable);
+> = BaseEvilAreaChartProps<TData, TConfig> & (EvilAreaChartClickable | EvilAreaChartNotClickable);
 
 export function EvilAreaChart<
   TData extends Record<string, unknown>,

@@ -221,7 +221,7 @@ export function NavMain({
                           className={cn("relative flex w-full")}
                         >
                           <SidebarMenuSubButton
-                            className={cn("w-full pl-8", !isActive && "text-muted-foreground")}
+                            className={cn("w-full pl-8", !isActive && "text-muted-foreground/80")}
                             asChild
                           >
                             <Link href={subItem.url} onClick={handleLinkClick}>

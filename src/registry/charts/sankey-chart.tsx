@@ -6,7 +6,14 @@ import {
   getColorsCount,
   LoadingIndicator,
 } from "@/registry/ui/chart";
-import { useCallback, useId, useState, type ComponentProps, type ReactNode } from "react";
+import type {
+  SankeyProps,
+  SankeyNodeProps,
+  SankeyLinkProps,
+  SankeyData,
+  SankeyNode,
+} from "recharts";
+import { useCallback, useId, useState, type ReactNode } from "react";
 import { Sankey, Layer, Tooltip } from "recharts";
 import { motion } from "motion/react";
 
@@ -18,27 +25,6 @@ const DEFAULT_NODE_WIDTH = 10;
 const DEFAULT_NODE_PADDING = 10;
 const DEFAULT_LINK_CURVATURE = 0.5;
 const DEFAULT_ITERATIONS = 32;
-
-type SankeyProps = ComponentProps<typeof Sankey>;
-
-// Sankey node data structure
-export type SankeyNode = {
-  name: string;
-  icon?: ReactNode;
-};
-
-// Sankey link data structure
-export type SankeyLink = {
-  source: number;
-  target: number;
-  value: number;
-};
-
-// Sankey data structure
-export type SankeyData = {
-  nodes: SankeyNode[];
-  links: SankeyLink[];
-};
 
 type LinkVariant = "gradient" | "solid" | "source" | "target";
 
@@ -207,40 +193,34 @@ export function EvilSankeyChart({
             <Tooltip
               content={({ active, payload }) => {
                 if (!active || !payload || payload.length === 0) return null;
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const tooltipData = payload[0]?.payload as any;
+                const tooltipData = payload[0]?.payload as SankeyNode | SankeyLinkProps["payload"];
 
                 // Check if it's a link or node by checking for source property
-                if (tooltipData?.source !== undefined && tooltipData?.target !== undefined) {
-                  // It's a link
-                  const sourceNode = tooltipData.source;
-                  const targetNode = tooltipData.target;
+                if ("source" in tooltipData && typeof tooltipData.source === "object") {
+                  // It's a link - source/target are resolved SankeyNode objects
+                  const linkData = tooltipData as SankeyLinkProps["payload"];
                   return (
                     <div className="bg-background border-border rounded-lg border px-3 py-2 shadow-lg">
                       <div className="flex items-center gap-2 text-sm">
-                        <span className="text-foreground font-medium">
-                          {sourceNode?.name ?? "Source"}
-                        </span>
+                        <span className="text-foreground font-medium">{linkData.source.name}</span>
                         <span className="text-muted-foreground">&rarr;</span>
-                        <span className="text-foreground font-medium">
-                          {targetNode?.name ?? "Target"}
-                        </span>
+                        <span className="text-foreground font-medium">{linkData.target.name}</span>
                       </div>
                       <div className="text-muted-foreground mt-1 text-xs">
-                        Value:{" "}
-                        <span className="text-foreground font-medium">{tooltipData.value}</span>
+                        Value: <span className="text-foreground font-medium">{linkData.value}</span>
                       </div>
                     </div>
                   );
                 } else {
                   // It's a node
+                  const nodeData = tooltipData as SankeyNode;
                   return (
                     <div className="bg-background border-border rounded-lg border px-3 py-2 shadow-lg">
-                      <div className="text-foreground text-sm font-medium">{tooltipData.name}</div>
-                      {tooltipData.value !== undefined && (
+                      <div className="text-foreground text-sm font-medium">{nodeData.name}</div>
+                      {nodeData.value !== undefined && (
                         <div className="text-muted-foreground mt-1 text-xs">
                           Total:{" "}
-                          <span className="text-foreground font-medium">{tooltipData.value}</span>
+                          <span className="text-foreground font-medium">{nodeData.value}</span>
                         </div>
                       )}
                     </div>
@@ -301,16 +281,6 @@ export function EvilSankeyChart({
 // CUSTOM NODE COMPONENT
 // ========================================
 
-type SankeyNodeProps = {
-  x?: number;
-  y?: number;
-  width?: number;
-  height?: number;
-  index?: number;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  payload?: any;
-};
-
 type CustomNodeProps = SankeyNodeProps & {
   chartId: string;
   chartConfig: ChartConfig;
@@ -326,10 +296,10 @@ type CustomNodeProps = SankeyNodeProps & {
 };
 
 const CustomNode = ({
-  x = 0,
-  y = 0,
-  width = 0,
-  height = 0,
+  x,
+  y,
+  width,
+  height,
   payload,
   chartId,
   chartConfig,
@@ -343,9 +313,9 @@ const CustomNode = ({
   neonNodes,
   onNodeClick,
 }: CustomNodeProps) => {
-  const nodeName = payload?.name ?? "";
-  const nodeValue = payload?.value ?? 0;
-  const nodeIcon = payload?.icon;
+  const nodeName = payload.name;
+  const nodeValue = payload.value;
+  const nodeIcon = (payload as SankeyNode & { icon?: ReactNode }).icon;
   const isSelected = selectedNode === null || selectedNode === nodeName;
   const isGlowing = glowingNodes.includes(nodeName);
   const isNeon = neonNodes.includes(nodeName);
@@ -478,19 +448,6 @@ const CustomNode = ({
 // CUSTOM LINK COMPONENT
 // ========================================
 
-type SankeyLinkProps = {
-  sourceX?: number;
-  targetX?: number;
-  sourceY?: number;
-  targetY?: number;
-  sourceControlX?: number;
-  targetControlX?: number;
-  linkWidth?: number;
-  index?: number;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  payload?: any;
-};
-
 type CustomLinkProps = SankeyLinkProps & {
   chartId: string;
   chartConfig: ChartConfig;
@@ -502,14 +459,14 @@ type CustomLinkProps = SankeyLinkProps & {
 };
 
 const CustomLink = ({
-  sourceX = 0,
-  targetX = 0,
-  sourceY = 0,
-  targetY = 0,
-  sourceControlX = 0,
-  targetControlX = 0,
-  linkWidth = 0,
-  index = 0,
+  sourceX,
+  targetX,
+  sourceY,
+  targetY,
+  sourceControlX,
+  targetControlX,
+  linkWidth,
+  index,
   payload,
   chartId,
   chartConfig,
@@ -519,10 +476,8 @@ const CustomLink = ({
   glowingLinks,
   neonLinks,
 }: CustomLinkProps) => {
-  const sourceNode = payload?.source;
-  const targetNode = payload?.target;
-  const sourceName = sourceNode?.name ?? "";
-  const targetName = targetNode?.name ?? "";
+  const sourceName = payload.source.name;
+  const targetName = payload.target.name;
 
   // Check if either source or target is selected
   const isConnected =

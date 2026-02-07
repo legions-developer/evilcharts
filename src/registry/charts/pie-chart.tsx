@@ -7,9 +7,9 @@ import {
   LoadingIndicator,
 } from "@/registry/ui/chart";
 import { ChartTooltip, ChartTooltipContent } from "@/registry/ui/tooltip";
+import { useCallback, useId, useState, type ComponentProps } from "react";
 import { ChartLegend, ChartLegendContent } from "@/registry/ui/legend";
 import { Cell, LabelList, Pie, PieChart, Sector } from "recharts";
-import { useCallback, useId, useState, type ComponentProps } from "react";
 import { motion } from "motion/react";
 
 // Loading animation constants

@@ -1,6 +1,7 @@
 "use client";
 
-import { EvilSankeyChart, type SankeyData } from "@/registry/charts/sankey-chart";
+import { EvilSankeyChart } from "@/registry/charts/sankey-chart";
+import type { SankeyData } from "recharts";
 import { type ChartConfig } from "@/registry/ui/chart";
 
 // Marketing funnel data

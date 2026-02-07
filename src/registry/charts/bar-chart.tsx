@@ -7,12 +7,12 @@ import {
   getLoadingData,
   LoadingIndicator,
 } from "@/registry/ui/chart";
-import { useCallback, useId, useMemo, useRef, useState, type ComponentProps } from "react";
 import { Bar, BarChart, CartesianGrid, Rectangle, ReferenceLine, XAxis, YAxis } from "recharts";
+import { useCallback, useId, useMemo, useRef, useState, type ComponentProps } from "react";
 import { ChartTooltip, ChartTooltipContent } from "@/registry/ui/tooltip";
 import { ChartLegend, ChartLegendContent } from "@/registry/ui/legend";
-import { motion } from "motion/react";
 import { RectRadius } from "recharts/types/shape/Rectangle";
+import { motion } from "motion/react";
 
 // Constants
 const DEFAULT_BAR_RADIUS = 2;
