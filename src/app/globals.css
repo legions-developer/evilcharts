@@ -186,6 +186,10 @@ html {
   @apply mx-auto w-full max-w-2xl px-4;
 }
 
+code {
+  font-family: var(--font-jetbrains-mono);
+}
+
 /* Shiki multi-theme support - switch between light/dark themes */
 html:not(.dark) .shiki,
 html:not(.dark) .shiki span,
