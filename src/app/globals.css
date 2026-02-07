@@ -154,6 +154,10 @@
   }
 }
 
+html {
+  background-color: var(--color-sidebar);
+}
+
 body,
 html {
   scroll-behavior: smooth;
