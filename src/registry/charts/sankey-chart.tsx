@@ -14,7 +14,8 @@ import type {
   SankeyNode,
 } from "recharts";
 import { useCallback, useId, useState, type ReactNode } from "react";
-import { Sankey, Layer, Tooltip } from "recharts";
+import { ChartTooltip, ChartTooltipContent } from "@/registry/ui/tooltip";
+import { Sankey, Layer } from "recharts";
 import { motion } from "motion/react";
 
 // Loading animation constants
@@ -190,44 +191,7 @@ export function EvilSankeyChart({
           {...sankeyProps}
         >
           {!hideTooltip && (
-            <Tooltip
-              content={({ active, payload }) => {
-                if (!active || !payload || payload.length === 0) return null;
-                const tooltipData = payload[0]?.payload as SankeyNode | SankeyLinkProps["payload"];
-
-                // Check if it's a link or node by checking for source property
-                if ("source" in tooltipData && typeof tooltipData.source === "object") {
-                  // It's a link - source/target are resolved SankeyNode objects
-                  const linkData = tooltipData as SankeyLinkProps["payload"];
-                  return (
-                    <div className="bg-background border-border rounded-lg border px-3 py-2 shadow-lg">
-                      <div className="flex items-center gap-2 text-sm">
-                        <span className="text-foreground font-medium">{linkData.source.name}</span>
-                        <span className="text-muted-foreground">&rarr;</span>
-                        <span className="text-foreground font-medium">{linkData.target.name}</span>
-                      </div>
-                      <div className="text-muted-foreground mt-1 text-xs">
-                        Value: <span className="text-foreground font-medium">{linkData.value}</span>
-                      </div>
-                    </div>
-                  );
-                } else {
-                  // It's a node
-                  const nodeData = tooltipData as SankeyNode;
-                  return (
-                    <div className="bg-background border-border rounded-lg border px-3 py-2 shadow-lg">
-                      <div className="text-foreground text-sm font-medium">{nodeData.name}</div>
-                      {nodeData.value !== undefined && (
-                        <div className="text-muted-foreground mt-1 text-xs">
-                          Total:{" "}
-                          <span className="text-foreground font-medium">{nodeData.value}</span>
-                        </div>
-                      )}
-                    </div>
-                  );
-                }
-              }}
-            />
+            <ChartTooltip content={<ChartTooltipContent nameKey="name" hideLabel />} />
           )}
           {/* ======== CHART STYLES ======== */}
           <defs>
