@@ -9,7 +9,7 @@ import {
 import { useCallback, useEffect, useId, useMemo, useState, type ComponentProps } from "react";
 import { ChartTooltip, ChartTooltipContent } from "@/registry/ui/tooltip";
 import { ChartLegend, ChartLegendContent } from "@/registry/ui/legend";
-import { Cell, RadialBar, RadialBarChart } from "recharts";
+import { RadialBar, RadialBarChart, Sector, type SectorProps } from "recharts";
 
 // Loading animation constants
 const LOADING_BARS = 5;
@@ -178,10 +178,10 @@ export function EvilRadialChart<TData extends Record<string, unknown>>({
               const clickedName = data[index]?.[nameKey] as string;
               handleSelectionChange(selectedBar === clickedName ? null : clickedName);
             }}
-            {...radialBarProps}
-          >
-            {data.map((item, index) => {
-              const barName = item[nameKey] as string;
+            shape={(props: SectorProps) => {
+              // Recharts merges data entry properties into shape props,
+              // so we can read the nameKey value directly from props
+              const barName = (props as unknown as TData)[nameKey] as string;
               const isGlowing = glowingBars.includes(barName);
               const isNeon = neonBars.includes(barName);
               const isSelected = selectedBar === null || selectedBar === barName;
@@ -193,16 +193,16 @@ export function EvilRadialChart<TData extends Record<string, unknown>>({
               };
 
               return (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={`url(#${chartId}-radial-colors-${barName})`}
+                <Sector
+                  {...props}
                   filter={getFilter()}
                   opacity={isClickable && !isSelected ? 0.3 : 1}
                   className="transition-opacity duration-200"
                 />
               );
-            })}
-          </RadialBar>
+            }}
+            {...radialBarProps}
+          />
         )}
 
         {/* Loading state with animated data */}
@@ -215,11 +215,10 @@ export function EvilRadialChart<TData extends Record<string, unknown>>({
             isAnimationActive
             animationDuration={LOADING_ANIMATION_DURATION}
             animationEasing="ease-in-out"
-          >
-            {loadingData.map((_, index) => (
-              <Cell key={`loading-cell-${index}`} fill="currentColor" fillOpacity={0.25} />
-            ))}
-          </RadialBar>
+            shape={(props: SectorProps) => (
+              <Sector {...props} fill="currentColor" fillOpacity={0.25} />
+            )}
+          />
         )}
 
         {/* ======== CHART STYLES ======== */}

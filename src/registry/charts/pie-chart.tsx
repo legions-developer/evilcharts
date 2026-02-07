@@ -9,7 +9,7 @@ import {
 import { ChartTooltip, ChartTooltipContent } from "@/registry/ui/tooltip";
 import { useCallback, useId, useState, type ComponentProps } from "react";
 import { ChartLegend, ChartLegendContent } from "@/registry/ui/legend";
-import { Cell, LabelList, Pie, PieChart, Sector } from "recharts";
+import { LabelList, Pie, PieChart, Sector, type PieSectorShapeProps } from "recharts";
 import { motion } from "motion/react";
 
 // Loading animation constants
@@ -171,10 +171,9 @@ export function EvilPieChart<TData extends Record<string, unknown>>({
               const clickedName = data[index]?.[nameKey] as string;
               handleSelectionChange(selectedSector === clickedName ? null : clickedName);
             }}
-            {...pieProps}
-          >
-            {data.map((item, index) => {
-              const sectorName = item[nameKey] as string;
+            shape={(props: PieSectorShapeProps) => {
+              const index = props.index ?? 0;
+              const sectorName = data[index]?.[nameKey] as string;
               const isGlowing = glowingSectors.includes(sectorName);
               const isNeon = neonSectors.includes(sectorName);
               const isSelected = selectedSector === null || selectedSector === sectorName;
@@ -186,16 +185,17 @@ export function EvilPieChart<TData extends Record<string, unknown>>({
               };
 
               return (
-                <Cell
-                  key={`cell-${index}`}
+                <Sector
+                  {...props}
                   fill={`url(#${chartId}-pie-colors-${sectorName})`}
                   filter={getFilter()}
                   opacity={isClickable && !isSelected ? 0.3 : 1}
                   className="transition-opacity duration-200"
                 />
               );
-            })}
-
+            }}
+            {...pieProps}
+          >
             {showLabels && (
               <LabelList
                 dataKey={labelKey ?? dataKey}
