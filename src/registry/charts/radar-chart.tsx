@@ -9,7 +9,7 @@ import {
 import { useCallback, useEffect, useId, useMemo, useState, type ComponentProps } from "react";
 import { PolarAngleAxis, PolarGrid, PolarRadiusAxis, Radar, RadarChart } from "recharts";
 import { ChartTooltip, ChartTooltipContent } from "@/registry/ui/tooltip";
-import { ChartLegend, ChartLegendContent } from "@/registry/ui/legend";
+import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/legend";
 
 // Loading animation constants
 const LOADING_POINTS = 6;
@@ -56,6 +56,7 @@ type EvilRadarChartProps<
   hideTooltip?: boolean;
   hideLegend?: boolean;
   hideDots?: boolean;
+  legendVariant?: ChartLegendVariant;
 
   // Interactive Stuffs
   isLoading?: boolean;
@@ -100,6 +101,7 @@ export function EvilRadarChart<
   hideTooltip = false,
   hideLegend = false,
   hideDots = false,
+  legendVariant,
   isClickable = false,
   isLoading = false,
   glowingRadars = [],
@@ -167,6 +169,7 @@ export function EvilRadarChart<
                 selected={selectedRadar}
                 onSelectChange={handleSelectionChange}
                 isClickable={isClickable}
+                variant={legendVariant}
               />
             }
           />

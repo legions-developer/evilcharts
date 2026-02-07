@@ -10,7 +10,7 @@ import {
 import { Bar, BarChart, CartesianGrid, Rectangle, ReferenceLine, XAxis, YAxis } from "recharts";
 import { useCallback, useId, useMemo, useRef, useState, type ComponentProps } from "react";
 import { ChartTooltip, ChartTooltipContent } from "@/registry/ui/tooltip";
-import { ChartLegend, ChartLegendContent } from "@/registry/ui/legend";
+import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/legend";
 import { RectRadius } from "recharts/types/shape/Rectangle";
 import { motion } from "motion/react";
 
@@ -56,6 +56,7 @@ type EvilBarChartProps<
   barGap?: number;
   barCategoryGap?: number;
   tickGap?: number;
+  legendVariant?: ChartLegendVariant;
   // Hide Stuffs
   hideTooltip?: boolean;
   hideCartesianGrid?: boolean;
@@ -104,6 +105,7 @@ export function EvilBarChart<
   barGap,
   barCategoryGap,
   tickGap = 8,
+  legendVariant,
   hideTooltip = false,
   hideCartesianGrid = false,
   hideLegend = false,
@@ -162,6 +164,7 @@ export function EvilBarChart<
                 selected={selectedDataKey}
                 onSelectChange={handleSelectionChange}
                 isClickable={isClickable}
+                variant={legendVariant}
               />
             }
           />

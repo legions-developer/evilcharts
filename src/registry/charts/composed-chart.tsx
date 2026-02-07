@@ -10,7 +10,7 @@ import {
 import { Bar, ComposedChart, CartesianGrid, Line, ReferenceLine, XAxis, YAxis } from "recharts";
 import { useCallback, useId, useMemo, useRef, useState, type ComponentProps } from "react";
 import { ChartTooltip, ChartTooltipContent } from "@/registry/ui/tooltip";
-import { ChartLegend, ChartLegendContent } from "@/registry/ui/legend";
+import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/legend";
 import { ChartDot, DotVariant } from "@/registry/ui/dot";
 import { motion } from "motion/react";
 
@@ -78,6 +78,7 @@ type EvilComposedChartProps<
   hideCartesianGrid?: boolean;
   hideLegend?: boolean;
   hideCursorLine?: boolean;
+  legendVariant?: ChartLegendVariant;
 
   // Interactive Stuffs
   isLoading?: boolean;
@@ -138,6 +139,7 @@ export function EvilComposedChart<
   hideCartesianGrid = false,
   hideLegend = false,
   hideCursorLine = false,
+  legendVariant,
   isClickable = false,
   isLoading = false,
   loadingBars,
@@ -185,6 +187,7 @@ export function EvilComposedChart<
                 selected={selectedDataKey}
                 onSelectChange={handleSelectionChange}
                 isClickable={isClickable}
+                variant={legendVariant}
               />
             }
           />

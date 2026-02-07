@@ -11,7 +11,7 @@ import {
 import { useCallback, useId, useMemo, useRef, useState, type ComponentProps } from "react";
 import { Area, AreaChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from "recharts";
 import { ChartTooltip, ChartTooltipContent } from "@/registry/ui/tooltip";
-import { ChartLegend, ChartLegendContent } from "@/registry/ui/legend";
+import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/legend";
 import { ChartDot, DotVariant } from "@/registry/ui/dot";
 import { motion } from "motion/react";
 
@@ -52,6 +52,7 @@ type BaseEvilAreaChartProps<
   stackType?: StackType;
   dotVariant?: DotVariant;
   activeDotVariant?: DotVariant;
+  legendVariant?: ChartLegendVariant;
   connectNulls?: boolean;
   tickGap?: number;
   // Hide Stuffs
@@ -97,6 +98,7 @@ export function EvilAreaChart<
   stackType = "default",
   dotVariant,
   activeDotVariant,
+  legendVariant,
   connectNulls = false,
   tickGap = 8,
   hideTooltip = false,
@@ -148,6 +150,7 @@ export function EvilAreaChart<
                 selected={selectedDataKey}
                 onSelectChange={handleSelectionChange}
                 isClickable={isClickable}
+                variant={legendVariant}
               />
             }
           />

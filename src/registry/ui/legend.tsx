@@ -201,4 +201,4 @@ function getLegendOutlineStyle(dataKey: string, colorsCount: number): React.CSSP
 
 const ChartLegend = RechartsPrimitive.Legend;
 
-export { ChartLegend, ChartLegendContent };
+export { ChartLegend, ChartLegendContent, type ChartLegendVariant };

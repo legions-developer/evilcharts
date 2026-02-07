@@ -8,7 +8,7 @@ import {
 } from "@/registry/ui/chart";
 import { useCallback, useEffect, useId, useMemo, useState, type ComponentProps } from "react";
 import { ChartTooltip, ChartTooltipContent } from "@/registry/ui/tooltip";
-import { ChartLegend, ChartLegendContent } from "@/registry/ui/legend";
+import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/legend";
 import { RadialBar, RadialBarChart, Sector, type SectorProps } from "recharts";
 
 // Loading animation constants
@@ -49,6 +49,7 @@ type EvilRadialChartProps<TData extends Record<string, unknown>> = {
   hideTooltip?: boolean;
   hideLegend?: boolean;
   hideBackground?: boolean;
+  legendVariant?: ChartLegendVariant;
 
   // Interactive Stuffs
   isLoading?: boolean;
@@ -87,6 +88,7 @@ export function EvilRadialChart<TData extends Record<string, unknown>>({
   hideTooltip = false,
   hideLegend = false,
   hideBackground = false,
+  legendVariant,
   isClickable = false,
   isLoading = false,
   glowingBars = [],
@@ -153,6 +155,7 @@ export function EvilRadialChart<TData extends Record<string, unknown>>({
                 onSelectChange={handleSelectionChange}
                 isClickable={isClickable}
                 nameKey={nameKey}
+                variant={legendVariant}
               />
             }
           />

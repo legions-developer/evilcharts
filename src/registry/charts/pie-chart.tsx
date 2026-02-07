@@ -8,7 +8,7 @@ import {
 } from "@/registry/ui/chart";
 import { ChartTooltip, ChartTooltipContent } from "@/registry/ui/tooltip";
 import { useCallback, useId, useState, type ComponentProps } from "react";
-import { ChartLegend, ChartLegendContent } from "@/registry/ui/legend";
+import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/legend";
 import { LabelList, Pie, PieChart, Sector, type PieSectorShapeProps } from "recharts";
 import { motion } from "motion/react";
 
@@ -52,6 +52,7 @@ type EvilPieChartProps<TData extends Record<string, unknown>> = {
   // Hide Stuffs
   hideTooltip?: boolean;
   hideLegend?: boolean;
+  legendVariant?: ChartLegendVariant;
 
   // Interactive Stuffs
   isLoading?: boolean;
@@ -93,6 +94,7 @@ export function EvilPieChart<TData extends Record<string, unknown>>({
   labelListProps,
   hideTooltip = false,
   hideLegend = false,
+  legendVariant,
   isClickable = false,
   isLoading = false,
   glowingSectors = [],
@@ -145,6 +147,7 @@ export function EvilPieChart<TData extends Record<string, unknown>>({
                 onSelectChange={handleSelectionChange}
                 isClickable={isClickable}
                 nameKey={nameKey}
+                variant={legendVariant}
               />
             }
           />
