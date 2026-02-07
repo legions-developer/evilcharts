@@ -43,23 +43,57 @@ const chartConfig = {
 
 export function EvilMonospaceBarChart() {
   return (
-    <ChartContainer config={chartConfig} className="h-full w-full p-4">
-      <BarChart accessibilityLayer data={chartData}>
-        <XAxis
-          dataKey="month"
-          tickLine={false}
-          tickMargin={10}
-          axisLine={false}
-          tickFormatter={(value) => value.slice(0, 3)}
-        />
-        <Bar
-          dataKey="desktop"
-          fill="var(--color-desktop-0)"
-          shape={BarShape}
-          activeBar={BarShape}
-        />
-      </BarChart>
-    </ChartContainer>
+    <div className="flex h-full flex-col p-4">
+      <div className="flex flex-row justify-between">
+        <div className="flex flex-row">
+          <div className="flex flex-col gap-2">
+            <span className="text-muted-foreground font-mono text-xs">{"[$] Total Sales"}</span>
+            <span className="text-primary font-mono text-3xl">
+              <span className="text-muted-foreground text-xl font-normal">$</span>
+              <span className="tracking-tighter">14,340</span>
+            </span>
+          </div>
+          <hr className="mx-4 h-full border-l border-dashed" />
+          <div className="flex flex-col gap-2">
+            <span className="text-muted-foreground font-mono text-xs">{"[⬆] Top Month"}</span>
+            <span className="text-primary font-mono text-3xl">
+              <span className="tracking-tighter">June</span>
+            </span>
+          </div>
+        </div>
+        <div className="flex flex-col justify-end gap-1">
+          <span className="text-muted-foreground font-mono text-[10px]">
+            {"// X-AXIS: "}
+            <span className="text-primary">MONTHS</span>
+          </span>
+          <span className="text-muted-foreground font-mono text-[10px]">
+            {"// Y-AXIS: "}
+            <span className="text-primary">SALES</span>
+          </span>
+        </div>
+      </div>
+      <hr className="my-4 border-t border-dashed" />
+      <ChartContainer config={chartConfig}>
+        <BarChart accessibilityLayer data={chartData}>
+          <XAxis
+            dataKey="month"
+            tickLine={false}
+            tickMargin={10}
+            axisLine={false}
+            tickFormatter={(value) => value.slice(0, 3)}
+          />
+          {Object.keys(chartConfig).map((key) => (
+            <Bar
+              key={key}
+              dataKey={key}
+              fill={`var(--color-${key}-0)`}
+              shape={BarShape}
+              activeBar={BarShape}
+            />
+          ))}
+        </BarChart>
+      </ChartContainer>
+    </div>
   );
 }
 
