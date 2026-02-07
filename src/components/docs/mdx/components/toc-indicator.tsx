@@ -14,7 +14,7 @@ const CENTER_OFFSET = 6.5;
 
 const SPRING_CONFIG = { stiffness: 180, damping: 20 };
 
-const GRADIENT_HEIGHT = ITEM_HEIGHT * 4;
+const GRADIENT_HEIGHT = ITEM_HEIGHT * 2.5;
 
 interface TocItem {
   title?: React.ReactNode;
