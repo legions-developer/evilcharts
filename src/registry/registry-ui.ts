@@ -53,15 +53,15 @@ export const ui: Registry["items"] = [
     ],
   },
   {
-    name: "zoomer",
+    name: "evil-brush",
     type: "registry:component",
     registryDependencies: ["@evilcharts/chart"],
     dependencies: ["recharts"],
     files: [
       {
-        path: "ui/chart-zoomer.tsx",
+        path: "ui/evil-brush.tsx",
         type: "registry:component",
-        target: TARGET_BASE_PATH + "/chart-zoomer.tsx",
+        target: TARGET_BASE_PATH + "/evil-brush.tsx",
       },
     ],
   },

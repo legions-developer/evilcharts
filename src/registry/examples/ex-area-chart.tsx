@@ -38,7 +38,7 @@ const chartConfig = {
 export function EvilExampleAreaChart() {
   return (
     <EvilAreaChart
-      showZoomer
+      showBrush
       isClickable
       className="h-full w-full p-4"
       xDataKey="month"
@@ -49,7 +49,7 @@ export function EvilExampleAreaChart() {
       dotVariant="border"
       data={data}
       chartConfig={chartConfig}
-      zoomerFormatLabel={(value) => String(value).substring(0, 3)}
+      brushFormatLabel={(value) => String(value).substring(0, 3)}
       xAxisProps={{ tickFormatter: (value: string) => value.substring(0, 3) }}
     />
   );

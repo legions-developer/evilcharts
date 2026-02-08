@@ -7,12 +7,17 @@ import {
   getLoadingData,
   LoadingIndicator,
 } from "@/registry/ui/chart";
+import {
+  EvilBrush,
+  useEvilBrush,
+  type EvilBrushVariant,
+  type EvilBrushRange,
+} from "@/registry/ui/evil-brush";
+import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/legend";
 import { useCallback, useId, useMemo, useRef, useState, type ComponentProps } from "react";
 import { CartesianGrid, Line, LineChart, ReferenceLine, XAxis, YAxis } from "recharts";
 import { ChartTooltip, ChartTooltipContent } from "@/registry/ui/tooltip";
-import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/legend";
 import { ChartDot, DotVariant } from "@/registry/ui/dot";
-import { ChartZoomer, useChartZoom, type ChartZoomerVariant, type ChartZoomerRange } from "@/registry/ui/chart-zoomer";
 import { motion } from "motion/react";
 
 // Constants
@@ -67,12 +72,12 @@ type EvilLineChartProps<
   // Glow Effect
   glowingLines?: NumericDataKeys<TData>[];
   neonLines?: NumericDataKeys<TData>[];
-  // Zoomer
-  showZoomer?: boolean;
-  zoomerVariant?: ChartZoomerVariant;
-  zoomerHeight?: number;
-  zoomerFormatLabel?: (value: unknown, index: number) => string;
-  onZoomChange?: (range: ChartZoomerRange) => void;
+  // Brush
+  showBrush?: boolean;
+  brushVariant?: EvilBrushVariant;
+  brushHeight?: number;
+  brushFormatLabel?: (value: unknown, index: number) => string;
+  onBrushChange?: (range: EvilBrushRange) => void;
 };
 
 type EvilLineChartClickable = {
@@ -119,11 +124,11 @@ export function EvilLineChart<
   loadingPoints,
   glowingLines = [],
   neonLines = [],
-  showZoomer = false,
-  zoomerVariant,
-  zoomerHeight,
-  zoomerFormatLabel,
-  onZoomChange,
+  showBrush = false,
+  brushVariant,
+  brushHeight,
+  brushFormatLabel,
+  onBrushChange,
   onSelectionChange,
 }: EvilLineChartPropsWithCallback<TData, TConfig>) {
   const [selectedDataKey, setSelectedDataKey] = useState<string | null>(defaultSelectedDataKey);
@@ -131,8 +136,8 @@ export function EvilLineChart<
   const chartId = useId().replace(/:/g, ""); // Remove colons for valid CSS selectors
 
   // ── Zoom state ──────────────────────────────────────────────────────────
-  const { visibleData, zoomerProps } = useChartZoom({ data });
-  const displayData = showZoomer && !isLoading ? visibleData : data;
+  const { visibleData, brushProps } = useEvilBrush({ data });
+  const displayData = showBrush && !isLoading ? visibleData : data;
 
   // Wrapper function to update state and call parent callback
   const handleSelectionChange = useCallback(
@@ -150,24 +155,24 @@ export function EvilLineChart<
       className={className}
       config={chartConfig}
       footer={
-        showZoomer &&
+        showBrush &&
         !isLoading && (
-          <ChartZoomer
+          <EvilBrush
             data={data}
             chartConfig={chartConfig}
             xDataKey={xDataKey}
-            variant={zoomerVariant ?? "line"}
+            variant={brushVariant ?? "line"}
             curveType={curveType}
-            strokeVariant={strokeVariant === "animated-dashed" ? "dashed" : strokeVariant}
+            strokeVariant={strokeVariant}
             connectNulls={connectNulls}
-            height={zoomerHeight}
-            formatLabel={zoomerFormatLabel}
+            height={brushHeight}
+            formatLabel={brushFormatLabel}
             skipStyle
             className="mt-1"
-            {...zoomerProps}
+            {...brushProps}
             onChange={(range) => {
-              zoomerProps.onChange(range);
-              onZoomChange?.(range);
+              brushProps.onChange(range);
+              onBrushChange?.(range);
             }}
           />
         )

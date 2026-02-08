@@ -83,7 +83,7 @@ interface ChartContainerProps
   innerResponsiveContainerStyle?: React.ComponentProps<
     typeof RechartsPrimitive.ResponsiveContainer
   >["style"];
-  /** Optional content rendered below the chart (e.g. ChartZoomer) */
+  /** Optional content rendered below the chart (e.g. EvilBrush) */
   footer?: React.ReactNode;
 }
 

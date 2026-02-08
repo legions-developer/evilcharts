@@ -9,15 +9,15 @@ import * as React from "react";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
-type ChartZoomerVariant = "line" | "area" | "bar";
+type EvilBrushVariant = "line" | "area" | "bar";
 type CurveType = ComponentProps<typeof Area>["type"];
 
-interface ChartZoomerRange {
+interface EvilBrushRange {
   startIndex: number;
   endIndex: number;
 }
 
-interface ChartZoomerProps {
+interface EvilBrushProps {
   /** Full dataset – always rendered in the miniature chart */
   data: Record<string, unknown>[];
   /** Chart config with colour definitions */
@@ -27,8 +27,8 @@ interface ChartZoomerProps {
   /** X-axis data key – used for handle labels */
   xDataKey?: string;
   /** Visual variant of the mini chart */
-  variant?: ChartZoomerVariant;
-  /** Pixel height of the zoomer */
+  variant?: EvilBrushVariant;
+  /** Pixel height of the brush */
   height?: number;
   /** Extra className */
   className?: string;
@@ -54,7 +54,7 @@ interface ChartZoomerProps {
   defaultEndIndex?: number;
 
   /** Fired whenever the visible range changes */
-  onChange?: (range: ChartZoomerRange) => void;
+  onChange?: (range: EvilBrushRange) => void;
   /** Format the handle label from the xDataKey value */
   formatLabel?: (value: unknown, index: number) => string;
   /** Curve type for line / area variants */
@@ -70,7 +70,6 @@ interface ChartZoomerProps {
 // ─── Spring config ──────────────────────────────────────────────────────────
 
 const SPRING_TRANSITION = { type: "spring" as const, stiffness: 300, damping: 35, mass: 0.8 };
-const INSTANT_TRANSITION = { type: "tween" as const, duration: 0 };
 
 // ─── Pointer-capture drag hook ──────────────────────────────────────────────
 // Replaces raw addEventListener with the modern Pointer Events API.
@@ -82,19 +81,19 @@ type DragType = "left" | "right" | "middle";
 interface DragState {
   type: DragType;
   originX: number;
-  originRange: ChartZoomerRange;
+  originRange: EvilBrushRange;
 }
 
-function useZoomerDrag({
+function useBrushDrag({
   range,
   totalPoints,
   containerRef,
   commit,
 }: {
-  range: ChartZoomerRange;
+  range: EvilBrushRange;
   totalPoints: number;
   containerRef: React.RefObject<HTMLDivElement | null>;
-  commit: (next: ChartZoomerRange) => void;
+  commit: (next: EvilBrushRange) => void;
 }) {
   const dragRef = React.useRef<DragState | null>(null);
   const [isDragging, setIsDragging] = React.useState(false);
@@ -168,9 +167,9 @@ function useZoomerDrag({
   return { isDragging, bind };
 }
 
-// ─── ChartZoomer ────────────────────────────────────────────────────────────
+// ─── EvilBrush ────────────────────────────────────────────────────────────
 
-function ChartZoomer({
+function EvilBrush({
   data,
   chartConfig,
   dataKeys,
@@ -192,7 +191,7 @@ function ChartZoomer({
   minSpan = 2,
   showLabels = true,
   skipStyle = false,
-}: ChartZoomerProps) {
+}: EvilBrushProps) {
   const containerRef = React.useRef<HTMLDivElement>(null);
   const keys = React.useMemo(() => dataKeys ?? Object.keys(chartConfig), [dataKeys, chartConfig]);
   const totalPoints = data.length;
@@ -202,7 +201,7 @@ function ChartZoomer({
 
   const isControlled = controlledStart !== undefined && controlledEnd !== undefined;
 
-  const [internalRange, setInternalRange] = React.useState<ChartZoomerRange>(() => ({
+  const [internalRange, setInternalRange] = React.useState<EvilBrushRange>(() => ({
     startIndex: Math.max(0, Math.min(defaultStartIndex, totalPoints - 1)),
     endIndex: Math.max(0, Math.min(defaultEndIndex ?? totalPoints - 1, totalPoints - 1)),
   }));
@@ -216,15 +215,10 @@ function ChartZoomer({
     }
   }, [totalPoints, isControlled]);
 
-  const range: ChartZoomerRange = React.useMemo(
-    () => (isControlled ? { startIndex: controlledStart, endIndex: controlledEnd } : internalRange),
-    [isControlled, controlledStart, controlledEnd, internalRange],
-  );
-
   // ── Clamping & committing ───────────────────────────────────────────────
 
   const clampRange = React.useCallback(
-    (r: ChartZoomerRange): ChartZoomerRange => {
+    (r: EvilBrushRange): EvilBrushRange => {
       let { startIndex: s, endIndex: e } = r;
       s = Math.max(0, Math.min(s, totalPoints - 1));
       e = Math.max(0, Math.min(e, totalPoints - 1));
@@ -238,22 +232,37 @@ function ChartZoomer({
   );
 
   const commit = React.useCallback(
-    (next: ChartZoomerRange) => {
+    (next: EvilBrushRange) => {
       const clamped = clampRange(next);
-      if (!isControlled) setInternalRange(clamped);
-      onChange?.(clamped);
+      // Always update internal state immediately — handles move at full speed
+      setInternalRange(clamped);
+      // Defer the parent callback — chart re-render happens at lower priority,
+      // React can skip intermediate frames during fast drags
+      React.startTransition(() => {
+        onChange?.(clamped);
+      });
     },
-    [clampRange, isControlled, onChange],
+    [clampRange, onChange],
   );
 
   // ── Drag ────────────────────────────────────────────────────────────────
 
-  const { isDragging, bind } = useZoomerDrag({
-    range,
+  const { isDragging, bind } = useBrushDrag({
+    range: internalRange,
     totalPoints,
     containerRef,
     commit,
   });
+
+  // Position always driven by internalRange (never lags behind controlled props)
+  const range = internalRange;
+
+  // Sync internalRange with controlled props when not dragging
+  React.useEffect(() => {
+    if (isControlled && !isDragging) {
+      setInternalRange({ startIndex: controlledStart, endIndex: controlledEnd });
+    }
+  }, [isControlled, controlledStart, controlledEnd, isDragging]);
 
   // ── Computed positions (%) ──────────────────────────────────────────────
 
@@ -271,15 +280,13 @@ function ChartZoomer({
 
   // ── Render ──────────────────────────────────────────────────────────────
 
-  const transition = isDragging ? SPRING_TRANSITION : INSTANT_TRANSITION;
-
   if (totalPoints === 0) return null;
 
   return (
     <div
       ref={containerRef}
       data-chart={skipStyle ? undefined : chartId}
-      className={cn("relative select-none", className)}
+      className={cn("group relative select-none", className)}
       style={{ height }}
     >
       {!skipStyle && <ChartStyle id={chartId} config={chartConfig} />}
@@ -294,7 +301,7 @@ function ChartZoomer({
           curveType={curveType}
           chartId={chartId}
           stacked={stacked}
-          strokeVariant={strokeVariant}
+          strokeVariant={strokeVariant === "animated-dashed" ? "dashed" : strokeVariant}
           connectNulls={connectNulls}
           barRadius={barRadius}
         />
@@ -305,14 +312,14 @@ function ChartZoomer({
         className="bg-background/70 pointer-events-none absolute inset-y-0 left-0 rounded-l-md"
         initial={false}
         animate={{ width: `${leftPct}%` }}
-        transition={transition}
+        transition={SPRING_TRANSITION}
       />
       {/* Dim overlay – right */}
       <motion.div
         className="bg-background/70 pointer-events-none absolute inset-y-0 right-0 rounded-r-md"
         initial={false}
         animate={{ width: `${100 - rightPct}%` }}
-        transition={transition}
+        transition={SPRING_TRANSITION}
       />
 
       {/* Selected region – draggable to pan */}
@@ -320,38 +327,37 @@ function ChartZoomer({
         className="absolute inset-y-0 cursor-grab touch-none rounded-sm border active:cursor-grabbing"
         initial={false}
         animate={{ left: `${leftPct}%`, width: `${rightPct - leftPct}%` }}
-        transition={transition}
+        transition={SPRING_TRANSITION}
         {...bind("middle")}
       />
 
       {/* Left handle */}
-      <ZoomerHandle
+      <BrushHandle
         side="left"
         percent={leftPct}
         label={showLabels ? getLabel(range.startIndex) : undefined}
-        transition={transition}
+        transition={SPRING_TRANSITION}
         bind={bind("left")}
       />
 
       {/* Right handle */}
-      <ZoomerHandle
+      <BrushHandle
         side="right"
         percent={rightPct}
         label={showLabels ? getLabel(range.endIndex) : undefined}
-        transition={transition}
+        transition={SPRING_TRANSITION}
         bind={bind("right")}
       />
     </div>
   );
 }
 
-// ─── Zoomer Handle ──────────────────────────────────────────────────────────
+// ─── Brush Handle ───────────────────────────────────────────────────────────
 
-function ZoomerHandle({
+function BrushHandle({
   side,
   percent,
   label,
-  transition,
   bind,
 }: {
   side: "left" | "right";
@@ -371,7 +377,7 @@ function ZoomerHandle({
       className="absolute inset-y-0 z-10"
       initial={false}
       animate={{ left: `${percent}%` }}
-      transition={transition}
+      transition={SPRING_TRANSITION}
     >
       <div
         className={cn(
@@ -397,7 +403,7 @@ function ZoomerHandle({
       {label && (
         <div
           className={cn(
-            "bg-foreground text-background pointer-events-none absolute -bottom-3 -translate-y-1/2 rounded-[3px] px-1 py-px text-[8px] leading-tight font-medium whitespace-nowrap",
+            "bg-foreground opacity-0 group-hover:opacity-100 text-background pointer-events-none absolute -bottom-3 -translate-y-1/2 rounded-[3px] px-1 py-px text-[8px] leading-tight font-medium whitespace-nowrap",
             isLeft ? "left-1.5" : "right-1.5",
           )}
         >
@@ -425,7 +431,7 @@ function MiniChart({
   data: Record<string, unknown>[];
   keys: string[];
   chartConfig: ChartConfig;
-  variant: ChartZoomerVariant;
+  variant: EvilBrushVariant;
   curveType: CurveType;
   chartId: string;
   stacked: boolean;
@@ -582,9 +588,9 @@ function MiniChart({
   );
 }
 
-// ─── useChartZoom Hook ──────────────────────────────────────────────────────
+// ─── useEvilBrush Hook ──────────────────────────────────────────────────────
 
-function useChartZoom<TData extends Record<string, unknown>>({
+function useEvilBrush<TData extends Record<string, unknown>>({
   data,
   defaultStartIndex = 0,
   defaultEndIndex,
@@ -593,10 +599,16 @@ function useChartZoom<TData extends Record<string, unknown>>({
   defaultStartIndex?: number;
   defaultEndIndex?: number;
 }) {
-  const [range, setRange] = React.useState<ChartZoomerRange>({
+  const [range, setRange] = React.useState<EvilBrushRange>({
     startIndex: defaultStartIndex,
     endIndex: defaultEndIndex ?? Math.max(0, data.length - 1),
   });
+
+  // Defer the range used for data slicing — the brush handles move at the
+
+  // immediate `range` cadence while the expensive chart re-render uses the
+  // deferred value.  React can skip intermediate slices during fast drags.
+  const deferredRange = React.useDeferredValue(range);
 
   React.useEffect(() => {
     setRange({
@@ -606,25 +618,19 @@ function useChartZoom<TData extends Record<string, unknown>>({
   }, [data.length]);
 
   const visibleData = React.useMemo(
-    () => data.slice(range.startIndex, range.endIndex + 1),
-    [data, range.startIndex, range.endIndex],
+    () => data.slice(deferredRange.startIndex, deferredRange.endIndex + 1),
+    [data, deferredRange.startIndex, deferredRange.endIndex],
   );
 
   return {
     range,
     visibleData,
-    zoomerProps: {
+    brushProps: {
       startIndex: range.startIndex,
       endIndex: range.endIndex,
       onChange: setRange,
-    } satisfies Pick<ChartZoomerProps, "startIndex" | "endIndex" | "onChange">,
+    } satisfies Pick<EvilBrushProps, "startIndex" | "endIndex" | "onChange">,
   };
 }
 
-export {
-  ChartZoomer,
-  useChartZoom,
-  type ChartZoomerProps,
-  type ChartZoomerRange,
-  type ChartZoomerVariant,
-};
+export { EvilBrush, useEvilBrush, type EvilBrushProps, type EvilBrushRange, type EvilBrushVariant };

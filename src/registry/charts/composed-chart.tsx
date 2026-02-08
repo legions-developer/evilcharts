@@ -7,12 +7,17 @@ import {
   getLoadingData,
   LoadingIndicator,
 } from "@/registry/ui/chart";
+import {
+  EvilBrush,
+  useEvilBrush,
+  type EvilBrushVariant,
+  type EvilBrushRange,
+} from "@/registry/ui/evil-brush";
+import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/legend";
 import { Bar, ComposedChart, CartesianGrid, Line, ReferenceLine, XAxis, YAxis } from "recharts";
 import { useCallback, useId, useMemo, useRef, useState, type ComponentProps } from "react";
 import { ChartTooltip, ChartTooltipContent } from "@/registry/ui/tooltip";
-import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/legend";
 import { ChartDot, DotVariant } from "@/registry/ui/dot";
-import { ChartZoomer, useChartZoom, type ChartZoomerVariant, type ChartZoomerRange } from "@/registry/ui/chart-zoomer";
 import { motion } from "motion/react";
 
 // Constants
@@ -84,12 +89,12 @@ type EvilComposedChartProps<
   // Interactive Stuffs
   isLoading?: boolean;
   loadingBars?: number;
-  // Zoomer
-  showZoomer?: boolean;
-  zoomerVariant?: ChartZoomerVariant;
-  zoomerHeight?: number;
-  zoomerFormatLabel?: (value: unknown, index: number) => string;
-  onZoomChange?: (range: ChartZoomerRange) => void;
+  // Brush
+  showBrush?: boolean;
+  brushVariant?: EvilBrushVariant;
+  brushHeight?: number;
+  brushFormatLabel?: (value: unknown, index: number) => string;
+  onBrushChange?: (range: EvilBrushRange) => void;
 };
 
 type EvilComposedChartClickable = {
@@ -150,11 +155,11 @@ export function EvilComposedChart<
   isClickable = false,
   isLoading = false,
   loadingBars,
-  showZoomer = false,
-  zoomerVariant,
-  zoomerHeight,
-  zoomerFormatLabel,
-  onZoomChange,
+  showBrush = false,
+  brushVariant,
+  brushHeight,
+  brushFormatLabel,
+  onBrushChange,
   onSelectionChange,
 }: EvilComposedChartPropsWithCallback<TData, TBarConfig, TLineConfig>) {
   const [selectedDataKey, setSelectedDataKey] = useState<string | null>(defaultSelectedDataKey);
@@ -163,8 +168,8 @@ export function EvilComposedChart<
   const chartId = useId().replace(/:/g, "");
 
   // ── Zoom state ──────────────────────────────────────────────────────────
-  const { visibleData, zoomerProps } = useChartZoom({ data });
-  const displayData = showZoomer && !isLoading ? visibleData : data;
+  const { visibleData, brushProps } = useEvilBrush({ data });
+  const displayData = showBrush && !isLoading ? visibleData : data;
 
   // Wrapper function to update state and call parent callback
   const handleSelectionChange = useCallback(
@@ -185,25 +190,25 @@ export function EvilComposedChart<
       className={className}
       config={combinedConfig}
       footer={
-        showZoomer &&
+        showBrush &&
         !isLoading && (
-          <ChartZoomer
+          <EvilBrush
             data={data}
             chartConfig={combinedConfig}
             xDataKey={xDataKey}
-            variant={zoomerVariant ?? "area"}
+            variant={brushVariant ?? "area"}
             curveType={curveType}
-            strokeVariant={strokeVariant === "animated-dashed" ? "dashed" : strokeVariant}
+            strokeVariant={strokeVariant}
             connectNulls={connectNulls}
             barRadius={barRadius}
-            height={zoomerHeight}
-            formatLabel={zoomerFormatLabel}
+            height={brushHeight}
+            formatLabel={brushFormatLabel}
             skipStyle
             className="mt-1"
-            {...zoomerProps}
+            {...brushProps}
             onChange={(range) => {
-              zoomerProps.onChange(range);
-              onZoomChange?.(range);
+              brushProps.onChange(range);
+              onBrushChange?.(range);
             }}
           />
         )
