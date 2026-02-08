@@ -206,12 +206,20 @@ function EvilBrush({
     endIndex: Math.max(0, Math.min(defaultEndIndex ?? totalPoints - 1, totalPoints - 1)),
   }));
 
+  // Track the last committed range to avoid duplicate updates when small
+  // mouse movements don't produce index changes (e.g., at boundaries)
+  const lastCommittedRef = React.useRef<EvilBrushRange>(internalRange);
+
   React.useEffect(() => {
     if (!isControlled) {
-      setInternalRange((prev) => ({
-        startIndex: Math.min(prev.startIndex, Math.max(0, totalPoints - 1)),
-        endIndex: Math.min(prev.endIndex, Math.max(0, totalPoints - 1)),
-      }));
+      setInternalRange((prev) => {
+        const adjusted = {
+          startIndex: Math.min(prev.startIndex, Math.max(0, totalPoints - 1)),
+          endIndex: Math.min(prev.endIndex, Math.max(0, totalPoints - 1)),
+        };
+        lastCommittedRef.current = adjusted;
+        return adjusted;
+      });
     }
   }, [totalPoints, isControlled]);
 
@@ -234,7 +242,16 @@ function EvilBrush({
   const commit = React.useCallback(
     (next: EvilBrushRange) => {
       const clamped = clampRange(next);
-      // Always update internal state immediately — handles move at full speed
+      const last = lastCommittedRef.current;
+
+      // Only update if the range has actually changed — avoids unnecessary
+      // re-renders when the brush is at a boundary and small mouse movements
+      // don't produce index changes
+      if (last.startIndex === clamped.startIndex && last.endIndex === clamped.endIndex) {
+        return;
+      }
+
+      lastCommittedRef.current = clamped;
       setInternalRange(clamped);
       // Defer the parent callback — chart re-render happens at lower priority,
       // React can skip intermediate frames during fast drags
@@ -260,7 +277,9 @@ function EvilBrush({
   // Sync internalRange with controlled props when not dragging
   React.useEffect(() => {
     if (isControlled && !isDragging) {
-      setInternalRange({ startIndex: controlledStart, endIndex: controlledEnd });
+      const syncedRange = { startIndex: controlledStart, endIndex: controlledEnd };
+      setInternalRange(syncedRange);
+      lastCommittedRef.current = syncedRange;
     }
   }, [isControlled, controlledStart, controlledEnd, isDragging]);
 
