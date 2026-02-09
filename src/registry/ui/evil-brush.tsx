@@ -422,7 +422,7 @@ function BrushHandle({
       {label && (
         <div
           className={cn(
-            "bg-foreground opacity-0 group-hover:opacity-100 text-background pointer-events-none absolute -bottom-3 -translate-y-1/2 rounded-[3px] px-1 py-px text-[8px] leading-tight font-medium whitespace-nowrap",
+            "bg-foreground text-background pointer-events-none absolute -bottom-3 -translate-y-1/2 rounded-[3px] px-1 py-px text-[8px] leading-tight font-medium whitespace-nowrap opacity-0 group-hover:opacity-100",
             isLeft ? "left-1.5" : "right-1.5",
           )}
         >
@@ -500,8 +500,8 @@ function MiniChart({
 
         return (
           <React.Fragment key={dataKey}>
-            {/* Horizontal color gradient (stroke + bar fill) */}
-            <linearGradient id={`${chartId}-zm-${dataKey}`} x1="0" y1="0" x2="1" y2="0">
+            {/* Vertical color gradient (stroke + bar fill) */}
+            <linearGradient id={`${chartId}-zm-${dataKey}`} x1="0" y1="0" x2="0" y2="1">
               {colorStops}
             </linearGradient>
 
@@ -561,7 +561,12 @@ function MiniChart({
     const r = barRadius ?? 1;
     return (
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={data} margin={{ top: 2, right: 0, bottom: 0, left: 0 }} barGap={0}>
+        <BarChart
+          data={data}
+          margin={{ top: 2, right: 0, bottom: 0, left: 0 }}
+          barGap={2}
+          barSize={14}
+        >
           <defs>{defsContent}</defs>
           {keys.map((dk) => (
             <Bar
