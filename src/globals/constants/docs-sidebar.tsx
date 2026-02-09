@@ -1,10 +1,12 @@
 import { HouseIcon, ShapesIcon, SquareAddonIcon } from "@/assets/icons";
 
-export const getStartedOptions: {
+interface SidebarOption {
   name: string;
   url: string;
   icon: React.ReactNode;
-}[] = [
+}
+
+export const getStartedOptions: SidebarOption[] = [
   {
     name: "Get Started",
     url: "/docs",
@@ -26,4 +28,22 @@ export const EXCLUDED_PAGES: string[] = [
   "/docs/installation",
   "/docs/components",
   "/docs/changelog",
+];
+
+export const ChartComponentOptions: SidebarOption[] = [
+  {
+    name: "Background Variants",
+    url: "/docs/background-variants",
+    icon: <HouseIcon />,
+  },
+  {
+    name: "Tooltip Variants",
+    url: "/docs/tooltip-variants",
+    icon: <HouseIcon />,
+  },
+  {
+    name: "Legend Variants",
+    url: "/docs/legend-variants",
+    icon: <HouseIcon />,
+  },
 ];

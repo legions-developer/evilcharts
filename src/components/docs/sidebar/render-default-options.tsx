@@ -8,11 +8,21 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { getStartedOptions } from "@/globals/constants/docs-sidebar";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 
-export function GetStarted() {
+interface SidebarOption {
+  name: string;
+  url: string;
+  icon: React.ReactNode;
+}
+
+interface RenderDefaultOptionsProps {
+  options: SidebarOption[];
+  label: string;
+}
+
+export function RenderDefaultOptions({ options, label }: RenderDefaultOptionsProps) {
   const pathname = usePathname();
   const { isMobile, setOpenMobile } = useSidebar();
 
@@ -24,13 +34,13 @@ export function GetStarted() {
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-      <SidebarGroupLabel>Get Started</SidebarGroupLabel>
+      <SidebarGroupLabel>{label}</SidebarGroupLabel>
       <SidebarMenu>
-        {getStartedOptions.map((item) => (
+        {options.map((item) => (
           <SidebarMenuItem key={item.name}>
             <SidebarMenuButton
               asChild
-              className="text-muted-foreground hover:text-primary"
+              className="dark:text-muted-foreground/80 text-muted-foreground hover:text-primary"
               isActive={pathname === item.url}
             >
               <Link href={item.url} onClick={handleLinkClick}>

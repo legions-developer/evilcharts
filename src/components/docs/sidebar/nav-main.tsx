@@ -189,7 +189,11 @@ export function NavMain({
               <SidebarMenuItem>
                 <CollapsibleTrigger asChild>
                   <SidebarMenuButton
-                    className={!hasActiveChild ? "text-muted-foreground/80 hover:text-primary" : ""}
+                    className={
+                      !hasActiveChild
+                        ? "text-muted-foreground dark:text-muted-foreground/80 hover:text-primary"
+                        : ""
+                    }
                     isActive={hasActiveChild}
                   >
                     {getNavItemIcon(item.$id)}
@@ -221,7 +225,10 @@ export function NavMain({
                           className={cn("relative flex w-full")}
                         >
                           <SidebarMenuSubButton
-                            className={cn("w-full pl-8", !isActive && "text-muted-foreground/80")}
+                            className={cn(
+                              "w-full pl-8",
+                              !isActive && "text-muted-foreground dark:text-muted-foreground/80",
+                            )}
                             asChild
                           >
                             <Link href={subItem.url} onClick={handleLinkClick}>
