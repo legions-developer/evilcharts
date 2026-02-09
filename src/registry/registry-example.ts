@@ -381,6 +381,128 @@ export const examples: Registry["items"] = [
       },
     ],
   },
+  // Line Chart Background Variants
+  {
+    name: "ex-bg-dots-line-chart",
+    registryDependencies: ["@evilcharts/line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-bg-dots-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-bg-grid-line-chart",
+    registryDependencies: ["@evilcharts/line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-bg-grid-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-bg-cross-hatch-line-chart",
+    registryDependencies: ["@evilcharts/line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-bg-cross-hatch-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-bg-diagonal-lines-line-chart",
+    registryDependencies: ["@evilcharts/line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-bg-diagonal-lines-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-bg-plus-line-chart",
+    registryDependencies: ["@evilcharts/line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-bg-plus-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-bg-falling-triangles-line-chart",
+    registryDependencies: ["@evilcharts/line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-bg-falling-triangles-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-bg-4-pointed-star-line-chart",
+    registryDependencies: ["@evilcharts/line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-bg-4-pointed-star-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-bg-tiny-checkers-line-chart",
+    registryDependencies: ["@evilcharts/line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-bg-tiny-checkers-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-bg-overlapping-circles-line-chart",
+    registryDependencies: ["@evilcharts/line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-bg-overlapping-circles-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-bg-wiggle-lines-line-chart",
+    registryDependencies: ["@evilcharts/line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-bg-wiggle-lines-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-bg-bubbles-line-chart",
+    registryDependencies: ["@evilcharts/line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-bg-bubbles-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
   // ========================================
   // BAR CHART EXAMPLES
   // ========================================

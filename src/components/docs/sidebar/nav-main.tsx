@@ -191,7 +191,7 @@ export function NavMain({
                   <SidebarMenuButton
                     className={
                       !hasActiveChild
-                        ? "text-muted-foreground dark:text-muted-foreground/80 hover:text-primary"
+                        ? "text-muted-foreground dark:text-muted-foreground/80 hover:text-primary dark:hover:text-primary"
                         : ""
                     }
                     isActive={hasActiveChild}
