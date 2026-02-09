@@ -1,4 +1,11 @@
-import { HouseIcon, ShapesIcon, SquareAddonIcon } from "@/assets/icons";
+import {
+  BackgroundIcon,
+  ChartLegendIcon,
+  HouseIcon,
+  ShapesIcon,
+  SquareAddonIcon,
+  TooltipIcon,
+} from "@/assets/icons";
 
 interface SidebarOption {
   name: string;
@@ -34,16 +41,16 @@ export const ChartComponentOptions: SidebarOption[] = [
   {
     name: "Background",
     url: "/docs/ui/background",
-    icon: <HouseIcon />,
+    icon: <BackgroundIcon />,
   },
   {
     name: "Tooltip",
     url: "/docs/ui/tooltip",
-    icon: <HouseIcon />,
+    icon: <TooltipIcon />,
   },
   {
     name: "Legend",
     url: "/docs/ui/legend",
-    icon: <HouseIcon />,
+    icon: <ChartLegendIcon />,
   },
 ];
