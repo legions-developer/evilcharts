@@ -35,6 +35,8 @@ export function EvilExampleRadarChart() {
       className="h-full w-full p-4"
       data={data}
       dataKey="skill"
+      dotVariant="colored-border"
+      activeDotVariant="default"
       chartConfig={chartConfig}
     />
   );

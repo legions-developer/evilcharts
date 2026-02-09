@@ -253,6 +253,27 @@ export function EvilLineChart<
               return undefined;
             };
 
+            const dot = dotVariant ? (
+              <ChartDot
+                fillOpacity={_opacity.dot}
+                type={dotVariant}
+                dataKey={dataKey}
+                chartId={chartId}
+              />
+            ) : (
+              false
+            );
+            const activeDot = activeDotVariant ? (
+              <ChartDot
+                fillOpacity={_opacity.dot}
+                type={activeDotVariant}
+                dataKey={dataKey}
+                chartId={chartId}
+              />
+            ) : (
+              false
+            );
+
             return (
               <g key={dataKey}>
                 {/* Transparent hit area for easier clicking */}
@@ -281,30 +302,8 @@ export function EvilLineChart<
                   strokeOpacity={_opacity.stroke}
                   stroke={`url(#${chartId}-colors-${dataKey})`}
                   filter={getFilter()}
-                  dot={
-                    dotVariant ? (
-                      <ChartDot
-                        fillOpacity={_opacity.dot}
-                        type={dotVariant}
-                        dataKey={dataKey}
-                        chartId={chartId}
-                      />
-                    ) : (
-                      false
-                    )
-                  }
-                  activeDot={
-                    activeDotVariant ? (
-                      <ChartDot
-                        fillOpacity={_opacity.dot}
-                        type={activeDotVariant}
-                        dataKey={dataKey}
-                        chartId={chartId}
-                      />
-                    ) : (
-                      false
-                    )
-                  }
+                  dot={dot}
+                  activeDot={activeDot}
                   strokeWidth={STROKE_WIDTH}
                   strokeDasharray={
                     strokeVariant === "dashed"

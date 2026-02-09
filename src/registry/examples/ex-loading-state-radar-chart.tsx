@@ -35,6 +35,7 @@ export function EvilExampleRadarChart() {
       className="h-full w-full p-4"
       data={data}
       dataKey="skill"
+      hideDots
       chartConfig={chartConfig}
       isLoading // [!code highlight]
     />

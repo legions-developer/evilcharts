@@ -6,10 +6,11 @@ import {
   getColorsCount,
   LoadingIndicator,
 } from "@/registry/ui/chart";
+import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/legend";
 import { useCallback, useEffect, useId, useMemo, useState, type ComponentProps } from "react";
 import { PolarAngleAxis, PolarGrid, PolarRadiusAxis, Radar, RadarChart } from "recharts";
 import { ChartTooltip, ChartTooltipContent } from "@/registry/ui/tooltip";
-import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/legend";
+import { ChartDot, DotVariant } from "@/registry/ui/dot";
 
 // Loading animation constants
 const LOADING_POINTS = 6;
@@ -57,6 +58,8 @@ type EvilRadarChartProps<
   hideLegend?: boolean;
   hideDots?: boolean;
   legendVariant?: ChartLegendVariant;
+  dotVariant?: DotVariant;
+  activeDotVariant?: DotVariant;
 
   // Interactive Stuffs
   isLoading?: boolean;
@@ -102,6 +105,8 @@ export function EvilRadarChart<
   hideLegend = false,
   hideDots = false,
   legendVariant,
+  dotVariant,
+  activeDotVariant,
   isClickable = false,
   isLoading = false,
   glowingRadars = [],
@@ -193,8 +198,37 @@ export function EvilRadarChart<
               return undefined;
             };
 
+            const showDots = !hideDots;
+            const dot = showDots ? (
+              dotVariant ? (
+                <ChartDot
+                  fillOpacity={opacity}
+                  type={dotVariant}
+                  dataKey={radarKey}
+                  chartId={chartId}
+                />
+              ) : (
+                true
+              )
+            ) : (
+              false
+            );
+            const activeDot = showDots ? (
+              activeDotVariant ? (
+                <ChartDot
+                  fillOpacity={opacity}
+                  type={activeDotVariant}
+                  dataKey={radarKey}
+                  chartId={chartId}
+                />
+              ) : undefined
+            ) : (
+              false
+            );
+
             return (
               <Radar
+                {...radarProps}
                 key={radarKey}
                 dataKey={radarKey}
                 stroke={`url(#${chartId}-radar-stroke-${radarKey})`}
@@ -202,7 +236,8 @@ export function EvilRadarChart<
                 fillOpacity={variant === "filled" ? fillOpacity * opacity : 0}
                 strokeOpacity={opacity}
                 strokeWidth={1}
-                dot={!hideDots}
+                dot={dot}
+                activeDot={activeDot}
                 filter={getFilter()}
                 style={isClickable ? { cursor: "pointer" } : undefined}
                 onClick={() => {
@@ -210,7 +245,6 @@ export function EvilRadarChart<
                   handleSelectionChange(selectedRadar === radarKey ? null : radarKey);
                 }}
                 className="transition-opacity duration-200"
-                {...radarProps}
               />
             );
           })}
@@ -233,6 +267,9 @@ export function EvilRadarChart<
 
         {/* ======== CHART STYLES ======== */}
         <defs>
+          {/* Shared horizontal color gradient for dots */}
+          <HorizontalColorGradientStyle chartConfig={chartConfig} chartId={chartId} />
+
           {/* Stroke and fill gradients for each radar */}
           <RadarGradientStyle chartConfig={chartConfig} chartId={chartId} />
 
@@ -331,6 +368,49 @@ const RadarGradientStyle = ({
               )}
             </radialGradient>
           </g>
+        );
+      })}
+    </>
+  );
+};
+
+// Shared horizontal color gradient (left to right) - used by dots
+const HorizontalColorGradientStyle = ({
+  chartConfig,
+  chartId,
+}: {
+  chartConfig: ChartConfig;
+  chartId: string;
+}) => {
+  return (
+    <>
+      {Object.entries(chartConfig).map(([dataKey, config]) => {
+        const colorsCount = getColorsCount(config);
+
+        return (
+          <linearGradient
+            key={`${chartId}-colors-${dataKey}`}
+            id={`${chartId}-colors-${dataKey}`}
+            x1="0"
+            y1="0"
+            x2="1"
+            y2="0"
+          >
+            {colorsCount === 1 ? (
+              <>
+                <stop offset="0%" stopColor={`var(--color-${dataKey}-0)`} />
+                <stop offset="100%" stopColor={`var(--color-${dataKey}-0)`} />
+              </>
+            ) : (
+              Array.from({ length: colorsCount }, (_, index) => (
+                <stop
+                  key={index}
+                  offset={`${(index / (colorsCount - 1)) * 100}%`}
+                  stopColor={`var(--color-${dataKey}-${index}, var(--color-${dataKey}-0))`}
+                />
+              ))
+            )}
+          </linearGradient>
         );
       })}
     </>

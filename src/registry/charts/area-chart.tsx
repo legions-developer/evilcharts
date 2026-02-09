@@ -259,6 +259,27 @@ export function EvilAreaChart<
               chartId,
             );
 
+            const dot = dotVariant ? (
+              <ChartDot
+                fillOpacity={_opacity.dot}
+                type={dotVariant}
+                dataKey={dataKey}
+                chartId={chartId}
+              />
+            ) : (
+              false
+            );
+            const activeDot = activeDotVariant ? (
+              <ChartDot
+                fillOpacity={_opacity.dot}
+                type={activeDotVariant}
+                dataKey={dataKey}
+                chartId={chartId}
+              />
+            ) : (
+              false
+            );
+
             return (
               <Area
                 type={curveType}
@@ -270,30 +291,8 @@ export function EvilAreaChart<
                 fill={fillPattern}
                 stroke={`url(#${chartId}-colors-${dataKey})`}
                 stackId={isStacked ? "evil-stacked" : undefined}
-                dot={
-                  dotVariant ? (
-                    <ChartDot
-                      fillOpacity={_opacity.dot}
-                      type={dotVariant}
-                      dataKey={dataKey}
-                      chartId={chartId}
-                    />
-                  ) : (
-                    false
-                  )
-                }
-                activeDot={
-                  activeDotVariant ? (
-                    <ChartDot
-                      fillOpacity={_opacity.dot}
-                      type={activeDotVariant}
-                      dataKey={dataKey}
-                      chartId={chartId}
-                    />
-                  ) : (
-                    false
-                  )
-                }
+                dot={dot}
+                activeDot={activeDot}
                 strokeWidth={STROKE_WIDTH}
                 strokeDasharray={
                   strokeVariant === "dashed"
