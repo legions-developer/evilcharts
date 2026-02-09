@@ -9,7 +9,15 @@ import { useId } from "react";
 // 2. Create a pattern component with PatternProps
 // 3. Register it in PATTERN_MAP
 
-export type BackgroundVariant = "dots" | "grid" | "cross-hatch" | "diagonal-lines" | "plus";
+export type BackgroundVariant =
+  | "dots"
+  | "grid"
+  | "cross-hatch"
+  | "diagonal-lines"
+  | "plus"
+  | "falling-triangles"
+  | "4-pointed-star"
+  | "tiny-checkers";
 
 // ── Pattern Components ───────────────────────────────────────────────────────
 
@@ -80,15 +88,54 @@ const PlusPattern = ({ id }: PatternProps) => (
   </pattern>
 );
 
+const FallingTrianglesPattern = ({ id }: PatternProps) => (
+  <pattern id={id} x="0" y="0" width="18" height="36" patternUnits="userSpaceOnUse">
+    <path
+      className="text-border dark:text-border"
+      d="M2 6h12L8 18 2 6zm18 36h12l-6 12-6-12z"
+      transform="scale(0.5)"
+      fill="currentColor"
+      fillOpacity="0.4"
+    />
+  </pattern>
+);
+
+const FourPointedStarPattern = ({ id }: PatternProps) => (
+  <pattern id={id} x="0" y="0" width="16" height="16" patternUnits="userSpaceOnUse">
+    <polygon
+      className="text-border dark:text-border"
+      fillRule="evenodd"
+      points="5 3 8 4 5 5 4 8 3 5 0 4 3 3 4 0 5 3"
+      fill="currentColor"
+      fillOpacity="0.4"
+    />
+  </pattern>
+);
+
+const TinyCheckersPattern = ({ id }: PatternProps) => (
+  <pattern id={id} x="0" y="0" width="8" height="8" patternUnits="userSpaceOnUse">
+    <path
+      className="text-border dark:text-border"
+      fillRule="evenodd"
+      d="M0 0h4v4H0V0zm4 4h4v4H4V4z"
+      fill="currentColor"
+      fillOpacity="0.2"
+    />
+  </pattern>
+);
+
 // ── Pattern Registry ─────────────────────────────────────────────────────────
 // Map variant names to pattern components
 
 const PATTERN_MAP: Record<BackgroundVariant, React.FC<PatternProps>> = {
   dots: DotsPattern,
   grid: GridPattern,
+  plus: PlusPattern,
   "cross-hatch": CrossHatchPattern,
   "diagonal-lines": DiagonalLinesPattern,
-  plus: PlusPattern,
+  "falling-triangles": FallingTrianglesPattern,
+  "4-pointed-star": FourPointedStarPattern,
+  "tiny-checkers": TinyCheckersPattern,
 };
 
 // ── Main Component ───────────────────────────────────────────────────────────
