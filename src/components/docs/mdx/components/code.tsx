@@ -11,6 +11,7 @@ export async function CodeBlock({
   copyButton = true,
   showLineNumbers = true,
   withWrapper = false,
+  wrapperClassName,
 }: {
   code: string;
   language: string;
@@ -19,6 +20,7 @@ export async function CodeBlock({
   copyButton?: boolean;
   showLineNumbers?: boolean;
   withWrapper?: boolean;
+  wrapperClassName?: string;
 }) {
   const cleanedCode = stripCodeAnnotations(code);
   const highlightedCode = await highlightCode(code, language, {
@@ -27,10 +29,12 @@ export async function CodeBlock({
 
   if (withWrapper) {
     return (
-      <div className={cn("dark:bg-primary-foreground rounded-md bg-[#F5F5F5] p-1")}>
+      <div
+        className={cn("dark:bg-primary-foreground rounded-md bg-[#F5F5F5] p-1", wrapperClassName)}
+      >
         <div className="flex h-7 justify-between px-1">
           <figcaption
-            className="text-muted-foreground dark:text-muted-foreground/80 flex items-center gap-1.5 text-xs [&_svg]:size-3.5"
+            className="text-muted-foreground dark:text-muted-foreground/80 -mt-1 flex items-center gap-1.5 text-xs [&_svg]:size-3.5"
             data-language={language}
             data-rehype-pretty-code-title=""
           >

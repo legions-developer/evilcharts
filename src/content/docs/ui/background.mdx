@@ -70,45 +70,60 @@ You can add your own background style by defining an SVG `<pattern>` and registe
 
 Example custom pattern:
 
-```tsx
-// src/registry/ui/background.tsx
-export type BackgroundVariant =
-  | "dots"
-  | "grid"
-  | "cross-hatch"
-  | "custom-pattern";
-  // ...other variants
+<CodeBlock
+  wrapperClassName="mt-4"
+  title="src/registry/ui/background.tsx"
+  language="tsx"
+  withWrapper
+  code={`export type BackgroundVariant =
+    | "dots"
+    | "grid"
+    | "cross-hatch"
+    | "custom-pattern";
+    // ...other variants
 
 const CustomPattern = ({ id }: { id: string }) => (
-  <pattern id={id} x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
-    <path
-      className="text-border dark:text-border"
-      d="M12 2l2.2 4.6L19 9l-4.8 2.4L12 16l-2.2-4.6L5 9l4.8-2.4L12 2z"
-      fill="currentColor"
-      fillOpacity="0.35"
-    />
-  </pattern>
+    <pattern
+      id={id}
+      x="0"
+      y="0"
+      width="24"
+      height="24"
+      patternUnits="userSpaceOnUse"
+    >
+      <path
+        className="text-border dark:text-border"
+        d="M12 2l2.2 4.6L19 9l-4.8 2.4L12 16l-2.2-4.6L5 9l4.8-2.4L12 2z"
+        fill="currentColor"
+        fillOpacity="0.35"
+      />
+    </pattern>
 );
 
 const PATTERN_MAP: Record<BackgroundVariant, React.FC<{ id: string }>> = {
-  dots: DotsPattern,
-  grid: GridPattern,
-  "cross-hatch": CrossHatchPattern,
-  "custom-pattern": CustomPattern,
-  // ...other variants
+    dots: DotsPattern,
+    grid: GridPattern,
+    "cross-hatch": CrossHatchPattern,
+    "custom-pattern": CustomPattern,
+    // ...other variants
 };
-```
+`}
+/>
 
 Then use your new variant in any chart:
 
-```tsx
-<EvilLineChart
-  xDataKey="month"
-  data={data}
-  chartConfig={chartConfig}
-  backgroundVariant="custom-pattern"
+<CodeBlock
+  wrapperClassName="mt-4"
+  title="Example usage"
+  language="tsx"
+  withWrapper
+  code={`<EvilLineChart
+    xDataKey="month"
+    data={data}
+    chartConfig={chartConfig}
+    backgroundVariant="custom-pattern"
+/>`}
 />
-```
 
 <Alert>
   <AlertContent>
