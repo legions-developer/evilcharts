@@ -112,18 +112,14 @@ const PATTERN_MAP: Record<BackgroundVariant, React.FC<{ id: string }>> = {
 
 Then use your new variant in any chart:
 
-<CodeBlock
-  wrapperClassName="mt-4"
-  title="Example usage"
-  language="tsx"
-  withWrapper
-  code={`<EvilLineChart
-    xDataKey="month"
-    data={data}
-    chartConfig={chartConfig}
-    backgroundVariant="custom-pattern"
-/>`}
+```tsx
+<EvilLineChart
+  xDataKey="month"
+  data={data}
+  chartConfig={chartConfig}
+  backgroundVariant="custom-pattern"
 />
+```
 
 <Alert>
   <AlertContent>
