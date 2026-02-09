@@ -3,7 +3,7 @@
   "pages": [
     "index",
     "installation",
-    "components", 
+    "components",
     "area-chart",
     "line-chart",
     "bar-chart",
@@ -11,6 +11,9 @@
     "radar-chart",
     "pie-chart",
     "radial-chart",
-    "sankey-chart"
+    "sankey-chart",
+    "ui/background",
+    "ui/tooltip",
+    "ui/legend"
   ]
 }

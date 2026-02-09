@@ -32,18 +32,18 @@ export const EXCLUDED_PAGES: string[] = [
 
 export const ChartComponentOptions: SidebarOption[] = [
   {
-    name: "Background Variants",
-    url: "/docs/background-variants",
+    name: "Background",
+    url: "/docs/ui/background",
     icon: <HouseIcon />,
   },
   {
-    name: "Tooltip Variants",
-    url: "/docs/tooltip-variants",
+    name: "Tooltip",
+    url: "/docs/ui/tooltip",
     icon: <HouseIcon />,
   },
   {
-    name: "Legend Variants",
-    url: "/docs/legend-variants",
+    name: "Legend",
+    url: "/docs/ui/legend",
     icon: <HouseIcon />,
   },
 ];

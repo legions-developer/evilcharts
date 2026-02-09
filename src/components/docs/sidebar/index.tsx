@@ -20,7 +20,7 @@ export function DocsSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) 
       <SidebarContent>
         <RenderDefaultOptions options={getStartedOptions} label="Get Started" />
         <NavMain tree={source.pageTree} />
-        <RenderDefaultOptions options={ChartComponentOptions} label="Chart Component Options" />
+        <RenderDefaultOptions options={ChartComponentOptions} label="Chart Components" />
       </SidebarContent>
     </Sidebar>
   );

@@ -227,7 +227,8 @@ export function NavMain({
                           <SidebarMenuSubButton
                             className={cn(
                               "w-full pl-8",
-                              !isActive && "text-muted-foreground dark:text-muted-foreground/80",
+                              !isActive &&
+                                "text-muted-foreground dark:text-muted-foreground/80 hover:text-primary dark:hover:text-primary",
                             )}
                             asChild
                           >

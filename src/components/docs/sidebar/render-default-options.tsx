@@ -9,6 +9,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
 import Link from "next/link";
 
 interface SidebarOption {
@@ -36,20 +37,27 @@ export function RenderDefaultOptions({ options, label }: RenderDefaultOptionsPro
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarGroupLabel>{label}</SidebarGroupLabel>
       <SidebarMenu>
-        {options.map((item) => (
-          <SidebarMenuItem key={item.name}>
-            <SidebarMenuButton
-              asChild
-              className="dark:text-muted-foreground/80 text-muted-foreground hover:text-primary"
-              isActive={pathname === item.url}
-            >
-              <Link href={item.url} onClick={handleLinkClick}>
-                {item.icon}
-                <span>{item.name}</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        ))}
+        {options.map((item) => {
+          const isActive = pathname === item.url;
+
+          return (
+            <SidebarMenuItem key={item.name}>
+              <SidebarMenuButton
+                asChild
+                className={cn(
+                  !isActive &&
+                    "dark:text-muted-foreground/80 text-muted-foreground hover:text-primary dark:hover:text-primary",
+                )}
+                isActive={isActive}
+              >
+                <Link href={item.url} onClick={handleLinkClick}>
+                  {item.icon}
+                  <span>{item.name}</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          );
+        })}
       </SidebarMenu>
     </SidebarGroup>
   );
