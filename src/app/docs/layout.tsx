@@ -13,7 +13,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
         <DecorativeBorder />
         <div
           className={cn(
-            "no-scrollbar overflow-scroll sm:h-[calc(100vh-1rem)] sm:border",
+            "no-scrollbar bg-background overflow-scroll sm:h-[calc(100vh-1rem)] sm:border",
             "sm:rounded-tl-md sm:rounded-br-xl sm:rounded-bl-md", // bottom-right is XL to match mac-os browser radius (fk winodws :p)
           )}
         >
