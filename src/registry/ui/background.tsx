@@ -17,7 +17,10 @@ export type BackgroundVariant =
   | "plus"
   | "falling-triangles"
   | "4-pointed-star"
-  | "tiny-checkers";
+  | "tiny-checkers"
+  | "overlapping-circles"
+  | "wiggle-lines"
+  | "bubbles";
 
 // ── Pattern Components ───────────────────────────────────────────────────────
 
@@ -124,6 +127,57 @@ const TinyCheckersPattern = ({ id }: PatternProps) => (
   </pattern>
 );
 
+const OverlappingCirclesPattern = ({ id }: PatternProps) => (
+  <pattern id={id} x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+    <path
+      className="text-border dark:text-border"
+      fillRule="evenodd"
+      d="M25 25c0-2.762 2.238-5 5-5s5 2.238 5 5-2.238 5-5 5c0 2.762-2.238 5-5 5s-5-2.238-5-5 2.238-5 5-5zM5 5c0-2.762 2.238-5 5-5s5 2.238 5 5-2.238 5-5 5c0 2.762-2.238 5-5 5S0 12.762 0 10s2.238-5 5-5zm5 4c2.209 0 4-1.791 4-4s-1.791-4-4-4-4 1.791-4 4 1.791 4 4 4zm20 20c2.209 0 4-1.791 4-4s-1.791-4-4-4-4 1.791-4 4 1.791 4 4 4z"
+      fill="currentColor"
+      fillOpacity="0.4"
+    />
+  </pattern>
+);
+
+const WiggleLinesPattern = ({ id }: PatternProps) => (
+  <pattern
+    id={id}
+    x="0"
+    y="0"
+    width="52"
+    height="26"
+    patternUnits="userSpaceOnUse"
+    patternTransform="scale(0.6)"
+  >
+    <path
+      className="text-border dark:text-border"
+      d="M10 10c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-3.314 0-6-2.686-6-6 0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6zm25.464-1.95l8.486 8.486-1.414 1.414-8.486-8.486 1.414-1.414z"
+      fill="currentColor"
+      fillOpacity="0.4"
+    />
+  </pattern>
+);
+
+const BubblesPattern = ({ id }: PatternProps) => (
+  <pattern
+    id={id}
+    x="0"
+    y="0"
+    width="100"
+    height="100"
+    patternUnits="userSpaceOnUse"
+    patternTransform="scale(0.6667)"
+  >
+    <path
+      className="text-border dark:text-border"
+      d="M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z"
+      fill="currentColor"
+      fillOpacity="0.4"
+      fillRule="evenodd"
+    />
+  </pattern>
+);
+
 // ── Pattern Registry ─────────────────────────────────────────────────────────
 // Map variant names to pattern components
 
@@ -131,11 +185,14 @@ const PATTERN_MAP: Record<BackgroundVariant, React.FC<PatternProps>> = {
   dots: DotsPattern,
   grid: GridPattern,
   plus: PlusPattern,
+  bubbles: BubblesPattern,
   "cross-hatch": CrossHatchPattern,
   "diagonal-lines": DiagonalLinesPattern,
   "falling-triangles": FallingTrianglesPattern,
   "4-pointed-star": FourPointedStarPattern,
   "tiny-checkers": TinyCheckersPattern,
+  "overlapping-circles": OverlappingCirclesPattern,
+  "wiggle-lines": WiggleLinesPattern,
 };
 
 // ── Main Component ───────────────────────────────────────────────────────────

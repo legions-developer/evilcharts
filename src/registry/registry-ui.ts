@@ -6,7 +6,6 @@ export const ui: Registry["items"] = [
   {
     name: "chart",
     type: "registry:component",
-    registryDependencies: ["@evilcharts/tooltip", "@evilcharts/legend"],
     dependencies: ["recharts"],
     files: [
       {
@@ -62,6 +61,18 @@ export const ui: Registry["items"] = [
         path: "ui/evil-brush.tsx",
         type: "registry:component",
         target: TARGET_BASE_PATH + "/evil-brush.tsx",
+      },
+    ],
+  },
+  {
+    name: "background",
+    type: "registry:component",
+    dependencies: ["recharts"],
+    files: [
+      {
+        path: "ui/background.tsx",
+        type: "registry:component",
+        target: TARGET_BASE_PATH + "/background.tsx",
       },
     ],
   },

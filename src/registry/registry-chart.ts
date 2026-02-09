@@ -6,7 +6,14 @@ export const charts: Registry["items"] = [
   {
     name: "area-chart",
     description: "Area chart component",
-    registryDependencies: ["@evilcharts/chart", "@evilcharts/tooltip", "@evilcharts/legend", "@evilcharts/evil-brush"],
+    registryDependencies: [
+      "@evilcharts/chart",
+      "@evilcharts/tooltip",
+      "@evilcharts/legend",
+      "@evilcharts/dot",
+      "@evilcharts/evil-brush",
+      "@evilcharts/background",
+    ],
     dependencies: ["recharts", "motion"],
     type: "registry:component",
     files: [
@@ -20,7 +27,14 @@ export const charts: Registry["items"] = [
   {
     name: "line-chart",
     description: "Line chart component",
-    registryDependencies: ["@evilcharts/chart", "@evilcharts/tooltip", "@evilcharts/legend", "@evilcharts/evil-brush"],
+    registryDependencies: [
+      "@evilcharts/chart",
+      "@evilcharts/tooltip",
+      "@evilcharts/legend",
+      "@evilcharts/dot",
+      "@evilcharts/evil-brush",
+      "@evilcharts/background",
+    ],
     dependencies: ["recharts", "motion"],
     type: "registry:component",
     files: [
@@ -34,7 +48,13 @@ export const charts: Registry["items"] = [
   {
     name: "bar-chart",
     description: "Bar chart component",
-    registryDependencies: ["@evilcharts/chart", "@evilcharts/tooltip", "@evilcharts/legend", "@evilcharts/evil-brush"],
+    registryDependencies: [
+      "@evilcharts/chart",
+      "@evilcharts/tooltip",
+      "@evilcharts/legend",
+      "@evilcharts/evil-brush",
+      "@evilcharts/background",
+    ],
     dependencies: ["recharts", "motion"],
     type: "registry:component",
     files: [
@@ -54,6 +74,7 @@ export const charts: Registry["items"] = [
       "@evilcharts/legend",
       "@evilcharts/dot",
       "@evilcharts/evil-brush",
+      "@evilcharts/background",
     ],
     dependencies: ["recharts", "motion"],
     type: "registry:component",
@@ -68,7 +89,12 @@ export const charts: Registry["items"] = [
   {
     name: "pie-chart",
     description: "Pie chart component with donut, gradient, and glow effects",
-    registryDependencies: ["@evilcharts/chart", "@evilcharts/tooltip", "@evilcharts/legend"],
+    registryDependencies: [
+      "@evilcharts/chart",
+      "@evilcharts/tooltip",
+      "@evilcharts/legend",
+      "@evilcharts/background",
+    ],
     dependencies: ["recharts", "motion"],
     type: "registry:component",
     files: [
@@ -82,7 +108,12 @@ export const charts: Registry["items"] = [
   {
     name: "radial-chart",
     description: "Radial bar chart component with full and semi-circle variants",
-    registryDependencies: ["@evilcharts/chart", "@evilcharts/tooltip", "@evilcharts/legend"],
+    registryDependencies: [
+      "@evilcharts/chart",
+      "@evilcharts/tooltip",
+      "@evilcharts/legend",
+      "@evilcharts/background",
+    ],
     dependencies: ["recharts", "motion"],
     type: "registry:component",
     files: [
@@ -96,7 +127,13 @@ export const charts: Registry["items"] = [
   {
     name: "radar-chart",
     description: "Radar chart component with filled and lines variants",
-    registryDependencies: ["@evilcharts/chart", "@evilcharts/tooltip", "@evilcharts/legend"],
+    registryDependencies: [
+      "@evilcharts/chart",
+      "@evilcharts/tooltip",
+      "@evilcharts/legend",
+      "@evilcharts/dot",
+      "@evilcharts/background",
+    ],
     dependencies: ["recharts", "motion"],
     type: "registry:component",
     files: [
@@ -110,7 +147,7 @@ export const charts: Registry["items"] = [
   {
     name: "sankey-chart",
     description: "Sankey chart component for visualizing flow data with nodes and links",
-    registryDependencies: ["@evilcharts/chart"],
+    registryDependencies: ["@evilcharts/chart", "@evilcharts/tooltip", "@evilcharts/background"],
     dependencies: ["recharts", "motion"],
     type: "registry:component",
     files: [
