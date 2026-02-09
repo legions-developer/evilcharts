@@ -17,6 +17,7 @@ import {
 import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/legend";
 import { useCallback, useId, useMemo, useRef, useState, type ComponentProps } from "react";
 import { Area, AreaChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from "recharts";
+import { ChartBackground, type BackgroundVariant } from "@/registry/ui/background";
 import { ChartTooltip, ChartTooltipContent } from "@/registry/ui/tooltip";
 import { ChartDot, DotVariant } from "@/registry/ui/dot";
 import { motion } from "motion/react";
@@ -74,6 +75,8 @@ type BaseEvilAreaChartProps<
   brushHeight?: number;
   brushFormatLabel?: (value: unknown, index: number) => string;
   onBrushChange?: (range: EvilBrushRange) => void;
+  // Background
+  backgroundVariant?: BackgroundVariant;
 };
 
 type EvilAreaChartClickable = {
@@ -126,6 +129,7 @@ export function EvilAreaChart<
   brushFormatLabel,
   onBrushChange,
   onSelectionChange,
+  backgroundVariant,
 }: EvilAreaChartProps<TData, TConfig>) {
   const [selectedDataKey, setSelectedDataKey] = useState<string | null>(defaultSelectedDataKey);
   const { loadingData, onShimmerExit } = useLoadingData(isLoading, loadingPoints);
@@ -187,8 +191,11 @@ export function EvilAreaChart<
         data={isLoading ? loadingData : displayData}
         {...chartProps}
       >
+        {backgroundVariant && <ChartBackground variant={backgroundVariant} />}
         <ReferenceLine color="white" />
-        {!hideCartesianGrid && <CartesianGrid vertical={false} strokeDasharray="3 3" />}
+        {!hideCartesianGrid && !backgroundVariant && (
+          <CartesianGrid vertical={false} strokeDasharray="3 3" />
+        )}
         {!hideLegend && (
           <ChartLegend
             verticalAlign="top"
