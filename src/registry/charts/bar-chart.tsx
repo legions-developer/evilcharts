@@ -13,6 +13,7 @@ import { ChartTooltip, ChartTooltipContent } from "@/registry/ui/tooltip";
 import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/legend";
 import { RectRadius } from "recharts/types/shape/Rectangle";
 import { EvilBrush, useEvilBrush, type EvilBrushVariant, type EvilBrushRange } from "@/registry/ui/evil-brush";
+import { ChartBackground, type BackgroundVariant } from "@/registry/ui/background";
 import { motion } from "motion/react";
 
 // Constants
@@ -75,6 +76,8 @@ type EvilBarChartProps<
   brushHeight?: number;
   brushFormatLabel?: (value: unknown, index: number) => string;
   onBrushChange?: (range: EvilBrushRange) => void;
+  // Background
+  backgroundVariant?: BackgroundVariant;
 };
 
 type EvilBarChartClickable = {
@@ -128,6 +131,7 @@ export function EvilBarChart<
   brushFormatLabel,
   onBrushChange,
   onSelectionChange,
+  backgroundVariant,
 }: EvilBarChartPropsWithCallback<TData, TConfig>) {
   const [selectedDataKey, setSelectedDataKey] = useState<string | null>(defaultSelectedDataKey);
   const [isMouseInChart, setIsMouseInChart] = useState(false);
@@ -192,8 +196,9 @@ export function EvilBarChart<
         onMouseLeave={() => setIsMouseInChart(false)}
         {...chartProps}
       >
+        {backgroundVariant && <ChartBackground variant={backgroundVariant} />}
         <ReferenceLine color="white" />
-        {!hideCartesianGrid && (
+        {!hideCartesianGrid && !backgroundVariant && (
           <CartesianGrid vertical={isHorizontal} horizontal={!isHorizontal} strokeDasharray="3 3" />
         )}
         {!hideLegend && (

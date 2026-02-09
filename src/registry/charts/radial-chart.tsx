@@ -10,6 +10,7 @@ import { useCallback, useEffect, useId, useMemo, useState, type ComponentProps }
 import { ChartTooltip, ChartTooltipContent } from "@/registry/ui/tooltip";
 import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/legend";
 import { RadialBar, RadialBarChart, Sector, type SectorProps } from "recharts";
+import { ChartBackground, type BackgroundVariant } from "@/registry/ui/background";
 
 // Loading animation constants
 const LOADING_BARS = 5;
@@ -57,6 +58,8 @@ type EvilRadialChartProps<TData extends Record<string, unknown>> = {
   // Glow Effects
   glowingBars?: string[];
   neonBars?: string[];
+  // Background
+  backgroundVariant?: BackgroundVariant;
 };
 
 type EvilRadialChartClickable = {
@@ -94,6 +97,7 @@ export function EvilRadialChart<TData extends Record<string, unknown>>({
   glowingBars = [],
   neonBars = [],
   onSelectionChange,
+  backgroundVariant,
 }: EvilRadialChartPropsWithCallback<TData>) {
   const [selectedBar, setSelectedBar] = useState<string | null>(null);
   const chartId = useId().replace(/:/g, "");
@@ -145,6 +149,7 @@ export function EvilRadialChart<TData extends Record<string, unknown>>({
         cy={variantConfig.cy}
         {...chartProps}
       >
+        {backgroundVariant && <ChartBackground variant={backgroundVariant} />}
         {!hideLegend && !isLoading && (
           <ChartLegend
             verticalAlign={variant === "semi" ? "bottom" : "bottom"}

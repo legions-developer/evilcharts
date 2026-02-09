@@ -10,6 +10,7 @@ import { ChartTooltip, ChartTooltipContent } from "@/registry/ui/tooltip";
 import { useCallback, useId, useState, type ComponentProps } from "react";
 import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/legend";
 import { LabelList, Pie, PieChart, Sector, type PieSectorShapeProps } from "recharts";
+import { ChartBackground, type BackgroundVariant } from "@/registry/ui/background";
 import { motion } from "motion/react";
 
 // Loading animation constants
@@ -60,6 +61,8 @@ type EvilPieChartProps<TData extends Record<string, unknown>> = {
   // Glow Effects
   glowingSectors?: string[];
   neonSectors?: string[];
+  // Background
+  backgroundVariant?: BackgroundVariant;
 };
 
 type EvilPieChartClickable = {
@@ -100,6 +103,7 @@ export function EvilPieChart<TData extends Record<string, unknown>>({
   glowingSectors = [],
   neonSectors = [],
   onSelectionChange,
+  backgroundVariant,
 }: EvilPieChartPropsWithCallback<TData>) {
   const [selectedSector, setSelectedSector] = useState<string | null>(null);
   const chartId = useId().replace(/:/g, "");
@@ -137,6 +141,7 @@ export function EvilPieChart<TData extends Record<string, unknown>>({
     <ChartContainer className={className} config={chartConfig}>
       <LoadingIndicator isLoading={isLoading} />
       <PieChart id="evil-charts-pie-chart" accessibilityLayer {...chartProps}>
+        {backgroundVariant && <ChartBackground variant={backgroundVariant} />}
         {!hideLegend && (
           <ChartLegend
             verticalAlign="bottom"

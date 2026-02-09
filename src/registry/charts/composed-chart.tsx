@@ -18,6 +18,7 @@ import { Bar, ComposedChart, CartesianGrid, Line, ReferenceLine, XAxis, YAxis } 
 import { useCallback, useId, useMemo, useRef, useState, type ComponentProps } from "react";
 import { ChartTooltip, ChartTooltipContent } from "@/registry/ui/tooltip";
 import { ChartDot, DotVariant } from "@/registry/ui/dot";
+import { ChartBackground, type BackgroundVariant } from "@/registry/ui/background";
 import { motion } from "motion/react";
 
 // Constants
@@ -95,6 +96,8 @@ type EvilComposedChartProps<
   brushHeight?: number;
   brushFormatLabel?: (value: unknown, index: number) => string;
   onBrushChange?: (range: EvilBrushRange) => void;
+  // Background
+  backgroundVariant?: BackgroundVariant;
 };
 
 type EvilComposedChartClickable = {
@@ -161,6 +164,7 @@ export function EvilComposedChart<
   brushFormatLabel,
   onBrushChange,
   onSelectionChange,
+  backgroundVariant,
 }: EvilComposedChartPropsWithCallback<TData, TBarConfig, TLineConfig>) {
   const [selectedDataKey, setSelectedDataKey] = useState<string | null>(defaultSelectedDataKey);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
@@ -224,8 +228,9 @@ export function EvilComposedChart<
         onMouseLeave={() => enableHoverHighlight && setHoveredIndex(null)}
         {...chartProps}
       >
+        {backgroundVariant && <ChartBackground variant={backgroundVariant} />}
         <ReferenceLine color="white" />
-        {!hideCartesianGrid && <CartesianGrid vertical={false} strokeDasharray="3 3" />}
+        {!hideCartesianGrid && !backgroundVariant && <CartesianGrid vertical={false} strokeDasharray="3 3" />}
         {!hideLegend && (
           <ChartLegend
             verticalAlign="top"

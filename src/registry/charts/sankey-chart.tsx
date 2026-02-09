@@ -15,6 +15,7 @@ import type {
 } from "recharts";
 import { useCallback, useId, useState, type ReactNode } from "react";
 import { ChartTooltip, ChartTooltipContent } from "@/registry/ui/tooltip";
+import { ChartBackground, type BackgroundVariant } from "@/registry/ui/background";
 import { Sankey, Layer } from "recharts";
 import { motion } from "motion/react";
 
@@ -69,6 +70,8 @@ type EvilSankeyChartProps = {
   neonNodes?: string[];
   glowingLinks?: number[];
   neonLinks?: number[];
+  // Background
+  backgroundVariant?: BackgroundVariant;
 };
 
 type EvilSankeyChartClickable = {
@@ -110,6 +113,7 @@ export function EvilSankeyChart({
   glowingLinks = [],
   neonLinks = [],
   onSelectionChange,
+  backgroundVariant,
 }: EvilSankeyChartPropsWithCallback) {
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
   const chartId = useId().replace(/:/g, "");
@@ -146,6 +150,7 @@ export function EvilSankeyChart({
   return (
     <ChartContainer className={className} config={chartConfig}>
       <LoadingIndicator isLoading={isLoading} />
+      {backgroundVariant && <ChartBackground variant={backgroundVariant} />}
       {!isLoading && (
         <Sankey
           id="evil-charts-sankey-chart"

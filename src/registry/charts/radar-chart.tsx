@@ -11,6 +11,7 @@ import { useCallback, useEffect, useId, useMemo, useState, type ComponentProps }
 import { PolarAngleAxis, PolarGrid, PolarRadiusAxis, Radar, RadarChart } from "recharts";
 import { ChartTooltip, ChartTooltipContent } from "@/registry/ui/tooltip";
 import { ChartDot, DotVariant } from "@/registry/ui/dot";
+import { ChartBackground, type BackgroundVariant } from "@/registry/ui/background";
 
 // Loading animation constants
 const LOADING_POINTS = 6;
@@ -67,6 +68,8 @@ type EvilRadarChartProps<
   // Glow Effects
   glowingRadars?: NumericDataKeys<TData>[];
   neonRadars?: NumericDataKeys<TData>[];
+  // Background
+  backgroundVariant?: BackgroundVariant;
 };
 
 type EvilRadarChartClickable = {
@@ -112,6 +115,7 @@ export function EvilRadarChart<
   glowingRadars = [],
   neonRadars = [],
   onSelectionChange,
+  backgroundVariant,
 }: EvilRadarChartPropsWithCallback<TData, TConfig>) {
   const [selectedRadar, setSelectedRadar] = useState<string | null>(null);
   const chartId = useId().replace(/:/g, "");
@@ -139,6 +143,7 @@ export function EvilRadarChart<
         data={isLoading ? loadingData : data}
         {...chartProps}
       >
+        {backgroundVariant && <ChartBackground variant={backgroundVariant} />}
         {!hideGrid && (
           <PolarGrid
             gridType={gridType}

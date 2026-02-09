@@ -18,6 +18,7 @@ import { useCallback, useId, useMemo, useRef, useState, type ComponentProps } fr
 import { CartesianGrid, Line, LineChart, ReferenceLine, XAxis, YAxis } from "recharts";
 import { ChartTooltip, ChartTooltipContent } from "@/registry/ui/tooltip";
 import { ChartDot, DotVariant } from "@/registry/ui/dot";
+import { ChartBackground, type BackgroundVariant } from "@/registry/ui/background";
 import { motion } from "motion/react";
 
 // Constants
@@ -78,6 +79,8 @@ type EvilLineChartProps<
   brushHeight?: number;
   brushFormatLabel?: (value: unknown, index: number) => string;
   onBrushChange?: (range: EvilBrushRange) => void;
+  // Background
+  backgroundVariant?: BackgroundVariant;
 };
 
 type EvilLineChartClickable = {
@@ -130,6 +133,7 @@ export function EvilLineChart<
   brushFormatLabel,
   onBrushChange,
   onSelectionChange,
+  backgroundVariant,
 }: EvilLineChartPropsWithCallback<TData, TConfig>) {
   const [selectedDataKey, setSelectedDataKey] = useState<string | null>(defaultSelectedDataKey);
   const { loadingData, onShimmerExit } = useLoadingData(isLoading, loadingPoints);
@@ -185,8 +189,9 @@ export function EvilLineChart<
         data={isLoading ? loadingData : displayData}
         {...chartProps}
       >
+        {backgroundVariant && <ChartBackground variant={backgroundVariant} />}
         <ReferenceLine color="white" />
-        {!hideCartesianGrid && <CartesianGrid vertical={false} strokeDasharray="3 3" />}
+        {!hideCartesianGrid && !backgroundVariant && <CartesianGrid vertical={false} strokeDasharray="3 3" />}
         {!hideLegend && (
           <ChartLegend
             verticalAlign="top"
