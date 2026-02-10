@@ -422,12 +422,12 @@ const CustomBar = (props: CustomBarProps) => {
       />
       {/* Top border strip for stripped variant */}
       {isStripped && (
-        <rect
+        <Rectangle
           x={x}
           y={y - 4}
           width={width}
-          rx={1}
           height={2}
+          radius={1}
           fill={`url(#${chartId}-colors-${dataKey})`}
         />
       )}
