@@ -1,10 +1,10 @@
 "use client";
 
+import { motion, useMotionValue, useMotionValueEvent, useSpring, useTransform } from "motion/react";
 import { ResponsiveContainer, AreaChart, Area, LineChart, Line, BarChart, Bar } from "recharts";
 import { ChartStyle, getColorsCount, type ChartConfig } from "@/registry/ui/chart";
-import type { ComponentProps } from "react";
 import type { MotionValue } from "motion/react";
-import { motion, useMotionValue, useMotionValueEvent, useSpring, useTransform } from "motion/react";
+import type { ComponentProps } from "react";
 import { cn } from "@/lib/utils";
 import * as React from "react";
 
@@ -227,15 +227,19 @@ function EvilBrush({
   // ── Clamping & committing ───────────────────────────────────────────────
 
   const clampRange = React.useCallback(
-    (r: EvilBrushRange): EvilBrushRange => {
-      let { startIndex: s, endIndex: e } = r;
-      s = Math.max(0, Math.min(s, totalPoints - 1));
-      e = Math.max(0, Math.min(e, totalPoints - 1));
-      if (e - s < minSpan) {
-        e = Math.min(s + minSpan, totalPoints - 1);
-        if (e - s < minSpan) s = Math.max(0, e - minSpan);
+    (range: EvilBrushRange): EvilBrushRange => {
+      let { startIndex, endIndex } = range;
+
+      startIndex = Math.max(0, Math.min(startIndex, totalPoints - 1));
+      endIndex = Math.max(0, Math.min(endIndex, totalPoints - 1));
+
+      if (endIndex - startIndex < minSpan) {
+        endIndex = Math.min(startIndex + minSpan, totalPoints - 1);
+        if (endIndex - startIndex < minSpan) {
+          startIndex = Math.max(0, endIndex - minSpan);
+        }
       }
-      return { startIndex: s, endIndex: e };
+      return { startIndex, endIndex };
     },
     [totalPoints, minSpan],
   );
