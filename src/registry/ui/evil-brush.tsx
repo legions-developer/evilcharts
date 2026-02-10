@@ -426,14 +426,14 @@ function BrushHandle({
     <motion.div className="absolute inset-y-0 z-10" style={{ left: position }}>
       <div
         className={cn(
-          "group absolute inset-y-0 flex w-3 cursor-ew-resize touch-none items-center justify-center",
+          "group absolute inset-y-0 flex w-3 cursor-ew-resize touch-none items-center justify-center after:absolute after:inset-y-0 after:-left-4 after:w-11 after:content-['']",
           isLeft ? "" : "-translate-x-full",
         )}
         {...bind}
       >
         <div
           className={cn(
-            "bg-muted-foreground hover:bg-foreground relative flex h-4 w-1.5 items-center justify-center rounded-md transition-colors",
+            "bg-muted-foreground group-hover:bg-foreground relative flex h-4 w-1.5 items-center justify-center rounded-md transition-colors",
             isLeft ? "-left-[5.5px]" : "-right-[5.5px]",
           )}
         >
@@ -584,7 +584,7 @@ function MiniChart({
   }
 
   if (variant === "bar") {
-    const r = barRadius ?? 1;
+    const r = barRadius ?? 3;
     return (
       <ResponsiveContainer width="100%" height="100%">
         <BarChart
@@ -602,7 +602,7 @@ function MiniChart({
               fillOpacity={0.35}
               stackId={stacked ? "zm-stack" : undefined}
               isAnimationActive={false}
-              radius={[r, r, 0, 0]}
+              radius={[r, r, r, r]}
             />
           ))}
         </BarChart>
