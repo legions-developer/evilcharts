@@ -4,7 +4,7 @@ import { motion, useMotionValue, useMotionValueEvent, useSpring, useTransform } 
 import { ResponsiveContainer, AreaChart, Area, LineChart, Line, BarChart, Bar } from "recharts";
 import { ChartStyle, getColorsCount, type ChartConfig } from "@/registry/ui/chart";
 import type { MotionValue } from "motion/react";
-import type { ComponentProps } from "react";
+import { useCallback, useEffect, type ComponentProps } from "react";
 import { cn } from "@/lib/utils";
 import * as React from "react";
 
@@ -94,12 +94,12 @@ function useBrushDrag({
   range: EvilBrushRange;
   totalPoints: number;
   containerRef: React.RefObject<HTMLDivElement | null>;
-  commit: (next: EvilBrushRange) => void;
+  commit: (next: EvilBrushRange, mode?: DragType) => void;
 }) {
   const dragRef = React.useRef<DragState | null>(null);
   const [isDragging, setIsDragging] = React.useState(false);
 
-  const toIndexDelta = React.useCallback(
+  const toIndexDelta = useCallback(
     (px: number) => {
       if (!containerRef.current || totalPoints <= 1) return 0;
       return Math.round(
@@ -109,7 +109,7 @@ function useBrushDrag({
     [totalPoints, containerRef],
   );
 
-  const onPointerDown = React.useCallback(
+  const onPointerDown = useCallback(
     (e: React.PointerEvent, type: DragType) => {
       e.preventDefault();
       (e.target as HTMLElement).setPointerCapture(e.pointerId);
@@ -119,7 +119,7 @@ function useBrushDrag({
     [range],
   );
 
-  const onPointerMove = React.useCallback(
+  const onPointerMove = useCallback(
     (e: React.PointerEvent) => {
       const d = dragRef.current;
       if (!d) return;
@@ -128,9 +128,9 @@ function useBrushDrag({
       const { type, originRange: o } = d;
 
       if (type === "left") {
-        commit({ startIndex: o.startIndex + delta, endIndex: o.endIndex });
+        commit({ startIndex: o.startIndex + delta, endIndex: o.endIndex }, "left");
       } else if (type === "right") {
-        commit({ startIndex: o.startIndex, endIndex: o.endIndex + delta });
+        commit({ startIndex: o.startIndex, endIndex: o.endIndex + delta }, "right");
       } else {
         const span = o.endIndex - o.startIndex;
         let s = o.startIndex + delta;
@@ -143,20 +143,20 @@ function useBrushDrag({
           e2 = totalPoints - 1;
           s = Math.max(0, e2 - span);
         }
-        commit({ startIndex: s, endIndex: e2 });
+        commit({ startIndex: s, endIndex: e2 }, "middle");
       }
     },
     [toIndexDelta, totalPoints, commit],
   );
 
-  const onPointerUp = React.useCallback((e: React.PointerEvent) => {
+  const onPointerUp = useCallback((e: React.PointerEvent) => {
     (e.target as HTMLElement).releasePointerCapture(e.pointerId);
     dragRef.current = null;
     setIsDragging(false);
   }, []);
 
   // Helper to bind all three pointer handlers for a given drag type
-  const bind = React.useCallback(
+  const bind = useCallback(
     (type: DragType) => ({
       onPointerDown: (e: React.PointerEvent) => onPointerDown(e, type),
       onPointerMove,
@@ -211,7 +211,7 @@ function EvilBrush({
   // mouse movements don't produce index changes (e.g., at boundaries)
   const lastCommittedRef = React.useRef<EvilBrushRange>(internalRange);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!isControlled) {
       setInternalRange((prev) => {
         const adjusted = {
@@ -226,15 +226,28 @@ function EvilBrush({
 
   // ── Clamping & committing ───────────────────────────────────────────────
 
-  const clampRange = React.useCallback(
-    (range: EvilBrushRange): EvilBrushRange => {
+  const clampRange = useCallback(
+    (range: EvilBrushRange, mode?: DragType): EvilBrushRange => {
       let { startIndex, endIndex } = range;
+      const maxIndex = Math.max(0, totalPoints - 1);
 
-      startIndex = Math.max(0, Math.min(startIndex, totalPoints - 1));
-      endIndex = Math.max(0, Math.min(endIndex, totalPoints - 1));
+      startIndex = Math.max(0, Math.min(startIndex, maxIndex));
+      endIndex = Math.max(0, Math.min(endIndex, maxIndex));
+
+      if (mode === "left") {
+        const maxStart = Math.max(0, endIndex - minSpan);
+        startIndex = Math.min(startIndex, maxStart);
+        return { startIndex, endIndex };
+      }
+
+      if (mode === "right") {
+        const minEnd = Math.min(maxIndex, startIndex + minSpan);
+        endIndex = Math.max(endIndex, minEnd);
+        return { startIndex, endIndex };
+      }
 
       if (endIndex - startIndex < minSpan) {
-        endIndex = Math.min(startIndex + minSpan, totalPoints - 1);
+        endIndex = Math.min(startIndex + minSpan, maxIndex);
         if (endIndex - startIndex < minSpan) {
           startIndex = Math.max(0, endIndex - minSpan);
         }
@@ -244,9 +257,9 @@ function EvilBrush({
     [totalPoints, minSpan],
   );
 
-  const commit = React.useCallback(
-    (next: EvilBrushRange) => {
-      const clamped = clampRange(next);
+  const commit = useCallback(
+    (next: EvilBrushRange, mode?: DragType) => {
+      const clamped = clampRange(next, mode);
       const last = lastCommittedRef.current;
 
       // Only update if the range has actually changed — avoids unnecessary
@@ -280,9 +293,10 @@ function EvilBrush({
   const range = internalRange;
 
   // Sync internalRange with controlled props when not dragging
-  React.useEffect(() => {
+  useEffect(() => {
     if (isControlled && !isDragging) {
       const syncedRange = { startIndex: controlledStart, endIndex: controlledEnd };
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setInternalRange(syncedRange);
       lastCommittedRef.current = syncedRange;
     }
@@ -307,14 +321,14 @@ function EvilBrush({
   const rightOverlayWidth = useTransform(rightSpring, (v) => `${Math.max(0, 100 - v)}%`);
   const selectedWidth = useMotionValue(`${Math.max(0, rightPct - leftPct)}%`);
 
-  const updateSelectedWidth = React.useCallback(() => {
+  const updateSelectedWidth = useCallback(() => {
     selectedWidth.set(`${Math.max(0, rightSpring.get() - leftSpring.get())}%`);
   }, [leftSpring, rightSpring, selectedWidth]);
 
   useMotionValueEvent(leftSpring, "change", updateSelectedWidth);
   useMotionValueEvent(rightSpring, "change", updateSelectedWidth);
 
-  const getLabel = React.useCallback(
+  const getLabel = useCallback(
     (idx: number) => {
       if (!xDataKey) return String(idx);
       const v = data[idx]?.[xDataKey];
@@ -646,7 +660,8 @@ function useEvilBrush<TData extends Record<string, unknown>>({
   // deferred value.  React can skip intermediate slices during fast drags.
   const deferredRange = React.useDeferredValue(range);
 
-  React.useEffect(() => {
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setRange({
       startIndex: 0,
       endIndex: Math.max(0, data.length - 1),
