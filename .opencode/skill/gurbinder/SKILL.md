@@ -1,5 +1,5 @@
 ---
-name: gurbinder rule
+name: senior bs rule
 description: Basic coding rule
 compatibility: opencode
 ---
