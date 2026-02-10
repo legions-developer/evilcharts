@@ -1,0 +1,90 @@
+name: Bug Report
+description: Report a bug or issue with a chart component
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug! Please fill out the information below.
+
+  - type: dropdown
+    id: chart-type
+    attributes:
+      label: Chart Type
+      description: Which type of chart is affected?
+      options:
+        - Bar Chart
+        - Line Chart
+        - Area Chart
+        - Pie Chart
+        - Radar Chart
+        - Animated Chart
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: chart-name
+    attributes:
+      label: Chart Component Name
+      description: Name of the specific chart component (e.g., gradient-bar-chart)
+      placeholder: gradient-bar-chart
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Clear description of the bug
+      placeholder: The chart doesn't render when...
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: How can we reproduce this issue?
+      placeholder: |
+        1. Import the chart component
+        2. Pass data with...
+        3. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What should happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What actually happens?
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Your environment details
+      value: |
+        - OS:
+        - Browser:
+        - Node version:
+        - Next.js version:
+      render: markdown
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Screenshots, error messages, or other relevant information

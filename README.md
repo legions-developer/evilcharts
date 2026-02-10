@@ -14,6 +14,16 @@ A modern, customizable chart library for React and Next.js applications featurin
 - 🎭 Customizable styles, patterns, and effects
 - 📱 Fully responsive design
 
+## Contributing
+
+We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on:
+
+- Adding new chart components
+- Reporting bugs and requesting features
+- Development setup and workflow
+
+Please read our [Code of Conduct](CODE_OF_CONDUCT.md) before contributing.
+
 
 
  
