@@ -69,7 +69,6 @@ type EvilBarChartProps<
   loadingBars?: number;
   // Glow Effects
   glowingBars?: NumericDataKeys<TData>[];
-  neonBars?: NumericDataKeys<TData>[];
   // Brush
   showBrush?: boolean;
   brushVariant?: EvilBrushVariant;
@@ -124,7 +123,6 @@ export function EvilBarChart<
   isLoading = false,
   loadingBars,
   glowingBars = [],
-  neonBars = [],
   showBrush = false,
   brushVariant,
   brushHeight,
@@ -248,14 +246,7 @@ export function EvilBarChart<
         {!isLoading &&
           Object.keys(chartConfig).map((dataKey) => {
             const isGlowing = glowingBars.includes(dataKey as NumericDataKeys<TData>);
-            const isNeon = neonBars.includes(dataKey as NumericDataKeys<TData>);
-
-            // Determine which filter to apply (neon takes priority over glow)
-            const getFilter = () => {
-              if (isNeon) return `url(#${chartId}-bar-neon-${dataKey})`;
-              if (isGlowing) return `url(#${chartId}-bar-glow-${dataKey})`;
-              return undefined;
-            };
+            const filter = isGlowing ? `url(#${chartId}-bar-glow-${dataKey})` : undefined;
 
             // Shared props for both shape and activeBar
             const customBarProps = {
@@ -263,7 +254,7 @@ export function EvilBarChart<
               dataKey,
               barVariant,
               barRadius,
-              filter: getFilter(),
+              filter,
               isClickable,
               enableHoverHighlight,
               isMouseInChart,
@@ -327,10 +318,6 @@ export function EvilBarChart<
           {/* Glow filter for glowing bars */}
           {glowingBars.length > 0 && (
             <GlowFilterStyle chartId={chartId} glowingBars={glowingBars as string[]} />
-          )}
-          {/* Neon filter for neon bars */}
-          {neonBars.length > 0 && (
-            <NeonFilterStyle chartId={chartId} neonBars={neonBars as string[]} />
           )}
         </defs>
       </BarChart>
@@ -832,67 +819,6 @@ const GlowFilterStyle = ({ chartId, glowingBars }: { chartId: string; glowingBar
           />
           <feMerge>
             <feMergeNode in="glow" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-      ))}
-    </>
-  );
-};
-
-// Neon filter style for neon bars - multi-layered glow with white inner core
-const NeonFilterStyle = ({ chartId, neonBars }: { chartId: string; neonBars: string[] }) => {
-  return (
-    <>
-      {neonBars.map((dataKey) => (
-        <filter
-          key={`${chartId}-bar-neon-${dataKey}`}
-          id={`${chartId}-bar-neon-${dataKey}`}
-          x="-100%"
-          y="-100%"
-          width="300%"
-          height="300%"
-        >
-          {/* Outer glow - large, soft, colored */}
-          <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="outerBlur" />
-          <feColorMatrix
-            in="outerBlur"
-            type="matrix"
-            values="1 0 0 0 0
-                    0 1 0 0 0
-                    0 0 1 0 0
-                    0 0 0 0.8 0"
-            result="outerGlow"
-          />
-
-          {/* Middle glow - medium, brighter */}
-          <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="middleBlur" />
-          <feColorMatrix
-            in="middleBlur"
-            type="matrix"
-            values="1 0 0 0 0.05
-                    0 1 0 0 0.05
-                    0 0 1 0 0.05
-                    0 0 0 1.2 0"
-            result="middleGlow"
-          />
-
-          {/* White core - very tight, bright white center */}
-          <feGaussianBlur in="SourceGraphic" stdDeviation="1" result="coreBlur" />
-          <feColorMatrix
-            in="coreBlur"
-            type="matrix"
-            values="0 0 0 0 1
-                    0 0 0 0 1
-                    0 0 0 0 1
-                    0 0 0 1 0"
-            result="whiteCore"
-          />
-
-          <feMerge>
-            <feMergeNode in="outerGlow" />
-            <feMergeNode in="middleGlow" />
-            <feMergeNode in="whiteCore" />
             <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>

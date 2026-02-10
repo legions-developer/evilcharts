@@ -168,11 +168,6 @@ Below are some examples of the bar chart with different `variants`. You can cust
 <ComponentPreview className="mb-0" title="glowingBars={['desktop']} - gradient colors" name="ex-glowing-desktop-bar-chart"  />
 <ComponentPreview title="glowingBars={['mobile']} - solid colors" name="ex-glowing-mobile-bar-chart"  />
 
-### Neon Bars
-
-<ComponentPreview className="mb-0" title="neonBars={['desktop']} - gradient colors" name="ex-neon-desktop-bar-chart"  />
-<ComponentPreview title="neonBars={['mobile']} - solid colors" name="ex-neon-mobile-bar-chart"  />
-
 ## API Reference
 
 <ApiReferenceWrapper>
@@ -462,20 +457,7 @@ Below are some examples of the bar chart with different `variants`. You can cust
       propName="glowingBars"
     />
     <ApiContent>
-      Array of data keys that should have a glowing effect applied. Creates a smooth outer neon glow around the specified bars.
-      
-      type: `NumericDataKeys<TData>[]` (array of keys where the value is a number)
-      
-      default: `[]`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="neonBars"
-    />
-    <ApiContent>
-      Array of data keys that should have a neon effect applied. Creates a multi-layered glow with a bright white core for the specified bars. Neon effect takes priority over glow effect.
+      Array of data keys that should have a glowing effect applied. Creates a smooth outer glow around the specified bars.
       
       type: `NumericDataKeys<TData>[]` (array of keys where the value is a number)
       

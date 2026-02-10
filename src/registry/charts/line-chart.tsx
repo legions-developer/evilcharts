@@ -72,7 +72,6 @@ type EvilLineChartProps<
   loadingPoints?: number;
   // Glow Effect
   glowingLines?: NumericDataKeys<TData>[];
-  neonLines?: NumericDataKeys<TData>[];
   // Brush
   showBrush?: boolean;
   brushVariant?: EvilBrushVariant;
@@ -126,7 +125,6 @@ export function EvilLineChart<
   isLoading = false,
   loadingPoints,
   glowingLines = [],
-  neonLines = [],
   showBrush = false,
   brushVariant,
   brushHeight,
@@ -249,14 +247,7 @@ export function EvilLineChart<
             const _opacity = getOpacity(isClickable, selectedDataKey, dataKey);
             const hasSelection = selectedDataKey !== null;
             const isGlowing = glowingLines.includes(dataKey as NumericDataKeys<TData>);
-            const isNeon = neonLines.includes(dataKey as NumericDataKeys<TData>);
-
-            // Determine which filter to apply (neon takes priority over glow)
-            const getFilter = () => {
-              if (isNeon) return `url(#${chartId}-line-neon-${dataKey})`;
-              if (isGlowing) return `url(#${chartId}-line-glow-${dataKey})`;
-              return undefined;
-            };
+            const filter = isGlowing ? `url(#${chartId}-line-glow-${dataKey})` : undefined;
 
             const dot = dotVariant ? (
               <ChartDot
@@ -306,7 +297,7 @@ export function EvilLineChart<
                   connectNulls={connectNulls}
                   strokeOpacity={_opacity.stroke}
                   stroke={`url(#${chartId}-colors-${dataKey})`}
-                  filter={getFilter()}
+                  filter={filter}
                   dot={dot}
                   activeDot={activeDot}
                   strokeWidth={STROKE_WIDTH}
@@ -355,10 +346,6 @@ export function EvilLineChart<
           {/* Glow filter for glowing lines */}
           {glowingLines.length > 0 && (
             <GlowFilterStyle chartId={chartId} glowingLines={glowingLines as string[]} />
-          )}
-          {/* Neon filter for neon lines */}
-          {neonLines.length > 0 && (
-            <NeonFilterStyle chartId={chartId} neonLines={neonLines as string[]} />
           )}
         </defs>
       </LineChart>
@@ -442,7 +429,7 @@ const HorizontalColorGradientStyle = ({
   );
 };
 
-// Glow filter style for glowing lines - smooth outer neon glow
+// Glow filter style for glowing lines - smooth outer glow
 const GlowFilterStyle = ({
   chartId,
   glowingLines,
@@ -475,68 +462,6 @@ const GlowFilterStyle = ({
           {/* Place original line on top of glow */}
           <feMerge>
             <feMergeNode in="glow" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-      ))}
-    </>
-  );
-};
-
-// Neon filter style for neon lines - multi-layered glow with white inner core
-const NeonFilterStyle = ({ chartId, neonLines }: { chartId: string; neonLines: string[] }) => {
-  return (
-    <>
-      {neonLines.map((dataKey) => (
-        <filter
-          key={`${chartId}-line-neon-${dataKey}`}
-          id={`${chartId}-line-neon-${dataKey}`}
-          x="-100%"
-          y="-100%"
-          width="300%"
-          height="300%"
-        >
-          {/* Outer glow - large, soft, colored */}
-          <feGaussianBlur in="SourceGraphic" stdDeviation="20" result="outerBlur" />
-          <feColorMatrix
-            in="outerBlur"
-            type="matrix"
-            values="1 0 0 0 0
-                    0 1 0 0 0
-                    0 0 1 0 0
-                    0 0 0 1.5 0"
-            result="outerGlow"
-          />
-
-          {/* Middle glow - medium, brighter */}
-          <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="middleBlur" />
-          <feColorMatrix
-            in="middleBlur"
-            type="matrix"
-            values="1 0 0 0 0.1
-                    0 1 0 0 0.1
-                    0 0 1 0 0.1
-                    0 0 0 2 0"
-            result="middleGlow"
-          />
-
-          {/* White core - very tight, bright white center */}
-          <feGaussianBlur in="SourceGraphic" stdDeviation="0.2" result="coreBlur" />
-          <feColorMatrix
-            in="coreBlur"
-            type="matrix"
-            values="0 0 0 0 1
-                    0 0 0 0 1
-                    0 0 0 0 1
-                    0 0 0 2 0"
-            result="whiteCore"
-          />
-
-          {/* Merge all layers: outer -> middle -> inner -> white core -> original */}
-          <feMerge>
-            <feMergeNode in="outerGlow" />
-            <feMergeNode in="middleGlow" />
-            <feMergeNode in="whiteCore" />
             <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>

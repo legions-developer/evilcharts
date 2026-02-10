@@ -358,29 +358,6 @@ export const examples: Registry["items"] = [
       },
     ],
   },
-  // Line Chart Neon Lines
-  {
-    name: "ex-neon-desktop-line-chart",
-    registryDependencies: ["@evilcharts/line-chart"],
-    type: "registry:block",
-    files: [
-      {
-        path: "examples/ex-neon-desktop-line-chart.tsx",
-        type: "registry:block",
-      },
-    ],
-  },
-  {
-    name: "ex-neon-mobile-line-chart",
-    registryDependencies: ["@evilcharts/line-chart"],
-    type: "registry:block",
-    files: [
-      {
-        path: "examples/ex-neon-mobile-line-chart.tsx",
-        type: "registry:block",
-      },
-    ],
-  },
   // Line Chart Background Variants
   {
     name: "ex-bg-dots-line-chart",
@@ -675,29 +652,6 @@ export const examples: Registry["items"] = [
     files: [
       {
         path: "examples/ex-glowing-mobile-bar-chart.tsx",
-        type: "registry:block",
-      },
-    ],
-  },
-  // Bar Chart Neon Bars
-  {
-    name: "ex-neon-desktop-bar-chart",
-    registryDependencies: ["@evilcharts/bar-chart"],
-    type: "registry:block",
-    files: [
-      {
-        path: "examples/ex-neon-desktop-bar-chart.tsx",
-        type: "registry:block",
-      },
-    ],
-  },
-  {
-    name: "ex-neon-mobile-bar-chart",
-    registryDependencies: ["@evilcharts/bar-chart"],
-    type: "registry:block",
-    files: [
-      {
-        path: "examples/ex-neon-mobile-bar-chart.tsx",
         type: "registry:block",
       },
     ],
