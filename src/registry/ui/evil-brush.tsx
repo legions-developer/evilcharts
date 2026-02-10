@@ -3,7 +3,8 @@
 import { ResponsiveContainer, AreaChart, Area, LineChart, Line, BarChart, Bar } from "recharts";
 import { ChartStyle, getColorsCount, type ChartConfig } from "@/registry/ui/chart";
 import type { ComponentProps } from "react";
-import { motion } from "motion/react";
+import type { MotionValue } from "motion/react";
+import { motion, useMotionValue, useMotionValueEvent, useSpring, useTransform } from "motion/react";
 import { cn } from "@/lib/utils";
 import * as React from "react";
 
@@ -69,7 +70,7 @@ interface EvilBrushProps {
 
 // ─── Spring config ──────────────────────────────────────────────────────────
 
-const SPRING_TRANSITION = { type: "spring" as const, stiffness: 300, damping: 35, mass: 0.8 };
+const SPRING_CONFIG = { stiffness: 300, damping: 35, mass: 0.8 };
 
 // ─── Pointer-capture drag hook ──────────────────────────────────────────────
 // Replaces raw addEventListener with the modern Pointer Events API.
@@ -288,6 +289,27 @@ function EvilBrush({
   const leftPct = totalPoints > 1 ? (range.startIndex / (totalPoints - 1)) * 100 : 0;
   const rightPct = totalPoints > 1 ? (range.endIndex / (totalPoints - 1)) * 100 : 100;
 
+  // Drive all moving brush UI from the same springed edge values.
+  const leftTarget = useMotionValue(leftPct);
+  const rightTarget = useMotionValue(rightPct);
+  if (leftTarget.get() !== leftPct) leftTarget.set(leftPct);
+  if (rightTarget.get() !== rightPct) rightTarget.set(rightPct);
+
+  const leftSpring = useSpring(leftTarget, SPRING_CONFIG);
+  const rightSpring = useSpring(rightTarget, SPRING_CONFIG);
+  const leftPosition = useTransform(leftSpring, (v) => `${v}%`);
+  const rightPosition = useTransform(rightSpring, (v) => `${v}%`);
+  const leftOverlayWidth = useTransform(leftSpring, (v) => `${v}%`);
+  const rightOverlayWidth = useTransform(rightSpring, (v) => `${Math.max(0, 100 - v)}%`);
+  const selectedWidth = useMotionValue(`${Math.max(0, rightPct - leftPct)}%`);
+
+  const updateSelectedWidth = React.useCallback(() => {
+    selectedWidth.set(`${Math.max(0, rightSpring.get() - leftSpring.get())}%`);
+  }, [leftSpring, rightSpring, selectedWidth]);
+
+  useMotionValueEvent(leftSpring, "change", updateSelectedWidth);
+  useMotionValueEvent(rightSpring, "change", updateSelectedWidth);
+
   const getLabel = React.useCallback(
     (idx: number) => {
       if (!xDataKey) return String(idx);
@@ -329,42 +351,34 @@ function EvilBrush({
       {/* Dim overlay – left */}
       <motion.div
         className="bg-background/70 pointer-events-none absolute inset-y-0 left-0 rounded-l-md"
-        initial={false}
-        animate={{ width: `${leftPct}%` }}
-        transition={SPRING_TRANSITION}
+        style={{ width: leftOverlayWidth }}
       />
       {/* Dim overlay – right */}
       <motion.div
         className="bg-background/70 pointer-events-none absolute inset-y-0 right-0 rounded-r-md"
-        initial={false}
-        animate={{ width: `${100 - rightPct}%` }}
-        transition={SPRING_TRANSITION}
+        style={{ width: rightOverlayWidth }}
       />
 
       {/* Selected region – draggable to pan */}
       <motion.div
         className="absolute inset-y-0 cursor-grab touch-none rounded-sm border active:cursor-grabbing"
-        initial={false}
-        animate={{ left: `${leftPct}%`, width: `${rightPct - leftPct}%` }}
-        transition={SPRING_TRANSITION}
+        style={{ left: leftPosition, width: selectedWidth }}
         {...bind("middle")}
       />
 
       {/* Left handle */}
       <BrushHandle
         side="left"
-        percent={leftPct}
+        position={leftPosition}
         label={showLabels ? getLabel(range.startIndex) : undefined}
-        transition={SPRING_TRANSITION}
         bind={bind("left")}
       />
 
       {/* Right handle */}
       <BrushHandle
         side="right"
-        percent={rightPct}
+        position={rightPosition}
         label={showLabels ? getLabel(range.endIndex) : undefined}
-        transition={SPRING_TRANSITION}
         bind={bind("right")}
       />
     </div>
@@ -375,14 +389,13 @@ function EvilBrush({
 
 function BrushHandle({
   side,
-  percent,
+  position,
   label,
   bind,
 }: {
   side: "left" | "right";
-  percent: number;
+  position: MotionValue<string>;
   label?: string;
-  transition: Record<string, unknown>;
   bind: {
     onPointerDown: (e: React.PointerEvent) => void;
     onPointerMove: (e: React.PointerEvent) => void;
@@ -392,12 +405,7 @@ function BrushHandle({
   const isLeft = side === "left";
 
   return (
-    <motion.div
-      className="absolute inset-y-0 z-10"
-      initial={false}
-      animate={{ left: `${percent}%` }}
-      transition={SPRING_TRANSITION}
-    >
+    <motion.div className="absolute inset-y-0 z-10" style={{ left: position }}>
       <div
         className={cn(
           "group absolute inset-y-0 flex w-3 cursor-ew-resize touch-none items-center justify-center",
