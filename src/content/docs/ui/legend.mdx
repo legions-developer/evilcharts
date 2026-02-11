@@ -2,3 +2,102 @@
 title: Legend
 description: Display chart legends to identify different data series in your visualizations
 ---
+
+## Usage
+
+```tsx
+<EvilLineChart
+  xDataKey="month"
+  data={data}
+  chartConfig={chartConfig}
+  legendVariant="circle" | "square" | "circle-outline" // and so on
+/>
+```
+
+## Variants
+
+Control the legend indicator style with the `legendVariant` prop.
+
+### Square
+
+<ComponentPreview title="legendVariant='square'" name="ex-legend-square-line-chart" />
+
+### Circle
+
+<ComponentPreview title="legendVariant='circle'" name="ex-legend-circle-line-chart" />
+
+### Circle Outline
+
+<ComponentPreview title="legendVariant='circle-outline'" name="ex-legend-circle-outline-line-chart" />
+
+### Rounded Square (Default)
+
+<ComponentPreview title="legendVariant='rounded-square'" name="ex-legend-rounded-square-line-chart" />
+
+### Rounded Square Outline
+
+<ComponentPreview title="legendVariant='rounded-square-outline'" name="ex-legend-rounded-square-outline-line-chart" />
+
+### Vertical Bar
+
+<ComponentPreview title="legendVariant='vertical-bar'" name="ex-legend-vertical-bar-line-chart" />
+
+### Horizontal Bar
+
+<ComponentPreview title="legendVariant='horizontal-bar'" name="ex-legend-horizontal-bar-line-chart" />
+
+## API Reference
+
+<ApiReferenceWrapper>
+  <ApiReference>
+    <ApiHeader
+      propName="legendVariant"
+    />
+    <ApiContent>
+      Controls the style of the legend indicator icon.
+
+      type: `"square" | "circle" | "circle-outline" | "rounded-square" | "rounded-square-outline" | "vertical-bar" | "horizontal-bar"`
+
+      default: `"rounded-square"`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="hideLegend"
+    />
+    <ApiContent>
+      When `true`, hides the legend entirely.
+
+      type: `boolean`
+
+      default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="hideIcon"
+    />
+    <ApiContent>
+      When `true`, hides the color indicator icon next to each legend item. Only the label text is shown.
+
+      type: `boolean`
+
+      default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="align"
+    />
+    <ApiContent>
+      Controls the horizontal alignment of the legend items.
+
+      type: `"left" | "center" | "right"`
+
+      default: `"right"`
+    </ApiContent>
+  </ApiReference>
+</ApiReferenceWrapper>

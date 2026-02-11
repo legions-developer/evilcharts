@@ -1220,4 +1220,85 @@ export const examples: Registry["items"] = [
       },
     ],
   },
+  // ========================================
+  // LEGEND EXAMPLES
+  // ========================================
+  // Legend Variant Examples
+  {
+    name: "ex-legend-square-line-chart",
+    registryDependencies: ["@evilcharts/line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-legend-square-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-legend-circle-line-chart",
+    registryDependencies: ["@evilcharts/line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-legend-circle-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-legend-circle-outline-line-chart",
+    registryDependencies: ["@evilcharts/line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-legend-circle-outline-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-legend-rounded-square-line-chart",
+    registryDependencies: ["@evilcharts/line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-legend-rounded-square-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-legend-rounded-square-outline-line-chart",
+    registryDependencies: ["@evilcharts/line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-legend-rounded-square-outline-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-legend-vertical-bar-line-chart",
+    registryDependencies: ["@evilcharts/line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-legend-vertical-bar-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-legend-horizontal-bar-line-chart",
+    registryDependencies: ["@evilcharts/line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-legend-horizontal-bar-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
 ];
