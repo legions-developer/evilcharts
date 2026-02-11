@@ -68,7 +68,7 @@ function CliBlock({ commands }: CliBlockProps) {
               pnpm
             </TabsTab>
           </TabsList>
-          <CopyButton code={packageCommands[packageManager] + " " + commands.join(" ")} />
+          <CopyButton className="-mt-1" code={packageCommands[packageManager] + " " + commands.join(" ")} />
         </div>
         <div className="bg-background text-muted-foreground rounded-[5px] border p-3 text-[13px]">
           {Object.keys(packageCommands).map((manager) => (
