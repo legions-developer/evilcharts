@@ -10,23 +10,7 @@ interface MDXNavigationProps {
   url: string;
 }
 
-// Map of title patterns to their transformations
-const titleSuffixes: Record<string, string> = {
-  Default: "",
-  Blocks: " Blocks",
-  "Animated Blocks": " Animated Blocks",
-};
-
-export const MDXNavigation = ({ type, $id, title, url, description }: MDXNavigationProps) => {
-  // Extract page name from id (e.g., "root:pie-chart/default.mdx" -> "pie-chart")
-  const pageName = $id?.split("/")[0].split(":").pop() ?? "Default";
-  const formattedPageName = pageName.replace(/-/g, " ");
-
-  // Apply transformation if title matches a pattern
-  if (typeof title === "string" && title in titleSuffixes) {
-    title = formattedPageName + titleSuffixes[title];
-  }
-
+export const MDXNavigation = ({ type, title, url, description }: MDXNavigationProps) => {
   return (
     <Link href={url}>
       <div

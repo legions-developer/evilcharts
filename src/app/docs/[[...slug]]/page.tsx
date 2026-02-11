@@ -1,6 +1,7 @@
 import { DocsTableOfContents } from "@/components/docs/mdx/components/table-of-content";
 import { FeedbackButtons } from "@/components/docs/mdx/components/feedback-buttons";
 import { MDXNavigation } from "@/components/docs/mdx/components/navigation";
+import { DocsCopyPage } from "@/components/docs/layout/docs-copy-button";
 import { findNeighbour } from "fumadocs-core/page-tree";
 import { mdxComponents } from "@/components/docs/mdx";
 import { notFound } from "next/navigation";
@@ -23,32 +24,36 @@ export default async function Page(props: { params: Promise<{ slug: string[] }> 
   const MDX = doc.body;
   const links = doc.links;
   const neighbours = findNeighbour(source.pageTree, page.url);
+  const raw = await page.data.getText("raw");
 
   return (
     <div className="relative mt-10 flex sm:mt-0">
-      <div className="docs-container flex flex-col py-12 pb-32">
-        <div className="flex flex-col gap-1">
-          <h1 className="scroll-m-20 text-3xl font-semibold tracking-tight xl:text-4xl">
-            {doc.title}
-          </h1>
-          {doc.description && (
-            <p className="text-muted-foreground text-[15px]">{doc.description}</p>
-          )}
-          {links && (
-            <div className="mt-3 flex flex-row gap-3">
-              {Object.entries(links).map(([key, value]) => (
-                <a
-                  className="text-muted-foreground bg-muted/50 hover:text-primary flex flex-row items-center gap-2 rounded-md px-2 py-0.5 text-[11px] capitalize"
-                  href={value}
-                  target="_blank"
-                  key={key}
-                >
-                  <LinkIcon className="size-2.5" />
-                  {key}
-                </a>
-              ))}
-            </div>
-          )}
+      <div id="docs-container" className="docs-container flex flex-col py-12 pb-32">
+        <div id="page-header" className="flex flex-row items-start gap-4">
+          <div className="flex flex-1 flex-col gap-1">
+            <h1 className="scroll-m-20 text-3xl font-semibold tracking-tight xl:text-4xl">
+              {doc.title}
+            </h1>
+            {doc.description && (
+              <p className="text-muted-foreground text-[15px]">{doc.description}</p>
+            )}
+            {links && (
+              <div className="mt-3 flex flex-row gap-3 select-none">
+                {Object.entries(links).map(([key, value]) => (
+                  <a
+                    className="text-muted-foreground bg-muted/50 hover:text-primary flex flex-row items-center gap-2 rounded-md px-2 py-0.5 text-[11px] capitalize"
+                    href={value}
+                    target="_blank"
+                    key={key}
+                  >
+                    <LinkIcon className="size-2.5" />
+                    {key}
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
+          <div>{raw && <DocsCopyPage page={raw} url={"https://evilcharts.com" + page.url} />}</div>
         </div>
         <div className="text-primary/80 mt-8 w-full flex-1 text-[14px] *:data-[slot=alert]:first:mt-0">
           <MDX components={mdxComponents} />
