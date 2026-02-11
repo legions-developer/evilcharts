@@ -21,7 +21,7 @@ export function DocsSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) 
       <SidebarHeader className="p-4 pt-6">
         <EvilChartWordmark height="16" width="130" className="z-10" />
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="pb-24">
         <RenderDefaultOptions options={getStartedOptions} label="Get Started" />
         <NavMain tree={source.pageTree} />
         <RenderDefaultOptions options={ChartComponentOptions} label="Chart Components" />
