@@ -154,7 +154,8 @@
   }
 }
 
-html {
+html,
+body {
   background-color: var(--color-sidebar);
 }
 
@@ -221,6 +222,49 @@ html.dark [data-rehype-pretty-code-figure] code span,
   font-style: var(--shiki-dark-font-style) !important;
   font-weight: var(--shiki-dark-font-weight) !important;
   text-decoration: var(--shiki-dark-text-decoration) !important;
+}
+
+.docs-sidebar-top-fade {
+  --docs-sidebar-fade-stop-1: 10%;
+  --docs-sidebar-fade-stop-2: 22%;
+  --docs-sidebar-fade-stop-3: 34%;
+  --docs-sidebar-fade-stop-4: 46%;
+  --docs-sidebar-fade-stop-5: 58%;
+  --docs-sidebar-fade-stop-6: 70%;
+  --docs-sidebar-fade-stop-7: 80%;
+  --docs-sidebar-fade-stop-8: 89%;
+  --docs-sidebar-fade-stop-9: 95%;
+}
+
+.docs-sidebar-top-fade::after {
+  content: "";
+  position: absolute;
+  top: 3.5rem;
+  left: 0;
+  width: 100%;
+  height: 1.8rem;
+  pointer-events: none;
+  background-image:
+    linear-gradient(
+      to bottom,
+      var(--color-sidebar) 0%,
+      color-mix(in srgb, var(--color-sidebar) 98%, transparent) var(--docs-sidebar-fade-stop-1),
+      color-mix(in srgb, var(--color-sidebar) 95%, transparent) var(--docs-sidebar-fade-stop-2),
+      color-mix(in srgb, var(--color-sidebar) 90%, transparent) var(--docs-sidebar-fade-stop-3),
+      color-mix(in srgb, var(--color-sidebar) 83%, transparent) var(--docs-sidebar-fade-stop-4),
+      color-mix(in srgb, var(--color-sidebar) 74%, transparent) var(--docs-sidebar-fade-stop-5),
+      color-mix(in srgb, var(--color-sidebar) 62%, transparent) var(--docs-sidebar-fade-stop-6),
+      color-mix(in srgb, var(--color-sidebar) 48%, transparent) var(--docs-sidebar-fade-stop-7),
+      color-mix(in srgb, var(--color-sidebar) 32%, transparent) var(--docs-sidebar-fade-stop-8),
+      color-mix(in srgb, var(--color-sidebar) 16%, transparent) var(--docs-sidebar-fade-stop-9),
+      transparent 100%
+    ),
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--color-sidebar) 20%, transparent) 0%,
+      color-mix(in srgb, var(--color-sidebar) 10%, transparent) 52%,
+      transparent 100%
+    );
 }
 
 /* Make code lines stretch full width for highlights */

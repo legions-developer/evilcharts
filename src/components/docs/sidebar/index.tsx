@@ -13,6 +13,7 @@ import { RenderDefaultOptions } from "./render-default-options";
 import EvilChartWordmark from "@/assets/logos/evilchart";
 import { source } from "@/lib/source";
 import { NavMain } from "./nav-main";
+import { cn } from "@/lib/utils";
 import * as React from "react";
 
 export function DocsSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -21,7 +22,7 @@ export function DocsSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) 
       <SidebarHeader className="p-4 pt-6">
         <EvilChartWordmark height="16" width="130" className="z-10" />
       </SidebarHeader>
-      <SidebarContent className="pb-24">
+      <SidebarContent className={cn("docs-sidebar-top-fade", "pt-2 pb-14")}>
         <RenderDefaultOptions options={getStartedOptions} label="Get Started" />
         <NavMain tree={source.pageTree} />
         <RenderDefaultOptions options={ChartComponentOptions} label="Chart Components" />
