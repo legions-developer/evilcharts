@@ -26,7 +26,7 @@ import {
 import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/legend";
 import { useCallback, useId, useMemo, useRef, useState, type ComponentProps } from "react";
 import { ChartBackground, type BackgroundVariant } from "@/registry/ui/background";
-import { ChartTooltip, ChartTooltipContent } from "@/registry/ui/tooltip";
+import { ChartTooltip, ChartTooltipContent, type TooltipRoundness, type TooltipVariant } from "@/registry/ui/tooltip";
 import { ChartDot, DotVariant } from "@/registry/ui/dot";
 import { motion } from "motion/react";
 
@@ -76,6 +76,10 @@ type EvilLineChartProps<
   hideCartesianGrid?: boolean;
   hideLegend?: boolean;
   hideCursorLine?: boolean;
+  // Tooltip
+  tooltipRoundness?: TooltipRoundness;
+  tooltipVariant?: TooltipVariant;
+  tooltipDefaultIndex?: number;
   // Interactive Stuffs
   isLoading?: boolean;
   loadingPoints?: number;
@@ -132,6 +136,9 @@ export function EvilLineChart<
   hideCartesianGrid = false,
   hideLegend = false,
   hideCursorLine = false,
+  tooltipRoundness,
+  tooltipVariant,
+  tooltipDefaultIndex,
   isClickable = false,
   isLoading = false,
   loadingPoints,
@@ -242,6 +249,7 @@ export function EvilLineChart<
         )}
         {!hideTooltip && !isLoading && (
           <ChartTooltip
+            defaultIndex={tooltipDefaultIndex}
             cursor={
               hideCursorLine
                 ? false
@@ -253,7 +261,7 @@ export function EvilLineChart<
                     strokeWidth: STROKE_WIDTH,
                   }
             }
-            content={<ChartTooltipContent selected={selectedDataKey} />}
+            content={<ChartTooltipContent selected={selectedDataKey} roundness={tooltipRoundness} variant={tooltipVariant} />}
           />
         )}
         {!isLoading &&

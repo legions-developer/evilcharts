@@ -2,3 +2,124 @@
 title: Tooltip
 description: Display interactive tooltips when hovering over chart data points
 ---
+
+## Usage
+
+```tsx
+<EvilBarChart
+  xDataKey="month"
+  data={data}
+  chartConfig={chartConfig}
+  tooltipVariant="translucent"
+  tooltipRoundness="md"
+/>
+```
+
+## Variants
+
+Control the visual style of the tooltip with the `tooltipVariant` prop. Accepts `"default"` or `"translucent"`.
+
+### Default
+
+The default variant uses a solid background.
+
+<ComponentPreview title="tooltipVariant='default'" name="ex-tooltip-default-bar-chart" />
+
+### Translucent
+
+The translucent variant applies a semi-transparent background with a backdrop blur effect for a frosted-glass look.
+
+<ComponentPreview title="tooltipVariant='translucent'" name="ex-tooltip-translucent-bar-chart" />
+
+## API Reference
+
+<ApiReferenceWrapper>
+  <ApiReference>
+    <ApiHeader
+      propName="tooltipVariant"
+    />
+    <ApiContent>
+      Controls the visual style of the tooltip.
+
+      type: `"default" | "translucent"`
+
+      default: `"default"`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="tooltipRoundness"
+    />
+    <ApiContent>
+      Controls the border-radius of the tooltip.
+
+      type: `"sm" | "md" | "lg" | "xl"`
+
+      default: `"lg"`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="tooltipDefaultIndex"
+    />
+    <ApiContent>
+      When set, the tooltip will be visible by default at the specified data point index.
+
+      type: `number`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="hideTooltip"
+    />
+    <ApiContent>
+      When `true`, hides the tooltip entirely.
+
+      type: `boolean`
+
+      default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="indicator"
+    />
+    <ApiContent>
+      The style of the color indicator shown next to each tooltip item.
+
+      type: `"line" | "dot" | "dashed"`
+
+      default: `"dot"`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="hideLabel"
+    />
+    <ApiContent>
+      When `true`, hides the label (e.g. month name) at the top of the tooltip.
+
+      type: `boolean`
+
+      default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="hideIndicator"
+    />
+    <ApiContent>
+      When `true`, hides the color indicator dot/line next to each tooltip item.
+
+      type: `boolean`
+
+      default: `false`
+    </ApiContent>
+  </ApiReference>
+</ApiReferenceWrapper>

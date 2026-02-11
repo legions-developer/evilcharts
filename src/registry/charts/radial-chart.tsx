@@ -7,7 +7,7 @@ import {
   LoadingIndicator,
 } from "@/registry/ui/chart";
 import { useCallback, useEffect, useId, useMemo, useState, type ComponentProps } from "react";
-import { ChartTooltip, ChartTooltipContent } from "@/registry/ui/tooltip";
+import { ChartTooltip, ChartTooltipContent, type TooltipRoundness, type TooltipVariant } from "@/registry/ui/tooltip";
 import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/legend";
 import { RadialBar, RadialBarChart, Sector, type SectorProps } from "recharts";
 import { ChartBackground, type BackgroundVariant } from "@/registry/ui/background";
@@ -51,6 +51,10 @@ type EvilRadialChartProps<TData extends Record<string, unknown>> = {
   hideLegend?: boolean;
   hideBackground?: boolean;
   legendVariant?: ChartLegendVariant;
+  // Tooltip
+  tooltipRoundness?: TooltipRoundness;
+  tooltipVariant?: TooltipVariant;
+  tooltipDefaultIndex?: number;
 
   // Interactive Stuffs
   isLoading?: boolean;
@@ -92,6 +96,9 @@ export function EvilRadialChart<TData extends Record<string, unknown>>({
   hideLegend = false,
   hideBackground = false,
   legendVariant,
+  tooltipRoundness,
+  tooltipVariant,
+  tooltipDefaultIndex,
   isClickable = false,
   isLoading = false,
   glowingBars = [],
@@ -167,8 +174,9 @@ export function EvilRadialChart<TData extends Record<string, unknown>>({
         )}
         {!hideTooltip && !isLoading && (
           <ChartTooltip
+            defaultIndex={tooltipDefaultIndex}
             cursor={false}
-            content={<ChartTooltipContent nameKey={nameKey} hideLabel />}
+            content={<ChartTooltipContent nameKey={nameKey} hideLabel roundness={tooltipRoundness} variant={tooltipVariant} />}
           />
         )}
 

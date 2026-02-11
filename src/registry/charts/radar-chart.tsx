@@ -9,7 +9,7 @@ import {
 import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/legend";
 import { useCallback, useEffect, useId, useMemo, useState, type ComponentProps } from "react";
 import { PolarAngleAxis, PolarGrid, PolarRadiusAxis, Radar, RadarChart } from "recharts";
-import { ChartTooltip, ChartTooltipContent } from "@/registry/ui/tooltip";
+import { ChartTooltip, ChartTooltipContent, type TooltipRoundness, type TooltipVariant } from "@/registry/ui/tooltip";
 import { ChartDot, DotVariant } from "@/registry/ui/dot";
 import { ChartBackground, type BackgroundVariant } from "@/registry/ui/background";
 
@@ -59,6 +59,10 @@ type EvilRadarChartProps<
   hideLegend?: boolean;
   hideDots?: boolean;
   legendVariant?: ChartLegendVariant;
+  // Tooltip
+  tooltipRoundness?: TooltipRoundness;
+  tooltipVariant?: TooltipVariant;
+  tooltipDefaultIndex?: number;
   dotVariant?: DotVariant;
   activeDotVariant?: DotVariant;
 
@@ -108,6 +112,9 @@ export function EvilRadarChart<
   hideLegend = false,
   hideDots = false,
   legendVariant,
+  tooltipRoundness,
+  tooltipVariant,
+  tooltipDefaultIndex,
   dotVariant,
   activeDotVariant,
   isClickable = false,
@@ -186,7 +193,7 @@ export function EvilRadarChart<
         )}
 
         {!hideTooltip && !isLoading && (
-          <ChartTooltip cursor={false} content={<ChartTooltipContent selected={selectedRadar} />} />
+          <ChartTooltip defaultIndex={tooltipDefaultIndex} cursor={false} content={<ChartTooltipContent selected={selectedRadar} roundness={tooltipRoundness} variant={tooltipVariant} />} />
         )}
 
         {/* Render radars for each data key in chartConfig */}

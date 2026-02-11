@@ -4,6 +4,21 @@ import * as RechartsPrimitive from "recharts";
 import { cn } from "@/lib/utils";
 import * as React from "react";
 
+type TooltipRoundness = "sm" | "md" | "lg" | "xl";
+type TooltipVariant = "default" | "translucent";
+
+const roundnessMap: Record<TooltipRoundness, string> = {
+  sm: "rounded-sm",
+  md: "rounded-md",
+  lg: "rounded-lg",
+  xl: "rounded-xl",
+};
+
+const variantMap: Record<TooltipVariant, string> = {
+  default: "bg-background",
+  translucent: "bg-background/70 backdrop-blur-sm",
+};
+
 function ChartTooltipContent({
   active,
   payload,
@@ -18,6 +33,8 @@ function ChartTooltipContent({
   nameKey,
   labelKey,
   selected,
+  roundness = "lg",
+  variant = "default",
 }: React.ComponentProps<typeof RechartsPrimitive.Tooltip> &
   React.ComponentProps<"div"> & {
     hideLabel?: boolean;
@@ -26,6 +43,8 @@ function ChartTooltipContent({
     nameKey?: string;
     labelKey?: string;
     selected?: string | null;
+    roundness?: TooltipRoundness;
+    variant?: TooltipVariant;
   } & Omit<
     RechartsPrimitive.DefaultTooltipContentProps<ValueType, NameType>,
     "accessibilityLayer"
@@ -66,7 +85,9 @@ function ChartTooltipContent({
   return (
     <div
       className={cn(
-        "border-border/50 bg-background grid min-w-32 items-start gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs shadow-xl",
+        "border-border/50 grid min-w-32 items-start gap-1.5 border px-2.5 py-1.5 text-xs shadow-xl",
+        roundnessMap[roundness],
+        variantMap[variant],
         className,
       )}
     >
@@ -169,3 +190,4 @@ const ChartTooltip = ({
 );
 
 export { ChartTooltip, ChartTooltipContent };
+export type { TooltipRoundness, TooltipVariant };

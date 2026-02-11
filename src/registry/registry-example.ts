@@ -1194,4 +1194,30 @@ export const examples: Registry["items"] = [
       },
     ],
   },
+  // ========================================
+  // TOOLTIP EXAMPLES
+  // ========================================
+  // Tooltip Variant Examples
+  {
+    name: "ex-tooltip-default-bar-chart",
+    registryDependencies: ["@evilcharts/bar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-tooltip-default-bar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-tooltip-translucent-bar-chart",
+    registryDependencies: ["@evilcharts/bar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-tooltip-translucent-bar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
 ];

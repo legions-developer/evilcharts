@@ -13,11 +13,16 @@ import {
   type EvilBrushVariant,
   type EvilBrushRange,
 } from "@/registry/ui/evil-brush";
+import {
+  ChartTooltip,
+  ChartTooltipContent,
+  type TooltipRoundness,
+  type TooltipVariant,
+} from "@/registry/ui/tooltip";
 import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/legend";
 import { Bar, BarChart, CartesianGrid, Rectangle, ReferenceLine, XAxis, YAxis } from "recharts";
 import { useCallback, useId, useMemo, useRef, useState, type ComponentProps } from "react";
 import { ChartBackground, type BackgroundVariant } from "@/registry/ui/background";
-import { ChartTooltip, ChartTooltipContent } from "@/registry/ui/tooltip";
 import { RectRadius } from "recharts/types/shape/Rectangle";
 import { motion } from "motion/react";
 
@@ -68,6 +73,10 @@ type EvilBarChartProps<
   hideTooltip?: boolean;
   hideCartesianGrid?: boolean;
   hideLegend?: boolean;
+  // Tooltip
+  tooltipRoundness?: TooltipRoundness;
+  tooltipVariant?: TooltipVariant;
+  tooltipDefaultIndex?: number;
   // Interactive Stuffs
   enableHoverHighlight?: boolean;
   isLoading?: boolean;
@@ -125,6 +134,9 @@ export function EvilBarChart<
   hideTooltip = false,
   hideCartesianGrid = false,
   hideLegend = false,
+  tooltipRoundness,
+  tooltipVariant,
+  tooltipDefaultIndex,
   isClickable = false,
   enableHoverHighlight = false,
   isLoading = false,
@@ -247,8 +259,14 @@ export function EvilBarChart<
         {!hideTooltip && !isLoading && (
           <ChartTooltip
             cursor={false}
-            active={isMouseInChart ? undefined : false}
-            content={<ChartTooltipContent selected={selectedDataKey} />}
+            defaultIndex={tooltipDefaultIndex}
+            content={
+              <ChartTooltipContent
+                selected={selectedDataKey}
+                roundness={tooltipRoundness}
+                variant={tooltipVariant}
+              />
+            }
           />
         )}
         {!isLoading &&

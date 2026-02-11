@@ -14,7 +14,7 @@ import type {
   SankeyNode,
 } from "recharts";
 import { useCallback, useId, useState, type ReactNode } from "react";
-import { ChartTooltip, ChartTooltipContent } from "@/registry/ui/tooltip";
+import { ChartTooltip, ChartTooltipContent, type TooltipRoundness, type TooltipVariant } from "@/registry/ui/tooltip";
 import { ChartBackground, type BackgroundVariant } from "@/registry/ui/background";
 import { Sankey, Layer } from "recharts";
 import { motion } from "motion/react";
@@ -61,6 +61,10 @@ type EvilSankeyChartProps = {
 
   // Hide Stuffs
   hideTooltip?: boolean;
+  // Tooltip
+  tooltipRoundness?: TooltipRoundness;
+  tooltipVariant?: TooltipVariant;
+  tooltipDefaultIndex?: number;
 
   // Interactive Stuffs
   isLoading?: boolean;
@@ -106,6 +110,9 @@ export function EvilSankeyChart({
   showNodeValues = false,
   nodeValueFormatter = (value: number) => value.toLocaleString(),
   hideTooltip = false,
+  tooltipRoundness,
+  tooltipVariant,
+  tooltipDefaultIndex,
   isClickable = false,
   isLoading = false,
   glowingNodes = [],
@@ -196,7 +203,7 @@ export function EvilSankeyChart({
           {...sankeyProps}
         >
           {!hideTooltip && (
-            <ChartTooltip content={<ChartTooltipContent nameKey="name" hideLabel />} />
+            <ChartTooltip defaultIndex={tooltipDefaultIndex} content={<ChartTooltipContent nameKey="name" hideLabel roundness={tooltipRoundness} variant={tooltipVariant} />} />
           )}
           {/* ======== CHART STYLES ======== */}
           <defs>

@@ -18,7 +18,7 @@ import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/regi
 import { useCallback, useId, useMemo, useRef, useState, type ComponentProps } from "react";
 import { Area, AreaChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from "recharts";
 import { ChartBackground, type BackgroundVariant } from "@/registry/ui/background";
-import { ChartTooltip, ChartTooltipContent } from "@/registry/ui/tooltip";
+import { ChartTooltip, ChartTooltipContent, type TooltipRoundness, type TooltipVariant } from "@/registry/ui/tooltip";
 import { ChartDot, DotVariant } from "@/registry/ui/dot";
 import { motion } from "motion/react";
 
@@ -67,6 +67,10 @@ type BaseEvilAreaChartProps<
   hideCartesianGrid?: boolean;
   hideLegend?: boolean;
   hideCursorLine?: boolean;
+  // Tooltip
+  tooltipRoundness?: TooltipRoundness;
+  tooltipVariant?: TooltipVariant;
+  tooltipDefaultIndex?: number;
   isLoading?: boolean;
   loadingPoints?: number;
   // Brush
@@ -120,6 +124,9 @@ export function EvilAreaChart<
   hideCartesianGrid = false,
   hideLegend = false,
   hideCursorLine = false,
+  tooltipRoundness,
+  tooltipVariant,
+  tooltipDefaultIndex,
   isClickable = false,
   isLoading = false,
   loadingPoints,
@@ -236,6 +243,7 @@ export function EvilAreaChart<
         )}
         {!hideTooltip && !isLoading && (
           <ChartTooltip
+            defaultIndex={tooltipDefaultIndex}
             cursor={
               hideCursorLine
                 ? false
@@ -247,7 +255,7 @@ export function EvilAreaChart<
                     strokeWidth: STROKE_WIDTH,
                   }
             }
-            content={<ChartTooltipContent selected={selectedDataKey} />}
+            content={<ChartTooltipContent selected={selectedDataKey} roundness={tooltipRoundness} variant={tooltipVariant} />}
           />
         )}
         {!isLoading &&

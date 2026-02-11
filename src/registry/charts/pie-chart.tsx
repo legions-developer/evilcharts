@@ -6,7 +6,7 @@ import {
   getColorsCount,
   LoadingIndicator,
 } from "@/registry/ui/chart";
-import { ChartTooltip, ChartTooltipContent } from "@/registry/ui/tooltip";
+import { ChartTooltip, ChartTooltipContent, type TooltipRoundness, type TooltipVariant } from "@/registry/ui/tooltip";
 import { useCallback, useId, useState, type ComponentProps } from "react";
 import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/legend";
 import { LabelList, Pie, PieChart, Sector, type PieSectorShapeProps } from "recharts";
@@ -54,6 +54,10 @@ type EvilPieChartProps<TData extends Record<string, unknown>> = {
   hideTooltip?: boolean;
   hideLegend?: boolean;
   legendVariant?: ChartLegendVariant;
+  // Tooltip
+  tooltipRoundness?: TooltipRoundness;
+  tooltipVariant?: TooltipVariant;
+  tooltipDefaultIndex?: number;
 
   // Interactive Stuffs
   isLoading?: boolean;
@@ -98,6 +102,9 @@ export function EvilPieChart<TData extends Record<string, unknown>>({
   hideTooltip = false,
   hideLegend = false,
   legendVariant,
+  tooltipRoundness,
+  tooltipVariant,
+  tooltipDefaultIndex,
   isClickable = false,
   isLoading = false,
   glowingSectors = [],
@@ -158,7 +165,7 @@ export function EvilPieChart<TData extends Record<string, unknown>>({
           />
         )}
         {!hideTooltip && !isLoading && (
-          <ChartTooltip content={<ChartTooltipContent nameKey={nameKey} hideLabel />} />
+          <ChartTooltip defaultIndex={tooltipDefaultIndex} content={<ChartTooltipContent nameKey={nameKey} hideLabel roundness={tooltipRoundness} variant={tooltipVariant} />} />
         )}
         {!isLoading && (
           <Pie
