@@ -240,19 +240,6 @@ pre:has([data-line]) > code > [data-line] {
 }
 
 /* Highlighted lines via [!code highlight] */
-
-code [data-line].highlighted::before {
-  content: "";
-  position: absolute;
-  left: 0.35rem;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 4px;
-  height: 4px;
-  background-color: var(--color-vesper-type);
-  border-radius: 50%;
-}
-
 code [data-line].highlighted,
 code span.line.highlighted {
   position: relative;
@@ -267,13 +254,10 @@ code span.line.highlighted {
 
 /* Word highlight via [!code word:xxx] */
 code .highlighted-word {
-  background-color: color-mix(in srgb, var(--color-vesper-type) 10%, transparent);
-  padding: 0.125rem 0.375rem;
+  padding: 0.05rem 0.375rem;
   margin: -0.125rem 0;
-  border-radius: 4px;
   border: 1px solid color-mix(in srgb, var(--color-vesper-type) 60%, transparent);
   border-style: dashed;
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-vesper-type) 10%, transparent);
 }
 
 /* Focus via [!code focus] - dim non-focused lines */

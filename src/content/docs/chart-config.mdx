@@ -55,7 +55,7 @@ A human-readable name displayed in tooltips and legends. Can be a string or any 
 ```tsx
 const chartConfig = {
   desktop: {
-    label: "Desktop Users",
+    label: "Desktop Users", // [!code highlight]
     // ...
   },
 } satisfies ChartConfig;
@@ -95,12 +95,12 @@ import { Monitor, Smartphone } from "lucide-react";
 const chartConfig = {
   desktop: {
     label: "Desktop",
-    icon: Monitor,
+    icon: Monitor, // [!code highlight] [!code word:Monitor]
     colors: { light: ["#047857"], dark: ["#10b981"] },
   },
   mobile: {
     label: "Mobile",
-    icon: Smartphone,
+    icon: Smartphone, // [!code highlight] [!code word:Smartphone]
     colors: { light: ["#be123c"], dark: ["#f43f5e"] },
   },
 } satisfies ChartConfig;
