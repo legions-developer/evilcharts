@@ -1,5 +1,6 @@
 import {
   BackgroundIcon,
+  ChartConfigIcon,
   ChartLegendIcon,
   HouseIcon,
   ShapesIcon,
@@ -52,5 +53,13 @@ export const ChartComponentOptions: SidebarOption[] = [
     name: "Legend",
     url: "/docs/ui/legend",
     icon: <ChartLegendIcon />,
+  },
+];
+
+export const DocumentationOptions: SidebarOption[] = [
+  {
+    name: "Chart Config",
+    url: "/docs/chart-config",
+    icon: <ChartConfigIcon />,
   },
 ];

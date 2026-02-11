@@ -1,10 +1,14 @@
 import {
+  getStartedOptions,
+  ChartComponentOptions,
+  DocumentationOptions,
+} from "@/globals/constants/docs-sidebar";
+import {
   Sidebar,
   SidebarContent,
   // SidebarFooter,
   SidebarHeader,
 } from "@/components/ui/sidebar";
-import { getStartedOptions, ChartComponentOptions } from "@/globals/constants/docs-sidebar";
 import { RenderDefaultOptions } from "./render-default-options";
 import EvilChartWordmark from "@/assets/logos/evilchart";
 import { source } from "@/lib/source";
@@ -21,6 +25,7 @@ export function DocsSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) 
         <RenderDefaultOptions options={getStartedOptions} label="Get Started" />
         <NavMain tree={source.pageTree} />
         <RenderDefaultOptions options={ChartComponentOptions} label="Chart Components" />
+        <RenderDefaultOptions options={DocumentationOptions} label="Documentation" />
       </SidebarContent>
     </Sidebar>
   );

@@ -1301,4 +1301,31 @@ export const examples: Registry["items"] = [
       },
     ],
   },
+  // ========================================
+  // CHART CONFIG EXAMPLES
+  // ========================================
+  // Chart Config Default (labels + colors)
+  {
+    name: "ex-chart-config-default-bar-chart",
+    registryDependencies: ["@evilcharts/bar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-chart-config-default-bar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // Chart Config with Icons
+  {
+    name: "ex-chart-config-icons-bar-chart",
+    registryDependencies: ["@evilcharts/bar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-chart-config-icons-bar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
 ];

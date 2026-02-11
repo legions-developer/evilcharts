@@ -1,0 +1,196 @@
+---
+title: Chart Config
+description: Define labels, colors, and icons for each data series in your chart
+---
+
+The `chartConfig` is a central configuration object that every Evil Chart component accepts. It maps each data key in your dataset to its display metadata — **labels**, **colors** (with theme support), and optional **icons** that appear in tooltips and legends.
+
+## Structure
+
+```tsx
+import { type ChartConfig } from "@/registry/ui/chart";
+
+const chartConfig = {
+  desktop: {
+    label: "Desktop",
+    icon: MonitorIcon,
+    colors: {
+      light: ["#047857"],
+      dark: ["#10b981"],
+    },
+  },
+  mobile: {
+    label: "Mobile",
+    icon: SmartphoneIcon,
+    colors: {
+      light: ["#be123c"],
+      dark: ["#f43f5e"],
+    },
+  },
+} satisfies ChartConfig;
+```
+
+Each key in the config (e.g. `desktop`, `mobile`) must match a data key in your dataset. The config object is typed as:
+
+```tsx
+type ChartConfig = Record<
+  string,
+  {
+    label?: React.ReactNode;
+    icon?: React.ComponentType;
+    colors?: {
+      light?: string[];
+      dark?: string[];
+    };
+  }
+>;
+```
+
+## Properties
+
+### label
+
+A human-readable name displayed in tooltips and legends. Can be a string or any `React.ReactNode`.
+
+```tsx
+const chartConfig = {
+  desktop: {
+    label: "Desktop Users",
+    // ...
+  },
+} satisfies ChartConfig;
+```
+
+### colors
+
+Theme-aware color arrays. You must provide at least one theme key (`light` or `dark`). Each value is an array of CSS color strings.
+
+**Single color** — one color per theme for a solid fill:
+
+```tsx
+colors: {
+  light: ["#047857"],
+  dark: ["#10b981"],
+}
+```
+
+**Multiple colors** — pass an array to create gradient fills across bars, areas, and other chart elements. Colors are evenly distributed across the series:
+
+```tsx
+colors: {
+  light: ["#a855f7", "#6366f1", "#3b82f6"],
+  dark: ["#f43f5e", "#ec4899", "#a855f7", "#6366f1", "#3b82f6"],
+}
+```
+
+You can even define different color counts per theme — the chart intelligently distributes them using the max count across all themes.
+
+### icon
+
+An optional React component that replaces the default color indicator in both the **tooltip** and **legend**. This is useful when you want to visually distinguish series beyond just colors.
+
+```tsx
+import { Monitor, Smartphone } from "lucide-react";
+
+const chartConfig = {
+  desktop: {
+    label: "Desktop",
+    icon: Monitor,
+    colors: { light: ["#047857"], dark: ["#10b981"] },
+  },
+  mobile: {
+    label: "Mobile",
+    icon: Smartphone,
+    colors: { light: ["#be123c"], dark: ["#f43f5e"] },
+  },
+} satisfies ChartConfig;
+```
+
+When an `icon` is provided, it renders in place of the color dot/square in tooltips and the color indicator in legends. The icon is styled with `text-muted-foreground` and sized to `h-2.5 w-2.5` in tooltips and `h-3 w-3` in legends.
+
+## How Colors Work
+
+Under the hood, the chart config generates CSS custom properties scoped to each chart instance. For a config key `desktop` with colors `["#a855f7", "#6366f1"]`, the following CSS variables are created:
+
+```css
+--color-desktop-0: #a855f7;
+--color-desktop-1: #6366f1;
+```
+
+These variables are used by chart components, tooltips, and legends to apply consistent theming. When you switch between light and dark mode, the correct set of variables is automatically applied.
+
+### Color Distribution
+
+When fewer colors are provided than chart segments need, colors are **evenly distributed** across slots:
+
+- 2 colors for 4 slots: `[red, red, pink, pink]`
+- 3 colors for 4 slots: `[red, pink, blue, blue]`
+
+This means you can provide just 2-3 gradient stops and they'll smoothly span any number of data points.
+
+## Runtime Validation
+
+The chart config is validated at runtime. If you pass an empty `colors` object or one without a valid theme key, you'll get a clear error:
+
+```plaintext
+[EvilCharts] Invalid chart config for "desktop": colors object must
+have at least one theme key (light, dark). Received empty object or
+invalid keys.
+```
+
+## Examples
+
+### Default (Labels + Colors)
+
+A basic chart config with labels and theme-aware colors. The label appears in the tooltip and legend, while the colors control the chart fill.
+
+<ComponentPreview title="Basic chart config" name="ex-chart-config-default-bar-chart" />
+
+### With Icons
+
+Pass an `icon` component to each config entry. The icon replaces the default color indicator in both the tooltip and the legend.
+
+<ComponentPreview title="Chart config with icons" name="ex-chart-config-icons-bar-chart" />
+
+### Gradient Colors
+
+Pass multiple colors per theme to create gradient fills. Each color in the array represents a gradient stop that is distributed across the chart elements.
+
+<ComponentPreview title="Gradient colors" name="ex-gradient-colors-bar-chart" />
+
+## API Reference
+
+<ApiReferenceWrapper>
+  <ApiReference>
+    <ApiHeader
+      propName="label"
+    />
+    <ApiContent>
+      A human-readable name for the data series. Displayed in tooltips and legends.
+
+      type: `React.ReactNode`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="colors"
+    />
+    <ApiContent>
+      Theme-aware color configuration. Must include at least one theme key (`light` or `dark`). Each key maps to an array of CSS color strings. A single color gives a solid fill; multiple colors create a gradient.
+
+      type: `{ light?: string[]; dark?: string[] }`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="icon"
+    />
+    <ApiContent>
+      An optional React component rendered in place of the default color indicator in tooltips and legends.
+
+      type: `React.ComponentType`
+    </ApiContent>
+  </ApiReference>
+</ApiReferenceWrapper>
