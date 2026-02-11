@@ -48,6 +48,7 @@ export function EvilExampleLineChart() {
       data={data}
       chartConfig={chartConfig}
       xAxisProps={{ tickFormatter: (value) => value.substring(0, 3) }}
+      showBrush
     />
   );
 }

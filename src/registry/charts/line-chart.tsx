@@ -18,6 +18,12 @@ import {
   type CurveProps,
 } from "recharts";
 import {
+  ChartTooltip,
+  ChartTooltipContent,
+  type TooltipRoundness,
+  type TooltipVariant,
+} from "@/registry/ui/tooltip";
+import {
   EvilBrush,
   useEvilBrush,
   type EvilBrushVariant,
@@ -26,7 +32,6 @@ import {
 import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/legend";
 import { useCallback, useId, useMemo, useRef, useState, type ComponentProps } from "react";
 import { ChartBackground, type BackgroundVariant } from "@/registry/ui/background";
-import { ChartTooltip, ChartTooltipContent, type TooltipRoundness, type TooltipVariant } from "@/registry/ui/tooltip";
 import { ChartDot, DotVariant } from "@/registry/ui/dot";
 import { motion } from "motion/react";
 
@@ -261,7 +266,13 @@ export function EvilLineChart<
                     strokeWidth: STROKE_WIDTH,
                   }
             }
-            content={<ChartTooltipContent selected={selectedDataKey} roundness={tooltipRoundness} variant={tooltipVariant} />}
+            content={
+              <ChartTooltipContent
+                selected={selectedDataKey}
+                roundness={tooltipRoundness}
+                variant={tooltipVariant}
+              />
+            }
           />
         )}
         {!isLoading &&
@@ -372,14 +383,34 @@ export function EvilLineChart<
 }
 
 // Buffer line shape - renders the last segment as dashed while the rest stays solid.
-// Uses the Recharts `shape` prop on Line to customize the curve rendering.
-// Calculates Euclidean distances between points to compute a strokeDasharray
-// that is solid for all segments except the last, which gets a dashed pattern.
+// Renders a single <Curve> and uses a ref callback to measure the actual SVG path
+// length via getTotalLength() + getPointAtLength(), then sets stroke-dasharray
+// imperatively. Works correctly with any curve type (linear, natural, monotone, etc.).
 type CurvePoint = NonNullable<NonNullable<CurveProps["points"]>[number]>;
 type DrawableCurvePoint = CurvePoint & { x: number; y: number };
 
 const isDrawableCurvePoint = (point: CurvePoint): point is DrawableCurvePoint => {
   return typeof point.x === "number" && typeof point.y === "number";
+};
+
+const BUFFER_DASH_SIZE = 4;
+const BUFFER_GAP_SIZE = 3;
+
+/**
+ * Binary-search the path to find the length at which path.x ≈ targetX.
+ * Uses the browser's native getPointAtLength for exact curve measurement.
+ */
+const findLengthAtX = (path: SVGPathElement, totalLength: number, targetX: number): number => {
+  let lo = 0;
+  let hi = totalLength;
+  // ~0.5px precision is more than enough for a dasharray split
+  while (hi - lo > 0.5) {
+    const mid = (lo + hi) / 2;
+    const pt = path.getPointAtLength(mid);
+    if (pt.x < targetX) lo = mid;
+    else hi = mid;
+  }
+  return (lo + hi) / 2;
 };
 
 const bufferLineShape = (props: CurveProps) => {
@@ -390,35 +421,36 @@ const bufferLineShape = (props: CurveProps) => {
   }
 
   const drawablePoints = points.filter(isDrawableCurvePoint);
+  
   if (drawablePoints.length < 2) {
     return <Curve {...props} />;
   }
 
-  // Calculate total Euclidean distance between consecutive points
-  let totalLength = 0;
-  for (let i = 1; i < drawablePoints.length; i++) {
-    const dx = drawablePoints[i].x - drawablePoints[i - 1].x;
-    const dy = drawablePoints[i].y - drawablePoints[i - 1].y;
-    totalLength += Math.sqrt(dx * dx + dy * dy);
-  }
+  // x coordinate of the second-to-last point — where solid meets dashed
+  const splitX = drawablePoints[drawablePoints.length - 2].x;
 
-  // Calculate last segment length (second-to-last → last point)
-  const lastIdx = drawablePoints.length - 1;
-  const dx = drawablePoints[lastIdx].x - drawablePoints[lastIdx - 1].x;
-  const dy = drawablePoints[lastIdx].y - drawablePoints[lastIdx - 1].y;
-  const lastSegmentLength = Math.sqrt(dx * dx + dy * dy);
+  // Ref callback runs synchronously during React commit (before browser paint),
+  // so there's no visible flash of an un-dashed line.
+  const gRef = (g: SVGGElement | null) => {
+    if (!g) return;
+    const path = g.querySelector("path");
+    if (!path) return;
 
-  const solidLength = totalLength - lastSegmentLength;
+    const totalLength = path.getTotalLength();
+    const solidLength = findLengthAtX(path, totalLength, splitX);
+    const lastSegmentLength = totalLength - solidLength;
 
-  // Build strokeDasharray: solid portion, then dashed pattern for the buffer segment
-  // Pattern: [solidLength] [0 gap] [dash gap dash gap ...]
-  const dashSize = 4;
-  const gapSize = 3;
-  const repetitions = Math.ceil(lastSegmentLength / (dashSize + gapSize)) + 1;
-  const dashedPart = Array.from({ length: repetitions }, () => `${dashSize} ${gapSize}`).join(" ");
+    // Build dasharray: solid run, then repeating dash-gap for the buffer segment
+    const reps = Math.ceil(lastSegmentLength / (BUFFER_DASH_SIZE + BUFFER_GAP_SIZE)) + 1;
+    const dashedPart = Array.from({ length: reps }, () => `${BUFFER_DASH_SIZE} ${BUFFER_GAP_SIZE}`).join(" ");
+
+    path.setAttribute("stroke-dasharray", `${solidLength} 0 ${dashedPart}`);
+  };
 
   return (
-    <Curve {...rest} points={drawablePoints} strokeDasharray={`${solidLength} 0 ${dashedPart}`} />
+    <g ref={gRef}>
+      <Curve {...rest} points={drawablePoints} />
+    </g>
   );
 };
 
