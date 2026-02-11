@@ -8,12 +8,7 @@ import {
   getLoadingData,
   LoadingIndicator,
 } from "@/registry/ui/chart";
-import {
-  EvilBrush,
-  useEvilBrush,
-  type EvilBrushVariant,
-  type EvilBrushRange,
-} from "@/registry/ui/evil-brush";
+import { EvilBrush, useEvilBrush, type EvilBrushRange } from "@/registry/ui/evil-brush";
 import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/legend";
 import { useCallback, useId, useMemo, useRef, useState, type ComponentProps } from "react";
 import { Area, AreaChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from "recharts";
@@ -75,7 +70,6 @@ type BaseEvilAreaChartProps<
   loadingPoints?: number;
   // Brush
   showBrush?: boolean;
-  brushVariant?: EvilBrushVariant;
   brushHeight?: number;
   brushFormatLabel?: (value: unknown, index: number) => string;
   onBrushChange?: (range: EvilBrushRange) => void;
@@ -131,7 +125,6 @@ export function EvilAreaChart<
   isLoading = false,
   loadingPoints,
   showBrush = false,
-  brushVariant,
   brushHeight,
   brushFormatLabel,
   onBrushChange,
@@ -172,7 +165,7 @@ export function EvilAreaChart<
             data={data}
             chartConfig={chartConfig}
             xDataKey={xDataKey}
-            variant={brushVariant ?? "area"}
+            variant="area"
             curveType={curveType}
             strokeVariant={strokeVariant}
             connectNulls={connectNulls}

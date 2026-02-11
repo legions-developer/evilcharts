@@ -315,6 +315,43 @@ Below are some examples of the radial chart with different configurations. You c
 
   <ApiReference>
     <ApiHeader
+      propName="tooltipRoundness"
+    />
+    <ApiContent>
+      Controls the border-radius of the tooltip.
+      
+      type: `"sm" | "md" | "lg" | "xl"`
+      
+      default: `"lg"`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="tooltipVariant"
+    />
+    <ApiContent>
+      Controls the visual style of the tooltip.
+      
+      type: `"default" | "translucent"`
+      
+      default: `"default"`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="tooltipDefaultIndex"
+    />
+    <ApiContent>
+      When set, the tooltip will be visible by default at the specified data point index.
+      
+      type: `number`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
       propName="legendVariant"
     />
     <ApiContent>

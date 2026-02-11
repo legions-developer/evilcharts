@@ -7,12 +7,7 @@ import {
   getLoadingData,
   LoadingIndicator,
 } from "@/registry/ui/chart";
-import {
-  EvilBrush,
-  useEvilBrush,
-  type EvilBrushVariant,
-  type EvilBrushRange,
-} from "@/registry/ui/evil-brush";
+import { EvilBrush, useEvilBrush, type EvilBrushRange } from "@/registry/ui/evil-brush";
 import {
   ChartTooltip,
   ChartTooltipContent,
@@ -85,7 +80,6 @@ type EvilBarChartProps<
   glowingBars?: NumericDataKeys<TData>[];
   // Brush
   showBrush?: boolean;
-  brushVariant?: EvilBrushVariant;
   brushHeight?: number;
   brushFormatLabel?: (value: unknown, index: number) => string;
   onBrushChange?: (range: EvilBrushRange) => void;
@@ -143,7 +137,6 @@ export function EvilBarChart<
   loadingBars,
   glowingBars = [],
   showBrush = false,
-  brushVariant,
   brushHeight,
   brushFormatLabel,
   onBrushChange,
@@ -185,7 +178,7 @@ export function EvilBarChart<
             data={data}
             chartConfig={chartConfig}
             xDataKey={xDataKey}
-            variant={brushVariant ?? "bar"}
+            variant="bar"
             barRadius={barRadius}
             height={brushHeight}
             formatLabel={brushFormatLabel}

@@ -23,12 +23,7 @@ import {
   type TooltipRoundness,
   type TooltipVariant,
 } from "@/registry/ui/tooltip";
-import {
-  EvilBrush,
-  useEvilBrush,
-  type EvilBrushVariant,
-  type EvilBrushRange,
-} from "@/registry/ui/evil-brush";
+import { EvilBrush, useEvilBrush, type EvilBrushRange } from "@/registry/ui/evil-brush";
 import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/legend";
 import { useCallback, useId, useMemo, useRef, useState, type ComponentProps } from "react";
 import { ChartBackground, type BackgroundVariant } from "@/registry/ui/background";
@@ -92,7 +87,6 @@ type EvilLineChartProps<
   glowingLines?: NumericDataKeys<TData>[];
   // Brush
   showBrush?: boolean;
-  brushVariant?: EvilBrushVariant;
   brushHeight?: number;
   brushFormatLabel?: (value: unknown, index: number) => string;
   onBrushChange?: (range: EvilBrushRange) => void;
@@ -149,7 +143,6 @@ export function EvilLineChart<
   loadingPoints,
   glowingLines = [],
   showBrush = false,
-  brushVariant,
   brushHeight,
   brushFormatLabel,
   onBrushChange,
@@ -187,7 +180,7 @@ export function EvilLineChart<
             data={data}
             chartConfig={chartConfig}
             xDataKey={xDataKey}
-            variant={brushVariant ?? "line"}
+            variant="line"
             curveType={curveType}
             strokeVariant={strokeVariant}
             connectNulls={connectNulls}

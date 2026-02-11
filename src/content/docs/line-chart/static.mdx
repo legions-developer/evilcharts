@@ -328,6 +328,43 @@ Below are some examples of the line chart with different `variants`. where you c
 
   <ApiReference>
     <ApiHeader
+      propName="tooltipRoundness"
+    />
+    <ApiContent>
+      Controls the border-radius of the tooltip.
+      
+      type: `"sm" | "md" | "lg" | "xl"`
+      
+      default: `"lg"`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="tooltipVariant"
+    />
+    <ApiContent>
+      Controls the visual style of the tooltip.
+      
+      type: `"default" | "translucent"`
+      
+      default: `"default"`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="tooltipDefaultIndex"
+    />
+    <ApiContent>
+      When set, the tooltip will be visible by default at the specified data point index.
+      
+      type: `number`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
       propName="hideCartesianGrid"
     />
     <ApiContent>
@@ -451,6 +488,52 @@ Below are some examples of the line chart with different `variants`. where you c
       type: `boolean`
       
       default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="showBrush"
+    />
+    <ApiContent>
+      When enabled, displays a brush control below the chart for selecting and zooming into a range of data.
+      
+      type: `boolean`
+      
+      default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="brushHeight"
+    />
+    <ApiContent>
+      The height of the brush preview area in pixels.
+      
+      type: `number`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="brushFormatLabel"
+    />
+    <ApiContent>
+      Custom formatter for the brush axis labels.
+      
+      type: `(value: unknown, index: number) => string`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="onBrushChange"
+    />
+    <ApiContent>
+      Callback invoked when the user changes the brush selection range.
+      
+      type: `(range: EvilBrushRange) => void`
     </ApiContent>
   </ApiReference>
 

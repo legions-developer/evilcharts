@@ -7,12 +7,7 @@ import {
   getLoadingData,
   LoadingIndicator,
 } from "@/registry/ui/chart";
-import {
-  EvilBrush,
-  useEvilBrush,
-  type EvilBrushVariant,
-  type EvilBrushRange,
-} from "@/registry/ui/evil-brush";
+import { EvilBrush, useEvilBrush, type EvilBrushRange } from "@/registry/ui/evil-brush";
 import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/legend";
 import { Bar, ComposedChart, CartesianGrid, Line, ReferenceLine, XAxis, YAxis } from "recharts";
 import { useCallback, useId, useMemo, useRef, useState, type ComponentProps } from "react";
@@ -96,7 +91,6 @@ type EvilComposedChartProps<
   loadingBars?: number;
   // Brush
   showBrush?: boolean;
-  brushVariant?: EvilBrushVariant;
   brushHeight?: number;
   brushFormatLabel?: (value: unknown, index: number) => string;
   onBrushChange?: (range: EvilBrushRange) => void;
@@ -166,7 +160,6 @@ export function EvilComposedChart<
   isLoading = false,
   loadingBars,
   showBrush = false,
-  brushVariant,
   brushHeight,
   brushFormatLabel,
   onBrushChange,
@@ -207,7 +200,7 @@ export function EvilComposedChart<
             data={data}
             chartConfig={combinedConfig}
             xDataKey={xDataKey}
-            variant={brushVariant ?? "area"}
+            variant="area"
             curveType={curveType}
             strokeVariant={strokeVariant}
             connectNulls={connectNulls}
