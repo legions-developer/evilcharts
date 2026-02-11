@@ -133,6 +133,15 @@ When `isClickable` is enabled, you can use the `onSelectionChange` callback to h
   </AlertContent>
 </Alert>
 
+### Buffer Line
+
+<ComponentPreview className="mb-0" title="enableBufferLine='true'" name="ex-buffer-line-chart"  />
+<Alert > 
+  <AlertContent >
+    When `enableBufferLine` is enabled, the last segment of each line is rendered as a dashed/dotted pattern while the rest of the line stays solid. This is useful for indicating projected, estimated, or incomplete data at the end of a series — commonly seen in financial charts and forecasting dashboards.
+  </AlertContent>
+</Alert>
+
 ## Examples
 
 Below are some examples of the line chart with different `variants`. where you can change the `curveType` & `strokeVariant`. 
@@ -429,6 +438,19 @@ Below are some examples of the line chart with different `variants`. where you c
       type: `number`
       
       default: `14`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="enableBufferLine"
+    />
+    <ApiContent>
+      When enabled, renders the last segment of each line as a dashed pattern while the rest stays solid. Useful for indicating projected or incomplete data at the end of a series.
+      
+      type: `boolean`
+      
+      default: `false`
     </ApiContent>
   </ApiReference>
 

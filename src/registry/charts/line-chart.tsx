@@ -8,6 +8,16 @@ import {
   LoadingIndicator,
 } from "@/registry/ui/chart";
 import {
+  CartesianGrid,
+  Curve,
+  Line,
+  LineChart,
+  ReferenceLine,
+  XAxis,
+  YAxis,
+  type CurveProps,
+} from "recharts";
+import {
   EvilBrush,
   useEvilBrush,
   type EvilBrushVariant,
@@ -15,10 +25,9 @@ import {
 } from "@/registry/ui/evil-brush";
 import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/legend";
 import { useCallback, useId, useMemo, useRef, useState, type ComponentProps } from "react";
-import { CartesianGrid, Line, LineChart, ReferenceLine, XAxis, YAxis } from "recharts";
+import { ChartBackground, type BackgroundVariant } from "@/registry/ui/background";
 import { ChartTooltip, ChartTooltipContent } from "@/registry/ui/tooltip";
 import { ChartDot, DotVariant } from "@/registry/ui/dot";
-import { ChartBackground, type BackgroundVariant } from "@/registry/ui/background";
 import { motion } from "motion/react";
 
 // Constants
@@ -80,6 +89,8 @@ type EvilLineChartProps<
   onBrushChange?: (range: EvilBrushRange) => void;
   // Background
   backgroundVariant?: BackgroundVariant;
+  // Buffer Line - renders last segment as dashed/dotted
+  enableBufferLine?: boolean;
 };
 
 type EvilLineChartClickable = {
@@ -132,6 +143,7 @@ export function EvilLineChart<
   onBrushChange,
   onSelectionChange,
   backgroundVariant,
+  enableBufferLine = false,
 }: EvilLineChartPropsWithCallback<TData, TConfig>) {
   const [selectedDataKey, setSelectedDataKey] = useState<string | null>(defaultSelectedDataKey);
   const { loadingData, onShimmerExit } = useLoadingData(isLoading, loadingPoints);
@@ -189,7 +201,9 @@ export function EvilLineChart<
       >
         {backgroundVariant && <ChartBackground variant={backgroundVariant} />}
         <ReferenceLine color="white" />
-        {!hideCartesianGrid && !backgroundVariant && <CartesianGrid vertical={false} strokeDasharray="3 3" />}
+        {!hideCartesianGrid && !backgroundVariant && (
+          <CartesianGrid vertical={false} strokeDasharray="3 3" />
+        )}
         {!hideLegend && (
           <ChartLegend
             verticalAlign="top"
@@ -301,16 +315,12 @@ export function EvilLineChart<
                   dot={dot}
                   activeDot={activeDot}
                   strokeWidth={STROKE_WIDTH}
-                  strokeDasharray={
-                    strokeVariant === "dashed"
-                      ? "5 5"
-                      : strokeVariant === "animated-dashed"
-                        ? "5 5"
-                        : undefined
-                  }
+                  strokeDasharray={getStrokeDasharray(enableBufferLine, strokeVariant)}
+                  shape={enableBufferLine ? bufferLineShape : undefined}
                   style={isClickable ? { cursor: "pointer" } : undefined}
                   onClick={() => {
                     if (!isClickable) return;
+
                     // Toggle: if already selected, unselect; otherwise select
                     setSelectedDataKey(selectedDataKey === dataKey ? null : dataKey);
                   }}
@@ -353,12 +363,75 @@ export function EvilLineChart<
   );
 }
 
+// Buffer line shape - renders the last segment as dashed while the rest stays solid.
+// Uses the Recharts `shape` prop on Line to customize the curve rendering.
+// Calculates Euclidean distances between points to compute a strokeDasharray
+// that is solid for all segments except the last, which gets a dashed pattern.
+type CurvePoint = NonNullable<NonNullable<CurveProps["points"]>[number]>;
+type DrawableCurvePoint = CurvePoint & { x: number; y: number };
+
+const isDrawableCurvePoint = (point: CurvePoint): point is DrawableCurvePoint => {
+  return typeof point.x === "number" && typeof point.y === "number";
+};
+
+const bufferLineShape = (props: CurveProps) => {
+  const { points, ...rest } = props;
+
+  if (!points || points.length < 2) {
+    return <Curve {...props} />;
+  }
+
+  const drawablePoints = points.filter(isDrawableCurvePoint);
+  if (drawablePoints.length < 2) {
+    return <Curve {...props} />;
+  }
+
+  // Calculate total Euclidean distance between consecutive points
+  let totalLength = 0;
+  for (let i = 1; i < drawablePoints.length; i++) {
+    const dx = drawablePoints[i].x - drawablePoints[i - 1].x;
+    const dy = drawablePoints[i].y - drawablePoints[i - 1].y;
+    totalLength += Math.sqrt(dx * dx + dy * dy);
+  }
+
+  // Calculate last segment length (second-to-last → last point)
+  const lastIdx = drawablePoints.length - 1;
+  const dx = drawablePoints[lastIdx].x - drawablePoints[lastIdx - 1].x;
+  const dy = drawablePoints[lastIdx].y - drawablePoints[lastIdx - 1].y;
+  const lastSegmentLength = Math.sqrt(dx * dx + dy * dy);
+
+  const solidLength = totalLength - lastSegmentLength;
+
+  // Build strokeDasharray: solid portion, then dashed pattern for the buffer segment
+  // Pattern: [solidLength] [0 gap] [dash gap dash gap ...]
+  const dashSize = 4;
+  const gapSize = 3;
+  const repetitions = Math.ceil(lastSegmentLength / (dashSize + gapSize)) + 1;
+  const dashedPart = Array.from({ length: repetitions }, () => `${dashSize} ${gapSize}`).join(" ");
+
+  return (
+    <Curve {...rest} points={drawablePoints} strokeDasharray={`${solidLength} 0 ${dashedPart}`} />
+  );
+};
+
 // Returns opacity object for stroke and dot
 const getOpacity = (isClickable: boolean, selectedDataKey: string | null, dataKey: string) => {
   if (!isClickable || selectedDataKey === null) {
     return { stroke: 1, dot: 1 };
   }
   return selectedDataKey === dataKey ? { stroke: 1, dot: 1 } : { stroke: 0.3, dot: 0.3 };
+};
+
+const getStrokeDasharray = (enableBufferLine: boolean, strokeVariant: StrokeVariant) => {
+  if (enableBufferLine) {
+    return undefined;
+  }
+
+  if (strokeVariant === "dashed" || strokeVariant === "animated-dashed") {
+    return "5 5";
+  }
+
+  return undefined;
 };
 
 // Animated dashed-stroke style for the line chart

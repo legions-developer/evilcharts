@@ -358,6 +358,18 @@ export const examples: Registry["items"] = [
       },
     ],
   },
+  // Line Chart Buffer Line
+  {
+    name: "ex-buffer-line-chart",
+    registryDependencies: ["@evilcharts/line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-buffer-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
   // Line Chart Background Variants
   {
     name: "ex-bg-dots-line-chart",
