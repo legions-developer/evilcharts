@@ -495,6 +495,18 @@ export const examples: Registry["items"] = [
   // ========================================
   // BAR CHART EXAMPLES
   // ========================================
+  // Bar Chart Buffer Bar
+  {
+    name: "ex-buffer-bar-chart",
+    registryDependencies: ["@evilcharts/bar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-buffer-bar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
   // Base Bar Chart
   {
     name: "ex-bar-chart",

@@ -7,13 +7,18 @@ import {
   getLoadingData,
   LoadingIndicator,
 } from "@/registry/ui/chart";
+import {
+  EvilBrush,
+  useEvilBrush,
+  type EvilBrushVariant,
+  type EvilBrushRange,
+} from "@/registry/ui/evil-brush";
+import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/legend";
 import { Bar, BarChart, CartesianGrid, Rectangle, ReferenceLine, XAxis, YAxis } from "recharts";
 import { useCallback, useId, useMemo, useRef, useState, type ComponentProps } from "react";
-import { ChartTooltip, ChartTooltipContent } from "@/registry/ui/tooltip";
-import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/legend";
-import { RectRadius } from "recharts/types/shape/Rectangle";
-import { EvilBrush, useEvilBrush, type EvilBrushVariant, type EvilBrushRange } from "@/registry/ui/evil-brush";
 import { ChartBackground, type BackgroundVariant } from "@/registry/ui/background";
+import { ChartTooltip, ChartTooltipContent } from "@/registry/ui/tooltip";
+import { RectRadius } from "recharts/types/shape/Rectangle";
 import { motion } from "motion/react";
 
 // Constants
@@ -77,6 +82,8 @@ type EvilBarChartProps<
   onBrushChange?: (range: EvilBrushRange) => void;
   // Background
   backgroundVariant?: BackgroundVariant;
+  // Buffer Bar - renders last data point bars as hatched/lines style
+  enableBufferBar?: boolean;
 };
 
 type EvilBarChartClickable = {
@@ -130,6 +137,7 @@ export function EvilBarChart<
   onBrushChange,
   onSelectionChange,
   backgroundVariant,
+  enableBufferBar = false,
 }: EvilBarChartPropsWithCallback<TData, TConfig>) {
   const [selectedDataKey, setSelectedDataKey] = useState<string | null>(defaultSelectedDataKey);
   const [isMouseInChart, setIsMouseInChart] = useState(false);
@@ -259,6 +267,8 @@ export function EvilBarChart<
               enableHoverHighlight,
               isMouseInChart,
               selectedDataKey,
+              enableBufferBar,
+              dataLength: displayData.length,
               onClick: () => {
                 if (!isClickable) return;
                 handleSelectionChange(selectedDataKey === dataKey ? null : dataKey);
@@ -315,6 +325,10 @@ export function EvilBarChart<
           {barVariant === "stripped" && (
             <StrippedPatternStyle chartConfig={chartConfig} chartId={chartId} />
           )}
+          {/* Buffer bar hatched pattern - always rendered when enableBufferBar */}
+          {enableBufferBar && (
+            <BufferHatchedPatternStyle chartConfig={chartConfig} chartId={chartId} />
+          )}
           {/* Glow filter for glowing bars */}
           {glowingBars.length > 0 && (
             <GlowFilterStyle chartId={chartId} glowingBars={glowingBars as string[]} />
@@ -349,6 +363,8 @@ type CustomBarProps = {
   isMouseInChart?: boolean;
   selectedDataKey?: string | null;
   isActive?: boolean;
+  enableBufferBar?: boolean;
+  dataLength?: number;
   onClick?: () => void;
 } & BarShapeProps;
 
@@ -369,12 +385,21 @@ const CustomBar = (props: CustomBarProps) => {
     isMouseInChart,
     selectedDataKey,
     isActive,
+    enableBufferBar,
+    dataLength = 0,
     onClick,
   } = props;
 
+  const index = typeof props.index === "number" ? props.index : -1;
+  const isLastBar = enableBufferBar && dataLength > 0 && index === dataLength - 1;
   const isStripped = barVariant === "stripped";
 
   const getFill = () => {
+    // Buffer bar: last bar always uses hatched pattern
+    if (isLastBar) {
+      return `url(#${chartId}-buffer-hatched-${dataKey})`;
+    }
+
     switch (barVariant) {
       case "hatched":
         return `url(#${chartId}-hatched-${dataKey})`;
@@ -419,6 +444,8 @@ const CustomBar = (props: CustomBarProps) => {
         radius={radius}
         fill={getFill()}
         filter={filter}
+        stroke={isLastBar ? `url(#${chartId}-colors-${dataKey})` : undefined}
+        strokeWidth={isLastBar ? 1 : undefined}
       />
       {/* Top border strip for stripped variant */}
       {isStripped && (
@@ -521,6 +548,61 @@ const HatchedPatternStyle = ({
               height="100%"
               fill={`url(#${chartId}-colors-${dataKey})`}
               mask={`url(#${chartId}-hatched-mask-${dataKey})`}
+            />
+          </pattern>
+        </g>
+      ))}
+    </>
+  );
+};
+
+// Buffer hatched pattern style - diagonal lines only (no background fill), used for the last bar when enableBufferBar is true
+const BufferHatchedPatternStyle = ({
+  chartConfig,
+  chartId,
+}: {
+  chartConfig: ChartConfig;
+  chartId: string;
+}) => {
+  return (
+    <>
+      {/* Shared buffer hatched stripes mask pattern - lines only, no background */}
+      <pattern
+        id={`${chartId}-buffer-hatched-mask-pattern`}
+        x="0"
+        y="0"
+        width="5"
+        height="5"
+        patternUnits="userSpaceOnUse"
+        patternTransform="rotate(-45)"
+      >
+        <rect width="5" height="5" fill="black" fillOpacity={0} />
+        <rect width="1" height="5" fill="white" fillOpacity={1} />
+      </pattern>
+
+      {Object.keys(chartConfig).map((dataKey) => (
+        <g key={`${chartId}-buffer-hatched-group-${dataKey}`}>
+          {/* Mask using buffer hatched stripes */}
+          <mask id={`${chartId}-buffer-hatched-mask-${dataKey}`}>
+            <rect
+              width="100%"
+              height="100%"
+              fill={`url(#${chartId}-buffer-hatched-mask-pattern)`}
+            />
+          </mask>
+
+          {/* Pattern: gradient fill masked by buffer hatched stripes - lines only */}
+          <pattern
+            id={`${chartId}-buffer-hatched-${dataKey}`}
+            patternUnits="userSpaceOnUse"
+            width="100%"
+            height="100%"
+          >
+            <rect
+              width="100%"
+              height="100%"
+              fill={`url(#${chartId}-colors-${dataKey})`}
+              mask={`url(#${chartId}-buffer-hatched-mask-${dataKey})`}
             />
           </pattern>
         </g>

@@ -123,6 +123,15 @@ When `isClickable` is enabled, you can use the `onSelectionChange` callback to h
   </AlertContent>
 </Alert>
 
+### Buffer Bar
+
+<ComponentPreview className="mb-0" title="enableBufferBar='true'" name="ex-buffer-bar-chart"  />
+<Alert > 
+  <AlertContent >
+    When `enableBufferBar` is enabled, the last data point's bars are rendered with a diagonal lines (hatched) pattern while the rest stay solid. This is useful for indicating projected, estimated, or incomplete data at the end of a series — commonly seen in financial charts and forecasting dashboards.
+  </AlertContent>
+</Alert>
+
 ## Examples
 
 Below are some examples of the bar chart with different `variants`. You can customize the `barVariant`, `stackType`, and other properties.
@@ -449,6 +458,19 @@ Below are some examples of the bar chart with different `variants`. You can cust
       Number of bars to display in the loading skeleton.
       
       type: `number`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="enableBufferBar"
+    />
+    <ApiContent>
+      When enabled, renders the last data point's bars with a diagonal lines (hatched) pattern while the rest stay solid. Useful for indicating projected or incomplete data at the end of a series.
+      
+      type: `boolean`
+      
+      default: `false`
     </ApiContent>
   </ApiReference>
 
