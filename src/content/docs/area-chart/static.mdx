@@ -1,13 +1,13 @@
 ---
-title: Default
-description: Simple static & beautifully designed composed charts combining bars and lines
+title: Area Chart
+description: Simple static & beautifully designed area charts
 links:
-  github: https://github.com/legions-developer/evilcharts/blob/main/src/registry/charts/composed-chart.tsx
-  doc: https://recharts.github.io/en-US/examples/SimpleLineChart/
-  api: https://recharts.github.io/en-US/api/ComposedChart/
+  github: https://github.com/legions-developer/evilcharts/blob/main/src/registry/charts/area-chart.tsx
+  doc: https://recharts.github.io/en-US/examples/SimpleAreaChart/
+  api: https://recharts.github.io/en-US/api/AreaChart/
 ---
 
-<ComponentPreview title="Basic Chart" name="ex-composed-chart"  />
+<ComponentPreview title="Basic Chart" name="ex-area-chart"  />
 
 ## Installation
 
@@ -17,7 +17,7 @@ links:
     <TabsTab value="manual">Manual</TabsTab>
   </TabsList>
   <TabsPanel value="cli">
-    <CliBlock commands={["@evilcharts/composed-chart"]} />
+    <CliBlock commands={["@evilcharts/area-chart"]} />
   </TabsPanel>
   <TabsPanel value="manual">
     <Steps>
@@ -31,12 +31,12 @@ links:
         <StepTitle>Copy and paste the following code snippets into your project.</StepTitle>
          <StepDescription>
           To use the chart, first create the folder `evilcharts` and a subfolder called `charts` inside your `components` directory.
-          Then, copy the following base composed-chart code into a new file in that folder.
+          Then, copy the following base area-chart code into a new file in that folder.
         </StepDescription>
         <StepContent>
           <ComponentSource
-            name="composed-chart"
-            title="components/evilcharts/charts/composed-chart.tsx"
+            name="area-chart"
+            title="components/evilcharts/charts/area-chart.tsx"
           />
         </StepContent>
       </Step>
@@ -75,7 +75,7 @@ links:
           />
         </StepContent>
         <StepDescription>
-          Finally, create a file called `dot.tsx` inside the `evilcharts/ui` folder and paste the code there.
+          Finally, create last file called `dot.tsx` inside the `evilcharts/ui` folder and paste the code there.
         </StepDescription>
         <StepContent>
           <ComponentSource
@@ -91,29 +91,19 @@ links:
 ## Usage
 
 ```tsx
-import { EvilComposedChart } from "@/components/evilcharts/charts/composed-chart";
+import { EvilAreaChart } from "@/components/evilcharts/charts/area-chart";
 ```
 
 ```tsx
-const barConfig = {
-  revenue: {
-    label: "Revenue",
-    colors: { light: ["#3b82f6"], dark: ["#6A5ACD"] },
-  },
-} satisfies ChartConfig;
-
-const lineConfig = {
-  profit: {
-    label: "Profit",
-    colors: { light: ["#10b981"], dark: ["#34d399"] },
-  },
-} satisfies ChartConfig;
-
-<EvilComposedChart  
-  xDataKey="month"
+<EvilAreaChart  
+  xDataKey=""
+  stackType="stacked"
+  curveType="monotone"
+  strokeVariant="dashed" 
+  areaVariant="gradient"
+  activeDotVariant="default"
   data={data} 
-  barConfig={barConfig}
-  lineConfig={lineConfig}
+  chartConfig={chartConfig}
 />
 ```
 
@@ -122,10 +112,9 @@ const lineConfig = {
 When `isClickable` is enabled, you can use the `onSelectionChange` callback to handle selection events:
 
 ```tsx
-<EvilComposedChart
+<EvilAreaChart
   data={data}
-  barConfig={barConfig}
-  lineConfig={lineConfig}
+  chartConfig={chartConfig}
   isClickable={true}
   onSelectionChange={(selectedDataKey) => {
     if (selectedDataKey) {
@@ -139,72 +128,48 @@ When `isClickable` is enabled, you can use the `onSelectionChange` callback to h
 
 ### Loading State
 
-<ComponentPreview className="mb-0" title="isLoading='true'" name="ex-loading-state-composed-chart"  />
+<ComponentPreview className="mb-0" title="isLoading='true'" name="ex-loading-state-area-chart"  />
 <Alert > 
   <AlertContent >
-    The composed chart supports loading state with a shimmer animation. You can pass the `isLoading` prop to the chart to show the loading state while your data is being fetched.
+    The area chart supports loading state. You can pass the `isLoading` prop to the chart to show the loading state. You can also pass `curveType` to customize the curve type of the loading state. Here, im using `curveType='bump'` to make the loading state more realistic.
   </AlertContent>
 </Alert>
 
 ## Examples
 
-Below are some examples of the composed chart with different `variants`. You can customize the `barVariant`, `strokeVariant`, `curveType`, and other properties.
+Below are some examples of the area chart with different `variants`. where you can change the `stackType`, `curveType`, `strokeVariant` & `areaVariant`. 
 
 ### Gradient Colors
 
-<ComponentPreview title="gradient colors" name="ex-gradient-colors-composed-chart"  />
-
-### Bar Variants
-
-<ComponentPreview className="mb-0" title="barVariant='hatched'" name="ex-hatched-variant-composed-chart"  />
-<ComponentPreview className="mb-0" title="barVariant='duotone'" name="ex-duotone-variant-composed-chart"  />
-<ComponentPreview className="mb-0" title="barVariant='gradient'" name="ex-gradient-variant-composed-chart"  />
-<ComponentPreview title="barVariant='stripped'" name="ex-stripped-variant-composed-chart"  />
-
-### Line Stroke Variants
-
-<ComponentPreview className="mb-0" title="strokeVariant='dashed'" name="ex-dashed-stroke-composed-chart"  />
-<ComponentPreview title="strokeVariant='animated-dashed'" name="ex-animated-dashed-stroke-composed-chart"  />
+<ComponentPreview className="mb-0" title="gradient colors" name="ex-gradient-colors-area-chart"  />
+<ComponentPreview title="gradient colors - bump" name="ex-gradient-colors-bump-area-chart"  />
 
 ### Curve Types
 
-<ComponentPreview title="curveType='bump'" name="ex-bump-curve-composed-chart"  />
+<ComponentPreview className="mb-0" title="curveType='bump'" name="ex-bump-curve-type-area-chart"  />
+<ComponentPreview className="mb-0" title="curveType='step'" name="ex-step-curve-type-area-chart"  />
+<ComponentPreview title="curveType='monotoneY'" name="ex-monotoney-curve-type-area-chart"  />
 
-### Line Dots
+### Stack Types
 
-<ComponentPreview className="mb-0" title="dotVariant='default' activeDotVariant='border'" name="ex-dots-composed-chart"  />
-<Alert> 
-  <AlertContent>
-    The composed chart supports dots on lines. Use `dotVariant` for regular dots and `activeDotVariant` for the dot that appears when hovering. Available variants: `default`, `border`, `colored-border`.
-  </AlertContent>
-</Alert>
+<ComponentPreview className="mb-0" title="stackType='default'" name="ex-default-type-area-chart"  />
+<ComponentPreview className="mb-0" title="stackType='stacked'" name="ex-stacked-type-area-chart"  />
+<ComponentPreview title="stackType='expanded'" name="ex-expanded-type-area-chart"  />
 
-### Hover Highlight
+### Stroke Variants
 
-<ComponentPreview className="mb-0" title="enableHoverHighlight={true}" name="ex-hover-highlight-composed-chart"  />
-<Alert> 
-  <AlertContent>
-    The hover highlight feature dims other bars when you hover over a bar, making it easier to focus on specific data points. Use the `enableHoverHighlight` prop to enable this feature.
-  </AlertContent>
-</Alert>
+<ComponentPreview className="mb-0" title="strokeVariant='solid'" name="ex-solid-stroke-area-chart"  />
+<ComponentPreview className="mb-0" title="strokeVariant='dashed'" name="ex-dashed-stroke-area-chart"  />
+<ComponentPreview title="strokeVariant='animated-dashed'" name="ex-animated-dashed-stroke-area-chart"  />
 
-### Glowing Effects
+### Area Variants
 
-<ComponentPreview className="mb-0" title="glowingBars={['revenue']} glowingLines={['profit']}" name="ex-glowing-composed-chart"  />
-<Alert> 
-  <AlertContent>
-    Add a subtle glow effect to your bars and lines using `glowingBars` and `glowingLines` props. Pass an array of data keys to specify which elements should glow.
-  </AlertContent>
-</Alert>
-
-### Neon Effects
-
-<ComponentPreview className="mb-0" title="neonBars={['revenue']} neonLines={['profit']}" name="ex-neon-composed-chart"  />
-<Alert> 
-  <AlertContent>
-    Add an intense neon glow effect to your bars and lines using `neonBars` and `neonLines` props. This creates a more dramatic visual effect than the regular glow.
-  </AlertContent>
-</Alert>
+<ComponentPreview className="mb-0" title="areaVariant='gradient'" name="ex-gradient-area-variant-area-chart"  />
+<ComponentPreview className="mb-0" title="areaVariant='gradient-reverse'" name="ex-gradient-reverse-area-variant-area-chart"  />
+<ComponentPreview className="mb-0" title="areaVariant='solid'" name="ex-solid-area-variant-area-chart"  />
+<ComponentPreview className="mb-0" title="areaVariant='dotted'" name="ex-dotted-area-variant-area-chart"  />
+<ComponentPreview className="mb-0" title="areaVariant='lines'" name="ex-lines-area-variant-area-chart"  />
+<ComponentPreview title="areaVariant='hatched'" name="ex-hatched-area-variant-area-chart"  />
 
 ## API Reference
 
@@ -223,23 +188,11 @@ Below are some examples of the composed chart with different `variants`. You can
   
   <ApiReference>
     <ApiHeader
-      propName="barConfig"
+      propName="chartConfig"
       isRequired
     />
     <ApiContent>
-      Configuration object that defines the chart's bar series. Each key should match a data key in your data array, with corresponding colors.
-      
-      type: `Record<string, ChartConfig[string]>`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="lineConfig"
-      isRequired
-    />
-    <ApiContent>
-      Configuration object that defines the chart's line series. Each key should match a data key in your data array, with corresponding colors.
+      Configuration object that defines the chart's series. Each key should match a data key in your data array, with a corresponding color or color array.
       
       type: `Record<string, ChartConfig[string]>`
     </ApiContent>
@@ -280,97 +233,10 @@ Below are some examples of the composed chart with different `variants`. You can
 
   <ApiReference>
     <ApiHeader
-      propName="barVariant"
-    />
-    <ApiContent>
-      The visual style variant for the bars.
-      
-      type: `"default" | "hatched" | "duotone" | "duotone-reverse" | "gradient" | "stripped"`
-      
-      default: `"default"`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="barRadius"
-    />
-    <ApiContent>
-      The border radius of the bars in pixels.
-      
-      type: `number`
-      
-      default: `4`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="barGap"
-    />
-    <ApiContent>
-      The gap between bars in the same category (when using multiple bar series).
-      
-      type: `number`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="barCategoryGap"
-    />
-    <ApiContent>
-      The gap between different categories of bars.
-      
-      type: `number`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="enableHoverHighlight"
-    />
-    <ApiContent>
-      When enabled, hovering over a bar dims all other bars, making it easier to focus on specific data points.
-      
-      type: `boolean`
-      
-      default: `false`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="glowingBars"
-    />
-    <ApiContent>
-      Array of data keys that should have a glowing effect applied to their bars. Creates a smooth outer neon glow around the specified bars.
-      
-      type: `NumericDataKeys<TData>[]` (array of keys where the value is a number)
-      
-      default: `[]`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="neonBars"
-    />
-    <ApiContent>
-      Array of data keys that should have a neon effect applied to their bars. Creates a multi-layered glow with a bright white core. Neon effect takes priority over glow effect.
-      
-      type: `NumericDataKeys<TData>[]` (array of keys where the value is a number)
-      
-      default: `[]`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
       propName="curveType"
     />
     <ApiContent>
-      The type of curve interpolation for the lines. Determines how points are connected.
+      The type of curve interpolation for the area lines. Determines how points are connected.
       
       type: `"basis" | "basisClosed" | "basisOpen" | "bumpX" | "bumpY" | "bump" | "linear" | "linearClosed" | "natural" | "monotoneX" | "monotoneY" | "monotone" | "step" | "stepBefore" | "stepAfter"`
       
@@ -380,14 +246,40 @@ Below are some examples of the composed chart with different `variants`. You can
 
   <ApiReference>
     <ApiHeader
+      propName="areaVariant"
+    />
+    <ApiContent>
+      The visual style variant for the area fill.
+      
+      type: `"gradient" | "gradient-reverse" | "solid" | "dotted" | "lines" | "hatched"`
+      
+      default: `"gradient"`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
       propName="strokeVariant"
     />
     <ApiContent>
-      The visual style for the line strokes.
+      The visual style for the area stroke lines.
       
       type: `"solid" | "dashed" | "animated-dashed"`
       
-      default: `"solid"`
+      default: `"dashed"`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="stackType"
+    />
+    <ApiContent>
+      Controls how multiple areas are stacked. `"default"` renders areas independently, `"stacked"` stacks them on top of each other, and `"expanded"` normalizes them to show percentage distribution.
+      
+      type: `"default" | "expanded" | "stacked"`
+      
+      default: `"default"`
     </ApiContent>
   </ApiReference>
 
@@ -396,7 +288,7 @@ Below are some examples of the composed chart with different `variants`. You can
       propName="dotVariant"
     />
     <ApiContent>
-      The visual style for dots at data points on the lines.
+      The visual style for dots at data points on the area lines.
       
       type: `"default" | "border" | "colored-border"`
     </ApiContent>
@@ -407,7 +299,7 @@ Below are some examples of the composed chart with different `variants`. You can
       propName="activeDotVariant"
     />
     <ApiContent>
-      The visual style for the active/hovered dot at data points on the lines.
+      The visual style for the active/hovered dot at data points.
       
       type: `"default" | "border" | "colored-border"`
     </ApiContent>
@@ -434,32 +326,6 @@ Below are some examples of the composed chart with different `variants`. You can
       type: `boolean`
       
       default: `false`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="glowingLines"
-    />
-    <ApiContent>
-      Array of data keys that should have a glowing effect applied to their lines. Creates a smooth outer neon glow around the specified lines.
-      
-      type: `NumericDataKeys<TData>[]` (array of keys where the value is a number)
-      
-      default: `[]`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="neonLines"
-    />
-    <ApiContent>
-      Array of data keys that should have a neon effect applied to their lines. Creates a multi-layered glow with a bright white core. Neon effect takes priority over glow effect.
-      
-      type: `NumericDataKeys<TData>[]` (array of keys where the value is a number)
-      
-      default: `[]`
     </ApiContent>
   </ApiReference>
 
@@ -544,7 +410,7 @@ Below are some examples of the composed chart with different `variants`. You can
       propName="isClickable"
     />
     <ApiContent>
-      Enables interactive clicking on bars and lines to select/deselect them. When an element is selected, unselected elements become semi-transparent.
+      Enables interactive clicking on areas to select/deselect them. When an area is selected, unselected areas become semi-transparent.
       
       type: `boolean`
       
@@ -570,7 +436,7 @@ Below are some examples of the composed chart with different `variants`. You can
       propName="onSelectionChange"
     />
     <ApiContent>
-      Callback function that is called when a bar or line is selected or deselected. Receives the selected data key as a parameter, or `null` when deselected.
+      Callback function that is called when a chart area is selected or deselected. Receives the selected data key as a parameter, or `null` when deselected.
       
       **Note:** This prop is only available when `isClickable` is set to `true`.
       
@@ -593,12 +459,14 @@ Below are some examples of the composed chart with different `variants`. You can
 
   <ApiReference>
     <ApiHeader
-      propName="loadingBars"
+      propName="loadingPoints"
     />
     <ApiContent>
-      Number of bars to display in the loading skeleton.
+      Number of data points to display in the loading skeleton.
       
       type: `number`
+      
+      default: `14`
     </ApiContent>
   </ApiReference>
 
@@ -607,11 +475,11 @@ Below are some examples of the composed chart with different `variants`. You can
       propName="chartProps"
     />
     <ApiContent>
-      Additional props to pass to the underlying Recharts ComposedChart component.
+      Additional props to pass to the underlying Recharts AreaChart component.
       
-      type: `ComponentProps<typeof ComposedChart>`
+      type: `ComponentProps<typeof AreaChart>`
       
-      Read the <Link href="https://recharts.github.io/en-US/api/ComposedChart/" _blank>Recharts ComposedChart documentation</Link> for available props.
+      Read the <Link href="https://recharts.github.io/en-US/api/AreaChart/#layout" _blank>Recharts AreaChart documentation</Link> for available props.
     </ApiContent>
   </ApiReference>
 

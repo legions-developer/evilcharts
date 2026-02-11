@@ -1,13 +1,13 @@
 ---
-title: Default
-description: Simple static & beautifully designed pie charts with donut, gradient, and glow effects
+title: Radial Chart
+description: Beautiful radial bar charts with full and semi-circle variants, gradient colors, and glow effects
 links:
-  github: https://github.com/legions-developer/evilcharts/blob/main/src/registry/charts/pie-chart.tsx
-  doc: https://recharts.github.io/en-US/examples/SimplePieChart/
-  api: https://recharts.github.io/en-US/api/PieChart/
+  github: https://github.com/legions-developer/evilcharts/blob/main/src/registry/charts/radial-chart.tsx
+  doc: https://recharts.github.io/en-US/examples/SimpleRadialBarChart
+  api: https://recharts.github.io/en-US/api/RadialBarChart
 ---
 
-<ComponentPreview title="Basic Chart" name="ex-pie-chart"  />
+<ComponentPreview title="Basic Chart" name="ex-radial-chart"  />
 
 ## Installation
 
@@ -17,7 +17,7 @@ links:
     <TabsTab value="manual">Manual</TabsTab>
   </TabsList>
   <TabsPanel value="cli">
-    <CliBlock commands={["@evilcharts/pie-chart"]} />
+    <CliBlock commands={["@evilcharts/radial-chart"]} />
   </TabsPanel>
   <TabsPanel value="manual">
     <Steps>
@@ -31,12 +31,12 @@ links:
         <StepTitle>Copy and paste the following code snippets into your project.</StepTitle>
          <StepDescription>
           To use the chart, first create the folder `evilcharts` and a subfolder called `charts` inside your `components` directory.
-          Then, copy the following base pie-chart code into a new file in that folder.
+          Then, copy the following base radial-chart code into a new file in that folder.
         </StepDescription>
         <StepContent>
           <ComponentSource
-            name="pie-chart"
-            title="components/evilcharts/charts/pie-chart.tsx"
+            name="radial-chart"
+            title="components/evilcharts/charts/radial-chart.tsx"
           />
         </StepContent>
       </Step>
@@ -82,7 +82,7 @@ links:
 ## Usage
 
 ```tsx
-import { EvilPieChart } from "@/components/evilcharts/charts/pie-chart";
+import { EvilRadialChart } from "@/components/evilcharts/charts/radial-chart";
 ```
 
 ```tsx
@@ -113,7 +113,7 @@ const chartConfig = {
 When `isClickable` is enabled, you can use the `onSelectionChange` callback to handle selection events:
 
 ```tsx
-<EvilPieChart
+<EvilRadialChart
   data={data}
   dataKey="visitors"
   nameKey="browser"
@@ -130,7 +130,7 @@ When `isClickable` is enabled, you can use the `onSelectionChange` callback to h
 ```
 
 ```tsx
-<EvilPieChart  
+<EvilRadialChart  
   data={data}
   dataKey="visitors"
   nameKey="browser"
@@ -140,63 +140,36 @@ When `isClickable` is enabled, you can use the `onSelectionChange` callback to h
 
 ### Loading State
 
-<ComponentPreview className="mb-0" title="isLoading='true'" name="ex-loading-state-pie-chart"  />
+<ComponentPreview className="mb-0" title="isLoading='true'" name="ex-loading-state-radial-chart"  />
 <Alert > 
   <AlertContent >
-    The pie chart supports loading state with a placeholder animation. You can pass the `isLoading` prop to the chart to show the loading state while your data is being fetched.
+    The radial chart supports loading state with a placeholder animation. You can pass the `isLoading` prop to the chart to show the loading state while your data is being fetched.
   </AlertContent>
 </Alert>
 
 ## Examples
 
-Below are some examples of the pie chart with different configurations. You can customize the `innerRadius`, `paddingAngle`, `cornerRadius`, and other properties.
+Below are some examples of the radial chart with different configurations. You can customize the `variant`, `innerRadius`, `outerRadius`, and other properties.
+
+### Semi-Circle Variant
+
+<ComponentPreview className="mb-0" title="variant='semi'" name="ex-semi-variant-radial-chart"  />
+<Alert> 
+  <AlertContent>
+    Set `variant="semi"` to create a half-circle radial chart. This is useful for displaying progress or gauges in a more compact space.
+  </AlertContent>
+</Alert>
 
 ### Gradient Colors
 
-<ComponentPreview title="gradient colors" name="ex-gradient-colors-pie-chart"  />
+<ComponentPreview title="gradient colors" name="ex-gradient-colors-radial-chart"  />
 
-### Donut Chart
+### Glowing Bars
 
-<ComponentPreview className="mb-0" title="innerRadius={60}" name="ex-donut-pie-chart"  />
+<ComponentPreview className="mb-0" title="glowingBars={['chrome', 'safari']}" name="ex-glowing-radial-chart"  />
 <Alert> 
   <AlertContent>
-    Set `innerRadius` to a value greater than 0 to create a donut chart. The inner radius creates the hole in the center of the pie.
-  </AlertContent>
-</Alert>
-
-### Padded Sectors
-
-<ComponentPreview className="mb-0" title="paddingAngle={4} cornerRadius={8}" name="ex-padded-pie-chart"  />
-<Alert> 
-  <AlertContent>
-    Use `paddingAngle` to add space between sectors and `cornerRadius` to round the corners of each sector. Combine with `innerRadius` for a modern donut look.
-  </AlertContent>
-</Alert>
-
-### Labels
-
-<ComponentPreview className="mb-0" title="showLabels={true}" name="ex-labels-pie-chart"  />
-<Alert> 
-  <AlertContent>
-    Enable `showLabels` to display labels on each sector. You can customize the label with `labelKey` to show different data, and use `labelListProps` for additional customization.
-  </AlertContent>
-</Alert>
-
-### Glowing Sectors
-
-<ComponentPreview className="mb-0" title="glowingSectors={['chrome', 'safari']}" name="ex-glowing-pie-chart"  />
-<Alert> 
-  <AlertContent>
-    Add a subtle glow effect to specific sectors using `glowingSectors` prop. Pass an array of sector names (the values from your `nameKey` field) to specify which sectors should glow.
-  </AlertContent>
-</Alert>
-
-### Neon Sectors
-
-<ComponentPreview className="mb-0" title="neonSectors={['chrome', 'firefox']}" name="ex-neon-pie-chart"  />
-<Alert> 
-  <AlertContent>
-    Add an intense neon glow effect to sectors using `neonSectors` prop. This creates a more dramatic visual effect with a white core and colored outer glow.
+    Add a subtle glow effect to specific bars using `glowingBars` prop. Pass an array of bar names (the values from your `nameKey` field) to specify which bars should glow.
   </AlertContent>
 </Alert>
 
@@ -209,7 +182,7 @@ Below are some examples of the pie chart with different configurations. You can 
       isRequired 
     />
     <ApiContent>
-      Data used to display the chart. An array of objects where each object represents a sector.
+      Data used to display the chart. An array of objects where each object represents a radial bar.
       
       type: `TData[]` where `TData extends Record<string, unknown>`
     </ApiContent>
@@ -221,7 +194,7 @@ Below are some examples of the pie chart with different configurations. You can 
       isRequired
     />
     <ApiContent>
-      The key from your data objects to use for sector values (typically numeric values that determine sector size).
+      The key from your data objects to use for bar values (typically numeric values that determine bar size).
       
       type: `keyof TData & string`
     </ApiContent>
@@ -233,7 +206,7 @@ Below are some examples of the pie chart with different configurations. You can 
       isRequired
     />
     <ApiContent>
-      The key from your data objects to use for sector names (typically string values used for labels and legend).
+      The key from your data objects to use for bar names (typically string values used for labels and legend).
       
       type: `keyof TData & string`
     </ApiContent>
@@ -245,7 +218,7 @@ Below are some examples of the pie chart with different configurations. You can 
       isRequired
     />
     <ApiContent>
-      Configuration object that defines the chart's sectors. Each key should match a value from your `nameKey` field, with corresponding colors.
+      Configuration object that defines the chart's bars. Each key should match a value from your `nameKey` field, with corresponding colors.
       
       type: `ChartConfig`
     </ApiContent>
@@ -264,14 +237,27 @@ Below are some examples of the pie chart with different configurations. You can 
 
   <ApiReference>
     <ApiHeader
+      propName="variant"
+    />
+    <ApiContent>
+      The visual variant of the radial chart. `"full"` displays a full circle (360°), `"semi"` displays a half circle (180°).
+      
+      type: `"full" | "semi"`
+      
+      default: `"full"`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
       propName="innerRadius"
     />
     <ApiContent>
-      The inner radius of the pie. Set to a value greater than 0 to create a donut chart. Can be a number (pixels) or percentage string.
+      The inner radius of the radial bars. Can be a number (pixels) or percentage string.
       
       type: `number | string`
       
-      default: `0`
+      default: `"30%"`
     </ApiContent>
   </ApiReference>
 
@@ -280,11 +266,11 @@ Below are some examples of the pie chart with different configurations. You can 
       propName="outerRadius"
     />
     <ApiContent>
-      The outer radius of the pie. Can be a number (pixels) or percentage string.
+      The outer radius of the radial bars. Can be a number (pixels) or percentage string.
       
       type: `number | string`
       
-      default: `"80%"`
+      default: `"100%"`
     </ApiContent>
   </ApiReference>
 
@@ -293,87 +279,24 @@ Below are some examples of the pie chart with different configurations. You can 
       propName="cornerRadius"
     />
     <ApiContent>
-      The border radius for the corners of each sector in pixels.
+      The border radius for the corners of each bar in pixels.
       
       type: `number`
       
-      default: `0`
+      default: `5`
     </ApiContent>
   </ApiReference>
 
   <ApiReference>
     <ApiHeader
-      propName="paddingAngle"
+      propName="barSize"
     />
     <ApiContent>
-      The angle of padding between sectors in degrees.
+      The thickness of each radial bar in pixels.
       
       type: `number`
       
-      default: `0`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="startAngle"
-    />
-    <ApiContent>
-      The starting angle of the pie chart in degrees (0 is 3 o'clock, 90 is 12 o'clock).
-      
-      type: `number`
-      
-      default: `0`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="endAngle"
-    />
-    <ApiContent>
-      The ending angle of the pie chart in degrees. Set to less than 360 for a partial pie.
-      
-      type: `number`
-      
-      default: `360`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="showLabels"
-    />
-    <ApiContent>
-      Whether to display labels on each sector.
-      
-      type: `boolean`
-      
-      default: `false`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="labelKey"
-    />
-    <ApiContent>
-      The key from your data objects to use for label text when `showLabels` is enabled. If not provided, uses the `dataKey` value.
-      
-      type: `keyof TData & string`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="labelListProps"
-    />
-    <ApiContent>
-      Additional props to customize the label list appearance and behavior.
-      
-      type: `Omit<ComponentProps<typeof LabelList>, "dataKey">`
-      
-      Read the <Link href="https://recharts.github.io/en-US/api/LabelList/" _blank>Recharts LabelList documentation</Link> for available props.
+      default: `14`
     </ApiContent>
   </ApiReference>
 
@@ -427,10 +350,23 @@ Below are some examples of the pie chart with different configurations. You can 
 
   <ApiReference>
     <ApiHeader
+      propName="hideBackground"
+    />
+    <ApiContent>
+      Whether to hide the background bars (the unfilled portion of each bar).
+      
+      type: `boolean`
+      
+      default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
       propName="isClickable"
     />
     <ApiContent>
-      Enables interactive clicking on sectors to select/deselect them. Selected sectors expand slightly and unselected sectors dim.
+      Enables interactive clicking on bars to select/deselect them. Selected bars expand slightly and unselected bars dim.
       
       type: `boolean`
       
@@ -443,7 +379,7 @@ Below are some examples of the pie chart with different configurations. You can 
       propName="onSelectionChange"
     />
     <ApiContent>
-      Callback function that is called when a sector is selected or deselected. Receives an object with `dataKey` (sector name) and `value` (sector value), or `null` when deselected.
+      Callback function that is called when a bar is selected or deselected. Receives an object with `dataKey` (bar name) and `value` (bar value), or `null` when deselected.
       
       **Note:** This prop is only available when `isClickable` is set to `true`.
       
@@ -466,10 +402,10 @@ Below are some examples of the pie chart with different configurations. You can 
 
   <ApiReference>
     <ApiHeader
-      propName="glowingSectors"
+      propName="glowingBars"
     />
     <ApiContent>
-      Array of sector names (values from your `nameKey` field) that should have a glowing effect applied. Creates a smooth outer glow around the specified sectors.
+      Array of bar names (values from your `nameKey` field) that should have a glowing effect applied. Creates a smooth outer glow around the specified bars.
       
       type: `string[]`
       
@@ -479,10 +415,10 @@ Below are some examples of the pie chart with different configurations. You can 
 
   <ApiReference>
     <ApiHeader
-      propName="neonSectors"
+      propName="neonBars"
     />
     <ApiContent>
-      Array of sector names (values from your `nameKey` field) that should have a neon effect applied. Creates a multi-layered glow with a bright white core. Neon effect takes priority over glow effect.
+      Array of bar names (values from your `nameKey` field) that should have a neon effect applied. Creates a multi-layered glow with a bright white core. Neon effect takes priority over glow effect.
       
       type: `string[]`
       
@@ -495,24 +431,24 @@ Below are some examples of the pie chart with different configurations. You can 
       propName="chartProps"
     />
     <ApiContent>
-      Additional props to pass to the underlying Recharts PieChart component.
+      Additional props to pass to the underlying Recharts RadialBarChart component.
       
-      type: `ComponentProps<typeof PieChart>`
+      type: `ComponentProps<typeof RadialBarChart>`
       
-      Read the <Link href="https://recharts.github.io/en-US/api/PieChart/" _blank>Recharts PieChart documentation</Link> for available props.
+      Read the <Link href="https://recharts.github.io/en-US/api/RadialBarChart/" _blank>Recharts RadialBarChart documentation</Link> for available props.
     </ApiContent>
   </ApiReference>
 
   <ApiReference>
     <ApiHeader
-      propName="pieProps"
+      propName="radialBarProps"
     />
     <ApiContent>
-      Additional props to pass to the underlying Recharts Pie component.
+      Additional props to pass to the underlying Recharts RadialBar component.
       
-      type: `Omit<ComponentProps<typeof Pie>, "data" | "dataKey" | "nameKey">`
+      type: `Omit<ComponentProps<typeof RadialBar>, "dataKey">`
       
-      Read the <Link href="https://recharts.github.io/en-US/api/Pie/" _blank>Recharts Pie documentation</Link> for available props.
+      Read the <Link href="https://recharts.github.io/en-US/api/RadialBar/" _blank>Recharts RadialBar documentation</Link> for available props.
     </ApiContent>
   </ApiReference>
 </ApiReferenceWrapper>
