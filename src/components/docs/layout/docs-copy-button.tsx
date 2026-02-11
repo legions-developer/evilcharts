@@ -134,7 +134,7 @@ const menuItems = {
   ),
 };
 
-export function DocsCopyPage({ page, url }: { page: string; url: string }) {
+export function DocsCopyPage({ mdx, url }: { mdx: string; url: string }) {
   const { copy, copied } = useClipboard();
 
   const trigger = (
@@ -155,7 +155,7 @@ export function DocsCopyPage({ page, url }: { page: string; url: string }) {
           variant="secondary"
           size="sm"
           className="bg-background hover:bg-background text-muted-foreground hover:text-primary hover:border-primary/20 border px-1.5! text-xs"
-          onClick={() => copy(page)}
+          onClick={() => copy(mdx)}
         >
           {copied ? <CheckIcon /> : <CopyIcon />}
           Copy Page
