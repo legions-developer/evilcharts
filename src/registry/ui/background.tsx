@@ -27,7 +27,7 @@ export type BackgroundVariant =
 type PatternProps = { id: string };
 
 const DotsPattern = ({ id }: PatternProps) => (
-  <pattern id={id} x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse">
+  <pattern id={id} x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
     <circle className="text-border dark:text-border" cx="2" cy="2" r="1" fill="currentColor" />
   </pattern>
 );
