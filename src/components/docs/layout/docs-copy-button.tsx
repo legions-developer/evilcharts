@@ -165,7 +165,7 @@ export function DocsCopyPage({ page, url }: { page: string; url: string }) {
           <DropdownMenuContent align="end" className="bg-background rounded-lg">
             {Object.entries(menuItems).map(([key, value]) => (
               <DropdownMenuItem
-                className="hover:bg-muted/50! text-muted-foreground/80 hover:text-primary! cursor-pointer"
+                className="hover:bg-muted/50! text-muted-foreground/80 hover:text-primary! cursor-pointer text-[13px]"
                 key={key}
                 asChild
               >

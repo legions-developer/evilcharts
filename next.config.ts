@@ -52,6 +52,26 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  rewrites() {
+    return [
+      {
+        source: "/docs.md",
+        destination: "/llm",
+      },
+      {
+        source: "/docs/:slug.md",
+        destination: "/llm/:slug",
+      },
+      {
+        source: "/docs/:chart/:slug.md",
+        destination: "/llm/:chart/:slug",
+      },
+      {
+        source: "/docs/:chart/:slug/blocks.md",
+        destination: "/llm/:chart/:slug/blocks",
+      },
+    ];
+  },
 };
 
 const withMDX = createMDX();

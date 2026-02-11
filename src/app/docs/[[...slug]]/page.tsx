@@ -53,7 +53,7 @@ export default async function Page(props: { params: Promise<{ slug: string[] }> 
               </div>
             )}
           </div>
-          <div>{raw && <DocsCopyPage page={raw} url={"https://evilcharts.com" + page.url} />}</div>
+          <div>{raw && <DocsCopyPage page={raw} url={page.url} />}</div>
         </div>
         <div className="text-primary/80 mt-8 w-full flex-1 text-[14px] *:data-[slot=alert]:first:mt-0">
           <MDX components={mdxComponents} />
