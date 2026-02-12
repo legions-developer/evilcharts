@@ -141,6 +141,7 @@ export function DocsCopyPage({ mdx, url }: { mdx: string; url: string }) {
     <Button
       variant="secondary"
       size="sm"
+      aria-label="Open dropdown menu"
       className="peer text-muted-foreground hover:text-primary bg-transparent px-1! hover:bg-transparent focus-visible:ring-0!"
     >
       <CaretDown />
@@ -152,6 +153,7 @@ export function DocsCopyPage({ mdx, url }: { mdx: string; url: string }) {
       <div className="dark:bg-primary-foreground group/buttons relative flex rounded-lg bg-[#F5F5F5] p-[2px] select-none *:data-[slot=button]:focus-visible:relative *:data-[slot=button]:focus-visible:z-10">
         <PopoverAnchor />
         <Button
+          aria-label="Copy page"
           variant="secondary"
           size="sm"
           className="bg-background hover:bg-background text-muted-foreground hover:text-primary hover:border-primary/20 border px-1.5! text-xs"
