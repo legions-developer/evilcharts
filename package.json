@@ -59,7 +59,7 @@
     "input-otp": "^1.4.2",
     "lucide-react": "^0.562.0",
     "motion": "^12.23.26",
-    "next": "16.1.0",
+    "next": "^16.1.6",
     "next-themes": "^0.4.6",
     "react": "19.2.3",
     "react-day-picker": "^9.13.0",
