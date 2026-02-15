@@ -128,7 +128,13 @@ export function TocIndicator({ toc, activeIndex, className }: TocIndicatorProps)
   const cssOffsetPath = `path('${path}')`;
 
   return (
-    <div className={cn("text-path pointer-events-none absolute h-full w-full", className)}>
+    <div
+      style={{
+        maskImage:
+          "linear-gradient(to bottom, transparent 0px, currentColor 15px, currentColor 100%)",
+      }}
+      className={cn("text-path pointer-events-none absolute h-full w-full", className)}
+    >
       <svg className="h-full w-full" overflow="visible">
         <defs>
           <marker
