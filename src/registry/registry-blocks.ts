@@ -16,4 +16,17 @@ export const blocks: Registry["items"] = [
       },
     ],
   },
+  {
+    name: "hover-trace-bar-chart",
+    description: "Bar chart with active value line and animated marker",
+    dependencies: ["recharts", "motion", "@number-flow/react"],
+    type: "registry:block",
+    files: [
+      {
+        path: "blocks/b-hover-trace-bar-chart.tsx",
+        type: "registry:block",
+        target: TARGET_BASE_PATH + "/hover-trace-bar-chart.tsx",
+      },
+    ],
+  },
 ];
