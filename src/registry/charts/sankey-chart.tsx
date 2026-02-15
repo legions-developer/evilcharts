@@ -1,6 +1,12 @@
 "use client";
 
 import {
+  ChartTooltip,
+  ChartTooltipContent,
+  type TooltipRoundness,
+  type TooltipVariant,
+} from "@/registry/ui/tooltip";
+import {
   type ChartConfig,
   ChartContainer,
   getColorsCount,
@@ -13,9 +19,8 @@ import type {
   SankeyData,
   SankeyNode,
 } from "recharts";
-import { useCallback, useId, useState, type ReactNode } from "react";
-import { ChartTooltip, ChartTooltipContent, type TooltipRoundness, type TooltipVariant } from "@/registry/ui/tooltip";
 import { ChartBackground, type BackgroundVariant } from "@/registry/ui/background";
+import { useCallback, useId, useState, type ReactNode } from "react";
 import { Sankey, Layer } from "recharts";
 import { motion } from "motion/react";
 
@@ -174,6 +179,7 @@ export function EvilSankeyChart({
               {...props}
               chartId={chartId}
               chartConfig={chartConfig}
+              data={data}
               selectedNode={selectedNode}
               isClickable={isClickable}
               nodeRadius={nodeRadius}
@@ -203,7 +209,17 @@ export function EvilSankeyChart({
           {...sankeyProps}
         >
           {!hideTooltip && (
-            <ChartTooltip defaultIndex={tooltipDefaultIndex} content={<ChartTooltipContent nameKey="name" hideLabel roundness={tooltipRoundness} variant={tooltipVariant} />} />
+            <ChartTooltip
+              defaultIndex={tooltipDefaultIndex}
+              content={
+                <ChartTooltipContent
+                  nameKey="name"
+                  hideLabel
+                  roundness={tooltipRoundness}
+                  variant={tooltipVariant}
+                />
+              }
+            />
           )}
           {/* ======== CHART STYLES ======== */}
           <defs>
@@ -257,6 +273,7 @@ export function EvilSankeyChart({
 type CustomNodeProps = SankeyNodeProps & {
   chartId: string;
   chartConfig: ChartConfig;
+  data: SankeyData;
   selectedNode: string | null;
   isClickable: boolean;
   nodeRadius: number;
@@ -276,6 +293,7 @@ const CustomNode = ({
   payload,
   chartId,
   chartConfig,
+  data,
   selectedNode,
   isClickable,
   nodeRadius,
@@ -289,7 +307,20 @@ const CustomNode = ({
   const nodeName = payload.name;
   const nodeValue = payload.value;
   const nodeIcon = (payload as SankeyNode & { icon?: ReactNode }).icon;
-  const isSelected = selectedNode === null || selectedNode === nodeName;
+
+  // Check if this node is the selected one, or connected to the selected one via a link
+  const isConnectedToSelected = (() => {
+    if (selectedNode === null) return true;
+    if (selectedNode === nodeName) return true;
+    const selectedIdx = data.nodes.findIndex((n) => n.name === selectedNode);
+    const thisIdx = data.nodes.findIndex((n) => n.name === nodeName);
+    return data.links.some(
+      (link) =>
+        (link.source === selectedIdx && link.target === thisIdx) ||
+        (link.source === thisIdx && link.target === selectedIdx),
+    );
+  })();
+  const isSelected = isConnectedToSelected;
   const isGlowing = glowingNodes.includes(nodeName);
   const isNeon = neonNodes.includes(nodeName);
 
@@ -332,15 +363,16 @@ const CustomNode = ({
       {/* Inside labels */}
       {showNodeLabels === "inside" && (
         <>
-          {/* Dark background for label readability */}
+          {/* Background overlay for label readability */}
           <rect
-            x={x + 2}
-            y={y + 2}
-            width={width - 4}
-            height={height - 4}
-            rx={Math.max(0, nodeRadius - 2)}
-            ry={Math.max(0, nodeRadius - 2)}
-            fill="rgba(0, 0, 0, 0.6)"
+            x={x + 1}
+            y={y + 1}
+            width={width - 2}
+            height={height - 2}
+            rx={Math.max(0, nodeRadius - 1)}
+            ry={Math.max(0, nodeRadius - 1)}
+            opacity={isClickable && !isSelected ? 0.3 : 1}
+            className="fill-white/50 transition-opacity duration-200 dark:fill-black/60"
             style={{ pointerEvents: "none" }}
           />
 
@@ -351,9 +383,13 @@ const CustomNode = ({
               y={labelY - 30}
               width={16}
               height={16}
+              opacity={isClickable && !isSelected ? 0.3 : 1}
+              className="transition-opacity duration-200"
               style={{ pointerEvents: "none" }}
             >
-              <div className="flex items-center justify-center text-white/80">{nodeIcon}</div>
+              <div className="text-foreground/80 flex items-center justify-center dark:text-white/80">
+                {nodeIcon}
+              </div>
             </foreignObject>
           )}
 
@@ -363,7 +399,8 @@ const CustomNode = ({
             y={nodeIcon ? labelY - 4 : labelY}
             textAnchor="middle"
             dominantBaseline="middle"
-            className="fill-white text-[10px] font-medium"
+            className="fill-foreground text-[10px] font-medium transition-opacity duration-200 dark:fill-white"
+            opacity={isClickable && !isSelected ? 0.3 : 1}
             style={{ pointerEvents: "none" }}
           >
             {configLabel}
@@ -376,8 +413,9 @@ const CustomNode = ({
               y={valueY}
               textAnchor="middle"
               dominantBaseline="middle"
-              className="fill-white text-xs font-bold tabular-nums"
-              style={{ pointerEvents: "none", fontFamily: "monospace" }}
+              className="fill-foreground/60 font-mono text-xs font-medium tabular-nums transition-opacity duration-200 dark:fill-white"
+              opacity={isClickable && !isSelected ? 0.3 : 0.6}
+              style={{ pointerEvents: "none" }}
             >
               {nodeValueFormatter(nodeValue)}
             </text>
@@ -393,7 +431,7 @@ const CustomNode = ({
             y={outsideLabelY - (showNodeValues ? 8 : 0)}
             textAnchor="start"
             dominantBaseline="middle"
-            className="fill-foreground text-xs font-medium"
+            className="fill-foreground text-xs"
             style={{ pointerEvents: "none" }}
           >
             {configLabel}
@@ -405,7 +443,8 @@ const CustomNode = ({
               y={outsideLabelY + 8}
               textAnchor="start"
               dominantBaseline="middle"
-              className="fill-muted-foreground text-xs tabular-nums"
+              opacity={0.5}
+              className="fill-foreground font-mono text-xs tabular-nums dark:fill-white"
               style={{ pointerEvents: "none" }}
             >
               {nodeValueFormatter(nodeValue)}
@@ -483,18 +522,21 @@ const CustomLink = ({
 
   // Apply vertical padding to the link width (reduces stroke width to create padding effect)
   const paddedLinkWidth = Math.max(1, linkWidth - linkVerticalPadding);
+  const halfWidth = paddedLinkWidth / 2;
 
-  // Build the bezier path for the link
-  const path = `
-    M${sourceX},${sourceY}
-    C${sourceControlX},${sourceY} ${targetControlX},${targetY} ${targetX},${targetY}
-  `;
+  // Build a closed area path for the link band (top edge forward, bottom edge backward)
+  const linkAreaPath = `M${sourceX},${sourceY - halfWidth}
+    C${sourceControlX},${sourceY - halfWidth} ${targetControlX},${targetY - halfWidth} ${targetX},${targetY - halfWidth}
+    L${targetX},${targetY + halfWidth}
+    C${targetControlX},${targetY + halfWidth} ${sourceControlX},${sourceY + halfWidth} ${sourceX},${sourceY + halfWidth}
+    Z`;
 
   return (
     <Layer>
       {/* Define gradient for this specific link if using gradient variant */}
-      {linkVariant === "gradient" && (
-        <defs>
+      <defs>
+        {/* Gradient fill for links */}
+        {linkVariant === "gradient" && (
           <linearGradient
             id={`${chartId}-link-gradient-${index}`}
             x1="0%"
@@ -507,6 +549,13 @@ const CustomLink = ({
               stopColor={
                 sourceName in chartConfig ? `var(--color-${sourceName}-0)` : "currentColor"
               }
+              stopOpacity={0.2}
+            />
+            <stop
+              offset="50%"
+              stopColor={
+                sourceName in chartConfig ? `var(--color-${sourceName}-0)` : "currentColor"
+              }
               stopOpacity={0.5}
             />
             <stop
@@ -514,17 +563,28 @@ const CustomLink = ({
               stopColor={
                 targetName in chartConfig ? `var(--color-${targetName}-0)` : "currentColor"
               }
-              stopOpacity={0.5}
+              stopOpacity={0.2}
             />
           </linearGradient>
-        </defs>
-      )}
+        )}
+        <linearGradient id={`${chartId}-link-stroke-${index}`} x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="var(--primary)" stopOpacity={0} />
+          <stop offset="15%" stopColor="var(--primary)" stopOpacity={0.8} />
+          <stop offset="50%" stopColor="var(--primary)" stopOpacity={1} />
+          <stop offset="85%" stopColor="var(--primary)" stopOpacity={0.8} />
+          <stop offset="100%" stopColor="var(--primary)" stopOpacity={0} />
+        </linearGradient>
+      </defs>
+
       <path
-        d={path}
-        fill="none"
-        stroke={getLinkFill()}
-        strokeWidth={paddedLinkWidth}
-        strokeOpacity={isConnected ? 0.4 : 0.1}
+        d={linkAreaPath}
+        fill={getLinkFill()}
+        fillOpacity={isConnected ? 0.4 : 0.1}
+        stroke={
+          selectedNode !== null && isConnected ? `url(#${chartId}-link-stroke-${index})` : "none"
+        }
+        strokeWidth={1}
+        strokeOpacity={0.3}
         filter={getFilter()}
         className="transition-opacity duration-200"
       />

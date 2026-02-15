@@ -156,11 +156,12 @@ export function DocsCopyPage({ mdx, url }: { mdx: string; url: string }) {
           aria-label="Copy page"
           variant="secondary"
           size="sm"
-          className="bg-background hover:bg-background text-muted-foreground hover:text-primary hover:border-primary/20 border px-1.5! text-xs"
+          className="bg-background hover:bg-background text-muted-foreground hover:text-primary hover:border-primary/20 border px-1.5! text-xs duration-0"
           onClick={() => copy(mdx)}
         >
           {copied ? <CheckIcon /> : <CopyIcon />}
-          Copy Page
+          <span>Copy Page</span>
+          <span className="absolute inset-0 hidden group-hover/buttons:block">Copied</span>
         </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
