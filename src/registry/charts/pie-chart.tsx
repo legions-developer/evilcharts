@@ -1,16 +1,21 @@
 "use client";
 
 import {
+  ChartTooltip,
+  ChartTooltipContent,
+  type TooltipRoundness,
+  type TooltipVariant,
+} from "@/registry/ui/tooltip";
+import {
   type ChartConfig,
   ChartContainer,
   getColorsCount,
   LoadingIndicator,
 } from "@/registry/ui/chart";
-import { ChartTooltip, ChartTooltipContent, type TooltipRoundness, type TooltipVariant } from "@/registry/ui/tooltip";
-import { useCallback, useId, useState, type ComponentProps } from "react";
 import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/legend";
 import { LabelList, Pie, PieChart, Sector, type PieSectorShapeProps } from "recharts";
 import { ChartBackground, type BackgroundVariant } from "@/registry/ui/background";
+import { useCallback, useId, useState, type ComponentProps } from "react";
 import { motion } from "motion/react";
 
 // Loading animation constants
@@ -165,7 +170,17 @@ export function EvilPieChart<TData extends Record<string, unknown>>({
           />
         )}
         {!hideTooltip && !isLoading && (
-          <ChartTooltip defaultIndex={tooltipDefaultIndex} content={<ChartTooltipContent nameKey={nameKey} hideLabel roundness={tooltipRoundness} variant={tooltipVariant} />} />
+          <ChartTooltip
+            defaultIndex={tooltipDefaultIndex}
+            content={
+              <ChartTooltipContent
+                nameKey={nameKey}
+                hideLabel
+                roundness={tooltipRoundness}
+                variant={tooltipVariant}
+              />
+            }
+          />
         )}
         {!isLoading && (
           <Pie
@@ -204,6 +219,8 @@ export function EvilPieChart<TData extends Record<string, unknown>>({
                   {...props}
                   fill={`url(#${chartId}-pie-colors-${sectorName})`}
                   filter={getFilter()}
+                  stroke={paddingAngle < 0 ? "var(--background)" : "none"}
+                  strokeWidth={paddingAngle < 0 ? 5 : 0}
                   opacity={isClickable && !isSelected ? 0.3 : 1}
                   className="transition-opacity duration-200"
                 />

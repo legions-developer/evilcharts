@@ -898,6 +898,18 @@ export const examples: Registry["items"] = [
       },
     ],
   },
+  // Pie Chart Overlapping Padded
+  {
+    name: "ex-overlapping-padded-pie-chart",
+    registryDependencies: ["@evilcharts/pie-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-overlapping-padded-pie-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
   // Pie Chart Labels
   {
     name: "ex-labels-pie-chart",
