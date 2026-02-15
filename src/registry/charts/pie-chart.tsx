@@ -69,7 +69,6 @@ type EvilPieChartProps<TData extends Record<string, unknown>> = {
 
   // Glow Effects
   glowingSectors?: string[];
-  neonSectors?: string[];
   // Background
   backgroundVariant?: BackgroundVariant;
 };
@@ -113,7 +112,6 @@ export function EvilPieChart<TData extends Record<string, unknown>>({
   isClickable = false,
   isLoading = false,
   glowingSectors = [],
-  neonSectors = [],
   onSelectionChange,
   backgroundVariant,
 }: EvilPieChartPropsWithCallback<TData>) {
@@ -205,11 +203,9 @@ export function EvilPieChart<TData extends Record<string, unknown>>({
               const index = props.index ?? 0;
               const sectorName = data[index]?.[nameKey] as string;
               const isGlowing = glowingSectors.includes(sectorName);
-              const isNeon = neonSectors.includes(sectorName);
               const isSelected = selectedSector === null || selectedSector === sectorName;
 
               const getFilter = () => {
-                if (isNeon) return `url(#${chartId}-pie-neon-${sectorName})`;
                 if (isGlowing) return `url(#${chartId}-pie-glow-${sectorName})`;
                 return undefined;
               };
@@ -268,11 +264,6 @@ export function EvilPieChart<TData extends Record<string, unknown>>({
           {/* Glow filters */}
           {glowingSectors.length > 0 && (
             <GlowFilterStyle chartId={chartId} glowingSectors={glowingSectors} />
-          )}
-
-          {/* Neon filters */}
-          {neonSectors.length > 0 && (
-            <NeonFilterStyle chartId={chartId} neonSectors={neonSectors} />
           )}
         </defs>
       </PieChart>
@@ -380,51 +371,6 @@ const GlowFilterStyle = ({
           />
           <feMerge>
             <feMergeNode in="glow" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-      ))}
-    </>
-  );
-};
-
-const NeonFilterStyle = ({ chartId, neonSectors }: { chartId: string; neonSectors: string[] }) => {
-  return (
-    <>
-      {neonSectors.map((sectorName) => (
-        <filter
-          key={`${chartId}-pie-neon-${sectorName}`}
-          id={`${chartId}-pie-neon-${sectorName}`}
-          x="-100%"
-          y="-100%"
-          width="300%"
-          height="300%"
-        >
-          <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="outerBlur" />
-          <feColorMatrix
-            in="outerBlur"
-            type="matrix"
-            values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.8 0"
-            result="outerGlow"
-          />
-          <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="middleBlur" />
-          <feColorMatrix
-            in="middleBlur"
-            type="matrix"
-            values="1 0 0 0 0.05  0 1 0 0 0.05  0 0 1 0 0.05  0 0 0 1.2 0"
-            result="middleGlow"
-          />
-          <feGaussianBlur in="SourceGraphic" stdDeviation="1" result="coreBlur" />
-          <feColorMatrix
-            in="coreBlur"
-            type="matrix"
-            values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1 0"
-            result="whiteCore"
-          />
-          <feMerge>
-            <feMergeNode in="outerGlow" />
-            <feMergeNode in="middleGlow" />
-            <feMergeNode in="whiteCore" />
             <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>

@@ -1,6 +1,12 @@
 "use client";
 
 import {
+  ChartTooltip,
+  ChartTooltipContent,
+  type TooltipRoundness,
+  type TooltipVariant,
+} from "@/registry/ui/tooltip";
+import {
   type ChartConfig,
   ChartContainer,
   getColorsCount,
@@ -9,9 +15,8 @@ import {
 import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/legend";
 import { useCallback, useEffect, useId, useMemo, useState, type ComponentProps } from "react";
 import { PolarAngleAxis, PolarGrid, PolarRadiusAxis, Radar, RadarChart } from "recharts";
-import { ChartTooltip, ChartTooltipContent, type TooltipRoundness, type TooltipVariant } from "@/registry/ui/tooltip";
-import { ChartDot, DotVariant } from "@/registry/ui/dot";
 import { ChartBackground, type BackgroundVariant } from "@/registry/ui/background";
+import { ChartDot, DotVariant } from "@/registry/ui/dot";
 
 // Loading animation constants
 const LOADING_POINTS = 6;
@@ -71,7 +76,6 @@ type EvilRadarChartProps<
 
   // Glow Effects
   glowingRadars?: NumericDataKeys<TData>[];
-  neonRadars?: NumericDataKeys<TData>[];
   // Background
   backgroundVariant?: BackgroundVariant;
 };
@@ -120,7 +124,6 @@ export function EvilRadarChart<
   isClickable = false,
   isLoading = false,
   glowingRadars = [],
-  neonRadars = [],
   onSelectionChange,
   backgroundVariant,
 }: EvilRadarChartPropsWithCallback<TData, TConfig>) {
@@ -193,19 +196,27 @@ export function EvilRadarChart<
         )}
 
         {!hideTooltip && !isLoading && (
-          <ChartTooltip defaultIndex={tooltipDefaultIndex} cursor={false} content={<ChartTooltipContent selected={selectedRadar} roundness={tooltipRoundness} variant={tooltipVariant} />} />
+          <ChartTooltip
+            defaultIndex={tooltipDefaultIndex}
+            cursor={false}
+            content={
+              <ChartTooltipContent
+                selected={selectedRadar}
+                roundness={tooltipRoundness}
+                variant={tooltipVariant}
+              />
+            }
+          />
         )}
 
         {/* Render radars for each data key in chartConfig */}
         {!isLoading &&
           radarDataKeys.map((radarKey) => {
             const isGlowing = glowingRadars.includes(radarKey as NumericDataKeys<TData>);
-            const isNeon = neonRadars.includes(radarKey as NumericDataKeys<TData>);
             const isSelected = selectedRadar === null || selectedRadar === radarKey;
             const opacity = isClickable && !isSelected ? 0.2 : 1;
 
             const getFilter = () => {
-              if (isNeon) return `url(#${chartId}-radar-neon-${radarKey})`;
               if (isGlowing) return `url(#${chartId}-radar-glow-${radarKey})`;
               return undefined;
             };
@@ -288,11 +299,6 @@ export function EvilRadarChart<
           {/* Glow filters */}
           {glowingRadars.length > 0 && (
             <GlowFilterStyle chartId={chartId} glowingRadars={glowingRadars as string[]} />
-          )}
-
-          {/* Neon filters */}
-          {neonRadars.length > 0 && (
-            <NeonFilterStyle chartId={chartId} neonRadars={neonRadars as string[]} />
           )}
         </defs>
       </RadarChart>
@@ -457,51 +463,6 @@ const GlowFilterStyle = ({
           />
           <feMerge>
             <feMergeNode in="glow" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-      ))}
-    </>
-  );
-};
-
-const NeonFilterStyle = ({ chartId, neonRadars }: { chartId: string; neonRadars: string[] }) => {
-  return (
-    <>
-      {neonRadars.map((radarKey) => (
-        <filter
-          key={`${chartId}-radar-neon-${radarKey}`}
-          id={`${chartId}-radar-neon-${radarKey}`}
-          x="-100%"
-          y="-100%"
-          width="300%"
-          height="300%"
-        >
-          <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="outerBlur" />
-          <feColorMatrix
-            in="outerBlur"
-            type="matrix"
-            values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.8 0"
-            result="outerGlow"
-          />
-          <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="middleBlur" />
-          <feColorMatrix
-            in="middleBlur"
-            type="matrix"
-            values="1 0 0 0 0.05  0 1 0 0 0.05  0 0 1 0 0.05  0 0 0 1.2 0"
-            result="middleGlow"
-          />
-          <feGaussianBlur in="SourceGraphic" stdDeviation="1" result="coreBlur" />
-          <feColorMatrix
-            in="coreBlur"
-            type="matrix"
-            values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1 0"
-            result="whiteCore"
-          />
-          <feMerge>
-            <feMergeNode in="outerGlow" />
-            <feMergeNode in="middleGlow" />
-            <feMergeNode in="whiteCore" />
             <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>

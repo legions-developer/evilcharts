@@ -1,16 +1,21 @@
 "use client";
 
 import {
+  ChartTooltip,
+  ChartTooltipContent,
+  type TooltipRoundness,
+  type TooltipVariant,
+} from "@/registry/ui/tooltip";
+import {
   type ChartConfig,
   ChartContainer,
   getColorsCount,
   LoadingIndicator,
 } from "@/registry/ui/chart";
-import { useCallback, useEffect, useId, useMemo, useState, type ComponentProps } from "react";
-import { ChartTooltip, ChartTooltipContent, type TooltipRoundness, type TooltipVariant } from "@/registry/ui/tooltip";
 import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/legend";
-import { RadialBar, RadialBarChart, Sector, type SectorProps } from "recharts";
+import { useCallback, useEffect, useId, useMemo, useState, type ComponentProps } from "react";
 import { ChartBackground, type BackgroundVariant } from "@/registry/ui/background";
+import { RadialBar, RadialBarChart, Sector, type SectorProps } from "recharts";
 
 // Loading animation constants
 const LOADING_BARS = 5;
@@ -61,7 +66,6 @@ type EvilRadialChartProps<TData extends Record<string, unknown>> = {
 
   // Glow Effects
   glowingBars?: string[];
-  neonBars?: string[];
   // Background
   backgroundVariant?: BackgroundVariant;
 };
@@ -102,7 +106,6 @@ export function EvilRadialChart<TData extends Record<string, unknown>>({
   isClickable = false,
   isLoading = false,
   glowingBars = [],
-  neonBars = [],
   onSelectionChange,
   backgroundVariant,
 }: EvilRadialChartPropsWithCallback<TData>) {
@@ -176,7 +179,14 @@ export function EvilRadialChart<TData extends Record<string, unknown>>({
           <ChartTooltip
             defaultIndex={tooltipDefaultIndex}
             cursor={false}
-            content={<ChartTooltipContent nameKey={nameKey} hideLabel roundness={tooltipRoundness} variant={tooltipVariant} />}
+            content={
+              <ChartTooltipContent
+                nameKey={nameKey}
+                hideLabel
+                roundness={tooltipRoundness}
+                variant={tooltipVariant}
+              />
+            }
           />
         )}
 
@@ -199,11 +209,9 @@ export function EvilRadialChart<TData extends Record<string, unknown>>({
               // so we can read the nameKey value directly from props
               const barName = (props as unknown as TData)[nameKey] as string;
               const isGlowing = glowingBars.includes(barName);
-              const isNeon = neonBars.includes(barName);
               const isSelected = selectedBar === null || selectedBar === barName;
 
               const getFilter = () => {
-                if (isNeon) return `url(#${chartId}-radial-neon-${barName})`;
                 if (isGlowing) return `url(#${chartId}-radial-glow-${barName})`;
                 return undefined;
               };
@@ -246,9 +254,6 @@ export function EvilRadialChart<TData extends Record<string, unknown>>({
           {glowingBars.length > 0 && (
             <GlowFilterStyle chartId={chartId} glowingBars={glowingBars} />
           )}
-
-          {/* Neon filters */}
-          {neonBars.length > 0 && <NeonFilterStyle chartId={chartId} neonBars={neonBars} />}
         </defs>
       </RadialBarChart>
     </ChartContainer>
@@ -370,51 +375,6 @@ const GlowFilterStyle = ({ chartId, glowingBars }: { chartId: string; glowingBar
           />
           <feMerge>
             <feMergeNode in="glow" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-      ))}
-    </>
-  );
-};
-
-const NeonFilterStyle = ({ chartId, neonBars }: { chartId: string; neonBars: string[] }) => {
-  return (
-    <>
-      {neonBars.map((barName) => (
-        <filter
-          key={`${chartId}-radial-neon-${barName}`}
-          id={`${chartId}-radial-neon-${barName}`}
-          x="-100%"
-          y="-100%"
-          width="300%"
-          height="300%"
-        >
-          <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="outerBlur" />
-          <feColorMatrix
-            in="outerBlur"
-            type="matrix"
-            values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.8 0"
-            result="outerGlow"
-          />
-          <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="middleBlur" />
-          <feColorMatrix
-            in="middleBlur"
-            type="matrix"
-            values="1 0 0 0 0.05  0 1 0 0 0.05  0 0 1 0 0.05  0 0 0 1.2 0"
-            result="middleGlow"
-          />
-          <feGaussianBlur in="SourceGraphic" stdDeviation="1" result="coreBlur" />
-          <feColorMatrix
-            in="coreBlur"
-            type="matrix"
-            values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1 0"
-            result="whiteCore"
-          />
-          <feMerge>
-            <feMergeNode in="outerGlow" />
-            <feMergeNode in="middleGlow" />
-            <feMergeNode in="whiteCore" />
             <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>

@@ -76,9 +76,7 @@ type EvilSankeyChartProps = {
 
   // Glow Effects
   glowingNodes?: string[];
-  neonNodes?: string[];
   glowingLinks?: number[];
-  neonLinks?: number[];
   // Background
   backgroundVariant?: BackgroundVariant;
 };
@@ -121,9 +119,7 @@ export function EvilSankeyChart({
   isClickable = false,
   isLoading = false,
   glowingNodes = [],
-  neonNodes = [],
   glowingLinks = [],
-  neonLinks = [],
   onSelectionChange,
   backgroundVariant,
 }: EvilSankeyChartPropsWithCallback) {
@@ -187,7 +183,6 @@ export function EvilSankeyChart({
               showNodeValues={showNodeValues}
               nodeValueFormatter={nodeValueFormatter}
               glowingNodes={glowingNodes}
-              neonNodes={neonNodes}
               onNodeClick={(name: string) => {
                 if (!isClickable) return;
                 handleNodeClick(selectedNode === name ? null : name);
@@ -203,7 +198,6 @@ export function EvilSankeyChart({
               linkVariant={linkVariant}
               linkVerticalPadding={linkVerticalPadding}
               glowingLinks={glowingLinks}
-              neonLinks={neonLinks}
             />
           )}
           {...sankeyProps}
@@ -231,11 +225,6 @@ export function EvilSankeyChart({
               <GlowFilterStyle chartId={chartId} glowingNodes={glowingNodes} type="node" />
             )}
 
-            {/* Neon filters for nodes */}
-            {neonNodes.length > 0 && (
-              <NeonFilterStyle chartId={chartId} neonNodes={neonNodes} type="node" />
-            )}
-
             {/* Glow filters for links */}
             {glowingLinks.length > 0 && (
               <GlowFilterStyle
@@ -243,11 +232,6 @@ export function EvilSankeyChart({
                 glowingNodes={glowingLinks.map(String)}
                 type="link"
               />
-            )}
-
-            {/* Neon filters for links */}
-            {neonLinks.length > 0 && (
-              <NeonFilterStyle chartId={chartId} neonNodes={neonLinks.map(String)} type="link" />
             )}
           </defs>
         </Sankey>
@@ -281,7 +265,6 @@ type CustomNodeProps = SankeyNodeProps & {
   showNodeValues: boolean;
   nodeValueFormatter: (value: number) => string;
   glowingNodes: string[];
-  neonNodes: string[];
   onNodeClick: (name: string) => void;
 };
 
@@ -301,7 +284,6 @@ const CustomNode = ({
   showNodeValues,
   nodeValueFormatter,
   glowingNodes,
-  neonNodes,
   onNodeClick,
 }: CustomNodeProps) => {
   const nodeName = payload.name;
@@ -322,13 +304,11 @@ const CustomNode = ({
   })();
   const isSelected = isConnectedToSelected;
   const isGlowing = glowingNodes.includes(nodeName);
-  const isNeon = neonNodes.includes(nodeName);
 
   const hasConfigColor = nodeName in chartConfig;
   const configLabel = chartConfig[nodeName]?.label ?? nodeName;
 
   const getFilter = () => {
-    if (isNeon) return `url(#${chartId}-node-neon-${nodeName})`;
     if (isGlowing) return `url(#${chartId}-node-glow-${nodeName})`;
     return undefined;
   };
@@ -464,7 +444,6 @@ type CustomLinkProps = SankeyLinkProps & {
   linkVariant: LinkVariant;
   linkVerticalPadding: number;
   glowingLinks: number[];
-  neonLinks: number[];
 };
 
 const CustomLink = ({
@@ -483,7 +462,6 @@ const CustomLink = ({
   linkVariant,
   linkVerticalPadding,
   glowingLinks,
-  neonLinks,
 }: CustomLinkProps) => {
   const sourceName = payload.source.name;
   const targetName = payload.target.name;
@@ -493,10 +471,8 @@ const CustomLink = ({
     selectedNode === null || selectedNode === sourceName || selectedNode === targetName;
 
   const isGlowing = glowingLinks.includes(index);
-  const isNeon = neonLinks.includes(index);
 
   const getFilter = () => {
-    if (isNeon) return `url(#${chartId}-link-neon-${index})`;
     if (isGlowing) return `url(#${chartId}-link-glow-${index})`;
     return undefined;
   };
@@ -759,59 +735,6 @@ const GlowFilterStyle = ({
           />
           <feMerge>
             <feMergeNode in="glow" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-      ))}
-    </>
-  );
-};
-
-const NeonFilterStyle = ({
-  chartId,
-  neonNodes,
-  type,
-}: {
-  chartId: string;
-  neonNodes: string[];
-  type: "node" | "link";
-}) => {
-  return (
-    <>
-      {neonNodes.map((nodeName) => (
-        <filter
-          key={`${chartId}-${type}-neon-${nodeName}`}
-          id={`${chartId}-${type}-neon-${nodeName}`}
-          x="-100%"
-          y="-100%"
-          width="300%"
-          height="300%"
-        >
-          <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="outerBlur" />
-          <feColorMatrix
-            in="outerBlur"
-            type="matrix"
-            values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.8 0"
-            result="outerGlow"
-          />
-          <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="middleBlur" />
-          <feColorMatrix
-            in="middleBlur"
-            type="matrix"
-            values="1 0 0 0 0.05  0 1 0 0 0.05  0 0 1 0 0.05  0 0 0 1.2 0"
-            result="middleGlow"
-          />
-          <feGaussianBlur in="SourceGraphic" stdDeviation="1" result="coreBlur" />
-          <feColorMatrix
-            in="coreBlur"
-            type="matrix"
-            values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1 0"
-            result="whiteCore"
-          />
-          <feMerge>
-            <feMergeNode in="outerGlow" />
-            <feMergeNode in="middleGlow" />
-            <feMergeNode in="whiteCore" />
             <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>

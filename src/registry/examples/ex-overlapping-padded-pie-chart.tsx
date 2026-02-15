@@ -52,7 +52,6 @@ const chartConfig = {
 export function EvilExamplePieChart() {
   return (
     <EvilPieChart
-      isClickable
       className="h-full w-full p-4"
       data={data}
       dataKey="visitors"

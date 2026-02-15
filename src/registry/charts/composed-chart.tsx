@@ -7,13 +7,18 @@ import {
   getLoadingData,
   LoadingIndicator,
 } from "@/registry/ui/chart";
-import { EvilBrush, useEvilBrush, type EvilBrushRange } from "@/registry/ui/evil-brush";
+import {
+  ChartTooltip,
+  ChartTooltipContent,
+  type TooltipRoundness,
+  type TooltipVariant,
+} from "@/registry/ui/tooltip";
 import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/legend";
 import { Bar, ComposedChart, CartesianGrid, Line, ReferenceLine, XAxis, YAxis } from "recharts";
 import { useCallback, useId, useMemo, useRef, useState, type ComponentProps } from "react";
-import { ChartTooltip, ChartTooltipContent, type TooltipRoundness, type TooltipVariant } from "@/registry/ui/tooltip";
-import { ChartDot, DotVariant } from "@/registry/ui/dot";
+import { EvilBrush, useEvilBrush, type EvilBrushRange } from "@/registry/ui/evil-brush";
 import { ChartBackground, type BackgroundVariant } from "@/registry/ui/background";
+import { ChartDot, DotVariant } from "@/registry/ui/dot";
 import { motion } from "motion/react";
 
 // Constants
@@ -63,7 +68,6 @@ type EvilComposedChartProps<
   barCategoryGap?: number;
   enableHoverHighlight?: boolean;
   glowingBars?: NumericDataKeys<TData>[];
-  neonBars?: NumericDataKeys<TData>[];
 
   // Line Configuration
   lineConfig: TLineConfig & ValidateConfigKeys<TData, TLineConfig>;
@@ -73,7 +77,6 @@ type EvilComposedChartProps<
   activeDotVariant?: DotVariant;
   connectNulls?: boolean;
   glowingLines?: NumericDataKeys<TData>[];
-  neonLines?: NumericDataKeys<TData>[];
 
   // Hide Stuffs
   hideTooltip?: boolean;
@@ -137,7 +140,6 @@ export function EvilComposedChart<
   barCategoryGap,
   enableHoverHighlight = false,
   glowingBars = [],
-  neonBars = [],
   // Line props
   lineConfig,
   curveType = "linear",
@@ -146,7 +148,6 @@ export function EvilComposedChart<
   activeDotVariant,
   connectNulls = false,
   glowingLines = [],
-  neonLines = [],
   // Common props
   hideTooltip = false,
   hideCartesianGrid = false,
@@ -230,7 +231,9 @@ export function EvilComposedChart<
       >
         {backgroundVariant && <ChartBackground variant={backgroundVariant} />}
         <ReferenceLine color="white" />
-        {!hideCartesianGrid && !backgroundVariant && <CartesianGrid vertical={false} strokeDasharray="3 3" />}
+        {!hideCartesianGrid && !backgroundVariant && (
+          <CartesianGrid vertical={false} strokeDasharray="3 3" />
+        )}
         {!hideLegend && (
           <ChartLegend
             verticalAlign="top"
@@ -280,7 +283,13 @@ export function EvilComposedChart<
                     strokeWidth: STROKE_WIDTH,
                   }
             }
-            content={<ChartTooltipContent selected={selectedDataKey} roundness={tooltipRoundness} variant={tooltipVariant} />}
+            content={
+              <ChartTooltipContent
+                selected={selectedDataKey}
+                roundness={tooltipRoundness}
+                variant={tooltipVariant}
+              />
+            }
           />
         )}
 
@@ -288,11 +297,9 @@ export function EvilComposedChart<
         {!isLoading &&
           Object.keys(barConfig).map((dataKey) => {
             const isGlowing = glowingBars.includes(dataKey as NumericDataKeys<TData>);
-            const isNeon = neonBars.includes(dataKey as NumericDataKeys<TData>);
             const isSelectedDataKey = selectedDataKey === null || selectedDataKey === dataKey;
 
             const getFilter = () => {
-              if (isNeon) return `url(#${chartId}-bar-neon-${dataKey})`;
               if (isGlowing) return `url(#${chartId}-bar-glow-${dataKey})`;
               return undefined;
             };
@@ -351,10 +358,8 @@ export function EvilComposedChart<
             const _opacity = getOpacity(isClickable, selectedDataKey, dataKey);
             const hasSelection = selectedDataKey !== null;
             const isGlowing = glowingLines.includes(dataKey as NumericDataKeys<TData>);
-            const isNeon = neonLines.includes(dataKey as NumericDataKeys<TData>);
 
             const getFilter = () => {
-              if (isNeon) return `url(#${chartId}-line-neon-${dataKey})`;
               if (isGlowing) return `url(#${chartId}-line-glow-${dataKey})`;
               return undefined;
             };
@@ -470,20 +475,14 @@ export function EvilComposedChart<
             <StrippedPatternStyle chartConfig={barConfig} chartId={chartId} />
           )}
 
-          {/* Bar glow/neon filters */}
+          {/* Bar glow filters */}
           {glowingBars.length > 0 && (
             <BarGlowFilterStyle chartId={chartId} glowingBars={glowingBars as string[]} />
           )}
-          {neonBars.length > 0 && (
-            <BarNeonFilterStyle chartId={chartId} neonBars={neonBars as string[]} />
-          )}
 
-          {/* Line glow/neon filters */}
+          {/* Line glow filters */}
           {glowingLines.length > 0 && (
             <LineGlowFilterStyle chartId={chartId} glowingLines={glowingLines as string[]} />
-          )}
-          {neonLines.length > 0 && (
-            <LineNeonFilterStyle chartId={chartId} neonLines={neonLines as string[]} />
           )}
         </defs>
       </ComposedChart>
@@ -1065,51 +1064,6 @@ const BarGlowFilterStyle = ({
   );
 };
 
-const BarNeonFilterStyle = ({ chartId, neonBars }: { chartId: string; neonBars: string[] }) => {
-  return (
-    <>
-      {neonBars.map((dataKey) => (
-        <filter
-          key={`${chartId}-bar-neon-${dataKey}`}
-          id={`${chartId}-bar-neon-${dataKey}`}
-          x="-100%"
-          y="-100%"
-          width="300%"
-          height="300%"
-        >
-          <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="outerBlur" />
-          <feColorMatrix
-            in="outerBlur"
-            type="matrix"
-            values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.8 0"
-            result="outerGlow"
-          />
-          <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="middleBlur" />
-          <feColorMatrix
-            in="middleBlur"
-            type="matrix"
-            values="1 0 0 0 0.05  0 1 0 0 0.05  0 0 1 0 0.05  0 0 0 1.2 0"
-            result="middleGlow"
-          />
-          <feGaussianBlur in="SourceGraphic" stdDeviation="1" result="coreBlur" />
-          <feColorMatrix
-            in="coreBlur"
-            type="matrix"
-            values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1 0"
-            result="whiteCore"
-          />
-          <feMerge>
-            <feMergeNode in="outerGlow" />
-            <feMergeNode in="middleGlow" />
-            <feMergeNode in="whiteCore" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-      ))}
-    </>
-  );
-};
-
 const LineGlowFilterStyle = ({
   chartId,
   glowingLines,
@@ -1137,51 +1091,6 @@ const LineGlowFilterStyle = ({
           />
           <feMerge>
             <feMergeNode in="glow" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-      ))}
-    </>
-  );
-};
-
-const LineNeonFilterStyle = ({ chartId, neonLines }: { chartId: string; neonLines: string[] }) => {
-  return (
-    <>
-      {neonLines.map((dataKey) => (
-        <filter
-          key={`${chartId}-line-neon-${dataKey}`}
-          id={`${chartId}-line-neon-${dataKey}`}
-          x="-100%"
-          y="-100%"
-          width="300%"
-          height="300%"
-        >
-          <feGaussianBlur in="SourceGraphic" stdDeviation="20" result="outerBlur" />
-          <feColorMatrix
-            in="outerBlur"
-            type="matrix"
-            values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1.5 0"
-            result="outerGlow"
-          />
-          <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="middleBlur" />
-          <feColorMatrix
-            in="middleBlur"
-            type="matrix"
-            values="1 0 0 0 0.1  0 1 0 0 0.1  0 0 1 0 0.1  0 0 0 2 0"
-            result="middleGlow"
-          />
-          <feGaussianBlur in="SourceGraphic" stdDeviation="0.2" result="coreBlur" />
-          <feColorMatrix
-            in="coreBlur"
-            type="matrix"
-            values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 2 0"
-            result="whiteCore"
-          />
-          <feMerge>
-            <feMergeNode in="outerGlow" />
-            <feMergeNode in="middleGlow" />
-            <feMergeNode in="whiteCore" />
             <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>

@@ -197,15 +197,6 @@ Below are some examples of the composed chart with different `variants`. You can
   </AlertContent>
 </Alert>
 
-### Neon Effects
-
-<ComponentPreview className="mb-0" title="neonBars={['revenue']} neonLines={['profit']}" name="ex-neon-composed-chart"  />
-<Alert> 
-  <AlertContent>
-    Add an intense neon glow effect to your bars and lines using `neonBars` and `neonLines` props. This creates a more dramatic visual effect than the regular glow.
-  </AlertContent>
-</Alert>
-
 ## API Reference
 
 <ApiReferenceWrapper>
@@ -354,19 +345,6 @@ Below are some examples of the composed chart with different `variants`. You can
 
   <ApiReference>
     <ApiHeader
-      propName="neonBars"
-    />
-    <ApiContent>
-      Array of data keys that should have a neon effect applied to their bars. Creates a multi-layered glow with a bright white core. Neon effect takes priority over glow effect.
-      
-      type: `NumericDataKeys<TData>[]` (array of keys where the value is a number)
-      
-      default: `[]`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
       propName="curveType"
     />
     <ApiContent>
@@ -443,19 +421,6 @@ Below are some examples of the composed chart with different `variants`. You can
     />
     <ApiContent>
       Array of data keys that should have a glowing effect applied to their lines. Creates a smooth outer neon glow around the specified lines.
-      
-      type: `NumericDataKeys<TData>[]` (array of keys where the value is a number)
-      
-      default: `[]`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="neonLines"
-    />
-    <ApiContent>
-      Array of data keys that should have a neon effect applied to their lines. Creates a multi-layered glow with a bright white core. Neon effect takes priority over glow effect.
       
       type: `NumericDataKeys<TData>[]` (array of keys where the value is a number)
       
