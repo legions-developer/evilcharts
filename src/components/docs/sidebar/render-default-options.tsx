@@ -46,7 +46,7 @@ export function RenderDefaultOptions({ options, label }: RenderDefaultOptionsPro
                 asChild
                 className={cn(
                   !isActive &&
-                    "dark:text-muted-foreground/80 text-muted-foreground hover:text-primary dark:hover:text-primary",
+                    "dark:text-muted-foreground/80 text-muted-foreground/90 hover:text-primary dark:hover:text-primary",
                 )}
                 isActive={isActive}
               >
