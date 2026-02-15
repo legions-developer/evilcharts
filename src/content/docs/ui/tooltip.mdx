@@ -11,13 +11,13 @@ description: Display interactive tooltips when hovering over chart data points
   data={data}
   tooltipRoundness="md" | "sm" | "lg" | "xl"  
   chartConfig={chartConfig}
-  tooltipVariant="translucent" | "default" // and so on
+  tooltipVariant="frosted-glass" | "default" // and so on
 />
 ```
 
 ## Variants
 
-Control the visual style of the tooltip with the `tooltipVariant` prop. Accepts `"default"` or `"translucent"`.
+Control the visual style of the tooltip with the `tooltipVariant` prop. Accepts `"default"` or `"frosted-glass"`.
 
 ### Default
 
@@ -25,11 +25,11 @@ The default variant uses a solid background.
 
 <ComponentPreview title="tooltipVariant='default'" name="ex-tooltip-default-bar-chart" />
 
-### Translucent
+### Frosted Glass
 
-The translucent variant applies a semi-transparent background with a backdrop blur effect for a frosted-glass look.
+The frosted-glass variant applies a semi-transparent background with a backdrop blur effect for a frosted-glass look.
 
-<ComponentPreview title="tooltipVariant='translucent'" name="ex-tooltip-translucent-bar-chart" />
+<ComponentPreview title="tooltipVariant='frosted-glass'" name="ex-tooltip-frosted-glass-bar-chart" />
 
 ## API Reference
 
@@ -41,7 +41,7 @@ The translucent variant applies a semi-transparent background with a backdrop bl
     <ApiContent>
       Controls the visual style of the tooltip.
 
-      type: `"default" | "translucent"`
+      type: `"default" | "frosted-glass"`
 
       default: `"default"`
     </ApiContent>

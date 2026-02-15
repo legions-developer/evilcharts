@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import * as React from "react";
 
 type TooltipRoundness = "sm" | "md" | "lg" | "xl";
-type TooltipVariant = "default" | "translucent";
+type TooltipVariant = "default" | "frosted-glass";
 
 const roundnessMap: Record<TooltipRoundness, string> = {
   sm: "rounded-sm",
@@ -16,7 +16,7 @@ const roundnessMap: Record<TooltipRoundness, string> = {
 
 const variantMap: Record<TooltipVariant, string> = {
   default: "bg-background",
-  translucent: "bg-background/70 backdrop-blur-sm",
+  "frosted-glass": "bg-background/70 backdrop-blur-sm",
 };
 
 function ChartTooltipContent({

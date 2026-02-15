@@ -35,12 +35,12 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function EvilExampleTooltipTranslucentBarChart() {
+export function EvilExampleTooltipFrostedGlassBarChart() {
   return (
     <EvilBarChart
       className="h-full w-full p-4"
       xDataKey="month"
-      tooltipVariant="translucent" // [!code highlight]
+      tooltipVariant="frosted-glass" // [!code highlight]
       tooltipDefaultIndex={4}
       data={data}
       chartConfig={chartConfig}

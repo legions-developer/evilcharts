@@ -1210,12 +1210,12 @@ export const examples: Registry["items"] = [
     ],
   },
   {
-    name: "ex-tooltip-translucent-bar-chart",
+    name: "ex-tooltip-frosted-glass-bar-chart",
     registryDependencies: ["@evilcharts/bar-chart"],
     type: "registry:block",
     files: [
       {
-        path: "examples/ex-tooltip-translucent-bar-chart.tsx",
+        path: "examples/ex-tooltip-frosted-glass-bar-chart.tsx",
         type: "registry:block",
       },
     ],
