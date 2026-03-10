@@ -26,13 +26,13 @@ const DecorativeBorder = () => {
       />
       {/* main path with fill */}
       <path
-        className="text-[#E5E5E5] dark:text-[#1F1F1F]"
+        className="text-[#E5E5E5] dark:text-[#1B1B1B]"
         d="M 0 0 q 10 0 20 10 l 24 24 q 10 10 20 10 L 390 44 q 10 0 10 10 l 0 -54 Z"
         fill="var(--sidebar)"
       />
       {/* main path with border */}
       <path
-        className="text-[#E5E5E5] dark:text-[#1F1F1F]"
+        className="text-[#E5E5E5] dark:text-[#1B1B1B]"
         d="M 0 0 q 10 0 20 10 l 24 24 q 10 10 20 10 L 390 44 q 10 0 10 10 v 10 "
         stroke="currentColor"
         strokeWidth="1"
