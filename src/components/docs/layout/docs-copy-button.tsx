@@ -14,6 +14,7 @@ import { CheckIcon, CopyIcon } from "@/assets/icons";
 import { Button } from "@/components/ui/button";
 import { CaretDown } from "@carbon/icons-react";
 import { useClipboard } from "@mantine/hooks";
+import { cn } from "@/lib/utils";
 
 function getPromptUrl(baseURL: string, url: string) {
   return `${baseURL}?q=${encodeURIComponent(
@@ -160,8 +161,8 @@ export function DocsCopyPage({ mdx, url }: { mdx: string; url: string }) {
           onClick={() => copy(mdx)}
         >
           {copied ? <CheckIcon /> : <CopyIcon />}
-          <span>Copy Page</span>
-          <span className="absolute inset-0 hidden group-hover/buttons:block">Copied</span>
+          <span className={cn(copied && "opacity-0")}>Copy Page</span>
+          <span className={cn("absolute opacity-0", copied && "opacity-100")}>Copied</span>
         </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
