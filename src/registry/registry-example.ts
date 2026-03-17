@@ -835,18 +835,6 @@ export const examples: Registry["items"] = [
       },
     ],
   },
-  // Composed Chart Neon
-  {
-    name: "ex-neon-composed-chart",
-    registryDependencies: ["@evilcharts/composed-chart"],
-    type: "registry:block",
-    files: [
-      {
-        path: "examples/ex-neon-composed-chart.tsx",
-        type: "registry:block",
-      },
-    ],
-  },
   // ========================================
   // PIE CHART EXAMPLES
   // ========================================
@@ -942,18 +930,6 @@ export const examples: Registry["items"] = [
     files: [
       {
         path: "examples/ex-glowing-pie-chart.tsx",
-        type: "registry:block",
-      },
-    ],
-  },
-  // Pie Chart Neon
-  {
-    name: "ex-neon-pie-chart",
-    registryDependencies: ["@evilcharts/pie-chart"],
-    type: "registry:block",
-    files: [
-      {
-        path: "examples/ex-neon-pie-chart.tsx",
         type: "registry:block",
       },
     ],
