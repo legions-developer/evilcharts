@@ -110,12 +110,20 @@ export function TocIndicator({ toc, activeIndex, className }: TocIndicatorProps)
   const isActive = activeDistance > 0;
 
   const animatedDistance = useSpring(0, SPRING_CONFIG);
+  const prevActiveIndexRef = React.useRef(activeIndex);
+  const tailRotate = useSpring(90, SPRING_CONFIG);
+  const tailMarginTop = useSpring(-38, SPRING_CONFIG);
 
   React.useEffect(() => {
+    if (activeIndex !== prevActiveIndexRef.current) {
+      const movingDown = activeIndex > prevActiveIndexRef.current;
+      tailRotate.set(movingDown ? 90 : -90);
+      tailMarginTop.set(movingDown ? -38 : -38 + 70);
+      prevActiveIndexRef.current = activeIndex;
+    }
     animatedDistance.set(activeDistance);
-  }, [activeDistance, animatedDistance]);
+  }, [activeDistance, activeIndex, animatedDistance, tailRotate, tailMarginTop]);
 
-  const strokeDashOffset = useTransform(animatedDistance, (v) => totalLength - v);
   const offsetDistancePercent = useTransform(animatedDistance, (v) =>
     totalLength > 0 ? `${(v / totalLength) * 100}%` : "0%",
   );
@@ -147,6 +155,16 @@ export function TocIndicator({ toc, activeIndex, className }: TocIndicatorProps)
           >
             <circle cx="3" cy="3" r="2" fill="currentColor" />
           </marker>
+          <mask id="toc-path-mask" maskUnits="userSpaceOnUse">
+            <path
+              d={path}
+              stroke="white"
+              strokeWidth="1"
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </mask>
           <motion.linearGradient
             id="toc-progress-gradient"
             gradientUnits="userSpaceOnUse"
@@ -166,15 +184,46 @@ export function TocIndicator({ toc, activeIndex, className }: TocIndicatorProps)
           fill="none"
           markerEnd="url(#toc-end-circle)"
         />
-        <motion.path
-          d={path}
-          stroke="url(#toc-progress-gradient)"
-          strokeWidth="1"
-          fill="none"
-          strokeDasharray={totalLength}
-          style={{ strokeDashoffset: strokeDashOffset }}
-        />
       </svg>
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          mask: "url(#toc-path-mask)",
+          WebkitMask: "url(#toc-path-mask)",
+        }}
+      >
+        <motion.div
+          id="gradient-tail-of-toc-indicator"
+          className="absolute top-0 left-0"
+          style={{
+            width: 80,
+            height: 80,
+            offsetPath: cssOffsetPath,
+            offsetRotate: "0deg",
+            rotate: tailRotate,
+            marginLeft: 0.2,
+            marginTop: tailMarginTop,
+            offsetDistance: offsetDistancePercent,
+            opacity: isActive ? 1 : 0,
+          }}
+        >
+          <svg width="80" height="80" viewBox="0 0 80 80" className="overflow-visible">
+            <defs>
+              <radialGradient
+                id="toc-glow-radial"
+                cx="0.5"
+                cy="0.5"
+                fx="0.9"
+                gradientUnits="objectBoundingBox"
+              >
+                <stop offset="0%" stopColor="var(--primary)" stopOpacity="1" />
+                <stop offset="100%" stopColor="transparent" stopOpacity="1" />
+              </radialGradient>
+            </defs>
+            <ellipse cx="40" cy="40" rx="40" ry="40" fill="url(#toc-glow-radial)" />
+          </svg>
+        </motion.div>
+      </div>
       <motion.div
         className="bg-primary absolute top-0 left-0 size-[6px] rounded-[1px]"
         style={{
