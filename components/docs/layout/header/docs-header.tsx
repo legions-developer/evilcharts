@@ -33,7 +33,7 @@ const DocsHeader = () => {
             <GithubIcon size={10} />
           </Button>
         </Link>
-        <Link href="https://legions.dev" target="_blank">
+        <Link href="https://gurbinder.dev" target="_blank">
           <Button variant="outline" className={cn("h-7 cursor-pointer")}>
             <span className="text-xs">Creator</span>
           </Button>
