@@ -179,6 +179,33 @@ export function NavMain({
             (child) => child.type === "page" && child.url === activeTrigger?.url,
           );
 
+          // If there is only one child, show it directly as clickable element 
+          if (visibleChildren.length === 1) {
+            const singleChild = visibleChildren[0];
+            const isActive = singleChild.type === "page" && singleChild.url === pathname;
+
+            return (
+              <SidebarMenuItem key={item.$id}>
+                <SidebarMenuButton
+                  className={cn(
+                    !isActive &&
+                      "text-muted-foreground/90 dark:text-muted-foreground/80 hover:text-primary dark:hover:text-primary",
+                  )}
+                  isActive={isActive}
+                  asChild
+                >
+                  <Link
+                    href={singleChild.type === "page" ? singleChild.url : "#"}
+                    onClick={handleLinkClick}
+                  >
+                    {getNavItemIcon(item.$id)}
+                    <span className="capitalize">{item.name}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            );
+          }
+
           return (
             <Collapsible
               key={item.$id}
