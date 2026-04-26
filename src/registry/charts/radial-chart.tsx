@@ -16,6 +16,7 @@ import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/regi
 import { useCallback, useEffect, useId, useMemo, useState, type ComponentProps } from "react";
 import { ChartBackground, type BackgroundVariant } from "@/registry/ui/background";
 import { RadialBar, RadialBarChart, Sector, type SectorProps } from "recharts";
+import { TypedDataKey } from "recharts/types/util/typedDataKey";
 
 // Loading animation constants
 const LOADING_BARS = 5;
@@ -193,7 +194,7 @@ export function EvilRadialChart<TData extends Record<string, unknown>>({
         {/* Main radial bar */}
         {!isLoading && (
           <RadialBar
-            dataKey={dataKey}
+            dataKey={dataKey as TypedDataKey<TData>}
             cornerRadius={cornerRadius}
             barSize={barSize}
             background={!hideBackground}
