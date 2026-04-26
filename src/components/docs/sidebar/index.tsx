@@ -20,7 +20,7 @@ export function DocsSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) 
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader className="p-4 pt-6">
-        <EvilChartWordmark height="16" width="130" className="z-10" />
+        <EvilChartWordmark height="20" width="130" className="z-10" />
       </SidebarHeader>
       <SidebarContent className={cn("docs-sidebar-top-fade", "pt-2 pb-14")}>
         <RenderDefaultOptions options={getStartedOptions} label="Get Started" />
