@@ -16,6 +16,7 @@ import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/regi
 import { useCallback, useEffect, useId, useMemo, useState, type ComponentProps } from "react";
 import { PolarAngleAxis, PolarGrid, PolarRadiusAxis, Radar, RadarChart } from "recharts";
 import { ChartBackground, type BackgroundVariant } from "@/registry/ui/background";
+import type { TypedDataKey } from "recharts/types/util/typedDataKey";
 import { ChartDot, DotVariant } from "@/registry/ui/dot";
 
 // Loading animation constants
@@ -166,7 +167,7 @@ export function EvilRadarChart<
 
         {!hideAngleAxis && !isLoading && (
           <PolarAngleAxis
-            dataKey={dataKey}
+            dataKey={dataKey as TypedDataKey<TData>}
             tick={{ fill: "currentColor", fontSize: 12 }}
             tickLine={false}
           />
