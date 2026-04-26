@@ -1,0 +1,15 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "ex-gradient-colors-pie-chart",
+  "registryDependencies": [
+    "@evilcharts/pie-chart"
+  ],
+  "files": [
+    {
+      "path": "src/registry/examples/ex-gradient-colors-pie-chart.tsx",
+      "content": "\"use client\";\n\nimport { EvilPieChart } from \"@/registry/charts/pie-chart\";\nimport { type ChartConfig } from \"@/registry/ui/chart\";\n\nconst data = [\n  { browser: \"chrome\", visitors: 275 },\n  { browser: \"safari\", visitors: 200 },\n  { browser: \"firefox\", visitors: 187 },\n  { browser: \"edge\", visitors: 173 },\n  { browser: \"other\", visitors: 90 },\n];\n\nconst chartConfig = {\n  chrome: {\n    label: \"Chrome\",\n    colors: {\n      light: [\"#93c5fd\", \"#3b82f6\", \"#2563eb\", \"#1d4ed8\", \"#1e40af\"], // [!code highlight]\n      dark: [\"#bfdbfe\", \"#60a5fa\", \"#3b82f6\", \"#2563eb\", \"#1d4ed8\"], // [!code highlight]\n    },\n  },\n  safari: {\n    label: \"Safari\",\n    colors: {\n      light: [\"#6ee7b7\", \"#10b981\", \"#059669\", \"#047857\", \"#065f46\"], // [!code highlight]\n      dark: [\"#a7f3d0\", \"#34d399\", \"#10b981\", \"#059669\", \"#047857\"], // [!code highlight]\n    },\n  },\n  firefox: {\n    label: \"Firefox\",\n    colors: {\n      light: [\"#fcd34d\", \"#f59e0b\", \"#d97706\", \"#b45309\", \"#92400e\"], // [!code highlight]\n      dark: [\"#fde68a\", \"#fbbf24\", \"#f59e0b\", \"#d97706\", \"#b45309\"], // [!code highlight]\n    },\n  },\n  edge: {\n    label: \"Edge\",\n    colors: {\n      light: [\"#c4b5fd\", \"#8b5cf6\", \"#7c3aed\", \"#6d28d9\", \"#5b21b6\"], // [!code highlight]\n      dark: [\"#ddd6fe\", \"#a78bfa\", \"#8b5cf6\", \"#7c3aed\", \"#6d28d9\"], // [!code highlight]\n    },\n  },\n  other: {\n    label: \"Other\",\n    colors: {\n      light: [\"#d1d5db\", \"#9ca3af\", \"#6b7280\", \"#4b5563\", \"#374151\"], // [!code highlight]\n      dark: [\"#e5e7eb\", \"#d1d5db\", \"#9ca3af\", \"#6b7280\", \"#4b5563\"], // [!code highlight]\n    },\n  },\n} satisfies ChartConfig;\n\nexport function EvilExamplePieChart() {\n  return (\n    <EvilPieChart\n      isClickable\n      className=\"h-full w-full p-4\"\n      data={data}\n      dataKey=\"visitors\"\n      nameKey=\"browser\"\n      chartConfig={chartConfig}\n    />\n  );\n}\n",
+      "type": "registry:block"
+    }
+  ],
+  "type": "registry:block"
+}

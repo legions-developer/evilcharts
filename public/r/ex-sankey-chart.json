@@ -1,0 +1,15 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "ex-sankey-chart",
+  "registryDependencies": [
+    "@evilcharts/sankey-chart"
+  ],
+  "files": [
+    {
+      "path": "src/registry/examples/ex-sankey-chart.tsx",
+      "content": "\"use client\";\n\nimport { EvilSankeyChart } from \"@/registry/charts/sankey-chart\";\nimport type { SankeyData } from \"recharts\";\nimport { type ChartConfig } from \"@/registry/ui/chart\";\n\n// Marketing funnel - user acquisition to conversions\nconst data: SankeyData = {\n  nodes: [\n    { name: \"Organic\" },\n    { name: \"PaidAds\" },\n    { name: \"Social\" },\n    { name: \"Landing\" },\n    { name: \"Product\" },\n    { name: \"Cart\" },\n    { name: \"Purchase\" },\n    { name: \"Bounced\" },\n  ],\n  links: [\n    { source: 0, target: 3, value: 42000 },\n    { source: 1, target: 3, value: 28000 },\n    { source: 2, target: 3, value: 18000 },\n    { source: 3, target: 4, value: 52000 },\n    { source: 3, target: 7, value: 36000 },\n    { source: 4, target: 5, value: 31000 },\n    { source: 4, target: 7, value: 21000 },\n    { source: 5, target: 6, value: 24000 },\n    { source: 5, target: 7, value: 7000 },\n  ],\n};\n\nconst chartConfig = {\n  Organic: {\n    label: \"Organic Search\",\n    colors: {\n      light: [\"#059669\"],\n      dark: [\"#34d399\"],\n    },\n  },\n  PaidAds: {\n    label: \"Paid Ads\",\n    colors: {\n      light: [\"#dc2626\"],\n      dark: [\"#f87171\"],\n    },\n  },\n  Social: {\n    label: \"Social Media\",\n    colors: {\n      light: [\"#7c3aed\"],\n      dark: [\"#a78bfa\"],\n    },\n  },\n  Landing: {\n    label: \"Landing Page\",\n    colors: {\n      light: [\"#0891b2\"],\n      dark: [\"#22d3ee\"],\n    },\n  },\n  Product: {\n    label: \"Product Page\",\n    colors: {\n      light: [\"#2563eb\"],\n      dark: [\"#60a5fa\"],\n    },\n  },\n  Cart: {\n    label: \"Cart\",\n    colors: {\n      light: [\"#ea580c\"],\n      dark: [\"#fb923c\"],\n    },\n  },\n  Purchase: {\n    label: \"Purchase\",\n    colors: {\n      light: [\"#16a34a\"],\n      dark: [\"#4ade80\"],\n    },\n  },\n  Bounced: {\n    label: \"Bounced\",\n    colors: {\n      light: [\"#f43f5e\"],\n      dark: [\"#fb7185\"],\n    },\n  },\n} satisfies ChartConfig;\n\nexport function EvilExampleSankeyChart() {\n  return (\n    <EvilSankeyChart\n      isClickable\n      className=\"h-full w-full p-4\"\n      data={data}\n      showNodeLabels=\"outside\"\n      showNodeValues={true}\n      chartConfig={chartConfig}\n      linkVariant=\"source\"\n    />\n  );\n}\n",
+      "type": "registry:block"
+    }
+  ],
+  "type": "registry:block"
+}

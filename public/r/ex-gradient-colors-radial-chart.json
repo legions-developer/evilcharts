@@ -1,0 +1,15 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "ex-gradient-colors-radial-chart",
+  "registryDependencies": [
+    "@evilcharts/radial-chart"
+  ],
+  "files": [
+    {
+      "path": "src/registry/examples/ex-gradient-colors-radial-chart.tsx",
+      "content": "\"use client\";\n\nimport { EvilRadialChart } from \"@/registry/charts/radial-chart\";\nimport { type ChartConfig } from \"@/registry/ui/chart\";\n\nconst data = [\n  { browser: \"chrome\", visitors: 275 },\n  { browser: \"safari\", visitors: 200 },\n  { browser: \"firefox\", visitors: 187 },\n  { browser: \"edge\", visitors: 173 },\n  { browser: \"other\", visitors: 90 },\n];\n\nconst chartConfig = {\n  chrome: {\n    label: \"Chrome\",\n    colors: {\n      light: [\"#ff6b6b\", \"#feca57\", \"#48dbfb\"], // Coral -> Gold -> Electric Blue // [!code highlight]\n      dark: [\"#ff7979\", \"#ffeaa7\", \"#74b9ff\"], // [!code highlight]\n    },\n  },\n  safari: {\n    label: \"Safari\",\n    colors: {\n      light: [\"#a29bfe\", \"#fd79a8\", \"#fdcb6e\"], // Lavender -> Pink -> Sunflower // [!code highlight]\n      dark: [\"#b8b5ff\", \"#ff9ff3\", \"#ffeaa7\"], // [!code highlight]\n    },\n  },\n  firefox: {\n    label: \"Firefox\",\n    colors: {\n      light: [\"#00d2d3\", \"#54a0ff\", \"#5f27cd\"], // Turquoise -> Blue -> Purple // [!code highlight]\n      dark: [\"#01e2e3\", \"#74b9ff\", \"#7c3aed\"], // [!code highlight]\n    },\n  },\n  edge: {\n    label: \"Edge\",\n    colors: {\n      light: [\"#ff9f43\", \"#ee5a24\", \"#b71540\"], // Tangerine -> Vermillion -> Wine // [!code highlight]\n      dark: [\"#ffbe76\", \"#f0932b\", \"#e74c3c\"], // [!code highlight]\n    },\n  },\n  other: {\n    label: \"Other\",\n    colors: {\n      light: [\"#1dd1a1\", \"#10ac84\", \"#01a3a4\"], // Mint -> Jungle -> Teal // [!code highlight]\n      dark: [\"#55efc4\", \"#00b894\", \"#00cec9\"], // [!code highlight]\n    },\n  },\n} satisfies ChartConfig;\n\nexport function EvilExampleRadialChart() {\n  return (\n    <EvilRadialChart\n      className=\"h-full w-full p-4\"\n      data={data}\n      dataKey=\"visitors\"\n      nameKey=\"browser\"\n      chartConfig={chartConfig}\n    />\n  );\n}\n",
+      "type": "registry:block"
+    }
+  ],
+  "type": "registry:block"
+}

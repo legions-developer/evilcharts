@@ -1,0 +1,15 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "ex-glowing-sankey-chart",
+  "registryDependencies": [
+    "@evilcharts/sankey-chart"
+  ],
+  "files": [
+    {
+      "path": "src/registry/examples/ex-glowing-sankey-chart.tsx",
+      "content": "\"use client\";\n\nimport { EvilSankeyChart } from \"@/registry/charts/sankey-chart\";\nimport type { SankeyData } from \"recharts\";\nimport { type ChartConfig } from \"@/registry/ui/chart\";\n\n// Energy flow - sources to consumption sectors\nconst data: SankeyData = {\n  nodes: [\n    { name: \"Solar\" },\n    { name: \"Wind\" },\n    { name: \"Nuclear\" },\n    { name: \"NaturalGas\" },\n    { name: \"Grid\" },\n    { name: \"Residential\" },\n    { name: \"Industrial\" },\n    { name: \"Commercial\" },\n    { name: \"Transport\" },\n  ],\n  links: [\n    { source: 0, target: 4, value: 18500 },\n    { source: 1, target: 4, value: 24200 },\n    { source: 2, target: 4, value: 31000 },\n    { source: 3, target: 4, value: 42800 },\n    { source: 4, target: 5, value: 28600 },\n    { source: 4, target: 6, value: 38900 },\n    { source: 4, target: 7, value: 22400 },\n    { source: 4, target: 8, value: 26600 },\n  ],\n};\n\nconst chartConfig = {\n  Solar: {\n    label: \"Solar\",\n    colors: {\n      light: [\"#fbbf24\"],\n      dark: [\"#fcd34d\"],\n    },\n  },\n  Wind: {\n    label: \"Wind\",\n    colors: {\n      light: [\"#06b6d4\"],\n      dark: [\"#22d3ee\"],\n    },\n  },\n  Nuclear: {\n    label: \"Nuclear\",\n    colors: {\n      light: [\"#a855f7\"],\n      dark: [\"#c084fc\"],\n    },\n  },\n  NaturalGas: {\n    label: \"Natural Gas\",\n    colors: {\n      light: [\"#f97316\"],\n      dark: [\"#fb923c\"],\n    },\n  },\n  Grid: {\n    label: \"Power Grid\",\n    colors: {\n      light: [\"#3b82f6\"],\n      dark: [\"#60a5fa\"],\n    },\n  },\n  Residential: {\n    label: \"Residential\",\n    colors: {\n      light: [\"#10b981\"],\n      dark: [\"#34d399\"],\n    },\n  },\n  Industrial: {\n    label: \"Industrial\",\n    colors: {\n      light: [\"#6366f1\"],\n      dark: [\"#818cf8\"],\n    },\n  },\n  Commercial: {\n    label: \"Commercial\",\n    colors: {\n      light: [\"#ec4899\"],\n      dark: [\"#f472b6\"],\n    },\n  },\n  Transport: {\n    label: \"Transport\",\n    colors: {\n      light: [\"#84cc16\"],\n      dark: [\"#a3e635\"],\n    },\n  },\n} satisfies ChartConfig;\n\nexport function EvilExampleSankeyChart() {\n  return (\n    <EvilSankeyChart\n      isClickable\n      className=\"h-full w-full p-4\"\n      data={data}\n      chartConfig={chartConfig}\n      linkVariant=\"source\"\n      glowingNodes={[\"Solar\", \"Wind\", \"Grid\"]} // [!code highlight]\n    />\n  );\n}\n",
+      "type": "registry:block"
+    }
+  ],
+  "type": "registry:block"
+}

@@ -1,0 +1,15 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "ex-solid-link-variant-sankey-chart",
+  "registryDependencies": [
+    "@evilcharts/sankey-chart"
+  ],
+  "files": [
+    {
+      "path": "src/registry/examples/ex-solid-link-variant-sankey-chart.tsx",
+      "content": "\"use client\";\n\nimport { EvilSankeyChart } from \"@/registry/charts/sankey-chart\";\nimport type { SankeyData } from \"recharts\";\nimport { type ChartConfig } from \"@/registry/ui/chart\";\n\n// E-commerce journey - traffic to purchase\nconst data: SankeyData = {\n  nodes: [\n    { name: \"Direct\" },\n    { name: \"Email\" },\n    { name: \"Referral\" },\n    { name: \"Browse\" },\n    { name: \"Search\" },\n    { name: \"ViewItem\" },\n    { name: \"AddToCart\" },\n    { name: \"Checkout\" },\n    { name: \"Abandoned\" },\n  ],\n  links: [\n    { source: 0, target: 3, value: 15200 },\n    { source: 1, target: 3, value: 8400 },\n    { source: 2, target: 3, value: 6800 },\n    { source: 3, target: 4, value: 18600 },\n    { source: 3, target: 8, value: 11800 },\n    { source: 4, target: 5, value: 12400 },\n    { source: 4, target: 8, value: 6200 },\n    { source: 5, target: 6, value: 8100 },\n    { source: 5, target: 8, value: 4300 },\n    { source: 6, target: 7, value: 5400 },\n    { source: 6, target: 8, value: 2700 },\n  ],\n};\n\nconst chartConfig = {\n  Direct: {\n    label: \"Direct Traffic\",\n    colors: {\n      light: [\"#3b82f6\"],\n      dark: [\"#60a5fa\"],\n    },\n  },\n  Email: {\n    label: \"Email Campaign\",\n    colors: {\n      light: [\"#8b5cf6\"],\n      dark: [\"#a78bfa\"],\n    },\n  },\n  Referral: {\n    label: \"Referral\",\n    colors: {\n      light: [\"#06b6d4\"],\n      dark: [\"#22d3ee\"],\n    },\n  },\n  Browse: {\n    label: \"Browse\",\n    colors: {\n      light: [\"#f59e0b\"],\n      dark: [\"#fbbf24\"],\n    },\n  },\n  Search: {\n    label: \"Search\",\n    colors: {\n      light: [\"#10b981\"],\n      dark: [\"#34d399\"],\n    },\n  },\n  ViewItem: {\n    label: \"View Item\",\n    colors: {\n      light: [\"#ec4899\"],\n      dark: [\"#f472b6\"],\n    },\n  },\n  AddToCart: {\n    label: \"Add to Cart\",\n    colors: {\n      light: [\"#f97316\"],\n      dark: [\"#fb923c\"],\n    },\n  },\n  Checkout: {\n    label: \"Checkout\",\n    colors: {\n      light: [\"#22c55e\"],\n      dark: [\"#4ade80\"],\n    },\n  },\n  Abandoned: {\n    label: \"Abandoned\",\n    colors: {\n      light: [\"#e11d48\"],\n      dark: [\"#f43f5e\"],\n    },\n  },\n} satisfies ChartConfig;\n\nexport function EvilExampleSankeyChart() {\n  return (\n    <EvilSankeyChart\n      isClickable\n      className=\"h-full w-full p-4\"\n      data={data}\n      chartConfig={chartConfig}\n      linkVariant=\"solid\" // [!code highlight]\n    />\n  );\n}\n",
+      "type": "registry:block"
+    }
+  ],
+  "type": "registry:block"
+}

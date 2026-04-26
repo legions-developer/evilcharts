@@ -1,0 +1,15 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "ex-horizontal-layout-bar-chart",
+  "registryDependencies": [
+    "@evilcharts/bar-chart"
+  ],
+  "files": [
+    {
+      "path": "src/registry/examples/ex-horizontal-layout-bar-chart.tsx",
+      "content": "\"use client\";\n\nimport { EvilBarChart } from \"@/registry/charts/bar-chart\";\nimport { type ChartConfig } from \"@/registry/ui/chart\";\n\nconst data = [\n  { month: \"January\", desktop: 186 },\n  { month: \"February\", desktop: 305 },\n  { month: \"March\", desktop: 237 },\n  { month: \"April\", desktop: 173 },\n  { month: \"May\", desktop: 209 },\n  { month: \"June\", desktop: 214 },\n];\n\nconst chartConfig = {\n  desktop: {\n    label: \"Desktop\",\n    colors: {\n      light: [\"#2563eb\"],\n      dark: [\"#3b82f6\"],\n    },\n  },\n} satisfies ChartConfig;\n\nexport function EvilExampleBarChart() {\n  return (\n    <EvilBarChart\n      className=\"h-full w-full p-4\"\n      xDataKey=\"month\"\n      data={data}\n      chartConfig={chartConfig}\n      layout=\"horizontal\" // [!code highlight]\n      yAxisProps={{ tickFormatter: (value) => value.substring(0, 3) }} // [!code highlight]\n    />\n  );\n}\n",
+      "type": "registry:block"
+    }
+  ],
+  "type": "registry:block"
+}

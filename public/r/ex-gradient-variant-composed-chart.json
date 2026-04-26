@@ -1,0 +1,15 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "ex-gradient-variant-composed-chart",
+  "registryDependencies": [
+    "@evilcharts/composed-chart"
+  ],
+  "files": [
+    {
+      "path": "src/registry/examples/ex-gradient-variant-composed-chart.tsx",
+      "content": "\"use client\";\n\nimport { EvilComposedChart } from \"@/registry/charts/composed-chart\";\nimport { type ChartConfig } from \"@/registry/ui/chart\";\n\nconst data = [\n  { month: \"January\", revenue: 4200, profit: 1800 },\n  { month: \"February\", revenue: 5800, profit: 2400 },\n  { month: \"March\", revenue: 4100, profit: 1600 },\n  { month: \"April\", revenue: 6200, profit: 2800 },\n  { month: \"May\", revenue: 5400, profit: 2200 },\n  { month: \"June\", revenue: 7800, profit: 3400 },\n  { month: \"July\", revenue: 6100, profit: 2600 },\n  { month: \"August\", revenue: 8200, profit: 3800 },\n  { month: \"September\", revenue: 5900, profit: 2500 },\n  { month: \"October\", revenue: 6800, profit: 3000 },\n  { month: \"November\", revenue: 7200, profit: 3200 },\n  { month: \"December\", revenue: 9100, profit: 4200 },\n];\n\nconst barConfig = {\n  revenue: {\n    label: \"Revenue\",\n    colors: {\n      light: [\"#3b82f6\"],\n      dark: [\"#6A5ACD\"],\n    },\n  },\n} satisfies ChartConfig;\n\nconst lineConfig = {\n  profit: {\n    label: \"Profit\",\n    colors: {\n      light: [\"#10b981\"],\n      dark: [\"#34d399\"],\n    },\n  },\n} satisfies ChartConfig;\n\nexport function EvilExampleComposedChart() {\n  return (\n    <EvilComposedChart\n      isClickable\n      className=\"h-full w-full p-4\"\n      xDataKey=\"month\"\n      data={data}\n      barConfig={barConfig}\n      lineConfig={lineConfig}\n      barVariant=\"gradient\" // [!code highlight]\n      xAxisProps={{ tickFormatter: (value) => value.substring(0, 3) }}\n    />\n  );\n}\n",
+      "type": "registry:block"
+    }
+  ],
+  "type": "registry:block"
+}

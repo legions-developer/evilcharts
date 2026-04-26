@@ -1,0 +1,15 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "ex-source-link-variant-sankey-chart",
+  "registryDependencies": [
+    "@evilcharts/sankey-chart"
+  ],
+  "files": [
+    {
+      "path": "src/registry/examples/ex-source-link-variant-sankey-chart.tsx",
+      "content": "\"use client\";\n\nimport { EvilSankeyChart } from \"@/registry/charts/sankey-chart\";\nimport type { SankeyData } from \"recharts\";\nimport { type ChartConfig } from \"@/registry/ui/chart\";\n\n// Data pipeline - sources through processing to destinations\nconst data: SankeyData = {\n  nodes: [\n    { name: \"API\" },\n    { name: \"Database\" },\n    { name: \"Logs\" },\n    { name: \"Ingestion\" },\n    { name: \"Transform\" },\n    { name: \"Analytics\" },\n    { name: \"MLPipeline\" },\n    { name: \"Dashboard\" },\n    { name: \"Archive\" },\n  ],\n  links: [\n    { source: 0, target: 3, value: 85000 },\n    { source: 1, target: 3, value: 62000 },\n    { source: 2, target: 3, value: 43000 },\n    { source: 3, target: 4, value: 190000 },\n    { source: 4, target: 5, value: 95000 },\n    { source: 4, target: 6, value: 55000 },\n    { source: 4, target: 8, value: 40000 },\n    { source: 5, target: 7, value: 72000 },\n    { source: 5, target: 8, value: 23000 },\n    { source: 6, target: 7, value: 38000 },\n    { source: 6, target: 8, value: 17000 },\n  ],\n};\n\nconst chartConfig = {\n  API: {\n    label: \"API Events\",\n    colors: {\n      light: [\"#0ea5e9\"],\n      dark: [\"#38bdf8\"],\n    },\n  },\n  Database: {\n    label: \"Database\",\n    colors: {\n      light: [\"#8b5cf6\"],\n      dark: [\"#a78bfa\"],\n    },\n  },\n  Logs: {\n    label: \"Log Files\",\n    colors: {\n      light: [\"#d97706\"],\n      dark: [\"#fbbf24\"],\n    },\n  },\n  Ingestion: {\n    label: \"Ingestion Layer\",\n    colors: {\n      light: [\"#f97316\"],\n      dark: [\"#fb923c\"],\n    },\n  },\n  Transform: {\n    label: \"Transform\",\n    colors: {\n      light: [\"#eab308\"],\n      dark: [\"#facc15\"],\n    },\n  },\n  Analytics: {\n    label: \"Analytics\",\n    colors: {\n      light: [\"#06b6d4\"],\n      dark: [\"#22d3ee\"],\n    },\n  },\n  MLPipeline: {\n    label: \"ML Pipeline\",\n    colors: {\n      light: [\"#ec4899\"],\n      dark: [\"#f472b6\"],\n    },\n  },\n  Dashboard: {\n    label: \"Dashboard\",\n    colors: {\n      light: [\"#22c55e\"],\n      dark: [\"#4ade80\"],\n    },\n  },\n  Archive: {\n    label: \"Archive\",\n    colors: {\n      light: [\"#be185d\"],\n      dark: [\"#ec4899\"],\n    },\n  },\n} satisfies ChartConfig;\n\nexport function EvilExampleSankeyChart() {\n  return (\n    <EvilSankeyChart\n      isClickable\n      className=\"h-full w-full p-4\"\n      data={data}\n      chartConfig={chartConfig}\n      linkVariant=\"source\" // [!code highlight]\n    />\n  );\n}\n",
+      "type": "registry:block"
+    }
+  ],
+  "type": "registry:block"
+}

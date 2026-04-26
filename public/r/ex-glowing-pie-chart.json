@@ -1,0 +1,15 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "ex-glowing-pie-chart",
+  "registryDependencies": [
+    "@evilcharts/pie-chart"
+  ],
+  "files": [
+    {
+      "path": "src/registry/examples/ex-glowing-pie-chart.tsx",
+      "content": "\"use client\";\n\nimport { EvilPieChart } from \"@/registry/charts/pie-chart\";\nimport { type ChartConfig } from \"@/registry/ui/chart\";\n\nconst data = [\n  { browser: \"chrome\", visitors: 275 },\n  { browser: \"safari\", visitors: 200 },\n  { browser: \"firefox\", visitors: 187 },\n  { browser: \"edge\", visitors: 173 },\n  { browser: \"other\", visitors: 90 },\n];\n\nconst chartConfig = {\n  chrome: {\n    label: \"Chrome\",\n    colors: {\n      light: [\"#3b82f6\"],\n      dark: [\"#60a5fa\"],\n    },\n  },\n  safari: {\n    label: \"Safari\",\n    colors: {\n      light: [\"#10b981\"],\n      dark: [\"#34d399\"],\n    },\n  },\n  firefox: {\n    label: \"Firefox\",\n    colors: {\n      light: [\"#f59e0b\"],\n      dark: [\"#fbbf24\"],\n    },\n  },\n  edge: {\n    label: \"Edge\",\n    colors: {\n      light: [\"#8b5cf6\"],\n      dark: [\"#a78bfa\"],\n    },\n  },\n  other: {\n    label: \"Other\",\n    colors: {\n      light: [\"#6b7280\"],\n      dark: [\"#9ca3af\"],\n    },\n  },\n} satisfies ChartConfig;\n\nexport function EvilExamplePieChart() {\n  return (\n    <EvilPieChart\n      isClickable\n      className=\"h-full w-full p-4\"\n      data={data}\n      dataKey=\"visitors\"\n      nameKey=\"browser\"\n      chartConfig={chartConfig}\n      glowingSectors={[\"chrome\", \"safari\"]} // [!code highlight]\n    />\n  );\n}\n",
+      "type": "registry:block"
+    }
+  ],
+  "type": "registry:block"
+}

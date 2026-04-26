@@ -1,0 +1,15 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "ex-loading-state-area-chart",
+  "registryDependencies": [
+    "@evilcharts/area-chart"
+  ],
+  "files": [
+    {
+      "path": "src/registry/examples/ex-loading-state-area-chart.tsx",
+      "content": "\"use client\";\n\nimport { EvilAreaChart } from \"@/registry/charts/area-chart\";\nimport { type ChartConfig } from \"@/registry/ui/chart\";\n\nconst chartConfig = {\n  desktop: {\n    label: \"Desktop\",\n    colors: {\n      light: [\"#047857\"],\n      dark: [\"#10b981\"],\n    },\n  },\n  mobile: {\n    label: \"Mobile\",\n    colors: {\n      light: [\"#be123c\"],\n      dark: [\"#f43f5e\"],\n    },\n  },\n} satisfies ChartConfig;\n\nexport function EvilExampleAreaChart() {\n  return (\n    <EvilAreaChart\n      isClickable\n      isLoading={true} // [!code highlight]\n      className=\"h-full w-full p-4\"\n      curveType=\"bump\"\n      xDataKey=\"month\"\n      yDataKey=\"desktop\"\n      stackType=\"stacked\"\n      strokeVariant=\"dashed\"\n      areaVariant=\"gradient\"\n      activeDotVariant=\"default\"\n      data={[]} // if isLoading is true, pass empty array → i.e isLoading ? [] : data\n      chartConfig={chartConfig}\n      xAxisProps={{ tickFormatter: (value) => value.substring(0, 3) }}\n    />\n  );\n}\n",
+      "type": "registry:block"
+    }
+  ],
+  "type": "registry:block"
+}

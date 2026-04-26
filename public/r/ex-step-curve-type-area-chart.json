@@ -1,0 +1,15 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "ex-step-curve-type-area-chart",
+  "registryDependencies": [
+    "@evilcharts/area-chart"
+  ],
+  "files": [
+    {
+      "path": "src/registry/examples/ex-step-curve-type-area-chart.tsx",
+      "content": "\"use client\";\n\nimport { EvilAreaChart } from \"@/registry/charts/area-chart\";\nimport { type ChartConfig } from \"@/registry/ui/chart\";\n\nconst data = [\n  { month: \"January\", desktop: 342, mobile: 245 },\n  { month: \"February\", desktop: 876, mobile: 654 },\n  { month: \"March\", desktop: 512, mobile: 387 },\n  { month: \"April\", desktop: 629, mobile: 521 },\n  { month: \"May\", desktop: 458, mobile: 412 },\n  { month: \"June\", desktop: 781, mobile: 598 },\n  { month: \"July\", desktop: 394, mobile: 312 },\n  { month: \"August\", desktop: 925, mobile: 743 },\n  { month: \"September\", desktop: 647, mobile: 489 },\n  { month: \"October\", desktop: 532, mobile: 476 },\n  { month: \"November\", desktop: 803, mobile: 687 },\n  { month: \"December\", desktop: 271, mobile: 198 },\n];\n\nconst chartConfig = {\n  desktop: {\n    label: \"Desktop\",\n    colors: {\n      light: [\"#047857\"],\n      dark: [\"#10b981\"],\n    },\n  },\n  mobile: {\n    label: \"Mobile\",\n    colors: {\n      light: [\"#be123c\"],\n      dark: [\"#f43f5e\"],\n    },\n  },\n} satisfies ChartConfig;\n\nexport function EvilExampleAreaChart() {\n  return (\n    <EvilAreaChart\n      isClickable\n      className=\"h-full w-full p-4\"\n      xDataKey=\"month\"\n      yDataKey=\"desktop\"\n      stackType=\"stacked\"\n      curveType=\"step\" // [!code highlight]\n      strokeVariant=\"dashed\"\n      areaVariant=\"gradient\"\n      activeDotVariant=\"default\"\n      dotVariant=\"default\"\n      data={data}\n      chartConfig={chartConfig}\n      xAxisProps={{ tickFormatter: (value) => value.substring(0, 3) }}\n    />\n  );\n}\n",
+      "type": "registry:block"
+    }
+  ],
+  "type": "registry:block"
+}

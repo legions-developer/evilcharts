@@ -1,0 +1,15 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "ex-loading-state-sankey-chart",
+  "registryDependencies": [
+    "@evilcharts/sankey-chart"
+  ],
+  "files": [
+    {
+      "path": "src/registry/examples/ex-loading-state-sankey-chart.tsx",
+      "content": "\"use client\";\n\nimport { EvilSankeyChart } from \"@/registry/charts/sankey-chart\";\nimport type { SankeyData } from \"recharts\";\nimport { type ChartConfig } from \"@/registry/ui/chart\";\n\n// Content distribution - how content flows to platforms\nconst data: SankeyData = {\n  nodes: [\n    { name: \"BlogPosts\" },\n    { name: \"Videos\" },\n    { name: \"Podcasts\" },\n    { name: \"Twitter\" },\n    { name: \"LinkedIn\" },\n    { name: \"YouTube\" },\n    { name: \"Newsletter\" },\n  ],\n  links: [\n    { source: 0, target: 3, value: 12000 },\n    { source: 0, target: 4, value: 8500 },\n    { source: 0, target: 6, value: 15000 },\n    { source: 1, target: 5, value: 28000 },\n    { source: 1, target: 3, value: 4200 },\n    { source: 2, target: 5, value: 9800 },\n    { source: 2, target: 4, value: 3600 },\n  ],\n};\n\nconst chartConfig = {\n  BlogPosts: {\n    label: \"Blog Posts\",\n    colors: {\n      light: [\"#3b82f6\"],\n      dark: [\"#60a5fa\"],\n    },\n  },\n  Videos: {\n    label: \"Videos\",\n    colors: {\n      light: [\"#ef4444\"],\n      dark: [\"#f87171\"],\n    },\n  },\n  Podcasts: {\n    label: \"Podcasts\",\n    colors: {\n      light: [\"#8b5cf6\"],\n      dark: [\"#a78bfa\"],\n    },\n  },\n  Twitter: {\n    label: \"Twitter\",\n    colors: {\n      light: [\"#0ea5e9\"],\n      dark: [\"#38bdf8\"],\n    },\n  },\n  LinkedIn: {\n    label: \"LinkedIn\",\n    colors: {\n      light: [\"#0077b5\"],\n      dark: [\"#0a95d9\"],\n    },\n  },\n  YouTube: {\n    label: \"YouTube\",\n    colors: {\n      light: [\"#dc2626\"],\n      dark: [\"#ef4444\"],\n    },\n  },\n  Newsletter: {\n    label: \"Newsletter\",\n    colors: {\n      light: [\"#10b981\"],\n      dark: [\"#34d399\"],\n    },\n  },\n} satisfies ChartConfig;\n\nexport function EvilExampleSankeyChart() {\n  return (\n    <EvilSankeyChart\n      className=\"h-full w-full p-4\"\n      data={data}\n      chartConfig={chartConfig}\n      linkVariant=\"source\"\n      isLoading // [!code highlight]\n    />\n  );\n}\n",
+      "type": "registry:block"
+    }
+  ],
+  "type": "registry:block"
+}

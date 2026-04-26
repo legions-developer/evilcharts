@@ -1,0 +1,15 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "ex-tooltip-default-bar-chart",
+  "registryDependencies": [
+    "@evilcharts/bar-chart"
+  ],
+  "files": [
+    {
+      "path": "src/registry/examples/ex-tooltip-default-bar-chart.tsx",
+      "content": "\"use client\";\n\nimport { EvilBarChart } from \"@/registry/charts/bar-chart\";\nimport { type ChartConfig } from \"@/registry/ui/chart\";\n\nconst data = [\n  { month: \"January\", desktop: 342, mobile: 184 },\n  { month: \"February\", desktop: 876, mobile: 491 },\n  { month: \"March\", desktop: 512, mobile: 290 },\n  { month: \"April\", desktop: 629, mobile: 391 },\n  { month: \"May\", desktop: 458, mobile: 309 },\n  { month: \"June\", desktop: 781, mobile: 449 },\n  { month: \"July\", desktop: 394, mobile: 234 },\n  { month: \"August\", desktop: 925, mobile: 557 },\n  { month: \"September\", desktop: 647, mobile: 367 },\n  { month: \"October\", desktop: 532, mobile: 357 },\n  { month: \"November\", desktop: 803, mobile: 515 },\n  { month: \"December\", desktop: 271, mobile: 149 },\n];\n\nconst chartConfig = {\n  desktop: {\n    label: \"Desktop\",\n    colors: {\n      light: [\"#047857\"],\n      dark: [\"#10b981\"],\n    },\n  },\n  mobile: {\n    label: \"Mobile\",\n    colors: {\n      light: [\"#be123c\"],\n      dark: [\"#f43f5e\"],\n    },\n  },\n} satisfies ChartConfig;\n\nexport function EvilExampleTooltipDefaultBarChart() {\n  return (\n    <EvilBarChart\n      className=\"h-full w-full p-4\"\n      xDataKey=\"month\"\n      tooltipVariant=\"default\" // [!code highlight]\n      tooltipDefaultIndex={4}\n      data={data}\n      chartConfig={chartConfig}\n      xAxisProps={{ tickFormatter: (value: string) => value.substring(0, 3) }}\n    />\n  );\n}\n",
+      "type": "registry:block"
+    }
+  ],
+  "type": "registry:block"
+}

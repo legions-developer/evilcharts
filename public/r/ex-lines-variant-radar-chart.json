@@ -1,0 +1,15 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "ex-lines-variant-radar-chart",
+  "registryDependencies": [
+    "@evilcharts/radar-chart"
+  ],
+  "files": [
+    {
+      "path": "src/registry/examples/ex-lines-variant-radar-chart.tsx",
+      "content": "\"use client\";\n\nimport { EvilRadarChart } from \"@/registry/charts/radar-chart\";\nimport { type ChartConfig } from \"@/registry/ui/chart\";\n\nconst data = [\n  { skill: \"JavaScript\", desktop: 186, mobile: 80 },\n  { skill: \"TypeScript\", desktop: 305, mobile: 200 },\n  { skill: \"React\", desktop: 237, mobile: 120 },\n  { skill: \"Node.js\", desktop: 173, mobile: 190 },\n  { skill: \"CSS\", desktop: 209, mobile: 130 },\n  { skill: \"Python\", desktop: 214, mobile: 140 },\n];\n\nconst chartConfig = {\n  desktop: {\n    label: \"Desktop\",\n    colors: {\n      light: [\"#3b82f6\"],\n      dark: [\"#60a5fa\"],\n    },\n  },\n  mobile: {\n    label: \"Mobile\",\n    colors: {\n      light: [\"#10b981\"],\n      dark: [\"#34d399\"],\n    },\n  },\n} satisfies ChartConfig;\n\nexport function EvilExampleRadarChart() {\n  return (\n    <EvilRadarChart\n      className=\"h-full w-full p-4\"\n      data={data}\n      dataKey=\"skill\"\n      dotVariant=\"colored-border\"\n      activeDotVariant=\"default\"\n      chartConfig={chartConfig}\n      variant=\"lines\" // [!code highlight]\n    />\n  );\n}\n",
+      "type": "registry:block"
+    }
+  ],
+  "type": "registry:block"
+}

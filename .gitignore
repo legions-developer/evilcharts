@@ -42,8 +42,4 @@ next-env.d.ts
 
 # fumadocs
 .source
-
-# shadcn stuff
-registry.json
-/public/r/
-__index__.tsx
+ 

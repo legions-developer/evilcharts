@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "bun run registry:build && next build",
+    "build": "bun run registry:fresh && next build",
     "start": "next start",
     "lint": "eslint",
     "clean": "rm -rf node_modules && rm -rf .next && rm -rf .source",
