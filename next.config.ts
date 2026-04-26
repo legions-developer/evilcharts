@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
       {
         source: "/",
         destination: "/docs/",
-        permanent: true,
+        permanent: false,
       },
       {
         source: "/docs/area-chart",
