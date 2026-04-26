@@ -42,7 +42,7 @@ export function ComponentPreviewTabs({
               <span className="line-clamp-1">{displayTitle}</span>
             </span>
             {!hideCode && (
-              <TabsList className={"opacity-0"} variant="underline">
+              <TabsList variant="underline">
                 <TabsTab className="h-5! px-1.5 hover:bg-transparent!" value="code">
                   Code
                 </TabsTab>
