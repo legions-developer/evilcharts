@@ -7,11 +7,57 @@ import { mdxComponents } from "@/components/docs/mdx";
 import { processMdxForLLMs } from "@/lib/llm";
 import { notFound } from "next/navigation";
 import { absoluteUrl } from "@/lib/utils";
+import type { Metadata } from "next";
 import { LinkIcon } from "lucide-react";
 import { source } from "@/lib/source";
 
 export function generateStaticParams() {
   return source.generateParams();
+}
+
+export async function generateMetadata(props: {
+  params: Promise<{ slug?: string[] }>;
+}): Promise<Metadata> {
+  const params = await props.params;
+  const page = source.getPage(params.slug);
+
+  if (!page) return {};
+
+  const { title, description, image } = page.data;
+
+  const url = absoluteUrl(page.url);
+  const ogImage = image ? absoluteUrl(image) : undefined;
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: url,
+    },
+    openGraph: {
+      type: "article",
+      url,
+      title,
+      description,
+      siteName: "Evil Charts",
+      ...(ogImage && {
+        images: [
+          {
+            url: ogImage,
+            width: 1200,
+            height: 630,
+            alt: `${title} — Evil Charts`,
+          },
+        ],
+      }),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      ...(ogImage && { images: [ogImage] }),
+    },
+  };
 }
 
 export default async function Page(props: { params: Promise<{ slug: string[] }> }) {

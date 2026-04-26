@@ -28,6 +28,7 @@ export const docs = defineDocs({
   dir: "src/content/docs",
   docs: {
     schema: frontmatterSchema.extend({
+      image: z.string().optional(),
       links: z
         .object({
           api: z.string().optional(),
