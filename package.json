@@ -68,7 +68,7 @@
     "react-dom": "19.2.3",
     "react-hook-form": "^7.69.0",
     "react-resizable-panels": "^4.0.14",
-    "recharts": "^3.7.0",
+    "recharts": "^3.8.1",
     "rehype-pretty-code": "^0.14.1",
     "rimraf": "^6.1.2",
     "shadcn": "^3.6.2",
