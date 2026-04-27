@@ -4,6 +4,7 @@ import * as React from "react";
 
 import { Tabs, TabsList, TabsPanel, TabsTab } from "@/components/ui/tabs";
 import { getIconForLanguageExtension } from "@/assets/language/icons";
+import { LazyMount } from "@/components/docs/charts/lazy-mount";
 import { useBreakpoint } from "@/hooks/use-breakpoint";
 import { cn } from "@/lib/utils";
 
@@ -62,7 +63,11 @@ export function ComponentPreviewTabs({
                 data-align={align}
               >
                 <div className="no-scrollbar h-full w-full [&>svg]:select-none" data-slot="preview">
-                  {component}
+                  <LazyMount
+                    fallback={<div className="flex size-full items-center justify-center" />}
+                  >
+                    {component}
+                  </LazyMount>
                 </div>
               </div>
             </TabsPanel>
