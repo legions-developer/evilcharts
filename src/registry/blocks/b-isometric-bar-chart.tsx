@@ -19,10 +19,6 @@ const chartData = [
 const chartConfig = {
   revenue: {
     label: "Revenue",
-    colors: {
-      light: ["#18181b"],
-      dark: ["#fafafa"],
-    },
   },
 } satisfies ChartConfig;
 
@@ -133,16 +129,16 @@ export function EvilIsometricBarChart() {
         >
           <defs>
             <linearGradient id="iso-front-base" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="var(--color-revenue-0)" stopOpacity={1} />
-              <stop offset="100%" stopColor="var(--color-revenue-0)" stopOpacity={0.8} />
+              <stop offset="0%" stopColor="var(--color-accent)" stopOpacity={1} />
+              <stop offset="100%" stopColor="var(--color-accent)" stopOpacity={0.8} />
             </linearGradient>
             <linearGradient id="iso-top-base" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stopColor="var(--color-revenue-0)" stopOpacity={1} />
-              <stop offset="100%" stopColor="var(--color-revenue-0)" stopOpacity={0.9} />
+              <stop offset="0%" stopColor="var(--color-accent)" stopOpacity={1} />
+              <stop offset="100%" stopColor="var(--color-accent)" stopOpacity={0.9} />
             </linearGradient>
             <linearGradient id="iso-right-base" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="var(--color-revenue-0)" stopOpacity={0.6} />
-              <stop offset="100%" stopColor="var(--color-revenue-0)" stopOpacity={0.45} />
+              <stop offset="0%" stopColor="var(--color-accent)" stopOpacity={0.6} />
+              <stop offset="100%" stopColor="var(--color-accent)" stopOpacity={0.45} />
             </linearGradient>
 
             <linearGradient id="iso-front-accent" x1="0" y1="0" x2="0" y2="1">
@@ -165,7 +161,7 @@ export function EvilIsometricBarChart() {
               height="6"
               patternTransform="rotate(45)"
             >
-              <line x1="0" y1="0" x2="0" y2="6" stroke="currentColor" strokeWidth="1" strokeOpacity="0.25" />
+              <line x1="0" y1="0" x2="0" y2="6" stroke="currentColor" strokeWidth="1" strokeOpacity="0.4" />
             </pattern>
             <pattern
               id="iso-hatch-accent"
