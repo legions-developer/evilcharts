@@ -19,6 +19,10 @@ const chartData = [
 const chartConfig = {
   revenue: {
     label: "Revenue",
+    colors: {
+      light: ["#18181b"],
+      dark: ["#fafafa"],
+    },
   },
 } satisfies ChartConfig;
 
