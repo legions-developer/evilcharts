@@ -1771,6 +1771,25 @@
           "target": "components/evilcharts/blocks/grid-bar-chart.tsx"
         }
       ]
+    },
+    {
+      "name": "isometric-bar-chart",
+      "description": "Bar chart with isometric 3D-extruded bars and a highlighted max value",
+      "dependencies": [
+        "recharts",
+        "motion"
+      ],
+      "registryDependencies": [
+        "@evilcharts/chart"
+      ],
+      "type": "registry:block",
+      "files": [
+        {
+          "path": "src/registry/blocks/b-isometric-bar-chart.tsx",
+          "type": "registry:block",
+          "target": "components/evilcharts/blocks/isometric-bar-chart.tsx"
+        }
+      ]
     }
   ]
 }

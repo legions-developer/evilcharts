@@ -45,4 +45,18 @@ export const blocks: Registry["items"] = [
       },
     ],
   },
+  {
+    name: "isometric-bar-chart",
+    description: "Bar chart with isometric 3D-extruded bars and a highlighted max value",
+    dependencies: ["recharts", "motion"],
+    registryDependencies: ["@evilcharts/chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "blocks/b-isometric-bar-chart.tsx",
+        type: "registry:block",
+        target: TARGET_BASE_PATH + "/isometric-bar-chart.tsx",
+      },
+    ],
+  },
 ];

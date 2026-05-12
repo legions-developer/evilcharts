@@ -2311,4 +2311,22 @@ export const Index: Record<string, any> = {
     categories: undefined,
     meta: undefined,
   },
+  "isometric-bar-chart": {
+    name: "isometric-bar-chart",
+    description: "Bar chart with isometric 3D-extruded bars and a highlighted max value",
+    type: "registry:block",
+    registryDependencies: ["@evilcharts/chart"],
+    files: [{
+      path: "@/registry/blocks/b-isometric-bar-chart.tsx",
+      type: "registry:block",
+      target: "components/evilcharts/blocks/isometric-bar-chart.tsx"
+    }],
+    component: React.lazy(async () => {
+      const mod = await import("@/registry/blocks/b-isometric-bar-chart.tsx")
+      const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
+      return { default: mod.default || mod[exportName] }
+    }),
+    categories: undefined,
+    meta: undefined,
+  },
   }
