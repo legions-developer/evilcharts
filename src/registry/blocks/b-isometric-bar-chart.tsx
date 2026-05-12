@@ -186,7 +186,25 @@ export function EvilIsometricBarChart() {
             tickFormatter={(value: string) => value.slice(0, 3)}
           />
           <YAxis hide domain={[0, "dataMax + 10"]} />
-          <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+          <ChartTooltip
+            cursor={false}
+            content={
+              <ChartTooltipContent
+                formatter={(value, name) => (
+                  <div className="flex flex-1 items-center gap-2">
+                    <div
+                      className="size-2.5 shrink-0 rounded-[2px]"
+                      style={{ background: "var(--color-revenue-0)" }}
+                    />
+                    <span className="text-muted-foreground flex-1 capitalize">{name}</span>
+                    <span className="text-foreground font-mono font-medium tabular-nums">
+                      ${value}K
+                    </span>
+                  </div>
+                )}
+              />
+            }
+          />
           <Bar
             dataKey="revenue"
             isAnimationActive={false}
