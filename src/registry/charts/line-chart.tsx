@@ -40,17 +40,31 @@ import {
   type ReactElement,
   type ReactNode,
 } from "react";
-import { motion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 
 // Constants
 const STROKE_WIDTH = 1;
 const LOADING_LINE_DATA_KEY = "loading";
 const LOADING_ANIMATION_DURATION = 2000; // in milliseconds
+const REVEAL_DURATION = 1; // intro wipe length, in seconds
+const REVEAL_EASE: [number, number, number, number] = [0, 0.7, 0.5, 1]; // intro wipe easing
 
 type CurveType = ComponentProps<typeof RechartsLine>["type"];
 type LineDotProp = ComponentProps<typeof RechartsLine>["dot"];
 type LineActiveDotProp = ComponentProps<typeof RechartsLine>["activeDot"];
 type StrokeVariant = "solid" | "dashed" | "animated-dashed";
+
+/**
+ * Direction of the custom motion.dev intro reveal. Recharts' own line animation
+ * is permanently disabled (it drew the line after the dots had already popped
+ * in) — these reveals replace it.
+ *
+ * NOTE: a reveal is a per-frame animated SVG mask, so it is heavier than a
+ * static chart. `"none"` opts out entirely; it is also what a device with the
+ * OS "reduce motion" preference falls back to automatically.
+ */
+type LineAnimationType = "none" | "left-to-right" | "right-to-left" | "center-out" | "edges-in";
+type RevealAnimationType = Exclude<LineAnimationType, "none">;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Shared context
@@ -64,6 +78,7 @@ type StrokeVariant = "solid" | "dashed" | "animated-dashed";
 type LineChartContextValue = {
   config: ChartConfig; // colors + labels for every series
   curveType: CurveType; // default curve interpolation each <Line /> inherits
+  animationType: LineAnimationType; // default intro reveal each <Line /> inherits
   isLoading: boolean; // whether the chart shows its loading skeleton
   selectedDataKey: string | null; // currently selected series, or null when none
   selectDataKey: (dataKey: string | null) => void; // sets the selected series
@@ -103,6 +118,7 @@ type EvilLineChartBaseProps<
   className?: string; // extra classes for the chart container
   chartProps?: ComponentProps<typeof RechartsLineChart>; // escape hatch for the raw Recharts chart
   curveType?: CurveType; // default curve interpolation for every <Line />
+  animationType?: LineAnimationType; // default intro reveal for every <Line />
   defaultSelectedDataKey?: string | null; // series selected on first render
   onSelectionChange?: (selectedDataKey: string | null) => void; // fires when the selected series changes
   isLoading?: boolean; // shows the animated loading skeleton
@@ -135,6 +151,7 @@ export function EvilLineChart<
   className,
   chartProps,
   curveType = "linear",
+  animationType = "left-to-right",
   defaultSelectedDataKey = null,
   onSelectionChange,
   isLoading = false,
@@ -165,11 +182,12 @@ export function EvilLineChart<
     () => ({
       config,
       curveType,
+      animationType,
       isLoading,
       selectedDataKey,
       selectDataKey,
     }),
-    [config, curveType, isLoading, selectedDataKey, selectDataKey],
+    [config, curveType, animationType, isLoading, selectedDataKey, selectDataKey],
   );
 
   return (
@@ -222,6 +240,7 @@ type LineProps = {
   dataKey: string; // series key — must exist on the data and config
   strokeVariant?: StrokeVariant; // stroke style for this line only
   curveType?: CurveType; // curve interpolation — falls back to the chart default
+  animationType?: LineAnimationType; // intro reveal — falls back to the chart default
   connectNulls?: boolean; // join segments across null/missing values
   isClickable?: boolean; // lets this line be selected by clicking it
   glowing?: boolean; // applies a soft outer glow to this line
@@ -241,6 +260,7 @@ export function Line({
   dataKey,
   strokeVariant = "solid",
   curveType,
+  animationType,
   connectNulls = false,
   isClickable = false,
   glowing = false,
@@ -248,20 +268,35 @@ export function Line({
   children,
   lineProps,
 }: LineProps) {
-  const { config, curveType: defaultCurve, isLoading, selectedDataKey, selectDataKey } =
-    useLineChart();
+  const {
+    config,
+    curveType: defaultCurve,
+    animationType: defaultAnimation,
+    isLoading,
+    selectedDataKey,
+    selectDataKey,
+  } = useLineChart();
   const id = useId().replace(/:/g, ""); // unique id scopes this line's style defs
+  // Devices set to "reduce motion" skip the intro reveal entirely
+  const shouldReduceMotion = useReducedMotion();
 
   // The root renders the skeleton line while loading, so real lines step aside
   if (isLoading) return null;
 
   const resolvedCurve = curveType ?? defaultCurve;
 
+  // The reveal is an animated SVG mask — heavier than a static chart — so
+  // `"none"` and the OS reduce-motion preference both opt out of it.
+  const revealType: LineAnimationType = shouldReduceMotion
+    ? "none"
+    : (animationType ?? defaultAnimation);
+  const maskId = revealType === "none" ? undefined : `${id}-reveal-mask`;
+
   const isSelected = selectedDataKey === dataKey;
   const hasSelection = selectedDataKey !== null;
   const opacity = getOpacity(selectedDataKey, dataKey);
 
-  const { dot, activeDot } = resolveDots(children, id, dataKey, opacity.dot);
+  const { dot, activeDot } = resolveDots(children, id, dataKey, opacity.dot, maskId);
 
   const isAnimatedDashed = strokeVariant === "animated-dashed";
   const isDashed = strokeVariant === "dashed" || isAnimatedDashed;
@@ -278,6 +313,7 @@ export function Line({
             strokeWidth={15}
             dot={false}
             activeDot={false}
+            isAnimationActive={false}
             legendType="none"
             tooltipType="none"
             style={{ cursor: "pointer" }}
@@ -296,7 +332,14 @@ export function Line({
           strokeWidth={STROKE_WIDTH}
           strokeDasharray={getStrokeDasharray(enableBufferLine, isDashed)}
           shape={enableBufferLine ? bufferLineShape : undefined}
-          style={isClickable ? { cursor: "pointer" } : undefined}
+          // Recharts' built-in line animation is permanently disabled — it drew
+          // the line after the dots had already popped in. The motion.dev reveal
+          // mask drives the intro instead, wiping stroke and dots in together.
+          isAnimationActive={false}
+          style={{
+            ...(maskId ? { mask: `url(#${maskId})` } : {}),
+            ...(isClickable ? { cursor: "pointer" } : {}),
+          }}
           onClick={() => {
             if (!isClickable) return;
             // Clicking the selected line clears the selection, otherwise selects it
@@ -308,6 +351,7 @@ export function Line({
         </RechartsLine>
       </g>
       <defs>
+        {revealType !== "none" && <RevealMask id={id} type={revealType} />}
         <ColorGradient id={id} dataKey={dataKey} config={config} />
         {glowing && <GlowFilter id={id} dataKey={dataKey} />}
       </defs>
@@ -484,12 +528,16 @@ const getStrokeDasharray = (enableBufferLine: boolean, isDashed: boolean) => {
   return isDashed ? "5 5" : undefined;
 };
 
-// Pulls <Dot /> and <ActiveDot /> out of a line's children into Recharts dot slots
+// Pulls <Dot /> and <ActiveDot /> out of a line's children into Recharts dot slots.
+// When a `maskId` is given the resting dot is wired to the intro reveal mask so it
+// wipes in with the line; the active dot is always left unmasked since it only
+// appears on hover, after the intro has finished.
 const resolveDots = (
   children: ReactNode,
   id: string,
   dataKey: string,
   dotOpacity: number,
+  maskId: string | undefined,
 ): { dot: LineDotProp; activeDot: LineActiveDotProp } => {
   let dot: LineDotProp = false;
   let activeDot: LineActiveDotProp = false;
@@ -499,7 +547,15 @@ const resolveDots = (
 
     if (child.type === Dot) {
       const { variant } = (child as ReactElement<DotProps>).props;
-      dot = <ChartDot type={variant} dataKey={dataKey} chartId={id} fillOpacity={dotOpacity} />;
+      dot = (
+        <ChartDot
+          type={variant}
+          dataKey={dataKey}
+          chartId={id}
+          fillOpacity={dotOpacity}
+          maskId={maskId}
+        />
+      );
     }
 
     if (child.type === ActiveDot) {
@@ -618,6 +674,81 @@ const AnimatedDashedStroke = () => {
         keyTimes="0;1"
       />
     </>
+  );
+};
+
+// motion `originX` for each single-rect reveal — the edge the wipe grows from.
+// 0 = left edge, 1 = right edge, 0.5 = centre (grows outward to both edges).
+const SINGLE_REVEAL_ORIGIN: Record<Exclude<RevealAnimationType, "edges-in">, number> = {
+  "left-to-right": 0,
+  "right-to-left": 1,
+  "center-out": 0.5,
+};
+
+/**
+ * Wipe mask driven by motion.dev, played once when a <Line /> mounts. The same
+ * mask is applied to the line's stroke and its resting dots, so both reveal in
+ * lockstep — fixing Recharts' default, where the dots appeared before the line
+ * had finished drawing.
+ *
+ * `maskUnits`/`maskContentUnits` are both userSpaceOnUse so every masked element
+ * shares one coordinate space and the wipe edge lands at the same x on each.
+ *
+ * Each rect animates `scaleX` 0 → 1; `originX` decides which edge it grows from.
+ * "edges-in" needs two rects — each half grows inward from an opposite edge.
+ */
+const RevealMask = ({ id, type }: { id: string; type: RevealAnimationType }) => {
+  const reveal = {
+    initial: { scaleX: 0 },
+    animate: { scaleX: 1 },
+    transition: { duration: REVEAL_DURATION, ease: REVEAL_EASE },
+  };
+
+  return (
+    <mask
+      id={`${id}-reveal-mask`}
+      maskUnits="userSpaceOnUse"
+      maskContentUnits="userSpaceOnUse"
+      x="0"
+      y="0"
+      width="100%"
+      height="100%"
+    >
+      {type === "edges-in" ? (
+        <>
+          {/* left half wipes inward from the left edge toward the centre */}
+          <motion.rect
+            {...reveal}
+            x="0"
+            y="0"
+            width="50%"
+            height="100%"
+            fill="white"
+            style={{ originX: 0 }}
+          />
+          {/* right half wipes inward from the right edge toward the centre */}
+          <motion.rect
+            {...reveal}
+            x="50%"
+            y="0"
+            width="50%"
+            height="100%"
+            fill="white"
+            style={{ originX: 1 }}
+          />
+        </>
+      ) : (
+        <motion.rect
+          {...reveal}
+          x="0"
+          y="0"
+          width="100%"
+          height="100%"
+          fill="white"
+          style={{ originX: SINGLE_REVEAL_ORIGIN[type] }}
+        />
+      )}
+    </mask>
   );
 };
 

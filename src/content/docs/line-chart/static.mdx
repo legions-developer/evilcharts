@@ -217,6 +217,9 @@ The root container. It owns the data, the shared selection state, the loading sk
   <ApiRow name="curveType" type='"basis" | "bumpX" | "bumpY" | "bump" | "linear" | "natural" | "monotoneX" | "monotoneY" | "monotone" | "step" | …' default='"linear"'>
     The default curve interpolation inherited by every `<Line />`. Each `<Line />` may override it locally.
   </ApiRow>
+  <ApiRow name="animationType" type='"none" | "left-to-right" | "right-to-left" | "center-out" | "edges-in"' default='"left-to-right"'>
+    Direction of the custom intro reveal inherited by every `<Line />`. `"none"` disables it — devices with the OS reduce-motion preference fall back to `"none"` automatically.
+  </ApiRow>
   <ApiRow name="defaultSelectedDataKey" type="string | null" default="null">
     The data key that should be selected by default.
   </ApiRow>
@@ -262,6 +265,9 @@ A single line series. Each `<Line />` is self-contained and generates its own gr
   </ApiRow>
   <ApiRow name="curveType" type='"basis" | "bump" | "linear" | "natural" | "monotoneX" | "monotoneY" | "monotone" | "step" | "stepBefore" | "stepAfter" | …'>
     The curve interpolation for this line. Falls back to the chart's `curveType` when omitted.
+  </ApiRow>
+  <ApiRow name="animationType" type='"none" | "left-to-right" | "right-to-left" | "center-out" | "edges-in"'>
+    The intro reveal animation for this line. Falls back to the chart's `animationType` when omitted.
   </ApiRow>
   <ApiRow name="connectNulls" type="boolean" default="false">
     Whether to connect line segments across null or missing values.
