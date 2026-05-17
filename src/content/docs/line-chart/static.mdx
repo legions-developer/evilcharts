@@ -201,474 +201,155 @@ The chart is composed of several parts. The props below are grouped by the compo
 
 The root container. It owns the data, the shared selection state, the loading skeleton, and the optional brush. Everything visual is composed as its children.
 
-<ApiReferenceWrapper>
-  <ApiReference>
-    <ApiHeader
-      propName="data"
-      isRequired
-    />
-    <ApiContent>
-      Data used to display the chart. An array of objects where each object represents a data point.
-
-      type: `TData[]` where `TData extends Record<string, unknown>`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="config"
-      isRequired
-    />
-    <ApiContent>
-      Configuration object that defines the chart's series. Each key should match a data key in your data array, with a corresponding color or color array.
-
-      type: `Record<string, ChartConfig[string]>`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="children"
-      isRequired
-    />
-    <ApiContent>
-      The composed chart parts — `<Grid />`, `<XAxis />`, `<YAxis />`, `<Legend />`, `<Tooltip />`, and one or more `<Line />`.
-
-      type: `ReactNode`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="className"
-    />
-    <ApiContent>
-      Additional CSS classes to apply to the chart container.
-
-      type: `string`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="curveType"
-    />
-    <ApiContent>
-      The default curve interpolation inherited by every `<Line />`. Each `<Line />` may override it locally.
-
-      type: `"basis" | "basisClosed" | "basisOpen" | "bumpX" | "bumpY" | "bump" | "linear" | "linearClosed" | "natural" | "monotoneX" | "monotoneY" | "monotone" | "step" | "stepBefore" | "stepAfter"`
-
-      default: `"linear"`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="defaultSelectedDataKey"
-    />
-    <ApiContent>
-      The data key that should be selected by default.
-
-      type: `string | null`
-
-      default: `null`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="onSelectionChange"
-    />
-    <ApiContent>
-      Callback fired when a series is selected or deselected — by clicking a clickable `<Line />` or `<Legend />` entry. Receives the selected data key, or `null` when deselected.
-
-      type: `(selectedDataKey: string | null) => void`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="isLoading"
-    />
-    <ApiContent>
-      Shows a loading skeleton animation with a shimmer effect when data is being fetched.
-
-      type: `boolean`
-
-      default: `false`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="loadingPoints"
-    />
-    <ApiContent>
-      Number of data points to display in the loading skeleton.
-
-      type: `number`
-
-      default: `14`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="showBrush"
-    />
-    <ApiContent>
-      When enabled, displays a brush control below the chart for selecting and zooming into a range of data.
-
-      type: `boolean`
-
-      default: `false`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="xDataKey"
-    />
-    <ApiContent>
-      The data key used for the x-axis. Only needed by the brush footer — the axis itself reads its key from `<XAxis dataKey="…" />`.
-
-      type: `keyof TData & string`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="brushHeight"
-    />
-    <ApiContent>
-      The height of the brush preview area in pixels.
-
-      type: `number`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="brushFormatLabel"
-    />
-    <ApiContent>
-      Custom formatter for the brush axis labels.
-
-      type: `(value: unknown, index: number) => string`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="onBrushChange"
-    />
-    <ApiContent>
-      Callback invoked when the user changes the brush selection range.
-
-      type: `(range: EvilBrushRange) => void`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="chartProps"
-    />
-    <ApiContent>
-      Additional props forwarded to the underlying Recharts LineChart component.
-
-      type: `ComponentProps<typeof LineChart>`
-
-      Read the <Link href="https://recharts.github.io/en-US/api/LineChart/" _blank>Recharts LineChart documentation</Link> for available props.
-    </ApiContent>
-  </ApiReference>
-</ApiReferenceWrapper>
+<ApiTable>
+  <ApiRow name="data" type="TData[]" required>
+    Data used to display the chart. An array of objects where each object represents a data point (`TData extends Record<string, unknown>`).
+  </ApiRow>
+  <ApiRow name="config" type="Record<string, ChartConfig[string]>" required>
+    Configuration object that defines the chart's series. Each key should match a data key in your data array, with a corresponding color or color array.
+  </ApiRow>
+  <ApiRow name="children" type="ReactNode" required>
+    The composed chart parts — `<Grid />`, `<XAxis />`, `<YAxis />`, `<Legend />`, `<Tooltip />`, and one or more `<Line />`.
+  </ApiRow>
+  <ApiRow name="className" type="string">
+    Additional CSS classes to apply to the chart container.
+  </ApiRow>
+  <ApiRow name="curveType" type='"basis" | "bumpX" | "bumpY" | "bump" | "linear" | "natural" | "monotoneX" | "monotoneY" | "monotone" | "step" | …' default='"linear"'>
+    The default curve interpolation inherited by every `<Line />`. Each `<Line />` may override it locally.
+  </ApiRow>
+  <ApiRow name="defaultSelectedDataKey" type="string | null" default="null">
+    The data key that should be selected by default.
+  </ApiRow>
+  <ApiRow name="onSelectionChange" type="(selectedDataKey: string | null) => void">
+    Callback fired when a series is selected or deselected — by clicking a clickable `<Line />` or `<Legend />` entry. Receives the selected data key, or `null` when deselected.
+  </ApiRow>
+  <ApiRow name="isLoading" type="boolean" default="false">
+    Shows a loading skeleton animation with a shimmer effect when data is being fetched.
+  </ApiRow>
+  <ApiRow name="loadingPoints" type="number" default="14">
+    Number of data points to display in the loading skeleton.
+  </ApiRow>
+  <ApiRow name="showBrush" type="boolean" default="false">
+    When enabled, displays a brush control below the chart for selecting and zooming into a range of data.
+  </ApiRow>
+  <ApiRow name="xDataKey" type="keyof TData & string">
+    The data key used for the x-axis. Only needed by the brush footer — the axis itself reads its key from `<XAxis dataKey="…" />`.
+  </ApiRow>
+  <ApiRow name="brushHeight" type="number">
+    The height of the brush preview area in pixels.
+  </ApiRow>
+  <ApiRow name="brushFormatLabel" type="(value: unknown, index: number) => string">
+    Custom formatter for the brush axis labels.
+  </ApiRow>
+  <ApiRow name="onBrushChange" type="(range: EvilBrushRange) => void">
+    Callback invoked when the user changes the brush selection range.
+  </ApiRow>
+  <ApiRow name="chartProps" type="ComponentProps<typeof LineChart>">
+    Additional props forwarded to the underlying Recharts LineChart component. Read the <Link href="https://recharts.github.io/en-US/api/LineChart/" _blank>Recharts LineChart documentation</Link> for available props.
+  </ApiRow>
+</ApiTable>
 
 ### `<Line />`
 
 A single line series. Each `<Line />` is self-contained and generates its own gradient and glow definitions, so a chart can hold any number of lines — each with its own stroke, glow, and clickability.
 
-<ApiReferenceWrapper>
-  <ApiReference>
-    <ApiHeader
-      propName="dataKey"
-      isRequired
-    />
-    <ApiContent>
-      The series key. Must exist on both the data rows and the chart `config`.
-
-      type: `string`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="strokeVariant"
-    />
-    <ApiContent>
-      The visual style for this line's stroke. Applies to this line only.
-
-      type: `"solid" | "dashed" | "animated-dashed"`
-
-      default: `"solid"`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="curveType"
-    />
-    <ApiContent>
-      The curve interpolation for this line. Falls back to the chart's `curveType` when omitted.
-
-      type: `"basis" | "bump" | "linear" | "natural" | "monotoneX" | "monotoneY" | "monotone" | "step" | "stepBefore" | "stepAfter" | …`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="connectNulls"
-    />
-    <ApiContent>
-      Whether to connect line segments across null or missing values.
-
-      type: `boolean`
-
-      default: `false`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="isClickable"
-    />
-    <ApiContent>
-      Lets this line be selected by clicking it. When any line is selected, unselected lines become semi-transparent.
-
-      type: `boolean`
-
-      default: `false`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="glowing"
-    />
-    <ApiContent>
-      Applies a soft outer glow to this line.
-
-      type: `boolean`
-
-      default: `false`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="enableBufferLine"
-    />
-    <ApiContent>
-      Renders this line's last segment as a dashed buffer while the rest stays solid. Useful for indicating projected or incomplete data at the end of a series.
-
-      type: `boolean`
-
-      default: `false`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="children"
-    />
-    <ApiContent>
-      Optional `<Dot />` and `<ActiveDot />` composition that adds point markers to this line.
-
-      type: `ReactNode`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="lineProps"
-    />
-    <ApiContent>
-      Escape hatch for raw props forwarded to the underlying Recharts Line component.
-
-      type: `ComponentProps<typeof Line>`
-    </ApiContent>
-  </ApiReference>
-</ApiReferenceWrapper>
+<ApiTable>
+  <ApiRow name="dataKey" type="string" required>
+    The series key. Must exist on both the data rows and the chart `config`.
+  </ApiRow>
+  <ApiRow name="strokeVariant" type='"solid" | "dashed" | "animated-dashed"' default='"solid"'>
+    The visual style for this line's stroke. Applies to this line only.
+  </ApiRow>
+  <ApiRow name="curveType" type='"basis" | "bump" | "linear" | "natural" | "monotoneX" | "monotoneY" | "monotone" | "step" | "stepBefore" | "stepAfter" | …'>
+    The curve interpolation for this line. Falls back to the chart's `curveType` when omitted.
+  </ApiRow>
+  <ApiRow name="connectNulls" type="boolean" default="false">
+    Whether to connect line segments across null or missing values.
+  </ApiRow>
+  <ApiRow name="isClickable" type="boolean" default="false">
+    Lets this line be selected by clicking it. When any line is selected, unselected lines become semi-transparent.
+  </ApiRow>
+  <ApiRow name="glowing" type="boolean" default="false">
+    Applies a soft outer glow to this line.
+  </ApiRow>
+  <ApiRow name="enableBufferLine" type="boolean" default="false">
+    Renders this line's last segment as a dashed buffer while the rest stays solid. Useful for indicating projected or incomplete data at the end of a series.
+  </ApiRow>
+  <ApiRow name="children" type="ReactNode">
+    Optional `<Dot />` and `<ActiveDot />` composition that adds point markers to this line.
+  </ApiRow>
+  <ApiRow name="lineProps" type="ComponentProps<typeof Line>">
+    Escape hatch for raw props forwarded to the underlying Recharts Line component.
+  </ApiRow>
+</ApiTable>
 
 ### `<Dot />` and `<ActiveDot />`
 
 Point markers composed inside a `<Line />`. `<Dot />` is the resting marker; `<ActiveDot />` is the hovered marker. They render nothing on their own — the parent `<Line />` reads their `variant`.
 
-<ApiReferenceWrapper>
-  <ApiReference>
-    <ApiHeader
-      propName="variant"
-    />
-    <ApiContent>
-      The visual style of the point marker.
-
-      type: `"default" | "border" | "colored-border"`
-    </ApiContent>
-  </ApiReference>
-</ApiReferenceWrapper>
+<ApiTable>
+  <ApiRow name="variant" type='"default" | "border" | "colored-border"'>
+    The visual style of the point marker.
+  </ApiRow>
+</ApiTable>
 
 ### `<XAxis />` and `<YAxis />`
 
 The category and value axes. Both ship with the chart's flat default styling and forward every Recharts axis prop, so `dataKey`, `tickFormatter`, `tickMargin`, etc. pass straight through. They are hidden automatically while the chart is loading.
 
-<ApiReferenceWrapper>
-  <ApiReference>
-    <ApiHeader
-      propName="dataKey"
-    />
-    <ApiContent>
-      The data key for the axis values.
-
-      type: `string`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="…axisProps"
-    />
-    <ApiContent>
-      Every other Recharts XAxis / YAxis prop is forwarded as-is.
-
-      Read the <Link href="https://recharts.github.io/en-US/api/XAxis/" _blank>Recharts XAxis</Link> and <Link href="https://recharts.github.io/en-US/api/YAxis/" _blank>Recharts YAxis</Link> documentation for available props.
-    </ApiContent>
-  </ApiReference>
-</ApiReferenceWrapper>
+<ApiTable>
+  <ApiRow name="dataKey" type="string">
+    The data key for the axis values.
+  </ApiRow>
+  <ApiRow name="…axisProps">
+    Every other Recharts XAxis / YAxis prop is forwarded as-is. Read the <Link href="https://recharts.github.io/en-US/api/XAxis/" _blank>Recharts XAxis</Link> and <Link href="https://recharts.github.io/en-US/api/YAxis/" _blank>Recharts YAxis</Link> documentation for available props.
+  </ApiRow>
+</ApiTable>
 
 ### `<Grid />`
 
 The background grid lines. Defaults to horizontal-only dashed lines and forwards every Recharts CartesianGrid prop.
 
-<ApiReferenceWrapper>
-  <ApiReference>
-    <ApiHeader
-      propName="…gridProps"
-    />
-    <ApiContent>
-      Every Recharts CartesianGrid prop is forwarded as-is.
-
-      Read the <Link href="https://recharts.github.io/en-US/api/CartesianGrid/" _blank>Recharts CartesianGrid documentation</Link> for available props.
-    </ApiContent>
-  </ApiReference>
-</ApiReferenceWrapper>
+<ApiTable>
+  <ApiRow name="…gridProps">
+    Every Recharts CartesianGrid prop is forwarded as-is. Read the <Link href="https://recharts.github.io/en-US/api/CartesianGrid/" _blank>Recharts CartesianGrid documentation</Link> for available props.
+  </ApiRow>
+</ApiTable>
 
 ### `<Tooltip />`
 
 The hover tooltip. It reads the chart's selection state so its content dims unselected series.
 
-<ApiReferenceWrapper>
-  <ApiReference>
-    <ApiHeader
-      propName="variant"
-    />
-    <ApiContent>
-      The visual style of the tooltip surface.
-
-      type: `"default" | "frosted-glass"`
-
-      default: `"default"`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="roundness"
-    />
-    <ApiContent>
-      Controls the border-radius of the tooltip.
-
-      type: `"sm" | "md" | "lg" | "xl"`
-
-      default: `"lg"`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="defaultIndex"
-    />
-    <ApiContent>
-      When set, the tooltip is visible by default at the specified data point index.
-
-      type: `number`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="cursor"
-    />
-    <ApiContent>
-      Whether the vertical cursor line follows the pointer on hover.
-
-      type: `boolean`
-
-      default: `true`
-    </ApiContent>
-  </ApiReference>
-</ApiReferenceWrapper>
+<ApiTable>
+  <ApiRow name="variant" type='"default" | "frosted-glass"' default='"default"'>
+    The visual style of the tooltip surface.
+  </ApiRow>
+  <ApiRow name="roundness" type='"sm" | "md" | "lg" | "xl"' default='"lg"'>
+    Controls the border-radius of the tooltip.
+  </ApiRow>
+  <ApiRow name="defaultIndex" type="number">
+    When set, the tooltip is visible by default at the specified data point index.
+  </ApiRow>
+  <ApiRow name="cursor" type="boolean" default="true">
+    Whether the vertical cursor line follows the pointer on hover.
+  </ApiRow>
+</ApiTable>
 
 ### `<Legend />`
 
 The series legend. When the chart is clickable, each entry toggles selection of its series.
 
-<ApiReferenceWrapper>
-  <ApiReference>
-    <ApiHeader
-      propName="variant"
-    />
-    <ApiContent>
-      The visual style of the legend indicators.
-
-      type: `"square" | "circle" | "circle-outline" | "rounded-square" | "rounded-square-outline" | "vertical-bar" | "horizontal-bar"`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="align"
-    />
-    <ApiContent>
-      Horizontal placement of the legend.
-
-      type: `"left" | "center" | "right"`
-
-      default: `"right"`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="verticalAlign"
-    />
-    <ApiContent>
-      Vertical placement of the legend.
-
-      type: `"top" | "middle" | "bottom"`
-
-      default: `"top"`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="isClickable"
-    />
-    <ApiContent>
-      Lets each legend entry toggle selection of its series.
-
-      type: `boolean`
-
-      default: `false`
-    </ApiContent>
-  </ApiReference>
-</ApiReferenceWrapper>
+<ApiTable>
+  <ApiRow name="variant" type='"square" | "circle" | "circle-outline" | "rounded-square" | "rounded-square-outline" | "vertical-bar" | "horizontal-bar"'>
+    The visual style of the legend indicators.
+  </ApiRow>
+  <ApiRow name="align" type='"left" | "center" | "right"' default='"right"'>
+    Horizontal placement of the legend.
+  </ApiRow>
+  <ApiRow name="verticalAlign" type='"top" | "middle" | "bottom"' default='"top"'>
+    Vertical placement of the legend.
+  </ApiRow>
+  <ApiRow name="isClickable" type="boolean" default="false">
+    Lets each legend entry toggle selection of its series.
+  </ApiRow>
+</ApiTable>

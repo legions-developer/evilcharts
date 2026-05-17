@@ -125,14 +125,22 @@ function stripMdxComponentTags(content: string) {
     .replace(/<\/StepContent>/g, "")
     .replace(/<StepTitle(?:\s[^>]*)?>([\s\S]*?)<\/StepTitle>/g, "### $1")
     .replace(/<StepDescription(?:\s[^>]*)?>([\s\S]*?)<\/StepDescription>/g, "$1")
-    .replace(/<ApiReferenceWrapper[^>]*>/g, "")
-    .replace(/<\/ApiReferenceWrapper>/g, "")
-    .replace(/<ApiReference[^>]*>/g, "")
-    .replace(/<\/ApiReference>/g, "")
-    .replace(/<ApiContent[^>]*>([\s\S]*?)<\/ApiContent>/g, "$1")
+    .replace(/<ApiTable[^>]*>/g, "")
+    .replace(/<\/ApiTable>/g, "")
     .replace(
-      /<ApiHeader[\s\S]*?propName="([^"]+)"[\s\S]*?(isRequired)?[\s\S]*?\/>/g,
-      (_match, propName, isRequired) => `### \`${propName}\`${isRequired ? " (required)" : ""}`,
+      /<ApiRow\s+([\s\S]*?)>([\s\S]*?)<\/ApiRow>/g,
+      (_match, attrs: string, description: string) => {
+        const name = attrs.match(/name="([^"]*)"/)?.[1] ?? "";
+        const typeMatch = attrs.match(/type=(?:"([^"]*)"|'([^']*)')/);
+        const type = typeMatch ? (typeMatch[1] ?? typeMatch[2] ?? "") : "";
+        const defaultMatch = attrs.match(/default=(?:"([^"]*)"|'([^']*)')/);
+        const defaultValue = defaultMatch ? (defaultMatch[1] ?? defaultMatch[2] ?? "") : "";
+        const required = /(?:^|\s)required(?:\s|$)/.test(attrs);
+        const meta = [type && `type: \`${type}\``, defaultValue && `default: \`${defaultValue}\``]
+          .filter(Boolean)
+          .join(" · ");
+        return `### \`${name}\`${required ? " (required)" : ""}\n\n${meta}\n\n${description.trim()}`;
+      },
     )
     .replace(/<Link\s+href="([^"]+)"[^>]*>([\s\S]*?)<\/Link>/g, "[$2]($1)")
     .replace(/<ShowcaseGrid\s*\/>/g, getShowcaseList())

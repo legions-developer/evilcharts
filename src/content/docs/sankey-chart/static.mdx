@@ -223,393 +223,121 @@ parts. Render the root, then compose the parts you need as children.
 The root container. Owns the flow data, the layout configuration, the shared
 context, and the loading skeleton.
 
-<ApiReferenceWrapper>
-  <ApiReference>
-    <ApiHeader
-      propName="data"
-      isRequired 
-    />
-    <ApiContent>
-      Sankey diagram data containing nodes and links. Nodes represent entities, and links represent flows between them.
-      
-      type: `SankeyData` which is `{ nodes: SankeyNode[]; links: SankeyLink[] }`
-      
-      where `SankeyNode = { name: string; icon?: ReactNode }` and `SankeyLink = { source: number; target: number; value: number }`
-    </ApiContent>
-  </ApiReference>
-  
-  <ApiReference>
-    <ApiHeader
-      propName="config"
-      isRequired
-    />
-    <ApiContent>
-      Configuration object that defines the chart's nodes. Each key should match a node name from your data, with corresponding colors.
-      
-      type: `ChartConfig`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="children"
-      isRequired
-    />
-    <ApiContent>
-      The composed parts — `<Node />`, `<Link />`, and `<Tooltip />`.
-      
-      type: `ReactNode`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="className"
-    />
-    <ApiContent>
-      Additional CSS classes to apply to the chart container.
-      
-      type: `string`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="nodeWidth"
-    />
-    <ApiContent>
-      The width of each node in pixels.
-      
-      type: `number`
-      
-      default: `10`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="nodePadding"
-    />
-    <ApiContent>
-      The vertical padding between nodes in pixels.
-      
-      type: `number`
-      
-      default: `10`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="linkCurvature"
-    />
-    <ApiContent>
-      The curvature of links between nodes. Value between 0 (straight) and 1 (maximum curve).
-      
-      type: `number`
-      
-      default: `0.5`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="iterations"
-    />
-    <ApiContent>
-      Number of iterations for the Sankey layout algorithm. Higher values produce better layouts but take more time.
-      
-      type: `number`
-      
-      default: `32`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="sort"
-    />
-    <ApiContent>
-      Whether to sort nodes automatically for optimal layout.
-      
-      type: `boolean`
-      
-      default: `true`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="align"
-    />
-    <ApiContent>
-      Horizontal alignment strategy for nodes. `"left"` aligns nodes to the left, `"justify"` spreads them across the width.
-      
-      type: `"left" | "justify"`
-      
-      default: `"justify"`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="verticalAlign"
-    />
-    <ApiContent>
-      Vertical alignment strategy for nodes. `"top"` aligns to top, `"justify"` distributes vertically.
-      
-      type: `"justify" | "top"`
-      
-      default: `"justify"`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="backgroundVariant"
-    />
-    <ApiContent>
-      Background pattern variant to display behind the chart.
-      
-      type: `BackgroundVariant`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="defaultSelectedNode"
-    />
-    <ApiContent>
-      The node name selected on first render.
-      
-      type: `string | null`
-      
-      default: `null`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="onSelectionChange"
-    />
-    <ApiContent>
-      Callback function that is called when a node is selected or deselected. Receives an object with `dataKey` (node name) and `value` (node value calculated from links), or `null` when deselected. Fires when a node is clicked while `<Node />` has `isClickable` set.
-      
-      type: `(selection: { dataKey: string; value: number } | null) => void`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="isLoading"
-    />
-    <ApiContent>
-      Shows a loading placeholder animation when data is being fetched.
-      
-      type: `boolean`
-      
-      default: `false`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="sankeyProps"
-    />
-    <ApiContent>
-      Additional props to pass to the underlying Recharts Sankey component.
-      
-      type: `Omit<SankeyProps, "data">`
-      
-      Read the <Link href="https://recharts.github.io/en-US/api/Sankey/" _blank>Recharts Sankey documentation</Link> for available props.
-    </ApiContent>
-  </ApiReference>
-</ApiReferenceWrapper>
+<ApiTable>
+  <ApiRow name="data" type="SankeyData" required>
+    Sankey diagram data containing nodes and links. Nodes represent entities, and links represent flows between them. `SankeyData` is `{ nodes: SankeyNode[]; links: SankeyLink[] }`, where `SankeyNode = { name: string; icon?: ReactNode }` and `SankeyLink = { source: number; target: number; value: number }`.
+  </ApiRow>
+  <ApiRow name="config" type="ChartConfig" required>
+    Configuration object that defines the chart's nodes. Each key should match a node name from your data, with corresponding colors.
+  </ApiRow>
+  <ApiRow name="children" type="ReactNode" required>
+    The composed parts — `<Node />`, `<Link />`, and `<Tooltip />`.
+  </ApiRow>
+  <ApiRow name="className" type="string">
+    Additional CSS classes to apply to the chart container.
+  </ApiRow>
+  <ApiRow name="nodeWidth" type="number" default="10">
+    The width of each node in pixels.
+  </ApiRow>
+  <ApiRow name="nodePadding" type="number" default="10">
+    The vertical padding between nodes in pixels.
+  </ApiRow>
+  <ApiRow name="linkCurvature" type="number" default="0.5">
+    The curvature of links between nodes. Value between 0 (straight) and 1 (maximum curve).
+  </ApiRow>
+  <ApiRow name="iterations" type="number" default="32">
+    Number of iterations for the Sankey layout algorithm. Higher values produce better layouts but take more time.
+  </ApiRow>
+  <ApiRow name="sort" type="boolean" default="true">
+    Whether to sort nodes automatically for optimal layout.
+  </ApiRow>
+  <ApiRow name="align" type='"left" | "justify"' default='"justify"'>
+    Horizontal alignment strategy for nodes. `"left"` aligns nodes to the left, `"justify"` spreads them across the width.
+  </ApiRow>
+  <ApiRow name="verticalAlign" type='"justify" | "top"' default='"justify"'>
+    Vertical alignment strategy for nodes. `"top"` aligns to top, `"justify"` distributes vertically.
+  </ApiRow>
+  <ApiRow name="backgroundVariant" type="BackgroundVariant">
+    Background pattern variant to display behind the chart.
+  </ApiRow>
+  <ApiRow name="defaultSelectedNode" type="string | null" default="null">
+    The node name selected on first render.
+  </ApiRow>
+  <ApiRow name="onSelectionChange" type="(selection: { dataKey: string; value: number } | null) => void">
+    Callback function that is called when a node is selected or deselected. Receives an object with `dataKey` (node name) and `value` (node value calculated from links), or `null` when deselected. Fires when a node is clicked while `<Node />` has `isClickable` set.
+  </ApiRow>
+  <ApiRow name="isLoading" type="boolean" default="false">
+    Shows a loading placeholder animation when data is being fetched.
+  </ApiRow>
+  <ApiRow name="sankeyProps" type='Omit<SankeyProps, "data">'>
+    Additional props to pass to the underlying Recharts Sankey component. Read the <Link href="https://recharts.github.io/en-US/api/Sankey/" _blank>Recharts Sankey documentation</Link> for available props.
+  </ApiRow>
+</ApiTable>
 
 ### `<Node />`
 
 Configures how the sankey nodes render. Compose a `<NodeLabel />` inside it to
 show labels and values.
 
-<ApiReferenceWrapper>
-  <ApiReference>
-    <ApiHeader
-      propName="radius"
-    />
-    <ApiContent>
-      The corner radius of node rectangles in pixels. Set to 0 for square nodes.
-      
-      type: `number`
-      
-      default: `0`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="isClickable"
-    />
-    <ApiContent>
-      Enables interactive clicking on nodes to select/deselect them. Selected nodes become highlighted while unselected nodes and their links dim.
-      
-      type: `boolean`
-      
-      default: `false`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="glow"
-    />
-    <ApiContent>
-      Array of node names that should have a glowing effect applied. Creates a smooth outer glow around the specified nodes.
-      
-      type: `string[]`
-      
-      default: `[]`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="children"
-    />
-    <ApiContent>
-      Optional `<NodeLabel />` composition.
-      
-      type: `ReactNode`
-    </ApiContent>
-  </ApiReference>
-</ApiReferenceWrapper>
+<ApiTable>
+  <ApiRow name="radius" type="number" default="0">
+    The corner radius of node rectangles in pixels. Set to 0 for square nodes.
+  </ApiRow>
+  <ApiRow name="isClickable" type="boolean" default="false">
+    Enables interactive clicking on nodes to select/deselect them. Selected nodes become highlighted while unselected nodes and their links dim.
+  </ApiRow>
+  <ApiRow name="glow" type="string[]" default="[]">
+    Array of node names that should have a glowing effect applied. Creates a smooth outer glow around the specified nodes.
+  </ApiRow>
+  <ApiRow name="children" type="ReactNode">
+    Optional `<NodeLabel />` composition.
+  </ApiRow>
+</ApiTable>
 
 ### `<NodeLabel />`
 
 Declares labels for the `<Node />` it is composed inside.
 
-<ApiReferenceWrapper>
-  <ApiReference>
-    <ApiHeader
-      propName="position"
-    />
-    <ApiContent>
-      Position of node labels. `"inside"` shows labels inside nodes, `"outside"` shows labels beside nodes. When `<NodeLabel />` is not composed, no labels are shown.
-      
-      type: `"inside" | "outside"`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="showValues"
-    />
-    <ApiContent>
-      Whether to display the total flow value alongside each node label.
-      
-      type: `boolean`
-      
-      default: `false`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="valueFormatter"
-    />
-    <ApiContent>
-      Function to format node values when `showValues` is enabled.
-      
-      type: `(value: number) => string`
-      
-      default: `(value) => value.toLocaleString()`
-    </ApiContent>
-  </ApiReference>
-</ApiReferenceWrapper>
+<ApiTable>
+  <ApiRow name="position" type='"inside" | "outside"'>
+    Position of node labels. `"inside"` shows labels inside nodes, `"outside"` shows labels beside nodes. When `<NodeLabel />` is not composed, no labels are shown.
+  </ApiRow>
+  <ApiRow name="showValues" type="boolean" default="false">
+    Whether to display the total flow value alongside each node label.
+  </ApiRow>
+  <ApiRow name="valueFormatter" type="(value: number) => string" default="(value) => value.toLocaleString()">
+    Function to format node values when `showValues` is enabled.
+  </ApiRow>
+</ApiTable>
 
 ### `<Link />`
 
 Configures how the sankey links render.
 
-<ApiReferenceWrapper>
-  <ApiReference>
-    <ApiHeader
-      propName="variant"
-    />
-    <ApiContent>
-      The coloring strategy for links. `"gradient"` fades from source to target color, `"solid"` uses a single color, `"source"` uses the source node color, `"target"` uses the target node color.
-      
-      type: `"gradient" | "solid" | "source" | "target"`
-      
-      default: `"gradient"`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="verticalPadding"
-    />
-    <ApiContent>
-      Vertical padding where links connect to nodes in pixels. Useful when using node labels.
-      
-      type: `number`
-      
-      default: `0`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="glow"
-    />
-    <ApiContent>
-      Array of link indices that should have a glowing effect applied. Creates a smooth outer glow around the specified links.
-      
-      type: `number[]`
-      
-      default: `[]`
-    </ApiContent>
-  </ApiReference>
-</ApiReferenceWrapper>
+<ApiTable>
+  <ApiRow name="variant" type='"gradient" | "solid" | "source" | "target"' default='"gradient"'>
+    The coloring strategy for links. `"gradient"` fades from source to target color, `"solid"` uses a single color, `"source"` uses the source node color, `"target"` uses the target node color.
+  </ApiRow>
+  <ApiRow name="verticalPadding" type="number" default="0">
+    Vertical padding where links connect to nodes in pixels. Useful when using node labels.
+  </ApiRow>
+  <ApiRow name="glow" type="number[]" default="[]">
+    Array of link indices that should have a glowing effect applied. Creates a smooth outer glow around the specified links.
+  </ApiRow>
+</ApiTable>
 
 ### `<Tooltip />`
 
 The hover tooltip. Hidden automatically while the chart is loading.
 
-<ApiReferenceWrapper>
-  <ApiReference>
-    <ApiHeader
-      propName="variant"
-    />
-    <ApiContent>
-      Controls the visual style of the tooltip.
-      
-      type: `"default" | "frosted-glass"`
-      
-      default: `"default"`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="roundness"
-    />
-    <ApiContent>
-      Controls the border-radius of the tooltip.
-      
-      type: `"sm" | "md" | "lg" | "xl"`
-      
-      default: `"lg"`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="defaultIndex"
-    />
-    <ApiContent>
-      When set, the tooltip will be visible by default at the specified data point index.
-      
-      type: `number`
-    </ApiContent>
-  </ApiReference>
-</ApiReferenceWrapper>
+<ApiTable>
+  <ApiRow name="variant" type='"default" | "frosted-glass"' default='"default"'>
+    Controls the visual style of the tooltip.
+  </ApiRow>
+  <ApiRow name="roundness" type='"sm" | "md" | "lg" | "xl"' default='"lg"'>
+    Controls the border-radius of the tooltip.
+  </ApiRow>
+  <ApiRow name="defaultIndex" type="number">
+    When set, the tooltip will be visible by default at the specified data point index.
+  </ApiRow>
+</ApiTable>

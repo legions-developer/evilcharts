@@ -220,407 +220,130 @@ The chart is composed of several parts. The props below are grouped by the compo
 
 The root container. It owns the data, the shared selection state, and the loading skeleton. Everything visual is composed as its children.
 
-<ApiReferenceWrapper>
-  <ApiReference>
-    <ApiHeader
-      propName="data"
-      isRequired
-    />
-    <ApiContent>
-      Data used to display the chart. An array of objects where each object represents a sector.
-
-      type: `TData[]` where `TData extends Record<string, unknown>`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="dataKey"
-      isRequired
-    />
-    <ApiContent>
-      The key from your data objects to use for sector values (typically numeric values that determine sector size).
-
-      type: `keyof TData & string`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="nameKey"
-      isRequired
-    />
-    <ApiContent>
-      The key from your data objects to use for sector names (typically string values used for labels and legend).
-
-      type: `keyof TData & string`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="config"
-      isRequired
-    />
-    <ApiContent>
-      Configuration object that defines the chart's sectors. Each key should match a value from your `nameKey` field, with corresponding colors.
-
-      type: `ChartConfig`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="children"
-      isRequired
-    />
-    <ApiContent>
-      The composed chart parts — `<Legend />`, `<Tooltip />`, `<Background />`, and one `<Pie />`.
-
-      type: `ReactNode`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="className"
-    />
-    <ApiContent>
-      Additional CSS classes to apply to the chart container.
-
-      type: `string`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="defaultSelectedSector"
-    />
-    <ApiContent>
-      The sector name that should be selected by default.
-
-      type: `string | null`
-
-      default: `null`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="onSelectionChange"
-    />
-    <ApiContent>
-      Callback fired when a sector is selected or deselected — by clicking a clickable `<Pie />` sector or `<Legend />` entry. Receives an object with `dataKey` (sector name) and `value` (sector value), or `null` when deselected.
-
-      type: `(selection: { dataKey: string; value: number } | null) => void`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="isLoading"
-    />
-    <ApiContent>
-      Shows a loading placeholder animation when data is being fetched.
-
-      type: `boolean`
-
-      default: `false`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="chartProps"
-    />
-    <ApiContent>
-      Additional props forwarded to the underlying Recharts PieChart component.
-
-      type: `ComponentProps<typeof PieChart>`
-
-      Read the <Link href="https://recharts.github.io/en-US/api/PieChart/" _blank>Recharts PieChart documentation</Link> for available props.
-    </ApiContent>
-  </ApiReference>
-</ApiReferenceWrapper>
+<ApiTable>
+  <ApiRow name="data" type="TData[]" required>
+    Data used to display the chart. An array of objects where each object represents a sector (`TData extends Record<string, unknown>`).
+  </ApiRow>
+  <ApiRow name="dataKey" type="keyof TData & string" required>
+    The key from your data objects to use for sector values (typically numeric values that determine sector size).
+  </ApiRow>
+  <ApiRow name="nameKey" type="keyof TData & string" required>
+    The key from your data objects to use for sector names (typically string values used for labels and legend).
+  </ApiRow>
+  <ApiRow name="config" type="ChartConfig" required>
+    Configuration object that defines the chart's sectors. Each key should match a value from your `nameKey` field, with corresponding colors.
+  </ApiRow>
+  <ApiRow name="children" type="ReactNode" required>
+    The composed chart parts — `<Legend />`, `<Tooltip />`, `<Background />`, and one `<Pie />`.
+  </ApiRow>
+  <ApiRow name="className" type="string">
+    Additional CSS classes to apply to the chart container.
+  </ApiRow>
+  <ApiRow name="defaultSelectedSector" type="string | null" default="null">
+    The sector name that should be selected by default.
+  </ApiRow>
+  <ApiRow name="onSelectionChange" type="(selection: { dataKey: string; value: number } | null) => void">
+    Callback fired when a sector is selected or deselected — by clicking a clickable `<Pie />` sector or `<Legend />` entry. Receives an object with `dataKey` (sector name) and `value` (sector value), or `null` when deselected.
+  </ApiRow>
+  <ApiRow name="isLoading" type="boolean" default="false">
+    Shows a loading placeholder animation when data is being fetched.
+  </ApiRow>
+  <ApiRow name="chartProps" type="ComponentProps<typeof PieChart>">
+    Additional props forwarded to the underlying Recharts PieChart component. Read the <Link href="https://recharts.github.io/en-US/api/PieChart/" _blank>Recharts PieChart documentation</Link> for available props.
+  </ApiRow>
+</ApiTable>
 
 ### `<Pie />`
 
 The pie series. Self-contained — it generates its own radial color gradients and glow filters, so any number of pies can live on one page without style collisions. Compose a `<Label />` inside it to draw labels on each sector.
 
-<ApiReferenceWrapper>
-  <ApiReference>
-    <ApiHeader
-      propName="innerRadius"
-    />
-    <ApiContent>
-      The inner radius of the pie. Set to a value greater than 0 to create a donut chart. Can be a number (pixels) or percentage string.
-
-      type: `number | string`
-
-      default: `0`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="outerRadius"
-    />
-    <ApiContent>
-      The outer radius of the pie. Can be a number (pixels) or percentage string.
-
-      type: `number | string`
-
-      default: `"80%"`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="cornerRadius"
-    />
-    <ApiContent>
-      The border radius for the corners of each sector in pixels.
-
-      type: `number`
-
-      default: `0`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="paddingAngle"
-    />
-    <ApiContent>
-      The angle of padding between sectors in degrees. Use a negative value to create overlapping sectors.
-
-      type: `number`
-
-      default: `0`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="startAngle"
-    />
-    <ApiContent>
-      The starting angle of the pie in degrees (0 is 3 o'clock, 90 is 12 o'clock).
-
-      type: `number`
-
-      default: `0`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="endAngle"
-    />
-    <ApiContent>
-      The ending angle of the pie in degrees. Set to less than 360 for a partial pie.
-
-      type: `number`
-
-      default: `360`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="isClickable"
-    />
-    <ApiContent>
-      Enables interactive clicking on sectors to select/deselect them. When a sector is selected, the others dim.
-
-      type: `boolean`
-
-      default: `false`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="glowingSectors"
-    />
-    <ApiContent>
-      Array of sector names (values from your `nameKey` field) that should have a glowing effect applied. Creates a smooth outer glow around the specified sectors.
-
-      type: `string[]`
-
-      default: `[]`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="children"
-    />
-    <ApiContent>
-      Optional `<Label />` composition that draws labels on each sector.
-
-      type: `ReactNode`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="pieProps"
-    />
-    <ApiContent>
-      Escape hatch for raw props forwarded to the underlying Recharts Pie component.
-
-      type: `Omit<ComponentProps<typeof Pie>, "data" | "dataKey" | "nameKey">`
-
-      Read the <Link href="https://recharts.github.io/en-US/api/Pie/" _blank>Recharts Pie documentation</Link> for available props.
-    </ApiContent>
-  </ApiReference>
-</ApiReferenceWrapper>
+<ApiTable>
+  <ApiRow name="innerRadius" type="number | string" default="0">
+    The inner radius of the pie. Set to a value greater than 0 to create a donut chart. Can be a number (pixels) or percentage string.
+  </ApiRow>
+  <ApiRow name="outerRadius" type="number | string" default='"80%"'>
+    The outer radius of the pie. Can be a number (pixels) or percentage string.
+  </ApiRow>
+  <ApiRow name="cornerRadius" type="number" default="0">
+    The border radius for the corners of each sector in pixels.
+  </ApiRow>
+  <ApiRow name="paddingAngle" type="number" default="0">
+    The angle of padding between sectors in degrees. Use a negative value to create overlapping sectors.
+  </ApiRow>
+  <ApiRow name="startAngle" type="number" default="0">
+    The starting angle of the pie in degrees (0 is 3 o'clock, 90 is 12 o'clock).
+  </ApiRow>
+  <ApiRow name="endAngle" type="number" default="360">
+    The ending angle of the pie in degrees. Set to less than 360 for a partial pie.
+  </ApiRow>
+  <ApiRow name="isClickable" type="boolean" default="false">
+    Enables interactive clicking on sectors to select/deselect them. When a sector is selected, the others dim.
+  </ApiRow>
+  <ApiRow name="glowingSectors" type="string[]" default="[]">
+    Array of sector names (values from your `nameKey` field) that should have a glowing effect applied. Creates a smooth outer glow around the specified sectors.
+  </ApiRow>
+  <ApiRow name="children" type="ReactNode">
+    Optional `<Label />` composition that draws labels on each sector.
+  </ApiRow>
+  <ApiRow name="pieProps" type='Omit<ComponentProps<typeof Pie>, "data" | "dataKey" | "nameKey">'>
+    Escape hatch for raw props forwarded to the underlying Recharts Pie component. Read the <Link href="https://recharts.github.io/en-US/api/Pie/" _blank>Recharts Pie documentation</Link> for available props.
+  </ApiRow>
+</ApiTable>
 
 ### `<Label />`
 
 Per-sector labels composed inside a `<Pie />`. It renders nothing on its own — the parent `<Pie />` reads its props and draws a label list over the sectors.
 
-<ApiReferenceWrapper>
-  <ApiReference>
-    <ApiHeader
-      propName="dataKey"
-    />
-    <ApiContent>
-      The key from your data objects to use for label text. Falls back to the chart's `dataKey` when omitted.
-
-      type: `string`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="labelListProps"
-    />
-    <ApiContent>
-      Escape hatch for raw props forwarded to the underlying Recharts LabelList component.
-
-      type: `Omit<ComponentProps<typeof LabelList>, "dataKey">`
-
-      Read the <Link href="https://recharts.github.io/en-US/api/LabelList/" _blank>Recharts LabelList documentation</Link> for available props.
-    </ApiContent>
-  </ApiReference>
-</ApiReferenceWrapper>
+<ApiTable>
+  <ApiRow name="dataKey" type="string">
+    The key from your data objects to use for label text. Falls back to the chart's `dataKey` when omitted.
+  </ApiRow>
+  <ApiRow name="labelListProps" type='Omit<ComponentProps<typeof LabelList>, "dataKey">'>
+    Escape hatch for raw props forwarded to the underlying Recharts LabelList component. Read the <Link href="https://recharts.github.io/en-US/api/LabelList/" _blank>Recharts LabelList documentation</Link> for available props.
+  </ApiRow>
+</ApiTable>
 
 ### `<Tooltip />`
 
 The hover tooltip. Hidden automatically while the chart is loading.
 
-<ApiReferenceWrapper>
-  <ApiReference>
-    <ApiHeader
-      propName="variant"
-    />
-    <ApiContent>
-      The visual style of the tooltip surface.
-
-      type: `"default" | "frosted-glass"`
-
-      default: `"default"`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="roundness"
-    />
-    <ApiContent>
-      Controls the border-radius of the tooltip.
-
-      type: `"sm" | "md" | "lg" | "xl"`
-
-      default: `"lg"`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="defaultIndex"
-    />
-    <ApiContent>
-      When set, the tooltip is visible by default at the specified sector index.
-
-      type: `number`
-    </ApiContent>
-  </ApiReference>
-</ApiReferenceWrapper>
+<ApiTable>
+  <ApiRow name="variant" type='"default" | "frosted-glass"' default='"default"'>
+    The visual style of the tooltip surface.
+  </ApiRow>
+  <ApiRow name="roundness" type='"sm" | "md" | "lg" | "xl"' default='"lg"'>
+    Controls the border-radius of the tooltip.
+  </ApiRow>
+  <ApiRow name="defaultIndex" type="number">
+    When set, the tooltip is visible by default at the specified sector index.
+  </ApiRow>
+</ApiTable>
 
 ### `<Legend />`
 
 The sector legend. When `isClickable` is set, each entry toggles selection of its sector.
 
-<ApiReferenceWrapper>
-  <ApiReference>
-    <ApiHeader
-      propName="variant"
-    />
-    <ApiContent>
-      The visual style of the legend indicators.
-
-      type: `"square" | "circle" | "circle-outline" | "rounded-square" | "rounded-square-outline" | "vertical-bar" | "horizontal-bar"`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="align"
-    />
-    <ApiContent>
-      Horizontal placement of the legend.
-
-      type: `"left" | "center" | "right"`
-
-      default: `"center"`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="verticalAlign"
-    />
-    <ApiContent>
-      Vertical placement of the legend.
-
-      type: `"top" | "middle" | "bottom"`
-
-      default: `"bottom"`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="isClickable"
-    />
-    <ApiContent>
-      Lets each legend entry toggle selection of its sector.
-
-      type: `boolean`
-
-      default: `false`
-    </ApiContent>
-  </ApiReference>
-</ApiReferenceWrapper>
+<ApiTable>
+  <ApiRow name="variant" type='"square" | "circle" | "circle-outline" | "rounded-square" | "rounded-square-outline" | …'>
+    The visual style of the legend indicators.
+  </ApiRow>
+  <ApiRow name="align" type='"left" | "center" | "right"' default='"center"'>
+    Horizontal placement of the legend.
+  </ApiRow>
+  <ApiRow name="verticalAlign" type='"top" | "middle" | "bottom"' default='"bottom"'>
+    Vertical placement of the legend.
+  </ApiRow>
+  <ApiRow name="isClickable" type="boolean" default="false">
+    Lets each legend entry toggle selection of its sector.
+  </ApiRow>
+</ApiTable>
 
 ### `<Background />`
 
 An optional decorative pattern drawn behind the pie. Compose it before the `<Pie />` so it sits underneath the sectors.
 
-<ApiReferenceWrapper>
-  <ApiReference>
-    <ApiHeader
-      propName="variant"
-    />
-    <ApiContent>
-      The background pattern style.
-
-      type: `BackgroundVariant`
-
-      default: `"dots"`
-    </ApiContent>
-  </ApiReference>
-</ApiReferenceWrapper>
+<ApiTable>
+  <ApiRow name="variant" type="BackgroundVariant" default='"dots"'>
+    The background pattern style.
+  </ApiRow>
+</ApiTable>

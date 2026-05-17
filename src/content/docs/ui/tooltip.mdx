@@ -34,93 +34,26 @@ The frosted-glass variant applies a semi-transparent background with a backdrop 
 
 ## API Reference
 
-<ApiReferenceWrapper>
-  <ApiReference>
-    <ApiHeader
-      propName="tooltipVariant"
-    />
-    <ApiContent>
-      Controls the visual style of the tooltip.
-
-      type: `"default" | "frosted-glass"`
-
-      default: `"default"`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="tooltipRoundness"
-    />
-    <ApiContent>
-      Controls the border-radius of the tooltip.
-
-      type: `"sm" | "md" | "lg" | "xl"`
-
-      default: `"lg"`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="tooltipDefaultIndex"
-    />
-    <ApiContent>
-      When set, the tooltip will be visible by default at the specified data point index.
-
-      type: `number`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="hideTooltip"
-    />
-    <ApiContent>
-      When `true`, hides the tooltip entirely.
-
-      type: `boolean`
-
-      default: `false`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="indicator"
-    />
-    <ApiContent>
-      The style of the color indicator shown next to each tooltip item.
-
-      type: `"line" | "dot" | "dashed"`
-
-      default: `"dot"`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="hideLabel"
-    />
-    <ApiContent>
-      When `true`, hides the label (e.g. month name) at the top of the tooltip.
-
-      type: `boolean`
-
-      default: `false`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="hideIndicator"
-    />
-    <ApiContent>
-      When `true`, hides the color indicator dot/line next to each tooltip item.
-
-      type: `boolean`
-
-      default: `false`
-    </ApiContent>
-  </ApiReference>
-</ApiReferenceWrapper>
+<ApiTable>
+  <ApiRow name="tooltipVariant" type='"default" | "frosted-glass"' default='"default"'>
+    Controls the visual style of the tooltip.
+  </ApiRow>
+  <ApiRow name="tooltipRoundness" type='"sm" | "md" | "lg" | "xl"' default='"lg"'>
+    Controls the border-radius of the tooltip.
+  </ApiRow>
+  <ApiRow name="tooltipDefaultIndex" type="number">
+    When set, the tooltip will be visible by default at the specified data point index.
+  </ApiRow>
+  <ApiRow name="hideTooltip" type="boolean" default="false">
+    When `true`, hides the tooltip entirely.
+  </ApiRow>
+  <ApiRow name="indicator" type='"line" | "dot" | "dashed"' default='"dot"'>
+    The style of the color indicator shown next to each tooltip item.
+  </ApiRow>
+  <ApiRow name="hideLabel" type="boolean" default="false">
+    When `true`, hides the label (e.g. month name) at the top of the tooltip.
+  </ApiRow>
+  <ApiRow name="hideIndicator" type="boolean" default="false">
+    When `true`, hides the color indicator dot/line next to each tooltip item.
+  </ApiRow>
+</ApiTable>

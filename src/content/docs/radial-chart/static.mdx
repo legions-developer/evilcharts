@@ -191,358 +191,107 @@ The chart is composed of several parts. The props below are grouped by the compo
 
 The root container. It owns the data, the shared selection state, the loading skeleton, and the chart-wide arc shape. Everything visual is composed as its children.
 
-<ApiReferenceWrapper>
-  <ApiReference>
-    <ApiHeader
-      propName="data"
-      isRequired
-    />
-    <ApiContent>
-      Data used to display the chart. An array of objects where each object represents a radial bar.
-
-      type: `TData[]` where `TData extends Record<string, unknown>`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="config"
-      isRequired
-    />
-    <ApiContent>
-      Configuration object that defines the chart's bars. Each key should match a value from your `nameKey` field, with corresponding colors.
-
-      type: `ChartConfig`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="nameKey"
-      isRequired
-    />
-    <ApiContent>
-      The key from your data objects to use for bar names (typically string values used for labels and the legend).
-
-      type: `keyof TData & string`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="children"
-      isRequired
-    />
-    <ApiContent>
-      The composed chart parts — `<Legend />`, `<Tooltip />`, and a `<RadialBar />`.
-
-      type: `ReactNode`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="className"
-    />
-    <ApiContent>
-      Additional CSS classes to apply to the chart container.
-
-      type: `string`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="variant"
-    />
-    <ApiContent>
-      The arc shape of the radial chart. `"full"` displays a full circle (360°), `"semi"` displays a half circle (180°).
-
-      type: `"full" | "semi"`
-
-      default: `"full"`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="innerRadius"
-    />
-    <ApiContent>
-      The inner radius of the radial bars. Can be a number (pixels) or percentage string.
-
-      type: `number | string`
-
-      default: `"30%"`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="outerRadius"
-    />
-    <ApiContent>
-      The outer radius of the radial bars. Can be a number (pixels) or percentage string.
-
-      type: `number | string`
-
-      default: `"100%"`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="defaultSelectedDataKey"
-    />
-    <ApiContent>
-      The bar name that should be selected by default.
-
-      type: `string | null`
-
-      default: `null`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="onSelectionChange"
-    />
-    <ApiContent>
-      Callback fired when a bar is selected or deselected — by clicking a clickable `<RadialBar />` or `<Legend />` entry. Receives an object with `dataKey` (bar name) and `value` (bar value), or `null` when deselected.
-
-      type: `(selection: { dataKey: string; value: number } | null) => void`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="isLoading"
-    />
-    <ApiContent>
-      Shows a loading placeholder animation when data is being fetched.
-
-      type: `boolean`
-
-      default: `false`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="backgroundVariant"
-    />
-    <ApiContent>
-      Background pattern variant to display behind the chart.
-
-      type: `BackgroundVariant`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="chartProps"
-    />
-    <ApiContent>
-      Additional props forwarded to the underlying Recharts RadialBarChart component.
-
-      type: `ComponentProps<typeof RadialBarChart>`
-
-      Read the <Link href="https://recharts.github.io/en-US/api/RadialBarChart/" _blank>Recharts RadialBarChart documentation</Link> for available props.
-    </ApiContent>
-  </ApiReference>
-</ApiReferenceWrapper>
+<ApiTable>
+  <ApiRow name="data" type="TData[]" required>
+    Data used to display the chart. An array of objects where each object represents a radial bar (`TData extends Record<string, unknown>`).
+  </ApiRow>
+  <ApiRow name="config" type="ChartConfig" required>
+    Configuration object that defines the chart's bars. Each key should match a value from your `nameKey` field, with corresponding colors.
+  </ApiRow>
+  <ApiRow name="nameKey" type="keyof TData & string" required>
+    The key from your data objects to use for bar names (typically string values used for labels and the legend).
+  </ApiRow>
+  <ApiRow name="children" type="ReactNode" required>
+    The composed chart parts — `<Legend />`, `<Tooltip />`, and a `<RadialBar />`.
+  </ApiRow>
+  <ApiRow name="className" type="string">
+    Additional CSS classes to apply to the chart container.
+  </ApiRow>
+  <ApiRow name="variant" type='"full" | "semi"' default='"full"'>
+    The arc shape of the radial chart. `"full"` displays a full circle (360°), `"semi"` displays a half circle (180°).
+  </ApiRow>
+  <ApiRow name="innerRadius" type="number | string" default='"30%"'>
+    The inner radius of the radial bars. Can be a number (pixels) or percentage string.
+  </ApiRow>
+  <ApiRow name="outerRadius" type="number | string" default='"100%"'>
+    The outer radius of the radial bars. Can be a number (pixels) or percentage string.
+  </ApiRow>
+  <ApiRow name="defaultSelectedDataKey" type="string | null" default="null">
+    The bar name that should be selected by default.
+  </ApiRow>
+  <ApiRow name="onSelectionChange" type="(selection: { dataKey: string; value: number } | null) => void">
+    Callback fired when a bar is selected or deselected — by clicking a clickable `<RadialBar />` or `<Legend />` entry. Receives an object with `dataKey` (bar name) and `value` (bar value), or `null` when deselected.
+  </ApiRow>
+  <ApiRow name="isLoading" type="boolean" default="false">
+    Shows a loading placeholder animation when data is being fetched.
+  </ApiRow>
+  <ApiRow name="backgroundVariant" type="BackgroundVariant">
+    Background pattern variant to display behind the chart.
+  </ApiRow>
+  <ApiRow name="chartProps" type="ComponentProps<typeof RadialBarChart>">
+    Additional props forwarded to the underlying Recharts RadialBarChart component. Read the <Link href="https://recharts.github.io/en-US/api/RadialBarChart/" _blank>Recharts RadialBarChart documentation</Link> for available props.
+  </ApiRow>
+</ApiTable>
 
 ### `<RadialBar />`
 
 The radial bar series. Each data row becomes one bar. It generates its own glow filter definitions, so glow effects never collide with other charts on the page.
 
-<ApiReferenceWrapper>
-  <ApiReference>
-    <ApiHeader
-      propName="dataKey"
-      isRequired
-    />
-    <ApiContent>
-      The key from your data objects to use for bar values (typically numeric values that determine bar size).
-
-      type: `string`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="cornerRadius"
-    />
-    <ApiContent>
-      The border radius for the corners of each bar in pixels.
-
-      type: `number`
-
-      default: `5`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="barSize"
-    />
-    <ApiContent>
-      The thickness of each radial bar in pixels.
-
-      type: `number`
-
-      default: `14`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="showBackground"
-    />
-    <ApiContent>
-      Whether to render the background track (the unfilled portion of each bar).
-
-      type: `boolean`
-
-      default: `true`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="isClickable"
-    />
-    <ApiContent>
-      Enables interactive clicking on bars to select/deselect them. Unselected bars dim while a selection is active.
-
-      type: `boolean`
-
-      default: `false`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="glowingBars"
-    />
-    <ApiContent>
-      Array of bar names (values from your `nameKey` field) that should have a glowing effect applied. Creates a smooth outer glow around the specified bars.
-
-      type: `string[]`
-
-      default: `[]`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="radialBarProps"
-    />
-    <ApiContent>
-      Additional props forwarded to the underlying Recharts RadialBar component.
-
-      type: `Omit<ComponentProps<typeof RadialBar>, "dataKey">`
-
-      Read the <Link href="https://recharts.github.io/en-US/api/RadialBar/" _blank>Recharts RadialBar documentation</Link> for available props.
-    </ApiContent>
-  </ApiReference>
-</ApiReferenceWrapper>
+<ApiTable>
+  <ApiRow name="dataKey" type="string" required>
+    The key from your data objects to use for bar values (typically numeric values that determine bar size).
+  </ApiRow>
+  <ApiRow name="cornerRadius" type="number" default="5">
+    The border radius for the corners of each bar in pixels.
+  </ApiRow>
+  <ApiRow name="barSize" type="number" default="14">
+    The thickness of each radial bar in pixels.
+  </ApiRow>
+  <ApiRow name="showBackground" type="boolean" default="true">
+    Whether to render the background track (the unfilled portion of each bar).
+  </ApiRow>
+  <ApiRow name="isClickable" type="boolean" default="false">
+    Enables interactive clicking on bars to select/deselect them. Unselected bars dim while a selection is active.
+  </ApiRow>
+  <ApiRow name="glowingBars" type="string[]" default="[]">
+    Array of bar names (values from your `nameKey` field) that should have a glowing effect applied. Creates a smooth outer glow around the specified bars.
+  </ApiRow>
+  <ApiRow name="radialBarProps" type='Omit<ComponentProps<typeof RadialBar>, "dataKey">'>
+    Additional props forwarded to the underlying Recharts RadialBar component. Read the <Link href="https://recharts.github.io/en-US/api/RadialBar/" _blank>Recharts RadialBar documentation</Link> for available props.
+  </ApiRow>
+</ApiTable>
 
 ### `<Tooltip />`
 
 The hover tooltip. Labels each bar by its name. Render it to show a tooltip, omit it for none.
 
-<ApiReferenceWrapper>
-  <ApiReference>
-    <ApiHeader
-      propName="variant"
-    />
-    <ApiContent>
-      Controls the visual style of the tooltip.
-
-      type: `"default" | "frosted-glass"`
-
-      default: `"default"`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="roundness"
-    />
-    <ApiContent>
-      Controls the border-radius of the tooltip.
-
-      type: `"sm" | "md" | "lg" | "xl"`
-
-      default: `"lg"`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="defaultIndex"
-    />
-    <ApiContent>
-      When set, the tooltip will be visible by default at the specified data point index.
-
-      type: `number`
-    </ApiContent>
-  </ApiReference>
-</ApiReferenceWrapper>
+<ApiTable>
+  <ApiRow name="variant" type='"default" | "frosted-glass"' default='"default"'>
+    Controls the visual style of the tooltip.
+  </ApiRow>
+  <ApiRow name="roundness" type='"sm" | "md" | "lg" | "xl"' default='"lg"'>
+    Controls the border-radius of the tooltip.
+  </ApiRow>
+  <ApiRow name="defaultIndex" type="number">
+    When set, the tooltip will be visible by default at the specified data point index.
+  </ApiRow>
+</ApiTable>
 
 ### `<Legend />`
 
 The bar legend. When `isClickable` is set, each entry toggles selection of its bar. Render it to show a legend, omit it for none.
 
-<ApiReferenceWrapper>
-  <ApiReference>
-    <ApiHeader
-      propName="variant"
-    />
-    <ApiContent>
-      The visual style variant for the legend indicators.
-
-      type: `"square" | "circle" | "circle-outline" | "rounded-square" | "rounded-square-outline" | "vertical-bar" | "horizontal-bar"`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="align"
-    />
-    <ApiContent>
-      Horizontal placement of the legend.
-
-      type: `"left" | "center" | "right"`
-
-      default: `"center"`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="verticalAlign"
-    />
-    <ApiContent>
-      Vertical placement of the legend.
-
-      type: `"top" | "middle" | "bottom"`
-
-      default: `"bottom"`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="isClickable"
-    />
-    <ApiContent>
-      When enabled, each legend entry toggles selection of its bar, driving the shared selection state read by `<RadialBar />`.
-
-      type: `boolean`
-
-      default: `false`
-    </ApiContent>
-  </ApiReference>
-</ApiReferenceWrapper>
+<ApiTable>
+  <ApiRow name="variant" type='"square" | "circle" | "circle-outline" | "rounded-square" | "rounded-square-outline" | …'>
+    The visual style variant for the legend indicators.
+  </ApiRow>
+  <ApiRow name="align" type='"left" | "center" | "right"' default='"center"'>
+    Horizontal placement of the legend.
+  </ApiRow>
+  <ApiRow name="verticalAlign" type='"top" | "middle" | "bottom"' default='"bottom"'>
+    Vertical placement of the legend.
+  </ApiRow>
+  <ApiRow name="isClickable" type="boolean" default="false">
+    When enabled, each legend entry toggles selection of its bar, driving the shared selection state read by `<RadialBar />`.
+  </ApiRow>
+</ApiTable>

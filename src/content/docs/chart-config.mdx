@@ -161,37 +161,14 @@ Pass multiple colors per theme to create gradient fills. Each color in the array
 
 ## API Reference
 
-<ApiReferenceWrapper>
-  <ApiReference>
-    <ApiHeader
-      propName="label"
-    />
-    <ApiContent>
-      A human-readable name for the data series. Displayed in tooltips and legends.
-
-      type: `React.ReactNode`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="colors"
-    />
-    <ApiContent>
-      Theme-aware color configuration. Must include at least one theme key (`light` or `dark`). Each key maps to an array of CSS color strings. A single color gives a solid fill; multiple colors create a gradient.
-
-      type: `{ light?: string[]; dark?: string[] }`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="icon"
-    />
-    <ApiContent>
-      An optional React component rendered in place of the default color indicator in tooltips and legends.
-
-      type: `React.ComponentType`
-    </ApiContent>
-  </ApiReference>
-</ApiReferenceWrapper>
+<ApiTable>
+  <ApiRow name="label" type="React.ReactNode">
+    A human-readable name for the data series. Displayed in tooltips and legends.
+  </ApiRow>
+  <ApiRow name="colors" type="{ light?: string[]; dark?: string[] }">
+    Theme-aware color configuration. Must include at least one theme key (`light` or `dark`). Each key maps to an array of CSS color strings. A single color gives a solid fill; multiple colors create a gradient.
+  </ApiRow>
+  <ApiRow name="icon" type="React.ComponentType">
+    An optional React component rendered in place of the default color indicator in tooltips and legends.
+  </ApiRow>
+</ApiTable>

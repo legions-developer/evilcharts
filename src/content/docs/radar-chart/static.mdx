@@ -219,416 +219,144 @@ The radar chart is composed of a root container and a set of composible parts. E
 
 The root container. Owns the data, the shared context, and the loading skeleton. All other parts must be rendered as its children.
 
-<ApiReferenceWrapper>
-  <ApiReference>
-    <ApiHeader
-      propName="data"
-      isRequired
-    />
-    <ApiContent>
-      Data used to display the chart. An array of objects where each object represents a data point on the radar.
-
-      type: `TData[]` where `TData extends Record<string, unknown>`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="config"
-      isRequired
-    />
-    <ApiContent>
-      Configuration object that defines the chart's radar series. Each key should match a numeric data key in your data array, with corresponding colors and labels.
-
-      type: `Record<string, ChartConfig[string]>`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="children"
-      isRequired
-    />
-    <ApiContent>
-      The composed parts of the chart — `<PolarGrid />`, `<PolarAngleAxis />`, `<PolarRadiusAxis />`, `<Tooltip />`, `<Legend />`, and one or more `<Radar />` series.
-
-      type: `ReactNode`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="className"
-    />
-    <ApiContent>
-      Additional CSS classes to apply to the chart container.
-
-      type: `string`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="backgroundVariant"
-    />
-    <ApiContent>
-      Background pattern variant to display behind the chart.
-
-      type: `BackgroundVariant`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="defaultSelectedDataKey"
-    />
-    <ApiContent>
-      The radar series selected on first render.
-
-      type: `string | null`
-
-      default: `null`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="onSelectionChange"
-    />
-    <ApiContent>
-      Callback fired when a radar is selected or deselected. Receives the selected data key, or `null` when deselected.
-
-      type: `(selectedDataKey: string | null) => void`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="isLoading"
-    />
-    <ApiContent>
-      Shows a loading animation with animated data when data is being fetched.
-
-      type: `boolean`
-
-      default: `false`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="loadingPoints"
-    />
-    <ApiContent>
-      Number of points rendered in the loading skeleton radar.
-
-      type: `number`
-
-      default: `6`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="chartProps"
-    />
-    <ApiContent>
-      Additional props to pass to the underlying Recharts RadarChart component.
-
-      type: `ComponentProps<typeof RadarChart>`
-
-      Read the <Link href="https://recharts.github.io/en-US/api/RadarChart/" _blank>Recharts RadarChart documentation</Link> for available props.
-    </ApiContent>
-  </ApiReference>
-</ApiReferenceWrapper>
+<ApiTable>
+  <ApiRow name="data" type="TData[]" required>
+    Data used to display the chart. An array of objects where each object represents a data point on the radar (`TData extends Record<string, unknown>`).
+  </ApiRow>
+  <ApiRow name="config" type="Record<string, ChartConfig[string]>" required>
+    Configuration object that defines the chart's radar series. Each key should match a numeric data key in your data array, with corresponding colors and labels.
+  </ApiRow>
+  <ApiRow name="children" type="ReactNode" required>
+    The composed parts of the chart — `<PolarGrid />`, `<PolarAngleAxis />`, `<PolarRadiusAxis />`, `<Tooltip />`, `<Legend />`, and one or more `<Radar />` series.
+  </ApiRow>
+  <ApiRow name="className" type="string">
+    Additional CSS classes to apply to the chart container.
+  </ApiRow>
+  <ApiRow name="backgroundVariant" type="BackgroundVariant">
+    Background pattern variant to display behind the chart.
+  </ApiRow>
+  <ApiRow name="defaultSelectedDataKey" type="string | null" default="null">
+    The radar series selected on first render.
+  </ApiRow>
+  <ApiRow name="onSelectionChange" type="(selectedDataKey: string | null) => void">
+    Callback fired when a radar is selected or deselected. Receives the selected data key, or `null` when deselected.
+  </ApiRow>
+  <ApiRow name="isLoading" type="boolean" default="false">
+    Shows a loading animation with animated data when data is being fetched.
+  </ApiRow>
+  <ApiRow name="loadingPoints" type="number" default="6">
+    Number of points rendered in the loading skeleton radar.
+  </ApiRow>
+  <ApiRow name="chartProps" type="ComponentProps<typeof RadarChart>">
+    Additional props to pass to the underlying Recharts RadarChart component. Read the <Link href="https://recharts.github.io/en-US/api/RadarChart/" _blank>Recharts RadarChart documentation</Link> for available props.
+  </ApiRow>
+</ApiTable>
 
 ### `<Radar />`
 
 A single radar series. Each `<Radar />` is self-contained — it generates its own gradients and glow filter under a unique id, so multiple radars never collide on styles. Compose `<Dot />` and `<ActiveDot />` inside it to add point markers.
 
-<ApiReferenceWrapper>
-  <ApiReference>
-    <ApiHeader
-      propName="dataKey"
-      isRequired
-    />
-    <ApiContent>
-      The series key to render. Must exist on both the data and the config.
-
-      type: `string`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="variant"
-    />
-    <ApiContent>
-      The visual style for this radar. `"filled"` shows a filled area, `"lines"` shows only the outline.
-
-      type: `"filled" | "lines"`
-
-      default: `"filled"`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="fillOpacity"
-    />
-    <ApiContent>
-      The opacity of the filled area when using `variant="filled"`.
-
-      type: `number`
-
-      default: `0.3`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="isGlowing"
-    />
-    <ApiContent>
-      Adds a soft outer glow around this radar. Each radar controls its own glow independently.
-
-      type: `boolean`
-
-      default: `false`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="isClickable"
-    />
-    <ApiContent>
-      Enables interactive clicking on this radar to select/deselect it. When a radar is selected, unselected radars become semi-transparent.
-
-      type: `boolean`
-
-      default: `false`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="children"
-    />
-    <ApiContent>
-      Optional `<Dot />` and `<ActiveDot />` composition for point markers on this radar.
-
-      type: `ReactNode`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="radarProps"
-    />
-    <ApiContent>
-      Additional props to pass to the underlying Recharts Radar component.
-
-      type: `Omit<ComponentProps<typeof Radar>, "dataKey">`
-
-      Read the <Link href="https://recharts.github.io/en-US/api/Radar/" _blank>Recharts Radar documentation</Link> for available props.
-    </ApiContent>
-  </ApiReference>
-</ApiReferenceWrapper>
+<ApiTable>
+  <ApiRow name="dataKey" type="string" required>
+    The series key to render. Must exist on both the data and the config.
+  </ApiRow>
+  <ApiRow name="variant" type='"filled" | "lines"' default='"filled"'>
+    The visual style for this radar. `"filled"` shows a filled area, `"lines"` shows only the outline.
+  </ApiRow>
+  <ApiRow name="fillOpacity" type="number" default="0.3">
+    The opacity of the filled area when using `variant="filled"`.
+  </ApiRow>
+  <ApiRow name="isGlowing" type="boolean" default="false">
+    Adds a soft outer glow around this radar. Each radar controls its own glow independently.
+  </ApiRow>
+  <ApiRow name="isClickable" type="boolean" default="false">
+    Enables interactive clicking on this radar to select/deselect it. When a radar is selected, unselected radars become semi-transparent.
+  </ApiRow>
+  <ApiRow name="children" type="ReactNode">
+    Optional `<Dot />` and `<ActiveDot />` composition for point markers on this radar.
+  </ApiRow>
+  <ApiRow name="radarProps" type='Omit<ComponentProps<typeof Radar>, "dataKey">'>
+    Additional props to pass to the underlying Recharts Radar component. Read the <Link href="https://recharts.github.io/en-US/api/Radar/" _blank>Recharts Radar documentation</Link> for available props.
+  </ApiRow>
+</ApiTable>
 
 ### `<Dot />` / `<ActiveDot />`
 
 Configuration slots composed inside a `<Radar />`. `<Dot />` styles the resting point markers; `<ActiveDot />` styles the hovered/active marker. They render nothing on their own.
 
-<ApiReferenceWrapper>
-  <ApiReference>
-    <ApiHeader
-      propName="variant"
-    />
-    <ApiContent>
-      The visual style for the point marker.
-
-      type: `"default" | "border" | "colored-border"`
-    </ApiContent>
-  </ApiReference>
-</ApiReferenceWrapper>
+<ApiTable>
+  <ApiRow name="variant" type='"default" | "border" | "colored-border"'>
+    The visual style for the point marker.
+  </ApiRow>
+</ApiTable>
 
 ### `<PolarGrid />`
 
 The polar grid lines. Defaults to a dashed polygon grid and forwards every Recharts PolarGrid prop.
 
-<ApiReferenceWrapper>
-  <ApiReference>
-    <ApiHeader
-      propName="gridType"
-    />
-    <ApiContent>
-      The shape of the grid lines. `"polygon"` creates angular grid lines, `"circle"` creates circular grid lines.
-
-      type: `"polygon" | "circle"`
-
-      default: `"polygon"`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="...props"
-    />
-    <ApiContent>
-      All other props are forwarded to the underlying Recharts PolarGrid component.
-
-      type: `ComponentProps<typeof PolarGrid>`
-
-      Read the <Link href="https://recharts.github.io/en-US/api/PolarGrid/" _blank>Recharts PolarGrid documentation</Link> for available props.
-    </ApiContent>
-  </ApiReference>
-</ApiReferenceWrapper>
+<ApiTable>
+  <ApiRow name="gridType" type='"polygon" | "circle"' default='"polygon"'>
+    The shape of the grid lines. `"polygon"` creates angular grid lines, `"circle"` creates circular grid lines.
+  </ApiRow>
+  <ApiRow name="...props" type="ComponentProps<typeof PolarGrid>">
+    All other props are forwarded to the underlying Recharts PolarGrid component. Read the <Link href="https://recharts.github.io/en-US/api/PolarGrid/" _blank>Recharts PolarGrid documentation</Link> for available props.
+  </ApiRow>
+</ApiTable>
 
 ### `<PolarAngleAxis />`
 
 The angular category axis — the labels around the chart's perimeter. Hidden automatically while the chart is loading.
 
-<ApiReferenceWrapper>
-  <ApiReference>
-    <ApiHeader
-      propName="dataKey"
-    />
-    <ApiContent>
-      The key from your data objects to use for the angle axis labels (e.g., categories, skills, months).
-
-      type: `string`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="...props"
-    />
-    <ApiContent>
-      All other props are forwarded to the underlying Recharts PolarAngleAxis component.
-
-      type: `ComponentProps<typeof PolarAngleAxis>`
-
-      Read the <Link href="https://recharts.github.io/en-US/api/PolarAngleAxis/" _blank>Recharts PolarAngleAxis documentation</Link> for available props.
-    </ApiContent>
-  </ApiReference>
-</ApiReferenceWrapper>
+<ApiTable>
+  <ApiRow name="dataKey" type="string">
+    The key from your data objects to use for the angle axis labels (e.g., categories, skills, months).
+  </ApiRow>
+  <ApiRow name="...props" type="ComponentProps<typeof PolarAngleAxis>">
+    All other props are forwarded to the underlying Recharts PolarAngleAxis component. Read the <Link href="https://recharts.github.io/en-US/api/PolarAngleAxis/" _blank>Recharts PolarAngleAxis documentation</Link> for available props.
+  </ApiRow>
+</ApiTable>
 
 ### `<PolarRadiusAxis />`
 
 The radial value axis — the scale running from the center outward. Hidden automatically while the chart is loading.
 
-<ApiReferenceWrapper>
-  <ApiReference>
-    <ApiHeader
-      propName="...props"
-    />
-    <ApiContent>
-      All props are forwarded to the underlying Recharts PolarRadiusAxis component.
-
-      type: `ComponentProps<typeof PolarRadiusAxis>`
-
-      Read the <Link href="https://recharts.github.io/en-US/api/PolarRadiusAxis/" _blank>Recharts PolarRadiusAxis documentation</Link> for available props.
-    </ApiContent>
-  </ApiReference>
-</ApiReferenceWrapper>
+<ApiTable>
+  <ApiRow name="...props" type="ComponentProps<typeof PolarRadiusAxis>">
+    All props are forwarded to the underlying Recharts PolarRadiusAxis component. Read the <Link href="https://recharts.github.io/en-US/api/PolarRadiusAxis/" _blank>Recharts PolarRadiusAxis documentation</Link> for available props.
+  </ApiRow>
+</ApiTable>
 
 ### `<Tooltip />`
 
 The hover tooltip. Reads the chart's selection so its content dims unselected series. Hidden automatically while the chart is loading.
 
-<ApiReferenceWrapper>
-  <ApiReference>
-    <ApiHeader
-      propName="variant"
-    />
-    <ApiContent>
-      Controls the visual style of the tooltip.
-
-      type: `"default" | "frosted-glass"`
-
-      default: `"default"`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="roundness"
-    />
-    <ApiContent>
-      Controls the border-radius of the tooltip.
-
-      type: `"sm" | "md" | "lg" | "xl"`
-
-      default: `"lg"`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="defaultIndex"
-    />
-    <ApiContent>
-      When set, the tooltip will be visible by default at the specified data point index.
-
-      type: `number`
-    </ApiContent>
-  </ApiReference>
-</ApiReferenceWrapper>
+<ApiTable>
+  <ApiRow name="variant" type='"default" | "frosted-glass"' default='"default"'>
+    Controls the visual style of the tooltip.
+  </ApiRow>
+  <ApiRow name="roundness" type='"sm" | "md" | "lg" | "xl"' default='"lg"'>
+    Controls the border-radius of the tooltip.
+  </ApiRow>
+  <ApiRow name="defaultIndex" type="number">
+    When set, the tooltip will be visible by default at the specified data point index.
+  </ApiRow>
+</ApiTable>
 
 ### `<Legend />`
 
 The series legend. When `isClickable` is set, each entry toggles selection of its series. Hidden automatically while the chart is loading.
 
-<ApiReferenceWrapper>
-  <ApiReference>
-    <ApiHeader
-      propName="variant"
-    />
-    <ApiContent>
-      The visual style variant for the legend indicators.
-
-      type: `"square" | "circle" | "circle-outline" | "rounded-square" | "rounded-square-outline" | "vertical-bar" | "horizontal-bar"`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="align"
-    />
-    <ApiContent>
-      Horizontal placement of the legend.
-
-      type: `"left" | "center" | "right"`
-
-      default: `"center"`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="verticalAlign"
-    />
-    <ApiContent>
-      Vertical placement of the legend.
-
-      type: `"top" | "middle" | "bottom"`
-
-      default: `"bottom"`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="isClickable"
-    />
-    <ApiContent>
-      Lets each legend entry toggle selection of its series, driving the shared selection state read by every `<Radar />`.
-
-      type: `boolean`
-
-      default: `false`
-    </ApiContent>
-  </ApiReference>
-</ApiReferenceWrapper>
+<ApiTable>
+  <ApiRow name="variant" type='"square" | "circle" | "circle-outline" | "rounded-square" | "rounded-square-outline" | …'>
+    The visual style variant for the legend indicators.
+  </ApiRow>
+  <ApiRow name="align" type='"left" | "center" | "right"' default='"center"'>
+    Horizontal placement of the legend.
+  </ApiRow>
+  <ApiRow name="verticalAlign" type='"top" | "middle" | "bottom"' default='"bottom"'>
+    Vertical placement of the legend.
+  </ApiRow>
+  <ApiRow name="isClickable" type="boolean" default="false">
+    Lets each legend entry toggle selection of its series, driving the shared selection state read by every `<Radar />`.
+  </ApiRow>
+</ApiTable>
