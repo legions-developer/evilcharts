@@ -1,5 +1,6 @@
 "use client";
 
+import { RotateCw } from "lucide-react";
 import * as React from "react";
 
 import { Tabs, TabsList, TabsPanel, TabsTab } from "@/components/ui/tabs";
@@ -27,6 +28,7 @@ export function ComponentPreviewTabs({
 }) {
   const isMobile = useBreakpoint(768);
   const displayTitle = title?.includes("=") && isMobile ? title.split("=")[0] : title;
+  const [reloadKey, setReloadKey] = React.useState(0);
 
   return (
     <div className={cn("group relative mt-4 mb-12", className)} {...props}>
@@ -42,16 +44,29 @@ export function ComponentPreviewTabs({
               {getIconForLanguageExtension("component")}{" "}
               <span className="line-clamp-1">{displayTitle}</span>
             </span>
-            {!hideCode && (
-              <TabsList variant="underline">
-                <TabsTab className="h-5! px-1.5 hover:bg-transparent!" value="code">
-                  Code
-                </TabsTab>
-                <TabsTab className="h-5! px-1.5 hover:bg-transparent!" value="preview">
-                  Preview
-                </TabsTab>
-              </TabsList>
-            )}
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => setReloadKey((key) => key + 1)}
+                aria-label="Reload preview"
+                className="text-muted-foreground hover:text-foreground flex size-3 shrink-0 translate-x-1 cursor-pointer items-center justify-center opacity-0 transition-all duration-200 ease-out group-hover:translate-x-0 group-hover:opacity-100"
+              >
+                <RotateCw
+                  className="size-4! transition-transform duration-500 ease-out"
+                  style={{ transform: `rotate(${reloadKey * 360}deg)` }}
+                />
+              </button>
+              {!hideCode && (
+                <TabsList variant="underline">
+                  <TabsTab className="h-5! px-1.5 hover:bg-transparent!" value="code">
+                    Code
+                  </TabsTab>
+                  <TabsTab className="h-5! px-1.5 hover:bg-transparent!" value="preview">
+                    Preview
+                  </TabsTab>
+                </TabsList>
+              )}
+            </div>
           </div>
 
           <div className="bg-background overflow-hidden rounded-[5px] border">
@@ -66,7 +81,7 @@ export function ComponentPreviewTabs({
                   <LazyMount
                     fallback={<div className="flex size-full items-center justify-center" />}
                   >
-                    {component}
+                    <React.Fragment key={reloadKey}>{component}</React.Fragment>
                   </LazyMount>
                 </div>
               </div>
