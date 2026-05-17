@@ -100,7 +100,7 @@ export function DocsTableOfContents({
   }
 
   return (
-    <div className={cn("flex flex-col px-4 pt-0 text-sm", className)}>
+    <div className={cn("flex flex-col px-4 pt-0 text-sm select-none", className)}>
       <div className="flex h-6 flex-row items-center gap-[5px]">
         <HugeiconsIcon size="14" className="text-muted-foreground" icon={Menu02Icon} />
         <p className="text-muted-foreground/75 bg-background sticky top-0 text-xs">On This Page</p>
