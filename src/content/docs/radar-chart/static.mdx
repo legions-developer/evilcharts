@@ -215,7 +215,7 @@ Below are some examples of the radar chart with different configurations.
 
 The radar chart is composed of a root container and a set of composible parts. Each part is documented in its own section below.
 
-### `<EvilRadarChart />`
+<ApiHeading>EvilRadarChart</ApiHeading>
 
 The root container. Owns the data, the shared context, and the loading skeleton. All other parts must be rendered as its children.
 
@@ -252,7 +252,7 @@ The root container. Owns the data, the shared context, and the loading skeleton.
   </ApiRow>
 </ApiTable>
 
-### `<Radar />`
+<ApiHeading>Radar</ApiHeading>
 
 A single radar series. Each `<Radar />` is self-contained — it generates its own gradients and glow filter under a unique id, so multiple radars never collide on styles. Compose `<Dot />` and `<ActiveDot />` inside it to add point markers.
 
@@ -280,7 +280,7 @@ A single radar series. Each `<Radar />` is self-contained — it generates its o
   </ApiRow>
 </ApiTable>
 
-### `<Dot />` / `<ActiveDot />`
+<ApiHeading>Dot / ActiveDot</ApiHeading>
 
 Configuration slots composed inside a `<Radar />`. `<Dot />` styles the resting point markers; `<ActiveDot />` styles the hovered/active marker. They render nothing on their own.
 
@@ -290,7 +290,7 @@ Configuration slots composed inside a `<Radar />`. `<Dot />` styles the resting 
   </ApiRow>
 </ApiTable>
 
-### `<PolarGrid />`
+<ApiHeading>PolarGrid</ApiHeading>
 
 The polar grid lines. Defaults to a dashed polygon grid and forwards every Recharts PolarGrid prop.
 
@@ -303,7 +303,7 @@ The polar grid lines. Defaults to a dashed polygon grid and forwards every Recha
   </ApiRow>
 </ApiTable>
 
-### `<PolarAngleAxis />`
+<ApiHeading>PolarAngleAxis</ApiHeading>
 
 The angular category axis — the labels around the chart's perimeter. Hidden automatically while the chart is loading.
 
@@ -316,7 +316,7 @@ The angular category axis — the labels around the chart's perimeter. Hidden au
   </ApiRow>
 </ApiTable>
 
-### `<PolarRadiusAxis />`
+<ApiHeading>PolarRadiusAxis</ApiHeading>
 
 The radial value axis — the scale running from the center outward. Hidden automatically while the chart is loading.
 
@@ -326,7 +326,7 @@ The radial value axis — the scale running from the center outward. Hidden auto
   </ApiRow>
 </ApiTable>
 
-### `<Tooltip />`
+<ApiHeading>Tooltip</ApiHeading>
 
 The hover tooltip. Reads the chart's selection so its content dims unselected series. Hidden automatically while the chart is loading.
 
@@ -342,7 +342,7 @@ The hover tooltip. Reads the chart's selection so its content dims unselected se
   </ApiRow>
 </ApiTable>
 
-### `<Legend />`
+<ApiHeading>Legend</ApiHeading>
 
 The series legend. When `isClickable` is set, each entry toggles selection of its series. Hidden automatically while the chart is loading.
 

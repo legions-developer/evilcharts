@@ -25,8 +25,7 @@ export const MDXLink = ({
       target={_blank ? "_blank" : "_self"}
       className={cn(className, "hover:text-primary group")}
     >
-      <span className="relative">
-        <span className="bg-primary/50 group-hover:bg-primary absolute -bottom-[0.5px] h-px w-full rounded transition-all duration-100 group-hover:w-full"></span>
+      <span className="decoration-primary/50 group-hover:decoration-primary underline decoration-1 underline-offset-4 transition-colors duration-100">
         {children}
       </span>
       <LinkIcon className="group-hover:text-primary text-muted-foreground mb-0.5 ml-0.5 inline size-2.5 duration-100" />

@@ -197,7 +197,7 @@ Below are some examples of the line chart with different `variants`. where you c
 
 The chart is composed of several parts. The props below are grouped by the component they belong to.
 
-### `<EvilLineChart />`
+<ApiHeading>EvilLineChart</ApiHeading>
 
 The root container. It owns the data, the shared selection state, the loading skeleton, and the optional brush. Everything visual is composed as its children.
 
@@ -249,7 +249,7 @@ The root container. It owns the data, the shared selection state, the loading sk
   </ApiRow>
 </ApiTable>
 
-### `<Line />`
+<ApiHeading>Line</ApiHeading>
 
 A single line series. Each `<Line />` is self-contained and generates its own gradient and glow definitions, so a chart can hold any number of lines — each with its own stroke, glow, and clickability.
 
@@ -283,7 +283,7 @@ A single line series. Each `<Line />` is self-contained and generates its own gr
   </ApiRow>
 </ApiTable>
 
-### `<Dot />` and `<ActiveDot />`
+<ApiHeading>Dot and ActiveDot</ApiHeading>
 
 Point markers composed inside a `<Line />`. `<Dot />` is the resting marker; `<ActiveDot />` is the hovered marker. They render nothing on their own — the parent `<Line />` reads their `variant`.
 
@@ -293,7 +293,7 @@ Point markers composed inside a `<Line />`. `<Dot />` is the resting marker; `<A
   </ApiRow>
 </ApiTable>
 
-### `<XAxis />` and `<YAxis />`
+<ApiHeading>XAxis and YAxis</ApiHeading>
 
 The category and value axes. Both ship with the chart's flat default styling and forward every Recharts axis prop, so `dataKey`, `tickFormatter`, `tickMargin`, etc. pass straight through. They are hidden automatically while the chart is loading.
 
@@ -306,7 +306,7 @@ The category and value axes. Both ship with the chart's flat default styling and
   </ApiRow>
 </ApiTable>
 
-### `<Grid />`
+<ApiHeading>Grid</ApiHeading>
 
 The background grid lines. Defaults to horizontal-only dashed lines and forwards every Recharts CartesianGrid prop.
 
@@ -316,7 +316,7 @@ The background grid lines. Defaults to horizontal-only dashed lines and forwards
   </ApiRow>
 </ApiTable>
 
-### `<Tooltip />`
+<ApiHeading>Tooltip</ApiHeading>
 
 The hover tooltip. It reads the chart's selection state so its content dims unselected series.
 
@@ -335,7 +335,7 @@ The hover tooltip. It reads the chart's selection state so its content dims unse
   </ApiRow>
 </ApiTable>
 
-### `<Legend />`
+<ApiHeading>Legend</ApiHeading>
 
 The series legend. When the chart is clickable, each entry toggles selection of its series.
 

@@ -222,7 +222,7 @@ Below are some examples of the composed chart with different `variants`. You can
 
 The chart is composed of several parts. The props below are grouped by the component they belong to.
 
-### `<EvilComposedChart />`
+<ApiHeading>EvilComposedChart</ApiHeading>
 
 The root container. It owns the data, the shared selection state, the loading skeleton, and the optional brush. Everything visual is composed as its children.
 
@@ -280,7 +280,7 @@ The root container. It owns the data, the shared selection state, the loading sk
   </ApiRow>
 </ApiTable>
 
-### `<Bar />`
+<ApiHeading>Bar</ApiHeading>
 
 A single bar series. Each `<Bar />` is self-contained and generates its own gradient/pattern definitions, so a chart can hold any number of bars — each with its own variant, glow, and clickability.
 
@@ -308,7 +308,7 @@ A single bar series. Each `<Bar />` is self-contained and generates its own grad
   </ApiRow>
 </ApiTable>
 
-### `<Line />`
+<ApiHeading>Line</ApiHeading>
 
 A single line series. Each `<Line />` is self-contained and generates its own color gradient and glow filter, so a chart can hold any number of lines — each with its own stroke, curve, glow, and clickability.
 
@@ -339,7 +339,7 @@ A single line series. Each `<Line />` is self-contained and generates its own co
   </ApiRow>
 </ApiTable>
 
-### `<Dot />` and `<ActiveDot />`
+<ApiHeading>Dot and ActiveDot</ApiHeading>
 
 Point markers composed inside a `<Line />`. `<Dot />` is the resting marker; `<ActiveDot />` is the hovered marker. They render nothing on their own — the parent `<Line />` reads their `variant`.
 
@@ -349,7 +349,7 @@ Point markers composed inside a `<Line />`. `<Dot />` is the resting marker; `<A
   </ApiRow>
 </ApiTable>
 
-### `<XAxis />` and `<YAxis />`
+<ApiHeading>XAxis and YAxis</ApiHeading>
 
 The category and value axes. Both ship with the chart's flat default styling and forward every Recharts axis prop, so `dataKey`, `tickFormatter`, `tickMargin`, etc. pass straight through. They are hidden automatically while the chart is loading.
 
@@ -362,7 +362,7 @@ The category and value axes. Both ship with the chart's flat default styling and
   </ApiRow>
 </ApiTable>
 
-### `<Grid />`
+<ApiHeading>Grid</ApiHeading>
 
 The background grid lines. Defaults to horizontal-only dashed lines and forwards every Recharts CartesianGrid prop.
 
@@ -372,7 +372,7 @@ The background grid lines. Defaults to horizontal-only dashed lines and forwards
   </ApiRow>
 </ApiTable>
 
-### `<Tooltip />`
+<ApiHeading>Tooltip</ApiHeading>
 
 The hover tooltip. It reads the chart's selection state so its content dims unselected series.
 
@@ -391,7 +391,7 @@ The hover tooltip. It reads the chart's selection state so its content dims unse
   </ApiRow>
 </ApiTable>
 
-### `<Legend />`
+<ApiHeading>Legend</ApiHeading>
 
 The series legend. When `isClickable` is set, each entry toggles selection of its series.
 

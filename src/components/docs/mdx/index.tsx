@@ -6,7 +6,7 @@ import {
   AccordionTrigger,
   AccordionPanel,
 } from "@/components/ui/accordion";
-import { ApiTable, ApiRow } from "./components/api-reference";
+import { ApiTable, ApiRow, ApiHeading } from "./components/api-reference";
 import { Step, Steps, StepTitle, StepContent, StepDescription } from "./components/steps";
 import { CodeCollapsibleWrapper } from "../charts/code-collapsible-wrapper";
 import { Tabs, TabsList, TabsPanel, TabsTab } from "@/components/ui/tabs";
@@ -165,5 +165,6 @@ export const mdxComponents: MDXComponents = {
   AlertContent,
   ApiTable,
   ApiRow,
+  ApiHeading,
   ShowcaseGrid,
 };

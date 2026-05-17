@@ -198,7 +198,7 @@ Below are some examples of the bar chart with different `variants`. Each `<Bar>`
 
 The chart is composed of several parts. The props below are grouped by the component they belong to.
 
-### `<EvilBarChart />`
+<ApiHeading>EvilBarChart</ApiHeading>
 
 The root container. It owns the data, the shared selection state, the loading skeleton, and the optional brush. Everything visual is composed as its children.
 
@@ -265,7 +265,7 @@ The root container. It owns the data, the shared selection state, the loading sk
   </ApiRow>
 </ApiTable>
 
-### `<Bar />`
+<ApiHeading>Bar</ApiHeading>
 
 A single bar series. Each `<Bar />` is self-contained and generates its own gradient/pattern definitions, so a chart can hold any number of bars — each with its own variant, radius, glow, and clickability.
 
@@ -296,7 +296,7 @@ A single bar series. Each `<Bar />` is self-contained and generates its own grad
   </ApiRow>
 </ApiTable>
 
-### `<XAxis />` and `<YAxis />`
+<ApiHeading>XAxis and YAxis</ApiHeading>
 
 The category and value axes. Both ship with the chart's flat default styling and forward every Recharts axis prop, so `dataKey`, `tickFormatter`, `tickMargin`, etc. pass straight through. They are hidden automatically while the chart is loading, and each resolves its axis `type` from the chart `layout` — categorical or numeric — unless you set `type` explicitly.
 
@@ -309,7 +309,7 @@ The category and value axes. Both ship with the chart's flat default styling and
   </ApiRow>
 </ApiTable>
 
-### `<Grid />`
+<ApiHeading>Grid</ApiHeading>
 
 The background grid lines. Defaults to dashed lines aligned to the value axis based on the chart layout, and forwards every Recharts CartesianGrid prop.
 
@@ -319,7 +319,7 @@ The background grid lines. Defaults to dashed lines aligned to the value axis ba
   </ApiRow>
 </ApiTable>
 
-### `<Tooltip />`
+<ApiHeading>Tooltip</ApiHeading>
 
 The hover tooltip. It reads the chart's selection state so its content dims unselected series.
 
@@ -335,7 +335,7 @@ The hover tooltip. It reads the chart's selection state so its content dims unse
   </ApiRow>
 </ApiTable>
 
-### `<Legend />`
+<ApiHeading>Legend</ApiHeading>
 
 The series legend. When `isClickable` is set, each entry toggles selection of its series.
 

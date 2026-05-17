@@ -71,6 +71,29 @@ function renderType(type: string) {
   );
 }
 
+interface ApiHeadingProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+/**
+ * Section header for a single component's API reference (e.g. `<Area />`).
+ * Renders like an h3 but is intentionally NOT a markdown heading, so these
+ * per-component entries stay out of the page's table of contents.
+ */
+export function ApiHeading({ children, className }: ApiHeadingProps) {
+  return (
+    <div
+      className={cn(
+        "font-heading text-primary mt-8 scroll-m-10 text-base font-medium tracking-tight select-none [&+p]:mt-4!",
+        className,
+      )}
+    >
+      {children}
+    </div>
+  );
+}
+
 /** A single prop row inside an <ApiTable>. */
 export function ApiRow({ name, type, default: defaultValue, required, children }: ApiRowProps) {
   return (

@@ -216,7 +216,7 @@ Below are some examples of the pie chart with different configurations. You can 
 
 The chart is composed of several parts. The props below are grouped by the component they belong to.
 
-### `<EvilPieChart />`
+<ApiHeading>EvilPieChart</ApiHeading>
 
 The root container. It owns the data, the shared selection state, and the loading skeleton. Everything visual is composed as its children.
 
@@ -253,7 +253,7 @@ The root container. It owns the data, the shared selection state, and the loadin
   </ApiRow>
 </ApiTable>
 
-### `<Pie />`
+<ApiHeading>Pie</ApiHeading>
 
 The pie series. Self-contained — it generates its own radial color gradients and glow filters, so any number of pies can live on one page without style collisions. Compose a `<Label />` inside it to draw labels on each sector.
 
@@ -290,7 +290,7 @@ The pie series. Self-contained — it generates its own radial color gradients a
   </ApiRow>
 </ApiTable>
 
-### `<Label />`
+<ApiHeading>Label</ApiHeading>
 
 Per-sector labels composed inside a `<Pie />`. It renders nothing on its own — the parent `<Pie />` reads its props and draws a label list over the sectors.
 
@@ -303,7 +303,7 @@ Per-sector labels composed inside a `<Pie />`. It renders nothing on its own —
   </ApiRow>
 </ApiTable>
 
-### `<Tooltip />`
+<ApiHeading>Tooltip</ApiHeading>
 
 The hover tooltip. Hidden automatically while the chart is loading.
 
@@ -319,7 +319,7 @@ The hover tooltip. Hidden automatically while the chart is loading.
   </ApiRow>
 </ApiTable>
 
-### `<Legend />`
+<ApiHeading>Legend</ApiHeading>
 
 The sector legend. When `isClickable` is set, each entry toggles selection of its sector.
 
@@ -338,7 +338,7 @@ The sector legend. When `isClickable` is set, each entry toggles selection of it
   </ApiRow>
 </ApiTable>
 
-### `<Background />`
+<ApiHeading>Background</ApiHeading>
 
 An optional decorative pattern drawn behind the pie. Compose it before the `<Pie />` so it sits underneath the sectors.
 
