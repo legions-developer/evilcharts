@@ -131,31 +131,24 @@ export function NavMain({
 
   // Derive activeTrigger from pathname - automatically resets when navigating away
   const activeTrigger = useMemo<ActiveTriggerProps>(() => {
-    let childIndex = -1;
-    let activeUrl = "";
-    let activeId: string | undefined = undefined;
+    // Index every folder page by url once, so the active page is an O(1) lookup.
+    const pageIndex = new Map<string, { index: number; id?: string }>();
 
     for (const item of tree.children) {
-      if (item.type === "folder") {
-        const foundIndex = item.children.findIndex(
-          (child) => child.type === "page" && child.url === pathname,
-        );
-        if (foundIndex !== -1) {
-          childIndex = foundIndex;
-          const child = item.children[foundIndex];
-          if (child.type === "page") {
-            activeUrl = child.url;
-            activeId = child.$id;
-          }
-          break;
+      if (item.type !== "folder") continue;
+      item.children.forEach((child, index) => {
+        if (child.type === "page") {
+          pageIndex.set(child.url, { index, id: child.$id });
         }
-      }
+      });
     }
 
+    const active = pageIndex.get(pathname);
+
     return {
-      url: activeUrl,
-      index: childIndex,
-      id: activeId,
+      url: active ? pathname : "",
+      index: active ? active.index : -1,
+      id: active?.id,
     };
   }, [pathname, tree.children]);
 

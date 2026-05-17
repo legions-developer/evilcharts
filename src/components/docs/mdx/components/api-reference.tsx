@@ -109,7 +109,7 @@ export function ApiRow({ name, type, default: defaultValue, required, children }
         </span>
       </td>
       <td className="px-4 py-2.5 align-top">
-        {type ? renderType(type) : <span className="text-muted-foreground/40">—</span>}
+        {type ? renderType(type) : <span className="text-muted-foreground/40">–</span>}
       </td>
       <td className="px-4 py-2.5 align-top">
         {defaultValue ? (
@@ -117,7 +117,7 @@ export function ApiRow({ name, type, default: defaultValue, required, children }
             {defaultValue}
           </span>
         ) : (
-          <span className="text-muted-foreground/40">—</span>
+          <span className="text-muted-foreground/40">–</span>
         )}
       </td>
       <td className="text-muted-foreground min-w-[220px] px-4 py-2.5 align-top text-[13px] [&>p]:my-0">

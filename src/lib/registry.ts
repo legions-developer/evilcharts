@@ -27,18 +27,20 @@ export async function getRegistryItem(name: string) {
   const typedItem = item as RegistryItem;
 
   const files = typedItem.files || [];
-  const processedFiles = [];
 
-  for (const file of files) {
-    const content = await getFileContent(file);
-    const relativePath = path.relative(process.cwd(), file.path);
+  // Read every file concurrently — the reads are independent of each other.
+  const processedFiles = await Promise.all(
+    files.map(async (file) => {
+      const content = await getFileContent(file);
+      const relativePath = path.relative(process.cwd(), file.path);
 
-    processedFiles.push({
-      ...file,
-      content,
-      path: relativePath,
-    });
-  }
+      return {
+        ...file,
+        content,
+        path: relativePath,
+      };
+    }),
+  );
 
   // Fix file paths.
   const finalFiles = fixFilePaths(processedFiles);
@@ -171,7 +173,7 @@ export function fixImport(content: string) {
   return content.replace(regex, replacement);
 }
 
-export type FileTree = {
+type FileTree = {
   name: string;
   path?: string;
   children?: FileTree[];

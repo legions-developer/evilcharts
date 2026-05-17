@@ -1,4 +1,11 @@
+import type { Metadata } from "next";
 import Image from "next/image";
+
+export const metadata: Metadata = {
+  title: "Evil Charts",
+  description:
+    "A collection of beautifully designed, customizable chart components for React.",
+};
 
 export default function Home() {
   return (

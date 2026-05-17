@@ -10,26 +10,28 @@ import { codeToHtml } from "shiki";
 
 // Strip [!code ...] annotations from raw code for copying
 export function stripCodeAnnotations(code: string): string {
-  return code
-    .split("\n")
-    .map((line) => {
-      // Remove // [!code ...] comments
-      let cleaned = line.replace(/\s*\/\/\s*\[!code\s+[^\]]+\]\s*$/, "");
-      // Remove /* [!code ...] */ and {/* [!code ...] */} comments
-      cleaned = cleaned.replace(/\s*\{?\s*\/\*\s*\[!code\s+[^\]]+\]\s*\*\/\s*\}?\s*$/, "");
-      // Remove <!-- [!code ...] --> comments
-      cleaned = cleaned.replace(/\s*<!--\s*\[!code\s+[^\]]+\]\s*-->\s*$/, "");
-      return cleaned;
-    })
-    .filter((line, index) => {
-      const originalLine = code.split("\n")[index];
-      // Remove lines that were only [!code word:...] annotations
-      const isWordAnnotationLine = /^\s*(?:\/\/|\/\*|\{\/\*|<!--)\s*\[!code\s+word:/.test(
-        originalLine,
-      );
-      return !(isWordAnnotationLine && line.trim() === "");
-    })
-    .join("\n");
+  const result: string[] = [];
+
+  // Single pass over the lines — cleaning and filtering together avoids
+  // re-splitting `code` for every line (which made this O(n²)).
+  for (const originalLine of code.split("\n")) {
+    // Remove // [!code ...] comments
+    let cleaned = originalLine.replace(/\s*\/\/\s*\[!code\s+[^\]]+\]\s*$/, "");
+    // Remove /* [!code ...] */ and {/* [!code ...] */} comments
+    cleaned = cleaned.replace(/\s*\{?\s*\/\*\s*\[!code\s+[^\]]+\]\s*\*\/\s*\}?\s*$/, "");
+    // Remove <!-- [!code ...] --> comments
+    cleaned = cleaned.replace(/\s*<!--\s*\[!code\s+[^\]]+\]\s*-->\s*$/, "");
+
+    // Drop lines that were only [!code word:...] annotations
+    const isWordAnnotationLine = /^\s*(?:\/\/|\/\*|\{\/\*|<!--)\s*\[!code\s+word:/.test(
+      originalLine,
+    );
+    if (isWordAnnotationLine && cleaned.trim() === "") continue;
+
+    result.push(cleaned);
+  }
+
+  return result.join("\n");
 }
 
 export const transformers = [

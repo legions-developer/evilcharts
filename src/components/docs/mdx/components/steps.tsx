@@ -72,7 +72,7 @@ function Step({ stepNumber, className, children, ...props }: StepProps & { stepN
   return (
     <div className={cn("mt-6 pl-9", className)} {...props}>
       {/* Step number circle */}
-      <div className="bg-border text-primary jetbrains absolute top-0.5 left-0 flex h-6 w-6 items-center justify-center rounded-md text-xs">
+      <div className="bg-border text-primary jetbrains absolute top-0.5 left-0 flex size-6 items-center justify-center rounded-md text-xs">
         {stepNumber}
       </div>
       <div>{children}</div>

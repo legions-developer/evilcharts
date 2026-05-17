@@ -84,7 +84,7 @@ const ShowcaseItem = ({ name, description, url, Component }: ShowcaseItemProps) 
           <Grid />
           <Component />
         </div>
-        <div className="flex flex-col gap-1 px-2 py-2">
+        <div className="flex flex-col gap-1 p-2">
           <p className="group-hover:text-primary text-xs font-medium">{name}</p>
           <p className="text-muted-foreground text-[11px]">{description}</p>
         </div>
