@@ -224,6 +224,9 @@ The root container. It owns the data, the shared selection state, the loading sk
   <ApiRow name="barRadius" type="number" default="2">
     The default corner radius for every `<Bar />`, in pixels. Each `<Bar />` may override it locally with its own `radius` prop.
   </ApiRow>
+  <ApiRow name="animationType" type='"none" | "left-to-right" | "right-to-left" | "center-out" | "edges-in"' default='"left-to-right"'>
+    Order in which bars grow into view, inherited by every `<Bar />`. Each bar grows from its baseline (bottom for vertical layout, left for horizontal). `"none"` disables it — devices with the OS reduce-motion preference fall back to `"none"` automatically.
+  </ApiRow>
   <ApiRow name="barGap" type="number">
     The gap between bars in the same category (when using multiple series).
   </ApiRow>
@@ -278,6 +281,9 @@ A single bar series. Each `<Bar />` is self-contained and generates its own grad
   </ApiRow>
   <ApiRow name="radius" type="number">
     The corner radius of this bar, in pixels. Falls back to the chart's `barRadius` when omitted.
+  </ApiRow>
+  <ApiRow name="animationType" type='"none" | "left-to-right" | "right-to-left" | "center-out" | "edges-in"'>
+    The grow-in order for this bar series. Falls back to the chart's `animationType` when omitted.
   </ApiRow>
   <ApiRow name="isClickable" type="boolean" default="false">
     Lets this bar be selected by clicking it. When any bar is selected, unselected bars become semi-transparent.

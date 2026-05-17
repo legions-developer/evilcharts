@@ -37,17 +37,31 @@ import {
   YAxis as RechartsYAxis,
 } from "recharts";
 import { RectRadius } from "recharts/types/shape/Rectangle";
-import { motion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 
 // Constants
 const DEFAULT_BAR_RADIUS = 2;
 const LOADING_BAR_DATA_KEY = "loading";
 const LOADING_ANIMATION_DURATION = 2000; // in milliseconds
 const STACK_ID = "evil-stacked";
+const BAR_GROW_DURATION = 0.5; // per-bar grow-in length, in seconds
+const BAR_STAGGER = 0.05; // delay between consecutive bars, in seconds
+const REVEAL_EASE: [number, number, number, number] = [0, 0.7, 0.5, 1]; // grow-in easing
 
 type BarVariant = "default" | "hatched" | "duotone" | "duotone-reverse" | "gradient" | "stripped";
 type StackType = "default" | "stacked" | "percent";
 type BarLayout = "vertical" | "horizontal";
+
+/**
+ * Order in which bars grow into view. Recharts' own bar animation is permanently
+ * disabled — every bar instead grows from its baseline (bottom for vertical
+ * layout, left for horizontal), and this controls the stagger sequence.
+ *
+ * NOTE: the grow-in is a per-frame animation, so it is heavier than a static
+ * chart. `"none"` opts out entirely; it is also what a device with the OS
+ * "reduce motion" preference falls back to automatically.
+ */
+type BarAnimationType = "none" | "left-to-right" | "right-to-left" | "center-out" | "edges-in";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Shared context
@@ -64,6 +78,8 @@ type BarChartContextValue = {
   isHorizontal: boolean; // whether bars are laid out horizontally
   isLoading: boolean; // whether the chart shows its loading skeleton
   barRadius: number; // default corner radius each <Bar /> inherits
+  animationType: BarAnimationType; // default grow-in order each <Bar /> inherits
+  introStartedAt: number; // timestamp the chart mounted — anchors the one-shot grow-in
   dataLength: number; // number of rows currently rendered
   selectedDataKey: string | null; // currently selected series, or null when none
   selectDataKey: (dataKey: string | null) => void; // sets the selected series
@@ -106,6 +122,7 @@ type EvilBarChartBaseProps<
   stackType?: StackType; // how multiple bars combine
   layout?: BarLayout; // orientation of the bars
   barRadius?: number; // default corner radius for every <Bar />
+  animationType?: BarAnimationType; // default grow-in order for every <Bar />
   barGap?: number; // gap between bars within the same category
   barCategoryGap?: number; // gap between categories of bars
   backgroundVariant?: BackgroundVariant; // background pattern drawn behind the chart
@@ -143,6 +160,7 @@ export function EvilBarChart<
   stackType = "default",
   layout = "vertical",
   barRadius = DEFAULT_BAR_RADIUS,
+  animationType = "left-to-right",
   barGap,
   barCategoryGap,
   backgroundVariant,
@@ -157,6 +175,10 @@ export function EvilBarChart<
   onBrushChange,
 }: EvilBarChartProps<TData, TConfig>) {
   const chartId = useId().replace(/:/g, ""); // colon-free id keeps CSS/SVG selectors valid
+  // Anchors the grow-in to a fixed moment so it plays exactly once — re-renders
+  // and Recharts' bar remounts read elapsed time from here instead of replaying.
+  // Lazy useState stamps the time once, on the initial render only.
+  const [introStartedAt] = useState(() => Date.now());
   const [selectedDataKey, setSelectedDataKey] = useState<string | null>(defaultSelectedDataKey);
   const [isMouseInChart, setIsMouseInChart] = useState(false);
   const { loadingData, onShimmerExit } = useLoadingData(isLoading, loadingBars);
@@ -182,6 +204,8 @@ export function EvilBarChart<
       isHorizontal,
       isLoading,
       barRadius,
+      animationType,
+      introStartedAt,
       dataLength: displayData.length,
       selectedDataKey,
       selectDataKey,
@@ -193,6 +217,8 @@ export function EvilBarChart<
       isHorizontal,
       isLoading,
       barRadius,
+      animationType,
+      introStartedAt,
       displayData.length,
       selectedDataKey,
       selectDataKey,
@@ -259,6 +285,7 @@ type BarProps = {
   dataKey: string; // series key — must exist on the data and config
   variant?: BarVariant; // fill style for this bar only
   radius?: number; // corner radius — falls back to the chart default
+  animationType?: BarAnimationType; // grow-in order — falls back to the chart default
   isClickable?: boolean; // lets this bar be selected by clicking it
   enableHoverHighlight?: boolean; // dims this bar while another bar is hovered
   glowing?: boolean; // applies a soft outer glow to this bar
@@ -276,6 +303,7 @@ export function Bar({
   dataKey,
   variant = "default",
   radius,
+  animationType,
   isClickable = false,
   enableHoverHighlight = false,
   glowing = false,
@@ -285,20 +313,31 @@ export function Bar({
   const {
     config,
     isStacked,
+    isHorizontal,
     isLoading,
     barRadius: defaultRadius,
+    animationType: defaultAnimation,
+    introStartedAt,
     dataLength,
     selectedDataKey,
     selectDataKey,
     isMouseInChart,
   } = useBarChart();
   const id = useId().replace(/:/g, ""); // unique id scopes this bar's style defs
+  // Devices set to "reduce motion" skip the grow-in animation entirely
+  const shouldReduceMotion = useReducedMotion();
 
   // The root renders the skeleton bar while loading, so real bars step aside
   if (isLoading) return null;
 
   const resolvedRadius = radius ?? defaultRadius;
   const isSelected = selectedDataKey === dataKey;
+
+  // The grow-in is a per-frame animation — heavier than a static chart — so
+  // `"none"` and the OS reduce-motion preference both opt out of it.
+  const revealType: BarAnimationType = shouldReduceMotion
+    ? "none"
+    : (animationType ?? defaultAnimation);
 
   const customBarProps = {
     id,
@@ -310,6 +349,8 @@ export function Bar({
     isClickable,
     enableHoverHighlight,
     isMouseInChart,
+    isHorizontal,
+    introStartedAt,
     selectedDataKey,
     dataLength,
     onClick: () => {
@@ -326,10 +367,16 @@ export function Bar({
         stackId={isStacked ? STACK_ID : undefined}
         fill={`url(#${id}-colors-${dataKey})`}
         radius={resolvedRadius}
+        // Recharts' built-in bar animation is permanently disabled — every bar
+        // instead grows in from its baseline via the staggered motion.dev shape.
+        isAnimationActive={false}
         style={isClickable || enableHoverHighlight ? { cursor: "pointer" } : undefined}
-        shape={(props: unknown) => <CustomBar {...(props as BarShapeProps)} {...customBarProps} />}
+        shape={(props: unknown) => (
+          <CustomBar {...(props as BarShapeProps)} {...customBarProps} animationType={revealType} />
+        )}
         activeBar={(props: unknown) => (
-          <CustomBar {...(props as BarShapeProps)} {...customBarProps} />
+          // The active (hovered) bar must never re-run the grow-in animation
+          <CustomBar {...(props as BarShapeProps)} {...customBarProps} animationType="none" />
         )}
         {...barProps}
       />
@@ -524,6 +571,9 @@ type CustomBarProps = {
   isClickable?: boolean;
   enableHoverHighlight?: boolean;
   isMouseInChart?: boolean;
+  isHorizontal?: boolean;
+  animationType?: BarAnimationType;
+  introStartedAt?: number;
   selectedDataKey?: string | null;
   isActive?: boolean;
   dataLength?: number;
@@ -550,6 +600,9 @@ const CustomBar = (props: CustomBarProps) => {
     isClickable,
     enableHoverHighlight,
     isMouseInChart,
+    isHorizontal = false,
+    animationType = "none",
+    introStartedAt = 0,
     selectedDataKey,
     isActive,
     dataLength = 0,
@@ -559,6 +612,7 @@ const CustomBar = (props: CustomBarProps) => {
   const index = typeof props.index === "number" ? props.index : -1;
   const isLastBar = bufferBar && dataLength > 0 && index === dataLength - 1;
   const isStripped = variant === "stripped";
+  const grow = getBarGrowAnimation(animationType, index, dataLength, isHorizontal, introStartedAt);
 
   const fill = isLastBar
     ? `url(#${id}-buffer-hatched-${dataKey})`
@@ -578,9 +632,9 @@ const CustomBar = (props: CustomBarProps) => {
   // Stripped bars round only their top corners; every other variant rounds all four
   const radius: RectRadius = isStripped ? [barRadius, barRadius, 0, 0] : barRadius;
 
-  return (
-    <g style={cursorStyle} onClick={onClick}>
-      <Rectangle {...props} fill="transparent" />
+  // The visible, painted bar — plus the stripped variant's solid top strip
+  const visibleBar = (
+    <>
       <Rectangle
         x={x}
         y={y}
@@ -603,8 +657,95 @@ const CustomBar = (props: CustomBarProps) => {
           fill={`url(#${id}-colors-${dataKey})`}
         />
       )}
+    </>
+  );
+
+  return (
+    <g style={cursorStyle} onClick={onClick}>
+      {/* Full-height invisible rect keeps the whole column hoverable/clickable */}
+      <Rectangle {...props} fill="transparent" />
+      {/* The painted bar grows in from its baseline; the hit rect above stays put */}
+      {grow ? (
+        <motion.g
+          initial={grow.initial}
+          animate={grow.animate}
+          transition={grow.transition}
+          style={grow.style}
+        >
+          {visibleBar}
+        </motion.g>
+      ) : (
+        visibleBar
+      )}
     </g>
   );
+};
+
+/**
+ * Builds the motion.dev grow-in animation for a single bar, or returns `null`
+ * when the bar should render statically (`"none"`, reduced motion, an unknown
+ * index, or — crucially — once the bar has already finished growing).
+ *
+ * Every bar grows from its baseline — `scaleY` from the bottom for vertical
+ * layout, `scaleX` from the left for horizontal — and `animationType` decides
+ * the stagger order, so the chart fills in one bar at a time.
+ *
+ * The intro is anchored to `introStartedAt` (stamped once when the chart
+ * mounts) rather than to component mount. Recharts remounts every bar whenever
+ * the chart re-renders — e.g. on hover-highlight — so a mount-based animation
+ * would replay endlessly. Reading elapsed time instead makes it a true
+ * one-shot: a bar past its window renders static, and a bar caught mid-grow
+ * resumes from the progress it should already be at.
+ */
+const getBarGrowAnimation = (
+  animationType: BarAnimationType,
+  index: number,
+  dataLength: number,
+  isHorizontal: boolean,
+  introStartedAt: number,
+) => {
+  if (animationType === "none" || index < 0 || dataLength <= 0) return null;
+
+  const lastIndex = dataLength - 1;
+  const center = lastIndex / 2;
+
+  // How many bars this one waits behind before it starts growing
+  let step: number;
+  switch (animationType) {
+    case "right-to-left":
+      step = lastIndex - index;
+      break;
+    case "center-out":
+      step = Math.abs(index - center);
+      break;
+    case "edges-in":
+      step = center - Math.abs(index - center);
+      break;
+    default: // left-to-right
+      step = index;
+  }
+
+  const startMs = step * BAR_STAGGER * 1000;
+  const durationMs = BAR_GROW_DURATION * 1000;
+  const endMs = startMs + durationMs;
+  const elapsed = Date.now() - introStartedAt;
+
+  // Already finished — render static so re-renders/remounts can't replay it
+  if (elapsed >= endMs) return null;
+
+  // Resume from wherever this bar should already be: 0 before it starts,
+  // partway through if a remount caught it mid-grow.
+  const from = elapsed <= startMs ? 0 : (elapsed - startMs) / durationMs;
+  const transition = {
+    duration: (endMs - Math.max(elapsed, startMs)) / 1000,
+    ease: REVEAL_EASE,
+    delay: Math.max(0, startMs - elapsed) / 1000,
+  };
+
+  // Horizontal bars grow rightward from the left edge, vertical from the bottom
+  return isHorizontal
+    ? { initial: { scaleX: from }, animate: { scaleX: 1 }, transition, style: { originX: 0 } }
+    : { initial: { scaleY: from }, animate: { scaleY: 1 }, transition, style: { originY: 1 } };
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
