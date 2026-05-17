@@ -242,6 +242,9 @@ The root container. It owns the data, the shared selection state, the loading sk
   <ApiRow name="curveType" type='"basis" | "bumpX" | "bumpY" | "bump" | "linear" | "natural" | "monotoneX" | "monotoneY" | "monotone" | "step" | …' default='"linear"'>
     The default curve interpolation inherited by every `<Line />`. Each `<Line />` may override it locally.
   </ApiRow>
+  <ApiRow name="animationType" type='"none" | "left-to-right" | "right-to-left" | "center-out" | "edges-in"' default='"left-to-right"'>
+    Default intro inherited by every `<Bar />` and `<Line />` — lines wipe in along this direction, bars grow up from their baseline staggered in this order. `"none"` disables it; devices with the OS reduce-motion preference fall back to `"none"` automatically.
+  </ApiRow>
   <ApiRow name="barGap" type="number">
     The gap between bars sharing the same category.
   </ApiRow>
@@ -294,6 +297,9 @@ A single bar series. Each `<Bar />` is self-contained and generates its own grad
   <ApiRow name="radius" type="number" default="4">
     The corner radius of the bar in pixels.
   </ApiRow>
+  <ApiRow name="animationType" type='"none" | "left-to-right" | "right-to-left" | "center-out" | "edges-in"'>
+    The grow-in order for this bar series. Falls back to the chart's `animationType` when omitted.
+  </ApiRow>
   <ApiRow name="glow" type="boolean" default="false">
     Applies a soft outer neon glow to this bar.
   </ApiRow>
@@ -321,6 +327,9 @@ A single line series. Each `<Line />` is self-contained and generates its own co
   </ApiRow>
   <ApiRow name="curveType" type='"basis" | "bump" | "linear" | "natural" | "monotoneX" | "monotoneY" | "monotone" | "step" | "stepBefore" | "stepAfter" | …'>
     The curve interpolation for this line. Falls back to the chart's `curveType` when omitted.
+  </ApiRow>
+  <ApiRow name="animationType" type='"none" | "left-to-right" | "right-to-left" | "center-out" | "edges-in"'>
+    The intro reveal direction for this line. Falls back to the chart's `animationType` when omitted.
   </ApiRow>
   <ApiRow name="connectNulls" type="boolean" default="false">
     Whether to connect line segments across null or missing values.

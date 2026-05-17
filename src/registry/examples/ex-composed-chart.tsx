@@ -9,6 +9,7 @@ import {
   Tooltip,
   Legend,
   ActiveDot,
+  Dot,
 } from "@/registry/charts/composed-chart";
 import { type ChartConfig } from "@/registry/ui/chart";
 
@@ -61,6 +62,7 @@ export function EvilExampleComposedChart() {
       <Bar dataKey="revenue" isClickable />
       <Line dataKey="profit" isClickable>
         <ActiveDot variant="colored-border" />
+        <Dot variant="default" />
       </Line>
     </EvilComposedChart>
   );

@@ -39,19 +39,39 @@ import {
   XAxis as RechartsXAxis,
   YAxis as RechartsYAxis,
 } from "recharts";
-import { motion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 
 // Constants
 const STROKE_WIDTH = 2;
 const DEFAULT_BAR_RADIUS = 4;
 const LOADING_DATA_KEY = "loading";
 const LOADING_ANIMATION_DURATION = 2000; // in milliseconds
+const REVEAL_DURATION = 1; // line intro wipe length, in seconds
+const REVEAL_EASE: [number, number, number, number] = [0, 0.7, 0.5, 1]; // intro easing
+const BAR_GROW_DURATION = 0.5; // per-bar grow-in length, in seconds
+const BAR_STAGGER = 0.05; // delay between consecutive bars, in seconds
 
 type CurveType = ComponentProps<typeof RechartsLine>["type"];
 type LineDotProp = ComponentProps<typeof RechartsLine>["dot"];
 type LineActiveDotProp = ComponentProps<typeof RechartsLine>["activeDot"];
 type StrokeVariant = "solid" | "dashed" | "animated-dashed";
 type BarVariant = "default" | "hatched" | "duotone" | "duotone-reverse" | "gradient" | "stripped";
+
+/**
+ * Direction of the custom motion.dev intro. Recharts' own animation is
+ * permanently disabled — lines wipe in along this direction, while bars grow up
+ * from their baseline staggered in this same order.
+ *
+ * NOTE: the intro is a per-frame animation, heavier than a static chart.
+ * `"none"` opts out — as does a device with the OS "reduce motion" preference.
+ */
+type ComposedAnimationType =
+  | "none"
+  | "left-to-right"
+  | "right-to-left"
+  | "center-out"
+  | "edges-in";
+type RevealAnimationType = Exclude<ComposedAnimationType, "none">;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Shared context
@@ -66,6 +86,9 @@ type BarVariant = "default" | "hatched" | "duotone" | "duotone-reverse" | "gradi
 type ComposedChartContextValue = {
   config: ChartConfig; // colors + labels for every bar and line series
   curveType: CurveType; // default curve interpolation each <Line /> inherits
+  animationType: ComposedAnimationType; // default intro each <Bar />/<Line /> inherits
+  introStartedAt: number; // timestamp the chart mounted — anchors the one-shot intro
+  dataLength: number; // number of rows currently rendered
   isLoading: boolean; // whether the chart shows its loading skeleton
   hoveredIndex: number | null; // data index currently hovered, or null when none
   selectedDataKey: string | null; // currently selected series, or null when none
@@ -106,6 +129,7 @@ type EvilComposedChartBaseProps<
   className?: string; // extra classes for the chart container
   chartProps?: ComponentProps<typeof RechartsComposedChart>; // escape hatch for the raw Recharts chart
   curveType?: CurveType; // default curve interpolation for every <Line />
+  animationType?: ComposedAnimationType; // default intro for every <Bar /> and <Line />
   barGap?: number; // gap between bars sharing a category
   barCategoryGap?: number; // gap between bar categories
   defaultSelectedDataKey?: string | null; // series selected on first render
@@ -140,6 +164,7 @@ export function EvilComposedChart<
   className,
   chartProps,
   curveType = "linear",
+  animationType = "left-to-right",
   barGap,
   barCategoryGap,
   defaultSelectedDataKey = null,
@@ -153,6 +178,9 @@ export function EvilComposedChart<
   onBrushChange,
 }: EvilComposedChartProps<TData, TConfig>) {
   const chartId = useId().replace(/:/g, ""); // colon-free id keeps CSS/SVG selectors valid
+  // Anchors the intro to a fixed moment so it plays exactly once — re-renders
+  // and Recharts remounts read elapsed time from here instead of replaying.
+  const [introStartedAt] = useState(() => Date.now());
   const [selectedDataKey, setSelectedDataKey] = useState<string | null>(defaultSelectedDataKey);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const { loadingData, onShimmerExit } = useLoadingData(isLoading, loadingBars);
@@ -173,12 +201,25 @@ export function EvilComposedChart<
     () => ({
       config,
       curveType,
+      animationType,
+      introStartedAt,
+      dataLength: displayData.length,
       isLoading,
       hoveredIndex,
       selectedDataKey,
       selectDataKey,
     }),
-    [config, curveType, isLoading, hoveredIndex, selectedDataKey, selectDataKey],
+    [
+      config,
+      curveType,
+      animationType,
+      introStartedAt,
+      displayData.length,
+      isLoading,
+      hoveredIndex,
+      selectedDataKey,
+      selectDataKey,
+    ],
   );
 
   return (
@@ -237,6 +278,7 @@ type BarProps = {
   variant?: BarVariant; // fill style for this bar only
   radius?: number; // corner radius of the bar in pixels
   glow?: boolean; // applies a soft neon glow to this bar
+  animationType?: ComposedAnimationType; // grow-in order — falls back to the chart default
   isClickable?: boolean; // lets this bar be selected by clicking it
   enableHoverHighlight?: boolean; // dims this bar when another column is hovered
   barProps?: ComponentProps<typeof RechartsBar>; // escape hatch for raw Recharts Bar props
@@ -253,12 +295,24 @@ export function Bar({
   variant = "default",
   radius = DEFAULT_BAR_RADIUS,
   glow = false,
+  animationType,
   isClickable = false,
   enableHoverHighlight = false,
   barProps,
 }: BarProps) {
-  const { config, isLoading, hoveredIndex, selectedDataKey, selectDataKey } = useComposedChart();
+  const {
+    config,
+    animationType: defaultAnimation,
+    introStartedAt,
+    dataLength,
+    isLoading,
+    hoveredIndex,
+    selectedDataKey,
+    selectDataKey,
+  } = useComposedChart();
   const id = useId().replace(/:/g, ""); // unique id scopes this bar's style defs
+  // Devices set to "reduce motion" skip the grow-in animation entirely
+  const shouldReduceMotion = useReducedMotion();
 
   // The root renders the skeleton bar while loading, so real bars step aside
   if (isLoading) return null;
@@ -266,12 +320,21 @@ export function Bar({
   const isSelected = selectedDataKey === null || selectedDataKey === dataKey;
   const filter = glow ? `url(#${id}-glow)` : undefined;
 
+  // The grow-in is a per-frame animation — heavier than a static chart — so
+  // `"none"` and the OS reduce-motion preference both opt out of it.
+  const revealType: ComposedAnimationType = shouldReduceMotion
+    ? "none"
+    : (animationType ?? defaultAnimation);
+
   return (
     <>
       <RechartsBar
         dataKey={dataKey}
         fill={`url(#${id}-bar-colors)`}
         radius={radius}
+        // Recharts' built-in bar animation is permanently disabled — every bar
+        // instead grows in from its baseline via the staggered motion.dev shape.
+        isAnimationActive={false}
         style={isClickable || enableHoverHighlight ? { cursor: "pointer" } : undefined}
         shape={(props: unknown) => {
           const barShapeProps = props as BarShapeProps;
@@ -294,6 +357,9 @@ export function Bar({
               })}
               isClickable={isClickable}
               enableHoverHighlight={enableHoverHighlight}
+              animationType={revealType}
+              dataLength={dataLength}
+              introStartedAt={introStartedAt}
               onClick={() => {
                 if (!isClickable) return;
                 selectDataKey(selectedDataKey === dataKey ? null : dataKey);
@@ -322,6 +388,7 @@ type LineProps = {
   dataKey: string; // series key — must exist on the data and config
   strokeVariant?: StrokeVariant; // stroke style for this line only
   curveType?: CurveType; // curve interpolation — falls back to the chart default
+  animationType?: ComposedAnimationType; // intro reveal — falls back to the chart default
   connectNulls?: boolean; // join segments across null/missing values
   glow?: boolean; // applies a soft neon glow to this line
   isClickable?: boolean; // lets this line be selected by clicking it
@@ -340,26 +407,42 @@ export function Line({
   dataKey,
   strokeVariant = "solid",
   curveType,
+  animationType,
   connectNulls = false,
   glow = false,
   isClickable = false,
   children,
   lineProps,
 }: LineProps) {
-  const { config, curveType: defaultCurve, isLoading, selectedDataKey, selectDataKey } =
-    useComposedChart();
+  const {
+    config,
+    curveType: defaultCurve,
+    animationType: defaultAnimation,
+    isLoading,
+    selectedDataKey,
+    selectDataKey,
+  } = useComposedChart();
   const id = useId().replace(/:/g, ""); // unique id scopes this line's style defs
+  // Devices set to "reduce motion" skip the intro reveal entirely
+  const shouldReduceMotion = useReducedMotion();
 
   // The root renders the skeleton bar while loading, so real lines step aside
   if (isLoading) return null;
 
   const resolvedCurve = curveType ?? defaultCurve;
 
+  // The reveal is an animated SVG mask — heavier than a static chart — so
+  // `"none"` and the OS reduce-motion preference both opt out of it.
+  const revealType: ComposedAnimationType = shouldReduceMotion
+    ? "none"
+    : (animationType ?? defaultAnimation);
+  const maskId = revealType === "none" ? undefined : `${id}-reveal-mask`;
+
   const opacity = getOpacity(selectedDataKey, dataKey);
   const hasSelection = selectedDataKey !== null;
   const filter = glow ? `url(#${id}-glow)` : undefined;
 
-  const { dot, activeDot } = resolveDots(children, id, dataKey, opacity.dot);
+  const { dot, activeDot } = resolveDots(children, id, dataKey, opacity.dot, maskId);
 
   const isAnimatedDashed = strokeVariant === "animated-dashed";
   const isDashed = strokeVariant === "dashed" || isAnimatedDashed;
@@ -380,6 +463,7 @@ export function Line({
           strokeWidth={20}
           dot={false}
           activeDot={false}
+          isAnimationActive={false}
           legendType="none"
           tooltipType="none"
           style={{ cursor: "pointer" }}
@@ -391,18 +475,25 @@ export function Line({
         dataKey={dataKey}
         connectNulls={connectNulls}
         strokeOpacity={opacity.stroke}
-        stroke={`url(#${id}-line-colors)`}
+        stroke={`url(#${id}-line-colors-${dataKey})`}
         filter={filter}
         dot={dot}
         activeDot={activeDot}
         strokeWidth={STROKE_WIDTH}
         strokeDasharray={isDashed ? "5 5" : undefined}
-        style={isClickable ? { cursor: "pointer", pointerEvents: "none" } : undefined}
+        // Recharts' built-in line animation is permanently disabled — the
+        // motion.dev reveal mask drives the intro, wiping stroke and dots in together.
+        isAnimationActive={false}
+        style={{
+          ...(maskId ? { mask: `url(#${maskId})` } : {}),
+          ...(isClickable ? { cursor: "pointer", pointerEvents: "none" } : {}),
+        }}
         {...lineProps}
       >
         {isAnimatedDashed && !hasSelection && <AnimatedDashedStroke />}
       </RechartsLine>
       <defs>
+        {revealType !== "none" && <RevealMask id={id} type={revealType} />}
         <HorizontalColorGradient id={id} dataKey={dataKey} config={config} />
         {glow && <LineGlowFilter id={id} />}
       </defs>
@@ -596,12 +687,16 @@ const getBarOpacity = ({
   return clickOpacity;
 };
 
-// Pulls <Dot /> and <ActiveDot /> out of a line's children into Recharts dot slots
+// Pulls <Dot /> and <ActiveDot /> out of a line's children into Recharts dot slots.
+// When a `maskId` is given the resting dot is wired to the intro reveal mask so it
+// wipes in with the line; the active dot is always left unmasked since it only
+// appears on hover, after the intro has finished.
 const resolveDots = (
   children: ReactNode,
   id: string,
   dataKey: string,
   dotOpacity: number,
+  maskId: string | undefined,
 ): { dot: LineDotProp; activeDot: LineActiveDotProp } => {
   let dot: LineDotProp = false;
   let activeDot: LineActiveDotProp = false;
@@ -611,7 +706,15 @@ const resolveDots = (
 
     if (child.type === Dot) {
       const { variant } = (child as ReactElement<DotProps>).props;
-      dot = <ChartDot type={variant} dataKey={dataKey} chartId={`${id}-line`} fillOpacity={dotOpacity} />;
+      dot = (
+        <ChartDot
+          type={variant}
+          dataKey={dataKey}
+          chartId={`${id}-line`}
+          fillOpacity={dotOpacity}
+          maskId={maskId}
+        />
+      );
     }
 
     if (child.type === ActiveDot) {
@@ -655,6 +758,9 @@ type CustomBarProps = {
   filter?: string; // optional glow filter reference
   isClickable?: boolean; // whether the bar is selectable by click
   enableHoverHighlight?: boolean; // whether hovering a column dims the others
+  animationType?: ComposedAnimationType; // grow-in order for this bar
+  dataLength?: number; // total bars in the series — drives the stagger
+  introStartedAt?: number; // chart-mount timestamp anchoring the one-shot grow-in
   onClick?: () => void; // fired when a clickable bar is clicked
 } & BarShapeProps;
 
@@ -666,12 +772,16 @@ const CustomBar = ({
   height = 0,
   fillOpacity = 1,
   background,
+  index = -1,
   id,
   variant,
   barRadius,
   filter,
   isClickable,
   enableHoverHighlight,
+  animationType = "none",
+  dataLength = 0,
+  introStartedAt = 0,
   onClick,
 }: CustomBarProps) => {
   const cursorStyle = isClickable || enableHoverHighlight ? { cursor: "pointer" } : undefined;
@@ -679,6 +789,9 @@ const CustomBar = ({
   const hitAreaY = background?.y ?? y;
   const hitAreaWidth = background?.width ?? width;
   const hitAreaHeight = background?.height ?? height;
+
+  // motion.dev grow-in props for this bar — an empty object once it has finished
+  const grow = getBarGrowAnimation(animationType, index, dataLength, introStartedAt) ?? {};
 
   const getFill = () => {
     switch (variant) {
@@ -697,50 +810,174 @@ const CustomBar = ({
     }
   };
 
+  // Full-height invisible rect — keeps the column hoverable even mid grow-in
+  const hitArea = enableHoverHighlight ? (
+    <rect x={hitAreaX} y={hitAreaY} width={hitAreaWidth} height={hitAreaHeight} fill="transparent" />
+  ) : null;
+
   if (variant === "stripped") {
     return (
       <g style={cursorStyle} onClick={onClick}>
-        <g filter={filter} opacity={fillOpacity} className="transition-opacity duration-200">
+        <motion.g
+          {...grow}
+          filter={filter}
+          opacity={fillOpacity}
+          className="transition-opacity duration-200"
+        >
           <rect x={x} y={y} width={width} height={height} fill={getFill()} />
           <rect x={x} y={y} width={width} height={2} fill={`url(#${id}-bar-colors)`} />
-        </g>
-        {enableHoverHighlight && (
-          <rect
-            x={hitAreaX}
-            y={hitAreaY}
-            width={hitAreaWidth}
-            height={hitAreaHeight}
-            fill="transparent"
-          />
-        )}
+        </motion.g>
+        {hitArea}
       </g>
     );
   }
 
   return (
     <g style={cursorStyle} onClick={onClick}>
-      <rect
-        x={x}
-        y={y}
-        width={width}
-        height={height}
-        rx={barRadius}
-        ry={barRadius}
-        fill={getFill()}
-        opacity={fillOpacity}
-        filter={filter}
-        className="transition-opacity duration-200"
-      />
-      {enableHoverHighlight && (
+      <motion.g {...grow}>
         <rect
-          x={hitAreaX}
-          y={hitAreaY}
-          width={hitAreaWidth}
-          height={hitAreaHeight}
-          fill="transparent"
+          x={x}
+          y={y}
+          width={width}
+          height={height}
+          rx={barRadius}
+          ry={barRadius}
+          fill={getFill()}
+          opacity={fillOpacity}
+          filter={filter}
+          className="transition-opacity duration-200"
+        />
+      </motion.g>
+      {hitArea}
+    </g>
+  );
+};
+
+/**
+ * Builds the motion.dev grow-in animation for a single bar, or returns `null`
+ * when it should render statically (`"none"`, an unknown index, or — crucially —
+ * once the bar has already finished growing).
+ *
+ * The intro is anchored to `introStartedAt` (stamped once when the chart mounts)
+ * rather than to component mount. Recharts remounts every bar whenever the chart
+ * re-renders, so a mount-based animation would replay endlessly; reading elapsed
+ * time instead makes it a true one-shot — a bar past its window renders static,
+ * a bar caught mid-grow resumes from where it should already be.
+ */
+const getBarGrowAnimation = (
+  animationType: ComposedAnimationType,
+  index: number,
+  dataLength: number,
+  introStartedAt: number,
+) => {
+  if (animationType === "none" || index < 0 || dataLength <= 0) return null;
+
+  const lastIndex = dataLength - 1;
+  const center = lastIndex / 2;
+
+  // How many bars this one waits behind before it starts growing
+  let step: number;
+  switch (animationType) {
+    case "right-to-left":
+      step = lastIndex - index;
+      break;
+    case "center-out":
+      step = Math.abs(index - center);
+      break;
+    case "edges-in":
+      step = center - Math.abs(index - center);
+      break;
+    default: // left-to-right
+      step = index;
+  }
+
+  const startMs = step * BAR_STAGGER * 1000;
+  const durationMs = BAR_GROW_DURATION * 1000;
+  const endMs = startMs + durationMs;
+  const elapsed = Date.now() - introStartedAt;
+
+  // Already finished — render static so re-renders/remounts can't replay it
+  if (elapsed >= endMs) return null;
+
+  // Resume from wherever this bar should already be (0 before it starts)
+  const from = elapsed <= startMs ? 0 : (elapsed - startMs) / durationMs;
+
+  return {
+    initial: { scaleY: from },
+    animate: { scaleY: 1 },
+    transition: {
+      duration: (endMs - Math.max(elapsed, startMs)) / 1000,
+      ease: REVEAL_EASE,
+      delay: Math.max(0, startMs - elapsed) / 1000,
+    },
+    style: { originY: 1 }, // grow upward from the baseline
+  };
+};
+
+// motion `originX` for each single-rect line reveal — the edge the wipe grows from
+const SINGLE_REVEAL_ORIGIN: Record<Exclude<RevealAnimationType, "edges-in">, number> = {
+  "left-to-right": 0,
+  "right-to-left": 1,
+  "center-out": 0.5,
+};
+
+/**
+ * Wipe mask driven by motion.dev, played once when a <Line /> mounts. The same
+ * mask is applied to the line's stroke and its resting dots so both reveal in
+ * lockstep, replacing Recharts' built-in animation.
+ */
+const RevealMask = ({ id, type }: { id: string; type: RevealAnimationType }) => {
+  const reveal = {
+    initial: { scaleX: 0 },
+    animate: { scaleX: 1 },
+    transition: { duration: REVEAL_DURATION, ease: REVEAL_EASE },
+  };
+
+  return (
+    <mask
+      id={`${id}-reveal-mask`}
+      maskUnits="userSpaceOnUse"
+      maskContentUnits="userSpaceOnUse"
+      x="0"
+      y="0"
+      width="100%"
+      height="100%"
+    >
+      {type === "edges-in" ? (
+        <>
+          {/* left half wipes inward from the left edge toward the centre */}
+          <motion.rect
+            {...reveal}
+            x="0"
+            y="0"
+            width="50%"
+            height="100%"
+            fill="white"
+            style={{ originX: 0 }}
+          />
+          {/* right half wipes inward from the right edge toward the centre */}
+          <motion.rect
+            {...reveal}
+            x="50%"
+            y="0"
+            width="50%"
+            height="100%"
+            fill="white"
+            style={{ originX: 1 }}
+          />
+        </>
+      ) : (
+        <motion.rect
+          {...reveal}
+          x="0"
+          y="0"
+          width="100%"
+          height="100%"
+          fill="white"
+          style={{ originX: SINGLE_REVEAL_ORIGIN[type] }}
         />
       )}
-    </g>
+    </mask>
   );
 };
 
@@ -812,7 +1049,7 @@ const HorizontalColorGradient = ({
   const colorsCount = getColorsCount(config[dataKey] ?? {});
 
   return (
-    <linearGradient id={`${id}-line-colors`} x1="0" y1="0" x2="1" y2="0">
+    <linearGradient id={`${id}-line-colors-${dataKey}`} x1="0" y1="0" x2="1" y2="0">
       {colorsCount === 1 ? (
         <>
           <stop offset="0%" stopColor={`var(--color-${dataKey}-0)`} />
