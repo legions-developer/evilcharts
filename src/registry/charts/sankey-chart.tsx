@@ -618,13 +618,16 @@ const NodeColorGradients = ({
                 <stop offset="100%" stopColor={`var(--color-${dataKey}-0)`} />
               </>
             ) : (
-              Array.from({ length: colorsCount }, (_, index) => (
-                <stop
-                  key={index}
-                  offset={`${(index / (colorsCount - 1)) * 100}%`}
-                  stopColor={`var(--color-${dataKey}-${index}, var(--color-${dataKey}-0))`}
-                />
-              ))
+              Array.from({ length: colorsCount }, (_, index) => {
+                const offset = `${(index / (colorsCount - 1)) * 100}%`;
+                return (
+                  <stop
+                    key={offset}
+                    offset={offset}
+                    stopColor={`var(--color-${dataKey}-${index}, var(--color-${dataKey}-0))`}
+                  />
+                );
+              })
             )}
           </linearGradient>
         );
@@ -758,7 +761,7 @@ const LoadingSankey = () => {
     <>
       {links.map((link, i) => (
         <motion.path
-          key={`loading-link-${i}`}
+          key={`loading-link-${link.from}-${link.to}`}
           d={getLinkPath(link.from, link.to)}
           fill="none"
           stroke="currentColor"
@@ -775,7 +778,7 @@ const LoadingSankey = () => {
       ))}
       {nodes.map((node, i) => (
         <motion.rect
-          key={`loading-node-${i}`}
+          key={`loading-node-${node.x}-${node.y}`}
           x={node.x}
           y={node.y}
           width={node.width}

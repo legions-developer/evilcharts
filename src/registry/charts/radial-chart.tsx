@@ -39,6 +39,8 @@ const DEFAULT_OUTER_RADIUS = "100%";
 const DEFAULT_CORNER_RADIUS = 5;
 const DEFAULT_BAR_SIZE = 14;
 const LOADING_BARS = 5;
+// Stable empty-array reference so the `glowingBars` default doesn't change every render
+const EMPTY_GLOWING_BARS: string[] = [];
 const LOADING_ANIMATION_DURATION = 1500; // in milliseconds — interval between skeleton data changes
 
 type RadialBarChartProps = ComponentProps<typeof RechartsRadialBarChart>;
@@ -214,7 +216,7 @@ export function RadialBar({
   barSize = DEFAULT_BAR_SIZE,
   showBackground = true,
   isClickable = false,
-  glowingBars = [],
+  glowingBars = EMPTY_GLOWING_BARS,
   radialBarProps,
 }: RadialBarProps) {
   const { nameKey, chartId, isLoading, selectedBar, selectBar } = useRadialChart();
@@ -379,13 +381,16 @@ const ColorGradientStyle = ({
                 <stop offset="100%" stopColor={`var(--color-${dataKey}-0)`} />
               </>
             ) : (
-              Array.from({ length: colorsCount }, (_, index) => (
-                <stop
-                  key={index}
-                  offset={`${(index / (colorsCount - 1)) * 100}%`}
-                  stopColor={`var(--color-${dataKey}-${index}, var(--color-${dataKey}-0))`}
-                />
-              ))
+              Array.from({ length: colorsCount }, (_, index) => {
+                const offset = `${(index / (colorsCount - 1)) * 100}%`;
+                return (
+                  <stop
+                    key={offset}
+                    offset={offset}
+                    stopColor={`var(--color-${dataKey}-${index}, var(--color-${dataKey}-0))`}
+                  />
+                );
+              })
             )}
           </linearGradient>
         );

@@ -46,6 +46,8 @@ const DEFAULT_CORNER_RADIUS = 0;
 const DEFAULT_PADDING_ANGLE = 0;
 const DEFAULT_START_ANGLE = 0;
 const DEFAULT_END_ANGLE = 360;
+// Stable empty-array reference so the `glowingSectors` default doesn't change every render
+const EMPTY_GLOWING_SECTORS: string[] = [];
 
 type LabelListProps = ComponentProps<typeof RechartsLabelList>;
 
@@ -198,7 +200,7 @@ export function Pie({
   startAngle = DEFAULT_START_ANGLE,
   endAngle = DEFAULT_END_ANGLE,
   isClickable = false,
-  glowingSectors = [],
+  glowingSectors = EMPTY_GLOWING_SECTORS,
   children,
   pieProps,
 }: PieProps) {
@@ -441,13 +443,16 @@ const RadialColorGradient = ({
                 <stop offset="100%" stopColor={`var(--color-${sectorKey}-0)`} />
               </>
             ) : (
-              Array.from({ length: colorsCount }, (_, index) => (
-                <stop
-                  key={index}
-                  offset={`${(index / (colorsCount - 1)) * 100}%`}
-                  stopColor={`var(--color-${sectorKey}-${index}, var(--color-${sectorKey}-0))`}
-                />
-              ))
+              Array.from({ length: colorsCount }, (_, index) => {
+                const offset = `${(index / (colorsCount - 1)) * 100}%`;
+                return (
+                  <stop
+                    key={offset}
+                    offset={offset}
+                    stopColor={`var(--color-${sectorKey}-${index}, var(--color-${sectorKey}-0))`}
+                  />
+                );
+              })
             )}
           </linearGradient>
         );

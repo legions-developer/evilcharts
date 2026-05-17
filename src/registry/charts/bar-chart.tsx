@@ -825,13 +825,16 @@ const ColorGradient = ({
           <stop offset="100%" stopColor={`var(--color-${dataKey}-0)`} />
         </>
       ) : (
-        Array.from({ length: colorsCount }, (_, index) => (
-          <stop
-            key={index}
-            offset={`${(index / (colorsCount - 1)) * 100}%`}
-            stopColor={`var(--color-${dataKey}-${index}, var(--color-${dataKey}-0))`}
-          />
-        ))
+        Array.from({ length: colorsCount }, (_, index) => {
+          const offset = `${(index / (colorsCount - 1)) * 100}%`;
+          return (
+            <stop
+              key={offset}
+              offset={offset}
+              stopColor={`var(--color-${dataKey}-${index}, var(--color-${dataKey}-0))`}
+            />
+          );
+        })
       )}
     </linearGradient>
   );
@@ -940,13 +943,16 @@ const DuotonePattern = ({ id, dataKey, config }: StyleProps & { config: ChartCon
             <stop offset="100%" stopColor={`var(--color-${dataKey}-0)`} />
           </>
         ) : (
-          Array.from({ length: colorsCount }, (_, index) => (
-            <stop
-              key={index}
-              offset={`${(index / (colorsCount - 1)) * 100}%`}
-              stopColor={`var(--color-${dataKey}-${index}, var(--color-${dataKey}-0))`}
-            />
-          ))
+          Array.from({ length: colorsCount }, (_, index) => {
+            const offset = `${(index / (colorsCount - 1)) * 100}%`;
+            return (
+              <stop
+                key={offset}
+                offset={offset}
+                stopColor={`var(--color-${dataKey}-${index}, var(--color-${dataKey}-0))`}
+              />
+            );
+          })
         )}
       </linearGradient>
       <mask id={`${id}-duotone-mask-${dataKey}`} maskContentUnits="objectBoundingBox">
@@ -1009,13 +1015,16 @@ const DuotoneReversePattern = ({ id, dataKey, config }: StyleProps & { config: C
             <stop offset="100%" stopColor={`var(--color-${dataKey}-0)`} />
           </>
         ) : (
-          Array.from({ length: colorsCount }, (_, index) => (
-            <stop
-              key={index}
-              offset={`${(index / (colorsCount - 1)) * 100}%`}
-              stopColor={`var(--color-${dataKey}-${index}, var(--color-${dataKey}-0))`}
-            />
-          ))
+          Array.from({ length: colorsCount }, (_, index) => {
+            const offset = `${(index / (colorsCount - 1)) * 100}%`;
+            return (
+              <stop
+                key={offset}
+                offset={offset}
+                stopColor={`var(--color-${dataKey}-${index}, var(--color-${dataKey}-0))`}
+              />
+            );
+          })
         )}
       </linearGradient>
       <mask id={`${id}-duotone-reverse-mask-${dataKey}`} maskContentUnits="objectBoundingBox">

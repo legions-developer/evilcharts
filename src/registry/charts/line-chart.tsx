@@ -767,13 +767,16 @@ const ColorGradient = ({ id, dataKey, config }: StyleProps & { config: ChartConf
           <stop offset="100%" stopColor={`var(--color-${dataKey}-0)`} />
         </>
       ) : (
-        Array.from({ length: colorsCount }, (_, index) => (
-          <stop
-            key={index}
-            offset={`${(index / (colorsCount - 1)) * 100}%`}
-            stopColor={`var(--color-${dataKey}-${index}, var(--color-${dataKey}-0))`}
-          />
-        ))
+        Array.from({ length: colorsCount }, (_, index) => {
+          const offset = `${(index / (colorsCount - 1)) * 100}%`;
+          return (
+            <stop
+              key={offset}
+              offset={offset}
+              stopColor={`var(--color-${dataKey}-${index}, var(--color-${dataKey}-0))`}
+            />
+          );
+        })
       )}
     </linearGradient>
   );

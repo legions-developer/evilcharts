@@ -432,8 +432,14 @@ type StyleProps = {
   config: ChartConfig; // colors + labels for every series
 };
 
+type ColorStopsProps = {
+  dataKey: string; // series key the stops belong to
+  colorsCount: number; // number of color steps in the gradient
+  opacities?: number[]; // optional per-stop opacity ramp
+};
+
 // Emits one <stop> per color, falling back to a flat gradient for single colors
-const renderColorStops = (dataKey: string, colorsCount: number, opacities?: number[]) => {
+const ColorStops = ({ dataKey, colorsCount, opacities }: ColorStopsProps) => {
   if (colorsCount === 1) {
     return (
       <>
@@ -447,14 +453,21 @@ const renderColorStops = (dataKey: string, colorsCount: number, opacities?: numb
     );
   }
 
-  return Array.from({ length: colorsCount }, (_, index) => (
-    <stop
-      key={index}
-      offset={`${(index / (colorsCount - 1)) * 100}%`}
-      stopColor={`var(--color-${dataKey}-${index}, var(--color-${dataKey}-0))`}
-      stopOpacity={opacities?.[index]}
-    />
-  ));
+  return (
+    <>
+      {Array.from({ length: colorsCount }, (_, index) => {
+        const offset = `${(index / (colorsCount - 1)) * 100}%`;
+        return (
+          <stop
+            key={offset}
+            offset={offset}
+            stopColor={`var(--color-${dataKey}-${index}, var(--color-${dataKey}-0))`}
+            stopOpacity={opacities?.[index]}
+          />
+        );
+      })}
+    </>
+  );
 };
 
 /**
@@ -466,7 +479,7 @@ const ColorGradient = ({ id, dataKey, config }: StyleProps) => {
 
   return (
     <linearGradient id={`${id}-colors-${dataKey}`} x1="0" y1="0" x2="1" y2="0">
-      {renderColorStops(dataKey, colorsCount)}
+      <ColorStops dataKey={dataKey} colorsCount={colorsCount} />
     </linearGradient>
   );
 };
@@ -477,7 +490,7 @@ const StrokeGradient = ({ id, dataKey, config }: StyleProps) => {
 
   return (
     <linearGradient id={`${id}-radar-stroke-${dataKey}`} x1="0" y1="0" x2="1" y2="1">
-      {renderColorStops(dataKey, colorsCount)}
+      <ColorStops dataKey={dataKey} colorsCount={colorsCount} />
     </linearGradient>
   );
 };
@@ -490,7 +503,7 @@ const FillGradient = ({ id, dataKey, config }: StyleProps) => {
 
   return (
     <radialGradient id={`${id}-radar-fill-${dataKey}`} cx="50%" cy="50%" r="50%">
-      {renderColorStops(dataKey, colorsCount, opacities)}
+      <ColorStops dataKey={dataKey} colorsCount={colorsCount} opacities={opacities} />
     </radialGradient>
   );
 };
