@@ -1,23 +1,6 @@
 "use client";
 
 import {
-  axisValueToPercentFormatter,
-  type ChartConfig,
-  ChartContainer,
-  getColorsCount,
-  getLoadingData,
-  LoadingIndicator,
-} from "@/registry/ui/chart";
-import { EvilBrush, useEvilBrush, type EvilBrushRange } from "@/registry/ui/evil-brush";
-import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/legend";
-import {
-  ChartTooltip,
-  ChartTooltipContent,
-  type TooltipRoundness,
-  type TooltipVariant,
-} from "@/registry/ui/tooltip";
-import { ChartDot, type DotVariant } from "@/registry/ui/dot";
-import {
   Children,
   createContext,
   isValidElement,
@@ -33,19 +16,38 @@ import {
   type ReactNode,
 } from "react";
 import {
+  axisValueToPercentFormatter,
+  type ChartConfig,
+  ChartContainer,
+  getColorsCount,
+  getLoadingData,
+  LoadingIndicator,
+} from "@/registry/ui/chart";
+import {
   Area as RechartsArea,
   AreaChart as RechartsAreaChart,
   CartesianGrid,
   XAxis as RechartsXAxis,
   YAxis as RechartsYAxis,
 } from "recharts";
-import { motion } from "motion/react";
+import {
+  ChartTooltip,
+  ChartTooltipContent,
+  type TooltipRoundness,
+  type TooltipVariant,
+} from "@/registry/ui/tooltip";
+import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/legend";
+import { EvilBrush, useEvilBrush, type EvilBrushRange } from "@/registry/ui/evil-brush";
+import { ChartDot, type DotVariant } from "@/registry/ui/dot";
+import { motion, useReducedMotion } from "motion/react";
 
 // Constants
 const STROKE_WIDTH = 0.8;
 const LOADING_AREA_DATA_KEY = "loading";
 const LOADING_ANIMATION_DURATION = 2000; // in milliseconds
 const STACK_ID = "evil-stacked";
+const REVEAL_DURATION = 1; // intro wipe length, in seconds
+const REVEAL_EASE: [number, number, number, number] = [0, 0.7, 0.5, 1]; // intro wipe easing
 
 type CurveType = ComponentProps<typeof RechartsArea>["type"];
 type AreaDotProp = ComponentProps<typeof RechartsArea>["dot"];
@@ -53,6 +55,18 @@ type AreaActiveDotProp = ComponentProps<typeof RechartsArea>["activeDot"];
 type AreaVariant = "gradient" | "gradient-reverse" | "solid" | "dotted" | "lines" | "hatched";
 type StrokeVariant = "solid" | "dashed" | "animated-dashed";
 type StackType = "default" | "expanded" | "stacked";
+
+/**
+ * Direction of the custom motion.dev intro reveal. Recharts' own area animation
+ * is permanently disabled (it drew the line after the dots had already popped
+ * in) — these reveals replace it.
+ *
+ * NOTE: a reveal is a per-frame animated SVG mask, so it is heavier than a
+ * static chart. `"none"` opts out entirely; it is also what a device with the
+ * OS "reduce motion" preference falls back to automatically.
+ */
+type AreaAnimationType = "none" | "left-to-right" | "right-to-left" | "center-out" | "edges-in";
+type RevealAnimationType = Exclude<AreaAnimationType, "none">;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Shared context
@@ -66,6 +80,7 @@ type StackType = "default" | "expanded" | "stacked";
 type AreaChartContextValue = {
   config: ChartConfig; // colors + labels for every series
   curveType: CurveType; // default curve interpolation each <Area /> inherits
+  animationType: AreaAnimationType; // default intro reveal each <Area /> inherits
   isStacked: boolean; // whether areas stack on top of each other
   isExpanded: boolean; // whether the stack is normalized to 100%
   isLoading: boolean; // whether the chart shows its loading skeleton
@@ -107,6 +122,7 @@ type EvilAreaChartBaseProps<
   className?: string; // extra classes for the chart container
   chartProps?: ComponentProps<typeof RechartsAreaChart>; // escape hatch for the raw Recharts chart
   curveType?: CurveType; // default curve interpolation for every <Area />
+  animationType?: AreaAnimationType; // default intro reveal for every <Area />
   stackType?: StackType; // how multiple areas combine
   defaultSelectedDataKey?: string | null; // series selected on first render
   onSelectionChange?: (selectedDataKey: string | null) => void; // fires when the selected series changes
@@ -140,6 +156,7 @@ export function EvilAreaChart<
   className,
   chartProps,
   curveType = "linear",
+  animationType = "left-to-right",
   stackType = "default",
   defaultSelectedDataKey = null,
   onSelectionChange,
@@ -173,13 +190,23 @@ export function EvilAreaChart<
     () => ({
       config,
       curveType,
+      animationType,
       isStacked,
       isExpanded,
       isLoading,
       selectedDataKey,
       selectDataKey,
     }),
-    [config, curveType, isStacked, isExpanded, isLoading, selectedDataKey, selectDataKey],
+    [
+      config,
+      curveType,
+      animationType,
+      isStacked,
+      isExpanded,
+      isLoading,
+      selectedDataKey,
+      selectDataKey,
+    ],
   );
 
   return (
@@ -237,6 +264,7 @@ type AreaProps = {
   variant?: AreaVariant; // fill style for this area only
   strokeVariant?: StrokeVariant; // stroke style for this area
   curveType?: CurveType; // curve interpolation — falls back to the chart default
+  animationType?: AreaAnimationType; // intro reveal — falls back to the chart default
   connectNulls?: boolean; // join segments across null/missing values
   isClickable?: boolean; // lets this area be selected by clicking it
   children?: ReactNode; // optional <Dot /> and <ActiveDot /> composition
@@ -255,26 +283,44 @@ export function Area({
   variant = "gradient",
   strokeVariant = "dashed",
   curveType,
+  animationType,
   connectNulls = false,
   isClickable = false,
   children,
   areaProps,
 }: AreaProps) {
-  const { config, curveType: defaultCurve, isStacked, isExpanded, isLoading, selectedDataKey, selectDataKey } =
-    useAreaChart();
+  const {
+    config,
+    curveType: defaultCurve,
+    animationType: defaultAnimation,
+    isStacked,
+    isExpanded,
+    isLoading,
+    selectedDataKey,
+    selectDataKey,
+  } = useAreaChart();
   const id = useId().replace(/:/g, ""); // unique id scopes this area's style defs
+  // Devices set to "reduce motion" skip the intro reveal entirely
+  const shouldReduceMotion = useReducedMotion();
 
   // The root renders the skeleton area while loading, so real areas step aside
   if (isLoading) return null;
 
   const resolvedCurve = curveType ?? defaultCurve;
 
+  // The reveal is an animated SVG mask — heavier than a static chart — so
+  // `"none"` and the OS reduce-motion preference both opt out of it.
+  const revealType: AreaAnimationType = shouldReduceMotion
+    ? "none"
+    : (animationType ?? defaultAnimation);
+  const maskId = revealType === "none" ? undefined : `${id}-reveal-mask`;
+
   const isSelected = selectedDataKey === dataKey;
   const hasSelection = selectedDataKey !== null;
   const opacity = getOpacity(selectedDataKey, dataKey);
   const showUnselected = hasSelection && !isSelected;
 
-  const { dot, activeDot } = resolveDots(children, id, dataKey, opacity.dot);
+  const { dot, activeDot } = resolveDots(children, id, dataKey, opacity.dot, maskId);
 
   const isAnimatedDashed = strokeVariant === "animated-dashed";
   const isDashed = strokeVariant === "dashed" || isAnimatedDashed;
@@ -294,7 +340,14 @@ export function Area({
         activeDot={activeDot}
         strokeWidth={STROKE_WIDTH}
         strokeDasharray={isDashed ? "3 3" : undefined}
-        style={isClickable ? { cursor: "pointer" } : undefined}
+        // Recharts' built-in area animation is permanently disabled — it drew
+        // the line after the dots had already popped in. The motion.dev reveal
+        // mask drives the intro instead, wiping fill, stroke, and dots in together.
+        isAnimationActive={false}
+        style={{
+          ...(maskId ? { mask: `url(#${maskId})` } : {}),
+          ...(isClickable ? { cursor: "pointer" } : {}),
+        }}
         onClick={() => {
           if (!isClickable) return;
           // Clicking the selected area clears the selection, otherwise selects it
@@ -305,6 +358,7 @@ export function Area({
         {isAnimatedDashed && !hasSelection && <AnimatedDashedStroke />}
       </RechartsArea>
       <defs>
+        {revealType !== "none" && <RevealMask id={id} type={revealType} />}
         <ColorGradient id={id} dataKey={dataKey} config={config} isExpanded={isExpanded} />
         {variant === "gradient" && <GradientPattern id={id} dataKey={dataKey} />}
         {variant === "gradient-reverse" && <ReverseGradientPattern id={id} dataKey={dataKey} />}
@@ -492,12 +546,16 @@ const getFillPattern = (variant: AreaVariant, showUnselected: boolean, id: strin
   return `url(#${id}-${variant})`;
 };
 
-// Pulls <Dot /> and <ActiveDot /> out of an area's children into Recharts dot slots
+// Pulls <Dot /> and <ActiveDot /> out of an area's children into Recharts dot slots.
+// When a `maskId` is given the resting dot is wired to the intro reveal mask so it
+// wipes in with the line; the active dot is always left unmasked since it only
+// appears on hover, after the intro has finished.
 const resolveDots = (
   children: ReactNode,
   id: string,
   dataKey: string,
   dotOpacity: number,
+  maskId: string | undefined,
 ): { dot: AreaDotProp; activeDot: AreaActiveDotProp } => {
   let dot: AreaDotProp = false;
   let activeDot: AreaActiveDotProp = false;
@@ -507,7 +565,15 @@ const resolveDots = (
 
     if (child.type === Dot) {
       const { variant } = (child as ReactElement<DotProps>).props;
-      dot = <ChartDot type={variant} dataKey={dataKey} chartId={id} fillOpacity={dotOpacity} />;
+      dot = (
+        <ChartDot
+          type={variant}
+          dataKey={dataKey}
+          chartId={id}
+          fillOpacity={dotOpacity}
+          maskId={maskId}
+        />
+      );
     }
 
     if (child.type === ActiveDot) {
@@ -549,6 +615,81 @@ const AnimatedDashedStroke = () => {
         keyTimes="0;1"
       />
     </>
+  );
+};
+
+// motion `originX` for each single-rect reveal — the edge the wipe grows from.
+// 0 = left edge, 1 = right edge, 0.5 = centre (grows outward to both edges).
+const SINGLE_REVEAL_ORIGIN: Record<Exclude<RevealAnimationType, "edges-in">, number> = {
+  "left-to-right": 0,
+  "right-to-left": 1,
+  "center-out": 0.5,
+};
+
+/**
+ * Wipe mask driven by motion.dev, played once when an <Area /> mounts. The same
+ * mask is applied to the area's fill, stroke, and resting dots, so all three
+ * reveal in lockstep — fixing Recharts' default, where the dots appeared before
+ * the line had finished drawing.
+ *
+ * `maskUnits`/`maskContentUnits` are both userSpaceOnUse so every masked element
+ * shares one coordinate space and the wipe edge lands at the same x on each.
+ *
+ * Each rect animates `scaleX` 0 → 1; `originX` decides which edge it grows from.
+ * "edges-in" needs two rects — each half grows inward from an opposite edge.
+ */
+const RevealMask = ({ id, type }: { id: string; type: RevealAnimationType }) => {
+  const reveal = {
+    initial: { scaleX: 0 },
+    animate: { scaleX: 1 },
+    transition: { duration: REVEAL_DURATION, ease: REVEAL_EASE },
+  };
+
+  return (
+    <mask
+      id={`${id}-reveal-mask`}
+      maskUnits="userSpaceOnUse"
+      maskContentUnits="userSpaceOnUse"
+      x="0"
+      y="0"
+      width="100%"
+      height="100%"
+    >
+      {type === "edges-in" ? (
+        <>
+          {/* left half wipes inward from the left edge toward the centre */}
+          <motion.rect
+            {...reveal}
+            x="0"
+            y="0"
+            width="50%"
+            height="100%"
+            fill="white"
+            style={{ originX: 0 }}
+          />
+          {/* right half wipes inward from the right edge toward the centre */}
+          <motion.rect
+            {...reveal}
+            x="50%"
+            y="0"
+            width="50%"
+            height="100%"
+            fill="white"
+            style={{ originX: 1 }}
+          />
+        </>
+      ) : (
+        <motion.rect
+          {...reveal}
+          x="0"
+          y="0"
+          width="100%"
+          height="100%"
+          fill="white"
+          style={{ originX: SINGLE_REVEAL_ORIGIN[type] }}
+        />
+      )}
+    </mask>
   );
 };
 
@@ -697,7 +838,14 @@ const LinesPattern = ({ id, dataKey }: StyleProps) => {
 const DottedPattern = ({ id, dataKey }: StyleProps) => {
   return (
     <>
-      <pattern id={`${id}-dotted-texture`} x="0" y="0" width="6" height="6" patternUnits="userSpaceOnUse">
+      <pattern
+        id={`${id}-dotted-texture`}
+        x="0"
+        y="0"
+        width="6"
+        height="6"
+        patternUnits="userSpaceOnUse"
+      >
         <circle cx="4" cy="4" r="0.5" fill="white" />
       </pattern>
       <mask id={`${id}-dotted-mask`}>
@@ -764,7 +912,12 @@ const UnselectedPattern = ({ id, dataKey }: StyleProps) => {
         <line x1="0" y1="0" x2="0" y2="5" stroke="white" strokeWidth="1" />
       </pattern>
       <mask id={`${id}-unselected-mask`}>
-        <rect width="100%" height="100%" fill={`url(#${id}-unselected-texture)`} fillOpacity="0.3" />
+        <rect
+          width="100%"
+          height="100%"
+          fill={`url(#${id}-unselected-texture)`}
+          fillOpacity="0.3"
+        />
       </mask>
       <pattern id={`${id}-unselected`} patternUnits="userSpaceOnUse" width="100%" height="100%">
         <rect
