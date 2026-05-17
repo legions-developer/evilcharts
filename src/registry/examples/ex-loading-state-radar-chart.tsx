@@ -1,16 +1,14 @@
 "use client";
 
-import { EvilRadarChart } from "@/registry/charts/radar-chart";
+import {
+  EvilRadarChart,
+  Radar,
+  PolarGrid,
+  PolarAngleAxis,
+  Tooltip,
+  Legend,
+} from "@/registry/charts/radar-chart";
 import { type ChartConfig } from "@/registry/ui/chart";
-
-const data = [
-  { skill: "JavaScript", desktop: 186, mobile: 80 },
-  { skill: "TypeScript", desktop: 305, mobile: 200 },
-  { skill: "React", desktop: 237, mobile: 120 },
-  { skill: "Node.js", desktop: 173, mobile: 190 },
-  { skill: "CSS", desktop: 209, mobile: 130 },
-  { skill: "Python", desktop: 214, mobile: 140 },
-];
 
 const chartConfig = {
   desktop: {
@@ -32,12 +30,17 @@ const chartConfig = {
 export function EvilExampleRadarChart() {
   return (
     <EvilRadarChart
+      data={[]} // if isLoading is true, pass empty array → i.e isLoading ? [] : data
+      config={chartConfig}
       className="h-full w-full p-4"
-      data={data}
-      dataKey="skill"
-      hideDots
-      chartConfig={chartConfig}
-      isLoading // [!code highlight]
-    />
+      isLoading={true} // [!code highlight]
+    >
+      <PolarGrid />
+      <PolarAngleAxis dataKey="skill" />
+      <Legend />
+      <Tooltip />
+      <Radar dataKey="desktop" variant="filled" />
+      <Radar dataKey="mobile" variant="filled" />
+    </EvilRadarChart>
   );
 }

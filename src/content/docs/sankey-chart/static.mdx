@@ -61,8 +61,18 @@ links:
 
 ## Usage
 
+The sankey chart is a composible compound component: `<EvilSankeyChart />` is the
+container, and `<Node />`, `<Link />`, and `<Tooltip />` are composed as children.
+Render only the parts you need.
+
 ```tsx
-import { EvilSankeyChart } from "@/components/evilcharts/charts/sankey-chart";
+import {
+  EvilSankeyChart,
+  Node,
+  NodeLabel,
+  Link,
+  Tooltip,
+} from "@/components/evilcharts/charts/sankey-chart";
 import type { SankeyData } from "recharts";
 ```
 
@@ -95,22 +105,24 @@ const chartConfig = {
   // ... more node configs
 } satisfies ChartConfig;
 
-<EvilSankeyChart
-  data={data}
-  chartConfig={chartConfig}
-  isClickable
-/>
+<EvilSankeyChart data={data} config={chartConfig}>
+  <Node isClickable>
+    <NodeLabel position="outside" showValues />
+  </Node>
+  <Link variant="source" />
+  <Tooltip />
+</EvilSankeyChart>
 ```
 
 ### Interactive Selection
 
-When `isClickable` is enabled, you can use the `onSelectionChange` callback to handle selection events:
+Set `isClickable` on `<Node />` to let nodes be selected by clicking. Use the
+`onSelectionChange` callback on the root to handle selection events:
 
 ```tsx
 <EvilSankeyChart
   data={data}
-  chartConfig={chartConfig}
-  isClickable={true}
+  config={chartConfig}
   onSelectionChange={(selection) => {
     if (selection) {
       console.log("Selected:", selection.dataKey, "Value:", selection.value);
@@ -118,7 +130,11 @@ When `isClickable` is enabled, you can use the `onSelectionChange` callback to h
       console.log("Deselected");
     }
   }}
-/>
+>
+  <Node isClickable />
+  <Link variant="source" />
+  <Tooltip />
+</EvilSankeyChart>
 ```
 
 ### Loading State
@@ -126,13 +142,13 @@ When `isClickable` is enabled, you can use the `onSelectionChange` callback to h
 <ComponentPreview className="mb-0" title="isLoading='true'" name="ex-loading-state-sankey-chart"  />
 <Alert > 
   <AlertContent >
-    The sankey chart supports loading state with a placeholder animation showing nodes and links. You can pass the `isLoading` prop to the chart to show the loading state while your data is being fetched.
+    The sankey chart supports loading state with a placeholder animation showing nodes and links. You can pass the `isLoading` prop to `<EvilSankeyChart />` to show the loading state while your data is being fetched.
   </AlertContent>
 </Alert>
 
 ## Examples
 
-Below are some examples of the sankey chart with different configurations. You can customize the `linkVariant`, `nodeWidth`, `nodePadding`, and other properties.
+Below are some examples of the sankey chart with different configurations. You can customize the `<Link />` `variant`, the root `nodeWidth`, `nodePadding`, and other properties.
 
 ### Gradient Colors
 
@@ -143,7 +159,7 @@ Below are some examples of the sankey chart with different configurations. You c
 
 <Alert>
   <AlertContent>
-    Display labels and values on nodes using the `showNodeLabels` prop.
+    Display labels and values on nodes by composing a `<NodeLabel />` inside `<Node />`.
   </AlertContent>
 </Alert>
 
@@ -153,7 +169,7 @@ Below are some examples of the sankey chart with different configurations. You c
 <ComponentPreview className="mb-0" title="showNodeLabels='inside' - solid colors" name="ex-solid-labeled-nodes-sankey-chart"  />
 <Alert> 
   <AlertContent>
-    Use a larger `nodeWidth` (e.g., 80) to accommodate the text. You can also use `linkVerticalPadding` to add padding where links connect to nodes.
+    Use a larger `nodeWidth` (e.g., 80) on the root to accommodate the text. You can also use `verticalPadding` on `<Link />` to add padding where links connect to nodes.
   </AlertContent>
 </Alert>  
 
@@ -165,39 +181,47 @@ Below are some examples of the sankey chart with different configurations. You c
 
 <Alert>
   <AlertContent>
-    The sankey chart supports different link coloring strategies through the `linkVariant` prop.
+    The sankey chart supports different link coloring strategies through the `variant` prop on `<Link />`.
   </AlertContent>
 </Alert>
 
 #### Solid Links
 
-<ComponentPreview className="mb-0" title="linkVariant='solid'" name="ex-solid-link-variant-sankey-chart"  />
+<ComponentPreview className="mb-0" title="<Link variant='solid' />" name="ex-solid-link-variant-sankey-chart"  />
 <Alert> 
   <AlertContent>
-    Set `linkVariant` to `"solid"` to use a single color for all links. This creates a clean, minimal look.
+    Set `<Link />` `variant` to `"solid"` to use a single color for all links. This creates a clean, minimal look.
   </AlertContent>
 </Alert>
 
 #### Source-colored Links
 
-<ComponentPreview className="mb-0" title="linkVariant='source'" name="ex-source-link-variant-sankey-chart"  />
+<ComponentPreview className="mb-0" title="<Link variant='source' />" name="ex-source-link-variant-sankey-chart"  />
 <Alert> 
   <AlertContent>
-    Set `linkVariant` to `"source"` to color links based on their source node. This helps trace where flows originate.
+    Set `<Link />` `variant` to `"source"` to color links based on their source node. This helps trace where flows originate.
   </AlertContent>
 </Alert>
 
 ### Glowing Nodes
 
-<ComponentPreview className="mb-0" title="glowingNodes={['Visit', 'Page-Click']}" name="ex-glowing-sankey-chart"  />
+<ComponentPreview className="mb-0" title="<Node glow={['Solar', 'Wind']} />" name="ex-glowing-sankey-chart"  />
 <Alert> 
   <AlertContent>
-    Add a subtle glow effect to specific nodes using `glowingNodes` prop. Pass an array of node names to specify which nodes should glow.
+    Add a subtle glow effect to specific nodes using the `glow` prop on `<Node />`. Pass an array of node names to specify which nodes should glow.
   </AlertContent>
 </Alert>
 
 
 ## API Reference
+
+The sankey chart is composed of a root container and a small set of composible
+parts. Render the root, then compose the parts you need as children.
+
+### `<EvilSankeyChart />`
+
+The root container. Owns the flow data, the layout configuration, the shared
+context, and the loading skeleton.
 
 <ApiReferenceWrapper>
   <ApiReference>
@@ -216,13 +240,25 @@ Below are some examples of the sankey chart with different configurations. You c
   
   <ApiReference>
     <ApiHeader
-      propName="chartConfig"
+      propName="config"
       isRequired
     />
     <ApiContent>
       Configuration object that defines the chart's nodes. Each key should match a node name from your data, with corresponding colors.
       
       type: `ChartConfig`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="children"
+      isRequired
+    />
+    <ApiContent>
+      The composed parts — `<Node />`, `<Link />`, and `<Tooltip />`.
+      
+      type: `ReactNode`
     </ApiContent>
   </ApiReference>
 
@@ -330,134 +366,6 @@ Below are some examples of the sankey chart with different configurations. You c
 
   <ApiReference>
     <ApiHeader
-      propName="linkVariant"
-    />
-    <ApiContent>
-      The coloring strategy for links. `"gradient"` uses gradient from source to target, `"solid"` uses a single color, `"source"` uses source node color, `"target"` uses target node color.
-      
-      type: `"gradient" | "solid" | "source" | "target"`
-      
-      default: `"gradient"`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="nodeRadius"
-    />
-    <ApiContent>
-      The border radius of nodes in pixels. Set to 0 for square nodes.
-      
-      type: `number`
-      
-      default: `0`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="linkVerticalPadding"
-    />
-    <ApiContent>
-      Vertical padding where links connect to nodes in pixels. Useful when using node labels.
-      
-      type: `number`
-      
-      default: `0`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="showNodeLabels"
-    />
-    <ApiContent>
-      Position of node labels. `"inside"` shows labels inside nodes, `"outside"` shows labels beside nodes, `"none"` hides labels.
-      
-      type: `"inside" | "outside" | "none"`
-      
-      default: `"none"`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="showNodeValues"
-    />
-    <ApiContent>
-      Whether to display the total flow value on each node label.
-      
-      type: `boolean`
-      
-      default: `false`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="nodeValueFormatter"
-    />
-    <ApiContent>
-      Function to format node values when `showNodeValues` is enabled.
-      
-      type: `(value: number) => string`
-      
-      default: `(value) => value.toLocaleString()`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="hideTooltip"
-    />
-    <ApiContent>
-      Whether to hide the tooltip on hover.
-      
-      type: `boolean`
-      
-      default: `false`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="tooltipRoundness"
-    />
-    <ApiContent>
-      Controls the border-radius of the tooltip.
-      
-      type: `"sm" | "md" | "lg" | "xl"`
-      
-      default: `"lg"`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="tooltipVariant"
-    />
-    <ApiContent>
-      Controls the visual style of the tooltip.
-      
-      type: `"default" | "frosted-glass"`
-      
-      default: `"default"`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="tooltipDefaultIndex"
-    />
-    <ApiContent>
-      When set, the tooltip will be visible by default at the specified data point index.
-      
-      type: `number`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
       propName="backgroundVariant"
     />
     <ApiContent>
@@ -469,14 +377,14 @@ Below are some examples of the sankey chart with different configurations. You c
 
   <ApiReference>
     <ApiHeader
-      propName="isClickable"
+      propName="defaultSelectedNode"
     />
     <ApiContent>
-      Enables interactive clicking on nodes to select/deselect them. Selected nodes become highlighted while unselected nodes and their links dim.
+      The node name selected on first render.
       
-      type: `boolean`
+      type: `string | null`
       
-      default: `false`
+      default: `null`
     </ApiContent>
   </ApiReference>
 
@@ -485,9 +393,7 @@ Below are some examples of the sankey chart with different configurations. You c
       propName="onSelectionChange"
     />
     <ApiContent>
-      Callback function that is called when a node is selected or deselected. Receives an object with `dataKey` (node name) and `value` (node value calculated from links), or `null` when deselected.
-      
-      **Note:** This prop is only available when `isClickable` is set to `true`.
+      Callback function that is called when a node is selected or deselected. Receives an object with `dataKey` (node name) and `value` (node value calculated from links), or `null` when deselected. Fires when a node is clicked while `<Node />` has `isClickable` set.
       
       type: `(selection: { dataKey: string; value: number } | null) => void`
     </ApiContent>
@@ -508,7 +414,53 @@ Below are some examples of the sankey chart with different configurations. You c
 
   <ApiReference>
     <ApiHeader
-      propName="glowingNodes"
+      propName="sankeyProps"
+    />
+    <ApiContent>
+      Additional props to pass to the underlying Recharts Sankey component.
+      
+      type: `Omit<SankeyProps, "data">`
+      
+      Read the <Link href="https://recharts.github.io/en-US/api/Sankey/" _blank>Recharts Sankey documentation</Link> for available props.
+    </ApiContent>
+  </ApiReference>
+</ApiReferenceWrapper>
+
+### `<Node />`
+
+Configures how the sankey nodes render. Compose a `<NodeLabel />` inside it to
+show labels and values.
+
+<ApiReferenceWrapper>
+  <ApiReference>
+    <ApiHeader
+      propName="radius"
+    />
+    <ApiContent>
+      The corner radius of node rectangles in pixels. Set to 0 for square nodes.
+      
+      type: `number`
+      
+      default: `0`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="isClickable"
+    />
+    <ApiContent>
+      Enables interactive clicking on nodes to select/deselect them. Selected nodes become highlighted while unselected nodes and their links dim.
+      
+      type: `boolean`
+      
+      default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="glow"
     />
     <ApiContent>
       Array of node names that should have a glowing effect applied. Creates a smooth outer glow around the specified nodes.
@@ -521,7 +473,93 @@ Below are some examples of the sankey chart with different configurations. You c
 
   <ApiReference>
     <ApiHeader
-      propName="glowingLinks"
+      propName="children"
+    />
+    <ApiContent>
+      Optional `<NodeLabel />` composition.
+      
+      type: `ReactNode`
+    </ApiContent>
+  </ApiReference>
+</ApiReferenceWrapper>
+
+### `<NodeLabel />`
+
+Declares labels for the `<Node />` it is composed inside.
+
+<ApiReferenceWrapper>
+  <ApiReference>
+    <ApiHeader
+      propName="position"
+    />
+    <ApiContent>
+      Position of node labels. `"inside"` shows labels inside nodes, `"outside"` shows labels beside nodes. When `<NodeLabel />` is not composed, no labels are shown.
+      
+      type: `"inside" | "outside"`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="showValues"
+    />
+    <ApiContent>
+      Whether to display the total flow value alongside each node label.
+      
+      type: `boolean`
+      
+      default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="valueFormatter"
+    />
+    <ApiContent>
+      Function to format node values when `showValues` is enabled.
+      
+      type: `(value: number) => string`
+      
+      default: `(value) => value.toLocaleString()`
+    </ApiContent>
+  </ApiReference>
+</ApiReferenceWrapper>
+
+### `<Link />`
+
+Configures how the sankey links render.
+
+<ApiReferenceWrapper>
+  <ApiReference>
+    <ApiHeader
+      propName="variant"
+    />
+    <ApiContent>
+      The coloring strategy for links. `"gradient"` fades from source to target color, `"solid"` uses a single color, `"source"` uses the source node color, `"target"` uses the target node color.
+      
+      type: `"gradient" | "solid" | "source" | "target"`
+      
+      default: `"gradient"`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="verticalPadding"
+    />
+    <ApiContent>
+      Vertical padding where links connect to nodes in pixels. Useful when using node labels.
+      
+      type: `number`
+      
+      default: `0`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="glow"
     />
     <ApiContent>
       Array of link indices that should have a glowing effect applied. Creates a smooth outer glow around the specified links.
@@ -531,17 +569,47 @@ Below are some examples of the sankey chart with different configurations. You c
       default: `[]`
     </ApiContent>
   </ApiReference>
+</ApiReferenceWrapper>
+
+### `<Tooltip />`
+
+The hover tooltip. Hidden automatically while the chart is loading.
+
+<ApiReferenceWrapper>
+  <ApiReference>
+    <ApiHeader
+      propName="variant"
+    />
+    <ApiContent>
+      Controls the visual style of the tooltip.
+      
+      type: `"default" | "frosted-glass"`
+      
+      default: `"default"`
+    </ApiContent>
+  </ApiReference>
 
   <ApiReference>
     <ApiHeader
-      propName="sankeyProps"
+      propName="roundness"
     />
     <ApiContent>
-      Additional props to pass to the underlying Recharts Sankey component.
+      Controls the border-radius of the tooltip.
       
-      type: `Omit<ComponentProps<typeof Sankey>, "data">`
+      type: `"sm" | "md" | "lg" | "xl"`
       
-      Read the <Link href="https://recharts.github.io/en-US/api/Sankey/" _blank>Recharts Sankey documentation</Link> for available props.
+      default: `"lg"`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="defaultIndex"
+    />
+    <ApiContent>
+      When set, the tooltip will be visible by default at the specified data point index.
+      
+      type: `number`
     </ApiContent>
   </ApiReference>
 </ApiReferenceWrapper>

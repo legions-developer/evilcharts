@@ -1,6 +1,15 @@
 "use client";
 
-import { EvilComposedChart } from "@/registry/charts/composed-chart";
+import {
+  EvilComposedChart,
+  Bar,
+  Line,
+  XAxis,
+  Grid,
+  Tooltip,
+  Legend,
+  ActiveDot,
+} from "@/registry/charts/composed-chart";
 import { type ChartConfig } from "@/registry/ui/chart";
 
 const data = [
@@ -18,7 +27,7 @@ const data = [
   { month: "December", revenue: 9100, profit: 4200 },
 ];
 
-const barConfig = {
+const chartConfig = {
   revenue: {
     label: "Revenue",
     colors: {
@@ -26,9 +35,6 @@ const barConfig = {
       dark: ["#6A5ACD"],
     },
   },
-} satisfies ChartConfig;
-
-const lineConfig = {
   profit: {
     label: "Profit",
     colors: {
@@ -41,16 +47,21 @@ const lineConfig = {
 export function EvilExampleComposedChart() {
   return (
     <EvilComposedChart
-      isClickable
       className="h-full w-full p-4"
       xDataKey="month"
       data={data}
-      dotVariant="colored-border"
-      barConfig={barConfig}
-      lineConfig={lineConfig}
-      xAxisProps={{ tickFormatter: (value) => value.substring(0, 3) }}
+      config={chartConfig}
       showBrush
       brushFormatLabel={(value) => String(value).substring(0, 3)}
-    />
+    >
+      <Grid />
+      <XAxis dataKey="month" tickFormatter={(value) => value.substring(0, 3)} />
+      <Legend isClickable />
+      <Tooltip />
+      <Bar dataKey="revenue" isClickable />
+      <Line dataKey="profit" isClickable>
+        <ActiveDot variant="colored-border" />
+      </Line>
+    </EvilComposedChart>
   );
 }

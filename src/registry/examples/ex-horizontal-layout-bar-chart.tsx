@@ -1,6 +1,6 @@
 "use client";
 
-import { EvilBarChart } from "@/registry/charts/bar-chart";
+import { EvilBarChart, Bar, YAxis, Grid, Tooltip, Legend } from "@/registry/charts/bar-chart";
 import { type ChartConfig } from "@/registry/ui/chart";
 
 const data = [
@@ -25,12 +25,19 @@ const chartConfig = {
 export function EvilExampleBarChart() {
   return (
     <EvilBarChart
-      className="h-full w-full p-4"
-      xDataKey="month"
       data={data}
-      chartConfig={chartConfig}
+      config={chartConfig}
+      className="h-full w-full p-4"
       layout="horizontal" // [!code highlight]
-      yAxisProps={{ tickFormatter: (value) => value.substring(0, 3) }} // [!code highlight]
-    />
+    >
+      <Grid />
+      <YAxis
+        dataKey="month"
+        tickFormatter={(value) => value.substring(0, 3)} // [!code highlight]
+      />
+      <Legend />
+      <Tooltip />
+      <Bar dataKey="desktop" variant="default" />
+    </EvilBarChart>
   );
 }

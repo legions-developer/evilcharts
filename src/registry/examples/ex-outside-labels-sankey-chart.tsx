@@ -1,6 +1,6 @@
 "use client";
 
-import { EvilSankeyChart } from "@/registry/charts/sankey-chart";
+import { EvilSankeyChart, Node, NodeLabel, Link, Tooltip } from "@/registry/charts/sankey-chart";
 import type { SankeyData } from "recharts";
 import { type ChartConfig } from "@/registry/ui/chart";
 
@@ -93,15 +93,19 @@ export function EvilExampleOutsideLabelsSankeyChart() {
     <EvilSankeyChart
       className="h-full w-full p-4"
       data={data}
-      chartConfig={chartConfig}
+      config={chartConfig}
       nodeWidth={8}
       nodePadding={20}
-      nodeRadius={4}
-      linkVariant="source"
-      showNodeLabels="outside" // [!code highlight]
-      showNodeValues={true} // [!code highlight]
-      nodeValueFormatter={(value) => value.toLocaleString()}
-      isClickable
-    />
+    >
+      <Node isClickable radius={4}>
+        <NodeLabel
+          position="outside" // [!code highlight]
+          showValues // [!code highlight]
+          valueFormatter={(value) => value.toLocaleString()}
+        />
+      </Node>
+      <Link variant="source" />
+      <Tooltip />
+    </EvilSankeyChart>
   );
 }

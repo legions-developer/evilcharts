@@ -1,6 +1,12 @@
 "use client";
 
-import { EvilLineChart } from "@/registry/charts/line-chart";
+import {
+  EvilLineChart,
+  Line,
+  XAxis,
+  Legend,
+  Tooltip,
+} from "@/registry/charts/line-chart";
 import { type ChartConfig } from "@/registry/ui/chart";
 
 const data = [
@@ -37,13 +43,14 @@ const chartConfig = {
 
 export function EvilExampleLegendRoundedSquareOutlineLineChart() {
   return (
-    <EvilLineChart
-      className="h-full w-full p-4"
-      xDataKey="month"
-      legendVariant="rounded-square-outline" // [!code highlight]
-      data={data}
-      chartConfig={chartConfig}
-      xAxisProps={{ tickFormatter: (value: string) => value.substring(0, 3) }}
-    />
+    <EvilLineChart data={data} config={chartConfig} className="h-full w-full p-4">
+      <XAxis dataKey="month" tickFormatter={(value) => value.substring(0, 3)} />
+      <Legend
+        variant="rounded-square-outline" // [!code highlight]
+      />
+      <Tooltip />
+      <Line dataKey="desktop" strokeVariant="solid" />
+      <Line dataKey="mobile" strokeVariant="solid" />
+    </EvilLineChart>
   );
 }

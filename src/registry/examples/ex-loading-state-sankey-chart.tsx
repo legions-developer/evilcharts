@@ -1,6 +1,6 @@
 "use client";
 
-import { EvilSankeyChart } from "@/registry/charts/sankey-chart";
+import { EvilSankeyChart, Node, Link, Tooltip } from "@/registry/charts/sankey-chart";
 import type { SankeyData } from "recharts";
 import { type ChartConfig } from "@/registry/ui/chart";
 
@@ -83,9 +83,12 @@ export function EvilExampleSankeyChart() {
     <EvilSankeyChart
       className="h-full w-full p-4"
       data={data}
-      chartConfig={chartConfig}
-      linkVariant="source"
+      config={chartConfig}
       isLoading // [!code highlight]
-    />
+    >
+      <Node />
+      <Link variant="source" />
+      <Tooltip />
+    </EvilSankeyChart>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { EvilBarChart } from "@/registry/charts/bar-chart";
+import { EvilBarChart, Bar, XAxis, Grid, Tooltip, Legend } from "@/registry/charts/bar-chart";
 import { type ChartConfig } from "@/registry/ui/chart";
 import { Monitor, Smartphone } from "lucide-react";
 
@@ -40,13 +40,13 @@ const chartConfig = {
 
 export function EvilExampleChartConfigIconsBarChart() {
   return (
-    <EvilBarChart
-      className="h-full w-full p-4"
-      xDataKey="month"
-      tooltipDefaultIndex={4}
-      data={data}
-      chartConfig={chartConfig}
-      xAxisProps={{ tickFormatter: (value: string) => value.substring(0, 3) }}
-    />
+    <EvilBarChart data={data} config={chartConfig} className="h-full w-full p-4">
+      <Grid />
+      <XAxis dataKey="month" tickFormatter={(value: string) => value.substring(0, 3)} />
+      <Legend />
+      <Tooltip defaultIndex={4} />
+      <Bar dataKey="desktop" variant="default" />
+      <Bar dataKey="mobile" variant="default" />
+    </EvilBarChart>
   );
 }

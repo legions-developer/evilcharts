@@ -82,8 +82,15 @@ links:
 
 ## Usage
 
+The radial chart is composible. `<EvilRadialChart>` is the container, and you compose only the parts you need — `<Legend>`, `<Tooltip>`, and a `<RadialBar>` — as its children. The `<RadialBar>` carries its own `glowingBars` and `isClickable`, so styling and interactivity live with the series itself.
+
 ```tsx
-import { EvilRadialChart } from "@/components/evilcharts/charts/radial-chart";
+import {
+  EvilRadialChart,
+  RadialBar,
+  Tooltip,
+  Legend,
+} from "@/components/evilcharts/charts/radial-chart";
 ```
 
 ```tsx
@@ -109,17 +116,23 @@ const chartConfig = {
 } satisfies ChartConfig;
 ```
 
+```tsx
+<EvilRadialChart data={data} nameKey="browser" config={chartConfig} variant="full">
+  <Legend isClickable />
+  <Tooltip />
+  <RadialBar dataKey="visitors" isClickable glowingBars={["chrome"]} />
+</EvilRadialChart>
+```
+
 ### Interactive Selection
 
-When `isClickable` is enabled, you can use the `onSelectionChange` callback to handle selection events:
+Add `isClickable` to `<RadialBar>` (and to `<Legend>`) to make bars selectable. Use the `onSelectionChange` callback on `<EvilRadialChart>` to handle selection events:
 
 ```tsx
 <EvilRadialChart
   data={data}
-  dataKey="visitors"
   nameKey="browser"
-  chartConfig={chartConfig}
-  isClickable={true}
+  config={chartConfig}
   onSelectionChange={(selection) => {
     if (selection) {
       console.log("Selected:", selection.dataKey, "Value:", selection.value);
@@ -127,16 +140,11 @@ When `isClickable` is enabled, you can use the `onSelectionChange` callback to h
       console.log("Deselected");
     }
   }}
-/>
-```
-
-```tsx
-<EvilRadialChart  
-  data={data}
-  dataKey="visitors"
-  nameKey="browser"
-  chartConfig={chartConfig}
-/>
+>
+  <Legend isClickable />
+  <Tooltip />
+  <RadialBar dataKey="visitors" isClickable />
+</EvilRadialChart>
 ```
 
 ### Loading State
@@ -170,34 +178,41 @@ Below are some examples of the radial chart with different configurations. You c
 <ComponentPreview className="mb-0" title="glowingBars={['chrome', 'safari']}" name="ex-glowing-radial-chart"  />
 <Alert> 
   <AlertContent>
-    Add a subtle glow effect to specific bars using `glowingBars` prop. Pass an array of bar names (the values from your `nameKey` field) to specify which bars should glow.
+    Add a subtle glow effect to specific bars using the `glowingBars` prop on `<RadialBar>`. Pass an array of bar names (the values from your `nameKey` field) to specify which bars should glow.
   </AlertContent>
 </Alert>
 
+
 ## API Reference
+
+The chart is composed of several parts. The props below are grouped by the component they belong to.
+
+### `<EvilRadialChart />`
+
+The root container. It owns the data, the shared selection state, the loading skeleton, and the chart-wide arc shape. Everything visual is composed as its children.
 
 <ApiReferenceWrapper>
   <ApiReference>
     <ApiHeader
       propName="data"
-      isRequired 
-    />
-    <ApiContent>
-      Data used to display the chart. An array of objects where each object represents a radial bar.
-      
-      type: `TData[]` where `TData extends Record<string, unknown>`
-    </ApiContent>
-  </ApiReference>
-  
-  <ApiReference>
-    <ApiHeader
-      propName="dataKey"
       isRequired
     />
     <ApiContent>
-      The key from your data objects to use for bar values (typically numeric values that determine bar size).
-      
-      type: `keyof TData & string`
+      Data used to display the chart. An array of objects where each object represents a radial bar.
+
+      type: `TData[]` where `TData extends Record<string, unknown>`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="config"
+      isRequired
+    />
+    <ApiContent>
+      Configuration object that defines the chart's bars. Each key should match a value from your `nameKey` field, with corresponding colors.
+
+      type: `ChartConfig`
     </ApiContent>
   </ApiReference>
 
@@ -207,21 +222,21 @@ Below are some examples of the radial chart with different configurations. You c
       isRequired
     />
     <ApiContent>
-      The key from your data objects to use for bar names (typically string values used for labels and legend).
-      
+      The key from your data objects to use for bar names (typically string values used for labels and the legend).
+
       type: `keyof TData & string`
     </ApiContent>
   </ApiReference>
 
   <ApiReference>
     <ApiHeader
-      propName="chartConfig"
+      propName="children"
       isRequired
     />
     <ApiContent>
-      Configuration object that defines the chart's bars. Each key should match a value from your `nameKey` field, with corresponding colors.
-      
-      type: `ChartConfig`
+      The composed chart parts — `<Legend />`, `<Tooltip />`, and a `<RadialBar />`.
+
+      type: `ReactNode`
     </ApiContent>
   </ApiReference>
 
@@ -231,7 +246,7 @@ Below are some examples of the radial chart with different configurations. You c
     />
     <ApiContent>
       Additional CSS classes to apply to the chart container.
-      
+
       type: `string`
     </ApiContent>
   </ApiReference>
@@ -241,10 +256,10 @@ Below are some examples of the radial chart with different configurations. You c
       propName="variant"
     />
     <ApiContent>
-      The visual variant of the radial chart. `"full"` displays a full circle (360°), `"semi"` displays a half circle (180°).
-      
+      The arc shape of the radial chart. `"full"` displays a full circle (360°), `"semi"` displays a half circle (180°).
+
       type: `"full" | "semi"`
-      
+
       default: `"full"`
     </ApiContent>
   </ApiReference>
@@ -255,9 +270,9 @@ Below are some examples of the radial chart with different configurations. You c
     />
     <ApiContent>
       The inner radius of the radial bars. Can be a number (pixels) or percentage string.
-      
+
       type: `number | string`
-      
+
       default: `"30%"`
     </ApiContent>
   </ApiReference>
@@ -268,147 +283,23 @@ Below are some examples of the radial chart with different configurations. You c
     />
     <ApiContent>
       The outer radius of the radial bars. Can be a number (pixels) or percentage string.
-      
+
       type: `number | string`
-      
+
       default: `"100%"`
     </ApiContent>
   </ApiReference>
 
   <ApiReference>
     <ApiHeader
-      propName="cornerRadius"
+      propName="defaultSelectedDataKey"
     />
     <ApiContent>
-      The border radius for the corners of each bar in pixels.
-      
-      type: `number`
-      
-      default: `5`
-    </ApiContent>
-  </ApiReference>
+      The bar name that should be selected by default.
 
-  <ApiReference>
-    <ApiHeader
-      propName="barSize"
-    />
-    <ApiContent>
-      The thickness of each radial bar in pixels.
-      
-      type: `number`
-      
-      default: `14`
-    </ApiContent>
-  </ApiReference>
+      type: `string | null`
 
-  <ApiReference>
-    <ApiHeader
-      propName="hideTooltip"
-    />
-    <ApiContent>
-      Whether to hide the tooltip on hover.
-      
-      type: `boolean`
-      
-      default: `false`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="tooltipRoundness"
-    />
-    <ApiContent>
-      Controls the border-radius of the tooltip.
-      
-      type: `"sm" | "md" | "lg" | "xl"`
-      
-      default: `"lg"`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="tooltipVariant"
-    />
-    <ApiContent>
-      Controls the visual style of the tooltip.
-      
-      type: `"default" | "frosted-glass"`
-      
-      default: `"default"`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="tooltipDefaultIndex"
-    />
-    <ApiContent>
-      When set, the tooltip will be visible by default at the specified data point index.
-      
-      type: `number`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="legendVariant"
-    />
-    <ApiContent>
-      The visual style variant for the legend indicators.
-      
-      type: `"square" | "circle" | "circle-outline" | "rounded-square" | "rounded-square-outline" | "vertical-bar" | "horizontal-bar"`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="hideLegend"
-    />
-    <ApiContent>
-      Whether to hide the chart legend.
-      
-      type: `boolean`
-      
-      default: `false`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="backgroundVariant"
-    />
-    <ApiContent>
-      Background pattern variant to display behind the chart.
-      
-      type: `BackgroundVariant`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="hideBackground"
-    />
-    <ApiContent>
-      Whether to hide the background bars (the unfilled portion of each bar).
-      
-      type: `boolean`
-      
-      default: `false`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="isClickable"
-    />
-    <ApiContent>
-      Enables interactive clicking on bars to select/deselect them. Selected bars expand slightly and unselected bars dim.
-      
-      type: `boolean`
-      
-      default: `false`
+      default: `null`
     </ApiContent>
   </ApiReference>
 
@@ -417,10 +308,8 @@ Below are some examples of the radial chart with different configurations. You c
       propName="onSelectionChange"
     />
     <ApiContent>
-      Callback function that is called when a bar is selected or deselected. Receives an object with `dataKey` (bar name) and `value` (bar value), or `null` when deselected.
-      
-      **Note:** This prop is only available when `isClickable` is set to `true`.
-      
+      Callback fired when a bar is selected or deselected — by clicking a clickable `<RadialBar />` or `<Legend />` entry. Receives an object with `dataKey` (bar name) and `value` (bar value), or `null` when deselected.
+
       type: `(selection: { dataKey: string; value: number } | null) => void`
     </ApiContent>
   </ApiReference>
@@ -431,9 +320,103 @@ Below are some examples of the radial chart with different configurations. You c
     />
     <ApiContent>
       Shows a loading placeholder animation when data is being fetched.
-      
+
       type: `boolean`
-      
+
+      default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="backgroundVariant"
+    />
+    <ApiContent>
+      Background pattern variant to display behind the chart.
+
+      type: `BackgroundVariant`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="chartProps"
+    />
+    <ApiContent>
+      Additional props forwarded to the underlying Recharts RadialBarChart component.
+
+      type: `ComponentProps<typeof RadialBarChart>`
+
+      Read the <Link href="https://recharts.github.io/en-US/api/RadialBarChart/" _blank>Recharts RadialBarChart documentation</Link> for available props.
+    </ApiContent>
+  </ApiReference>
+</ApiReferenceWrapper>
+
+### `<RadialBar />`
+
+The radial bar series. Each data row becomes one bar. It generates its own glow filter definitions, so glow effects never collide with other charts on the page.
+
+<ApiReferenceWrapper>
+  <ApiReference>
+    <ApiHeader
+      propName="dataKey"
+      isRequired
+    />
+    <ApiContent>
+      The key from your data objects to use for bar values (typically numeric values that determine bar size).
+
+      type: `string`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="cornerRadius"
+    />
+    <ApiContent>
+      The border radius for the corners of each bar in pixels.
+
+      type: `number`
+
+      default: `5`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="barSize"
+    />
+    <ApiContent>
+      The thickness of each radial bar in pixels.
+
+      type: `number`
+
+      default: `14`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="showBackground"
+    />
+    <ApiContent>
+      Whether to render the background track (the unfilled portion of each bar).
+
+      type: `boolean`
+
+      default: `true`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="isClickable"
+    />
+    <ApiContent>
+      Enables interactive clicking on bars to select/deselect them. Unselected bars dim while a selection is active.
+
+      type: `boolean`
+
       default: `false`
     </ApiContent>
   </ApiReference>
@@ -444,23 +427,10 @@ Below are some examples of the radial chart with different configurations. You c
     />
     <ApiContent>
       Array of bar names (values from your `nameKey` field) that should have a glowing effect applied. Creates a smooth outer glow around the specified bars.
-      
-      type: `string[]`
-      
-      default: `[]`
-    </ApiContent>
-  </ApiReference>
 
-  <ApiReference>
-    <ApiHeader
-      propName="chartProps"
-    />
-    <ApiContent>
-      Additional props to pass to the underlying Recharts RadialBarChart component.
-      
-      type: `ComponentProps<typeof RadialBarChart>`
-      
-      Read the <Link href="https://recharts.github.io/en-US/api/RadialBarChart/" _blank>Recharts RadialBarChart documentation</Link> for available props.
+      type: `string[]`
+
+      default: `[]`
     </ApiContent>
   </ApiReference>
 
@@ -469,11 +439,110 @@ Below are some examples of the radial chart with different configurations. You c
       propName="radialBarProps"
     />
     <ApiContent>
-      Additional props to pass to the underlying Recharts RadialBar component.
-      
+      Additional props forwarded to the underlying Recharts RadialBar component.
+
       type: `Omit<ComponentProps<typeof RadialBar>, "dataKey">`
-      
+
       Read the <Link href="https://recharts.github.io/en-US/api/RadialBar/" _blank>Recharts RadialBar documentation</Link> for available props.
+    </ApiContent>
+  </ApiReference>
+</ApiReferenceWrapper>
+
+### `<Tooltip />`
+
+The hover tooltip. Labels each bar by its name. Render it to show a tooltip, omit it for none.
+
+<ApiReferenceWrapper>
+  <ApiReference>
+    <ApiHeader
+      propName="variant"
+    />
+    <ApiContent>
+      Controls the visual style of the tooltip.
+
+      type: `"default" | "frosted-glass"`
+
+      default: `"default"`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="roundness"
+    />
+    <ApiContent>
+      Controls the border-radius of the tooltip.
+
+      type: `"sm" | "md" | "lg" | "xl"`
+
+      default: `"lg"`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="defaultIndex"
+    />
+    <ApiContent>
+      When set, the tooltip will be visible by default at the specified data point index.
+
+      type: `number`
+    </ApiContent>
+  </ApiReference>
+</ApiReferenceWrapper>
+
+### `<Legend />`
+
+The bar legend. When `isClickable` is set, each entry toggles selection of its bar. Render it to show a legend, omit it for none.
+
+<ApiReferenceWrapper>
+  <ApiReference>
+    <ApiHeader
+      propName="variant"
+    />
+    <ApiContent>
+      The visual style variant for the legend indicators.
+
+      type: `"square" | "circle" | "circle-outline" | "rounded-square" | "rounded-square-outline" | "vertical-bar" | "horizontal-bar"`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="align"
+    />
+    <ApiContent>
+      Horizontal placement of the legend.
+
+      type: `"left" | "center" | "right"`
+
+      default: `"center"`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="verticalAlign"
+    />
+    <ApiContent>
+      Vertical placement of the legend.
+
+      type: `"top" | "middle" | "bottom"`
+
+      default: `"bottom"`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="isClickable"
+    />
+    <ApiContent>
+      When enabled, each legend entry toggles selection of its bar, driving the shared selection state read by `<RadialBar />`.
+
+      type: `boolean`
+
+      default: `false`
     </ApiContent>
   </ApiReference>
 </ApiReferenceWrapper>

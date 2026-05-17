@@ -1,6 +1,14 @@
 "use client";
 
-import { EvilLineChart } from "@/registry/charts/line-chart";
+import {
+  EvilLineChart,
+  Line,
+  XAxis,
+  Legend,
+  Tooltip,
+  Dot,
+  ActiveDot,
+} from "@/registry/charts/line-chart";
 import { type ChartConfig } from "@/registry/ui/chart";
 
 const data = [
@@ -22,8 +30,8 @@ const chartConfig = {
   desktop: {
     label: "Desktop",
     colors: {
-      light: ["red", "orange", "rosybrown", "purple", "blue"], // [!code highlight]
-      dark: ["red", "orange", "rosybrown", "purple", "blue"], // [!code highlight]
+      light: ["red", "orange", "rosybrown", "purple", "blue"],
+      dark: ["red", "orange", "rosybrown", "purple", "blue"],
     },
   },
   mobile: {
@@ -38,16 +46,22 @@ const chartConfig = {
 export function EvilExampleLineChart() {
   return (
     <EvilLineChart
-      isClickable
-      className="h-full w-full p-4"
-      xDataKey="month"
-      curveType="bump" // [!code highlight]
-      strokeVariant="solid"
-      dotVariant="colored-border"
-      activeDotVariant="default"
       data={data}
-      chartConfig={chartConfig}
-      xAxisProps={{ tickFormatter: (value) => value.substring(0, 3) }}
-    />
+      config={chartConfig}
+      className="h-full w-full p-4"
+      curveType="bump" // [!code highlight]
+    >
+      <XAxis dataKey="month" tickFormatter={(value) => value.substring(0, 3)} />
+      <Legend isClickable />
+      <Tooltip />
+      <Line dataKey="desktop" strokeVariant="solid" isClickable>
+        <Dot variant="colored-border" />
+        <ActiveDot variant="default" />
+      </Line>
+      <Line dataKey="mobile" strokeVariant="solid" isClickable>
+        <Dot variant="colored-border" />
+        <ActiveDot variant="default" />
+      </Line>
+    </EvilLineChart>
   );
 }

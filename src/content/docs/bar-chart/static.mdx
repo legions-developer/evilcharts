@@ -82,29 +82,39 @@ links:
 
 ## Usage
 
+The bar chart is composible. `<EvilBarChart>` is the container, and you compose only the parts you need — `<Grid>`, `<XAxis>`, `<YAxis>`, `<Legend>`, `<Tooltip>`, and one or more `<Bar>` — as its children. Each `<Bar>` carries its own `variant`, `radius`, `glowing`, `bufferBar`, and `isClickable`, so a single chart can mix fill styles and make only some series interactive.
+
 ```tsx
-import { EvilBarChart } from "@/components/evilcharts/charts/bar-chart";
+import {
+  EvilBarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Grid,
+  Tooltip,
+  Legend,
+} from "@/components/evilcharts/charts/bar-chart";
 ```
 
 ```tsx
-<EvilBarChart  
-  xDataKey="month"
-  barVariant="default"
-  stackType="default"
-  data={data} 
-  chartConfig={chartConfig}
-/>
+<EvilBarChart data={data} config={chartConfig} stackType="default">
+  <Grid />
+  <XAxis dataKey="month" />
+  <Legend isClickable />
+  <Tooltip />
+  <Bar dataKey="desktop" variant="default" isClickable />
+  <Bar dataKey="mobile" variant="hatched" isClickable />
+</EvilBarChart>
 ```
 
 ### Interactive Selection
 
-When `isClickable` is enabled, you can use the `onSelectionChange` callback to handle selection events:
+Add `isClickable` to any `<Bar>` (and to `<Legend>`) to make those series selectable. Use the `onSelectionChange` callback on `<EvilBarChart>` to handle selection events:
 
 ```tsx
 <EvilBarChart
   data={data}
-  chartConfig={chartConfig}
-  isClickable={true}
+  config={chartConfig}
   onSelectionChange={(selectedDataKey) => {
     if (selectedDataKey) {
       console.log("Selected:", selectedDataKey);
@@ -112,7 +122,13 @@ When `isClickable` is enabled, you can use the `onSelectionChange` callback to h
       console.log("Deselected");
     }
   }}
-/>
+>
+  <XAxis dataKey="month" />
+  <Legend isClickable />
+  <Tooltip />
+  <Bar dataKey="desktop" variant="default" isClickable />
+  <Bar dataKey="mobile" variant="default" isClickable />
+</EvilBarChart>
 ```
 
 ### Loading State
@@ -126,23 +142,23 @@ When `isClickable` is enabled, you can use the `onSelectionChange` callback to h
 
 ### Buffer Bar
 
-<ComponentPreview className="mb-0" title="enableBufferBar='true'" name="ex-buffer-bar-chart"  />
+<ComponentPreview className="mb-0" title="<Bar bufferBar />" name="ex-buffer-bar-chart"  />
 <Alert > 
   <AlertContent >
-    When `enableBufferBar` is enabled, the last data point's bars are rendered with a diagonal lines (hatched) pattern while the rest stay solid. This is useful for indicating projected, estimated, or incomplete data at the end of a series — commonly seen in financial charts and forecasting dashboards.
+    When a `<Bar>` has `bufferBar` set, its last data point is rendered with a diagonal lines (hatched) pattern while the rest stay solid. This is useful for indicating projected, estimated, or incomplete data at the end of a series — commonly seen in financial charts and forecasting dashboards.
   </AlertContent>
 </Alert>
 
 ## Examples
 
-Below are some examples of the bar chart with different `variants`. You can customize the `barVariant`, `stackType`, and other properties.
+Below are some examples of the bar chart with different `variants`. Each `<Bar>` carries its own `variant`, and the chart-wide `stackType` and `layout` shape the rest.
 
 ### Hover Highlight
 
-<ComponentPreview className="mb-0" title="enableHoverHighlight={true}" name="ex-hover-highlight-bar-chart"  />
+<ComponentPreview className="mb-0" title="<Bar enableHoverHighlight />" name="ex-hover-highlight-bar-chart"  />
 <Alert> 
   <AlertContent>
-    The hover highlight feature dims other bars when you hover over a bar, making it easier to focus on specific data points. Use the `enableHoverHighlight` prop to enable this feature.
+    The hover highlight feature dims other bars when you hover over a bar, making it easier to focus on specific data points. Set the `enableHoverHighlight` prop on each `<Bar>` to enable this feature.
   </AlertContent>
 </Alert>
 
@@ -152,12 +168,12 @@ Below are some examples of the bar chart with different `variants`. You can cust
 
 ### Bar Variants
 
-<ComponentPreview className="mb-0" title="barVariant='default'" name="ex-default-variant-bar-chart"  />
-<ComponentPreview className="mb-0" title="barVariant='hatched'" name="ex-hatched-variant-bar-chart"  />
-<ComponentPreview className="mb-0" title="barVariant='duotone'" name="ex-duotone-variant-bar-chart"  />
-<ComponentPreview className="mb-0" title="barVariant='duotone-reverse'" name="ex-duotone-reverse-variant-bar-chart"  />
-<ComponentPreview className="mb-0" title="barVariant='gradient'" name="ex-gradient-variant-bar-chart"  />
-<ComponentPreview title="barVariant='stripped'" name="ex-stripped-variant-bar-chart"  />
+<ComponentPreview className="mb-0" title="variant='default'" name="ex-default-variant-bar-chart"  />
+<ComponentPreview className="mb-0" title="variant='hatched'" name="ex-hatched-variant-bar-chart"  />
+<ComponentPreview className="mb-0" title="variant='duotone'" name="ex-duotone-variant-bar-chart"  />
+<ComponentPreview className="mb-0" title="variant='duotone-reverse'" name="ex-duotone-reverse-variant-bar-chart"  />
+<ComponentPreview className="mb-0" title="variant='gradient'" name="ex-gradient-variant-bar-chart"  />
+<ComponentPreview title="variant='stripped'" name="ex-stripped-variant-bar-chart"  />
 
 ### Stack Types
 
@@ -169,61 +185,57 @@ Below are some examples of the bar chart with different `variants`. You can cust
 <ComponentPreview className="mb-0" title="layout='horizontal'" name="ex-horizontal-layout-bar-chart"  />
 <Alert> 
   <AlertContent>
-    Use `layout="horizontal"` to display bars horizontally. In horizontal mode, the Y-axis shows categories while the X-axis shows values. Use `yAxisProps` for category formatting.
+    Use `layout="horizontal"` on `<EvilBarChart>` to display bars horizontally. In horizontal mode, the `<YAxis>` shows categories while the `<XAxis>` shows values — pass a `tickFormatter` to `<YAxis>` for category formatting.
   </AlertContent>
 </Alert>
 
 ### Glowing Bars
 
-<ComponentPreview className="mb-0" title="glowingBars={['desktop']} - gradient colors" name="ex-glowing-desktop-bar-chart"  />
-<ComponentPreview title="glowingBars={['mobile']} - solid colors" name="ex-glowing-mobile-bar-chart"  />
+<ComponentPreview className="mb-0" title="<Bar glowing /> - desktop" name="ex-glowing-desktop-bar-chart"  />
+<ComponentPreview title="<Bar glowing /> - mobile" name="ex-glowing-mobile-bar-chart"  />
 
 ## API Reference
+
+The chart is composed of several parts. The props below are grouped by the component they belong to.
+
+### `<EvilBarChart />`
+
+The root container. It owns the data, the shared selection state, the loading skeleton, and the optional brush. Everything visual is composed as its children.
 
 <ApiReferenceWrapper>
   <ApiReference>
     <ApiHeader
       propName="data"
-      isRequired 
+      isRequired
     />
     <ApiContent>
       Data used to display the chart. An array of objects where each object represents a data point.
-      
+
       type: `TData[]` where `TData extends Record<string, unknown>`
     </ApiContent>
   </ApiReference>
-  
+
   <ApiReference>
     <ApiHeader
-      propName="chartConfig"
+      propName="config"
       isRequired
     />
     <ApiContent>
       Configuration object that defines the chart's series. Each key should match a data key in your data array, with a corresponding color or color array.
-      
+
       type: `Record<string, ChartConfig[string]>`
     </ApiContent>
   </ApiReference>
 
   <ApiReference>
     <ApiHeader
-      propName="xDataKey"
+      propName="children"
+      isRequired
     />
     <ApiContent>
-      The key from your data objects to use for the X-axis values.
-      
-      type: `keyof TData & string`
-    </ApiContent>
-  </ApiReference>
+      The composed chart parts — `<Grid />`, `<XAxis />`, `<YAxis />`, `<Legend />`, `<Tooltip />`, and one or more `<Bar />`.
 
-  <ApiReference>
-    <ApiHeader
-      propName="yDataKey"
-    />
-    <ApiContent>
-      The key from your data objects to use for the Y-axis values.
-      
-      type: `keyof TData & string`
+      type: `ReactNode`
     </ApiContent>
   </ApiReference>
 
@@ -233,21 +245,8 @@ Below are some examples of the bar chart with different `variants`. You can cust
     />
     <ApiContent>
       Additional CSS classes to apply to the chart container.
-      
-      type: `string`
-    </ApiContent>
-  </ApiReference>
 
-  <ApiReference>
-    <ApiHeader
-      propName="barVariant"
-    />
-    <ApiContent>
-      The visual style variant for the bars.
-      
-      type: `"default" | "hatched" | "duotone" | "duotone-reverse" | "gradient" | "stripped"`
-      
-      default: `"default"`
+      type: `string`
     </ApiContent>
   </ApiReference>
 
@@ -256,10 +255,10 @@ Below are some examples of the bar chart with different `variants`. You can cust
       propName="stackType"
     />
     <ApiContent>
-      Controls how multiple bars are stacked. `"default"` renders bars side by side, `"stacked"` stacks them on top of each other, and `"percent"` shows percentage distribution.
-      
+      Controls how multiple bars combine. `"default"` renders bars side by side, `"stacked"` stacks them on top of each other, and `"percent"` normalizes them to show percentage distribution.
+
       type: `"default" | "stacked" | "percent"`
-      
+
       default: `"default"`
     </ApiContent>
   </ApiReference>
@@ -269,10 +268,10 @@ Below are some examples of the bar chart with different `variants`. You can cust
       propName="layout"
     />
     <ApiContent>
-      The orientation of the bars. `"vertical"` displays bars vertically (default), `"horizontal"` displays bars horizontally.
-      
+      The orientation of the bars. `"vertical"` displays bars vertically, `"horizontal"` displays bars horizontally — in which case the `<YAxis />` shows categories and the `<XAxis />` shows values.
+
       type: `"vertical" | "horizontal"`
-      
+
       default: `"vertical"`
     </ApiContent>
   </ApiReference>
@@ -282,10 +281,10 @@ Below are some examples of the bar chart with different `variants`. You can cust
       propName="barRadius"
     />
     <ApiContent>
-      The border radius of the bars in pixels.
-      
+      The default corner radius for every `<Bar />`, in pixels. Each `<Bar />` may override it locally with its own `radius` prop.
+
       type: `number`
-      
+
       default: `2`
     </ApiContent>
   </ApiReference>
@@ -296,7 +295,7 @@ Below are some examples of the bar chart with different `variants`. You can cust
     />
     <ApiContent>
       The gap between bars in the same category (when using multiple series).
-      
+
       type: `number`
     </ApiContent>
   </ApiReference>
@@ -307,84 +306,8 @@ Below are some examples of the bar chart with different `variants`. You can cust
     />
     <ApiContent>
       The gap between different categories of bars.
-      
+
       type: `number`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="tickGap"
-    />
-    <ApiContent>
-      Minimum gap in pixels between axis ticks.
-      
-      type: `number`
-      
-      default: `8`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="hideTooltip"
-    />
-    <ApiContent>
-      Whether to hide the tooltip on hover.
-      
-      type: `boolean`
-      
-      default: `false`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="tooltipRoundness"
-    />
-    <ApiContent>
-      Controls the border-radius of the tooltip.
-      
-      type: `"sm" | "md" | "lg" | "xl"`
-      
-      default: `"lg"`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="tooltipVariant"
-    />
-    <ApiContent>
-      Controls the visual style of the tooltip.
-      
-      type: `"default" | "frosted-glass"`
-      
-      default: `"default"`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="tooltipDefaultIndex"
-    />
-    <ApiContent>
-      When set, the tooltip will be visible by default at the specified data point index.
-      
-      type: `number`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="hideCartesianGrid"
-    />
-    <ApiContent>
-      Whether to hide the background grid lines.
-      
-      type: `boolean`
-      
-      default: `false`
     </ApiContent>
   </ApiReference>
 
@@ -393,46 +316,9 @@ Below are some examples of the bar chart with different `variants`. You can cust
       propName="backgroundVariant"
     />
     <ApiContent>
-      Background pattern variant to display behind the chart. When set, the Cartesian grid is automatically hidden.
-      
+      Background pattern variant to display behind the chart.
+
       type: `BackgroundVariant`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="legendVariant"
-    />
-    <ApiContent>
-      The visual style variant for the legend indicators.
-      
-      type: `"square" | "circle" | "circle-outline" | "rounded-square" | "rounded-square-outline" | "vertical-bar" | "horizontal-bar"`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="hideLegend"
-    />
-    <ApiContent>
-      Whether to hide the chart legend.
-      
-      type: `boolean`
-      
-      default: `false`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="isClickable"
-    />
-    <ApiContent>
-      Enables interactive clicking on bars to select/deselect them. When a bar is selected, unselected bars become semi-transparent.
-      
-      type: `boolean`
-      
-      default: `false`
     </ApiContent>
   </ApiReference>
 
@@ -441,10 +327,10 @@ Below are some examples of the bar chart with different `variants`. You can cust
       propName="defaultSelectedDataKey"
     />
     <ApiContent>
-      The data key that should be selected by default when `isClickable` is enabled.
-      
+      The data key that should be selected by default.
+
       type: `string | null`
-      
+
       default: `null`
     </ApiContent>
   </ApiReference>
@@ -454,24 +340,9 @@ Below are some examples of the bar chart with different `variants`. You can cust
       propName="onSelectionChange"
     />
     <ApiContent>
-      Callback function that is called when a bar is selected or deselected. Receives the selected data key as a parameter, or `null` when deselected.
-      
-      **Note:** This prop is only available when `isClickable` is set to `true`.
-      
-      type: `(selectedDataKey: string | null) => void`
-    </ApiContent>
-  </ApiReference>
+      Callback fired when a series is selected or deselected — by clicking a clickable `<Bar />` or `<Legend />` entry. Receives the selected data key, or `null` when deselected.
 
-  <ApiReference>
-    <ApiHeader
-      propName="enableHoverHighlight"
-    />
-    <ApiContent>
-      When enabled, hovering over a bar dims all other bars, making it easier to focus on specific data points.
-      
-      type: `boolean`
-      
-      default: `false`
+      type: `(selectedDataKey: string | null) => void`
     </ApiContent>
   </ApiReference>
 
@@ -480,10 +351,10 @@ Below are some examples of the bar chart with different `variants`. You can cust
       propName="isLoading"
     />
     <ApiContent>
-      Shows a loading skeleton animation with shimmer effect when data is being fetched.
-      
+      Shows a loading skeleton animation with a shimmer effect when data is being fetched.
+
       type: `boolean`
-      
+
       default: `false`
     </ApiContent>
   </ApiReference>
@@ -494,8 +365,10 @@ Below are some examples of the bar chart with different `variants`. You can cust
     />
     <ApiContent>
       Number of bars to display in the loading skeleton.
-      
+
       type: `number`
+
+      default: `12`
     </ApiContent>
   </ApiReference>
 
@@ -505,10 +378,21 @@ Below are some examples of the bar chart with different `variants`. You can cust
     />
     <ApiContent>
       When enabled, displays a brush control below the chart for selecting and zooming into a range of data.
-      
+
       type: `boolean`
-      
+
       default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="xDataKey"
+    />
+    <ApiContent>
+      The data key used for the x-axis. Only needed by the brush footer — the axis itself reads its key from `<XAxis dataKey="…" />`.
+
+      type: `keyof TData & string`
     </ApiContent>
   </ApiReference>
 
@@ -518,7 +402,7 @@ Below are some examples of the bar chart with different `variants`. You can cust
     />
     <ApiContent>
       The height of the brush preview area in pixels.
-      
+
       type: `number`
     </ApiContent>
   </ApiReference>
@@ -529,7 +413,7 @@ Below are some examples of the bar chart with different `variants`. You can cust
     />
     <ApiContent>
       Custom formatter for the brush axis labels.
-      
+
       type: `(value: unknown, index: number) => string`
     </ApiContent>
   </ApiReference>
@@ -540,34 +424,8 @@ Below are some examples of the bar chart with different `variants`. You can cust
     />
     <ApiContent>
       Callback invoked when the user changes the brush selection range.
-      
+
       type: `(range: EvilBrushRange) => void`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="enableBufferBar"
-    />
-    <ApiContent>
-      When enabled, renders the last data point's bars with a diagonal lines (hatched) pattern while the rest stay solid. Useful for indicating projected or incomplete data at the end of a series.
-      
-      type: `boolean`
-      
-      default: `false`
-    </ApiContent>
-  </ApiReference>
-
-  <ApiReference>
-    <ApiHeader
-      propName="glowingBars"
-    />
-    <ApiContent>
-      Array of data keys that should have a glowing effect applied. Creates a smooth outer glow around the specified bars.
-      
-      type: `NumericDataKeys<TData>[]` (array of keys where the value is a number)
-      
-      default: `[]`
     </ApiContent>
   </ApiReference>
 
@@ -576,37 +434,260 @@ Below are some examples of the bar chart with different `variants`. You can cust
       propName="chartProps"
     />
     <ApiContent>
-      Additional props to pass to the underlying Recharts BarChart component.
-      
+      Additional props forwarded to the underlying Recharts BarChart component.
+
       type: `ComponentProps<typeof BarChart>`
-      
+
       Read the <Link href="https://recharts.github.io/en-US/api/BarChart/" _blank>Recharts BarChart documentation</Link> for available props.
     </ApiContent>
   </ApiReference>
+</ApiReferenceWrapper>
 
+### `<Bar />`
+
+A single bar series. Each `<Bar />` is self-contained and generates its own gradient/pattern definitions, so a chart can hold any number of bars — each with its own variant, radius, glow, and clickability.
+
+<ApiReferenceWrapper>
   <ApiReference>
     <ApiHeader
-      propName="xAxisProps"
+      propName="dataKey"
+      isRequired
     />
     <ApiContent>
-      Additional props to pass to the Recharts XAxis component.
-      
-      type: `ComponentProps<typeof XAxis>`
-      
-      Read the <Link href="https://recharts.github.io/en-US/api/XAxis/" _blank>Recharts XAxis documentation</Link> for available props.
+      The series key. Must exist on both the data rows and the chart `config`.
+
+      type: `string`
     </ApiContent>
   </ApiReference>
 
   <ApiReference>
     <ApiHeader
-      propName="yAxisProps"
+      propName="variant"
     />
     <ApiContent>
-      Additional props to pass to the Recharts YAxis component.
-      
-      type: `ComponentProps<typeof YAxis>`
-      
-      Read the <Link href="https://recharts.github.io/en-US/api/YAxis/" _blank>Recharts YAxis documentation</Link> for available props.
+      The visual style of the bar fill. Applies to this bar only.
+
+      type: `"default" | "hatched" | "duotone" | "duotone-reverse" | "gradient" | "stripped"`
+
+      default: `"default"`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="radius"
+    />
+    <ApiContent>
+      The corner radius of this bar, in pixels. Falls back to the chart's `barRadius` when omitted.
+
+      type: `number`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="isClickable"
+    />
+    <ApiContent>
+      Lets this bar be selected by clicking it. When any bar is selected, unselected bars become semi-transparent.
+
+      type: `boolean`
+
+      default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="enableHoverHighlight"
+    />
+    <ApiContent>
+      When enabled, hovering over a bar dims this bar while another is hovered, making it easier to focus on specific data points.
+
+      type: `boolean`
+
+      default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="glowing"
+    />
+    <ApiContent>
+      Applies a soft outer glow to this bar series.
+
+      type: `boolean`
+
+      default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="bufferBar"
+    />
+    <ApiContent>
+      When enabled, renders this series' last data point with a diagonal lines (hatched) pattern while the rest stay solid. Useful for indicating projected or incomplete data at the end of a series.
+
+      type: `boolean`
+
+      default: `false`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="barProps"
+    />
+    <ApiContent>
+      Escape hatch for raw props forwarded to the underlying Recharts Bar component.
+
+      type: `ComponentProps<typeof Bar>`
+    </ApiContent>
+  </ApiReference>
+</ApiReferenceWrapper>
+
+### `<XAxis />` and `<YAxis />`
+
+The category and value axes. Both ship with the chart's flat default styling and forward every Recharts axis prop, so `dataKey`, `tickFormatter`, `tickMargin`, etc. pass straight through. They are hidden automatically while the chart is loading, and each resolves its axis `type` from the chart `layout` — categorical or numeric — unless you set `type` explicitly.
+
+<ApiReferenceWrapper>
+  <ApiReference>
+    <ApiHeader
+      propName="dataKey"
+    />
+    <ApiContent>
+      The data key for the axis values.
+
+      type: `string`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="…axisProps"
+    />
+    <ApiContent>
+      Every other Recharts XAxis / YAxis prop is forwarded as-is.
+
+      Read the <Link href="https://recharts.github.io/en-US/api/XAxis/" _blank>Recharts XAxis</Link> and <Link href="https://recharts.github.io/en-US/api/YAxis/" _blank>Recharts YAxis</Link> documentation for available props.
+    </ApiContent>
+  </ApiReference>
+</ApiReferenceWrapper>
+
+### `<Grid />`
+
+The background grid lines. Defaults to dashed lines aligned to the value axis based on the chart layout, and forwards every Recharts CartesianGrid prop.
+
+<ApiReferenceWrapper>
+  <ApiReference>
+    <ApiHeader
+      propName="…gridProps"
+    />
+    <ApiContent>
+      Every Recharts CartesianGrid prop is forwarded as-is.
+
+      Read the <Link href="https://recharts.github.io/en-US/api/CartesianGrid/" _blank>Recharts CartesianGrid documentation</Link> for available props.
+    </ApiContent>
+  </ApiReference>
+</ApiReferenceWrapper>
+
+### `<Tooltip />`
+
+The hover tooltip. It reads the chart's selection state so its content dims unselected series.
+
+<ApiReferenceWrapper>
+  <ApiReference>
+    <ApiHeader
+      propName="variant"
+    />
+    <ApiContent>
+      The visual style of the tooltip surface.
+
+      type: `"default" | "frosted-glass"`
+
+      default: `"default"`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="roundness"
+    />
+    <ApiContent>
+      Controls the border-radius of the tooltip.
+
+      type: `"sm" | "md" | "lg" | "xl"`
+
+      default: `"lg"`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="defaultIndex"
+    />
+    <ApiContent>
+      When set, the tooltip is visible by default at the specified data point index.
+
+      type: `number`
+    </ApiContent>
+  </ApiReference>
+</ApiReferenceWrapper>
+
+### `<Legend />`
+
+The series legend. When `isClickable` is set, each entry toggles selection of its series.
+
+<ApiReferenceWrapper>
+  <ApiReference>
+    <ApiHeader
+      propName="variant"
+    />
+    <ApiContent>
+      The visual style of the legend indicators.
+
+      type: `"square" | "circle" | "circle-outline" | "rounded-square" | "rounded-square-outline" | "vertical-bar" | "horizontal-bar"`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="align"
+    />
+    <ApiContent>
+      Horizontal placement of the legend.
+
+      type: `"left" | "center" | "right"`
+
+      default: `"right"`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="verticalAlign"
+    />
+    <ApiContent>
+      Vertical placement of the legend.
+
+      type: `"top" | "middle" | "bottom"`
+
+      default: `"top"`
+    </ApiContent>
+  </ApiReference>
+
+  <ApiReference>
+    <ApiHeader
+      propName="isClickable"
+    />
+    <ApiContent>
+      Lets each legend entry toggle selection of its series.
+
+      type: `boolean`
+
+      default: `false`
     </ApiContent>
   </ApiReference>
 </ApiReferenceWrapper>

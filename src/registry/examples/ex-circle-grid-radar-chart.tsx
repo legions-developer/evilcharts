@@ -1,6 +1,15 @@
 "use client";
 
-import { EvilRadarChart } from "@/registry/charts/radar-chart";
+import {
+  EvilRadarChart,
+  Radar,
+  PolarGrid,
+  PolarAngleAxis,
+  Tooltip,
+  Legend,
+  Dot,
+  ActiveDot,
+} from "@/registry/charts/radar-chart";
 import { type ChartConfig } from "@/registry/ui/chart";
 
 const data = [
@@ -31,14 +40,21 @@ const chartConfig = {
 
 export function EvilExampleRadarChart() {
   return (
-    <EvilRadarChart
-      className="h-full w-full p-4"
-      data={data}
-      dataKey="skill"
-      dotVariant="colored-border"
-      activeDotVariant="default"
-      chartConfig={chartConfig}
-      gridType="circle" // [!code highlight]
-    />
+    <EvilRadarChart data={data} config={chartConfig} className="h-full w-full p-4">
+      <PolarGrid
+        gridType="circle" // [!code highlight]
+      />
+      <PolarAngleAxis dataKey="skill" />
+      <Legend />
+      <Tooltip />
+      <Radar dataKey="desktop" variant="filled">
+        <Dot variant="colored-border" />
+        <ActiveDot variant="default" />
+      </Radar>
+      <Radar dataKey="mobile" variant="filled">
+        <Dot variant="colored-border" />
+        <ActiveDot variant="default" />
+      </Radar>
+    </EvilRadarChart>
   );
 }

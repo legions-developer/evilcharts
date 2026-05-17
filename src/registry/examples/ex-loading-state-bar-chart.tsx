@@ -1,6 +1,6 @@
 "use client";
 
-import { EvilBarChart } from "@/registry/charts/bar-chart";
+import { EvilBarChart, Bar, XAxis, Grid, Tooltip, Legend } from "@/registry/charts/bar-chart";
 import { type ChartConfig } from "@/registry/ui/chart";
 
 const chartConfig = {
@@ -23,13 +23,17 @@ const chartConfig = {
 export function EvilExampleBarChart() {
   return (
     <EvilBarChart
-      isLoading={true} // [!code highlight]
+      data={[]} // if isLoading is true, pass empty array → i.e isLoading ? [] : data
+      config={chartConfig}
       className="h-full w-full p-4"
-      xDataKey="month"
-      barVariant="default"
-      data={[]}
-      chartConfig={chartConfig}
-      xAxisProps={{ tickFormatter: (value) => value.substring(0, 3) }}
-    />
+      isLoading={true} // [!code highlight]
+    >
+      <Grid />
+      <XAxis dataKey="month" tickFormatter={(value) => value.substring(0, 3)} />
+      <Legend />
+      <Tooltip />
+      <Bar dataKey="desktop" variant="default" />
+      <Bar dataKey="mobile" variant="default" />
+    </EvilBarChart>
   );
 }

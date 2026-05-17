@@ -1,6 +1,15 @@
 "use client";
 
-import { EvilAreaChart } from "@/registry/charts/area-chart";
+import {
+  EvilAreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  Grid,
+  Tooltip,
+  Legend,
+  ActiveDot,
+} from "@/registry/charts/area-chart";
 import { type ChartConfig } from "@/registry/ui/chart";
 
 const data = [
@@ -38,17 +47,30 @@ const chartConfig = {
 export function EvilExampleAreaChart() {
   return (
     <EvilAreaChart
-      isClickable
-      className="h-full w-full p-4"
-      xDataKey="month"
-      yDataKey="desktop"
-      stackType="stacked"
-      strokeVariant="dashed"
-      areaVariant="solid" // [!code highlight]
-      activeDotVariant="default"
       data={data}
-      chartConfig={chartConfig}
-      xAxisProps={{ tickFormatter: (value) => value.substring(0, 3) }}
-    />
+      config={chartConfig}
+      className="h-full w-full p-4"
+      stackType="stacked"
+    >
+      <Grid />
+      <XAxis dataKey="month" tickFormatter={(value) => value.substring(0, 3)} />
+      <YAxis dataKey="desktop" />
+      <Legend isClickable />
+      <Tooltip />
+      <Area
+        dataKey="desktop"
+        variant="solid" // [!code highlight]
+        isClickable
+      >
+        <ActiveDot variant="default" />
+      </Area>
+      <Area
+        dataKey="mobile"
+        variant="solid" // [!code highlight]
+        isClickable
+      >
+        <ActiveDot variant="default" />
+      </Area>
+    </EvilAreaChart>
   );
 }

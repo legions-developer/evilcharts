@@ -1,6 +1,6 @@
 "use client";
 
-import { EvilRadialChart } from "@/registry/charts/radial-chart";
+import { EvilRadialChart, RadialBar, Tooltip, Legend } from "@/registry/charts/radial-chart";
 import { type ChartConfig } from "@/registry/ui/chart";
 
 const data = [
@@ -51,12 +51,10 @@ const chartConfig = {
 
 export function EvilExampleRadialChart() {
   return (
-    <EvilRadialChart
-      className="h-full w-full p-4"
-      data={data}
-      dataKey="visitors"
-      nameKey="browser"
-      chartConfig={chartConfig}
-    />
+    <EvilRadialChart className="h-full w-full p-4" data={data} nameKey="browser" config={chartConfig}>
+      <Legend />
+      <Tooltip />
+      <RadialBar dataKey="visitors" />
+    </EvilRadialChart>
   );
 }
