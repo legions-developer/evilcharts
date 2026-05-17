@@ -3,8 +3,8 @@
 import { motion, useMotionValue, useMotionValueEvent, useSpring, useTransform } from "motion/react";
 import { ResponsiveContainer, AreaChart, Area, LineChart, Line, BarChart, Bar } from "recharts";
 import { ChartStyle, getColorsCount, type ChartConfig } from "@/registry/ui/chart";
-import type { MotionValue } from "motion/react";
 import { useCallback, useEffect, type ComponentProps } from "react";
+import type { MotionValue } from "motion/react";
 import { cn } from "@/lib/utils";
 import * as React from "react";
 
@@ -368,12 +368,12 @@ function EvilBrush({
 
       {/* Dim overlay – left */}
       <motion.div
-        className="bg-background/70 pointer-events-none absolute inset-y-0 left-0 rounded-l-md"
+        className="bg-background/70 pointer-events-none absolute inset-y-0 left-0 rounded-l-md backdrop-blur-[2px]"
         style={{ width: leftOverlayWidth }}
       />
       {/* Dim overlay – right */}
       <motion.div
-        className="bg-background/70 pointer-events-none absolute inset-y-0 right-0 rounded-r-md"
+        className="bg-background/70 pointer-events-none absolute inset-y-0 right-0 rounded-r-md backdrop-blur-[2px]"
         style={{ width: rightOverlayWidth }}
       />
 
