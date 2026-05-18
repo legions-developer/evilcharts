@@ -1,6 +1,6 @@
 // Chart geometry: layout boxes, d3 scales, and tick generation.
 
-import { scaleLinear, scaleTime } from "d3-scale";
+import { scaleBand, scaleLinear, scaleTime } from "d3-scale";
 import { timeFormat } from "d3-time-format";
 import type { AxisType, RepoSeries, StarHistoryOptions } from "../types";
 import { formatStars } from "./escape";
@@ -126,4 +126,125 @@ export function buildScales(
     .map((v) => ({ pos: yScale(v), label: formatStars(v) }));
 
   return { projected, xTicks, yTicks };
+}
+
+// --- Total-stars comparison charts (bar / radial / pie) ----------------------
+
+/**
+ * Per-repo total stars. Records are cumulative, so the latest equals the max —
+ * `Math.max` is robust to any out-of-order sampling. Clamped to ≥ 0.
+ */
+export function repoTotal(series: RepoSeries): number {
+  return Math.max(0, ...series.records.map((r) => r.stars));
+}
+
+export interface BarDatum {
+  series: RepoSeries;
+  /** Bar rect, already projected into plot coordinates. */
+  x: number;
+  width: number;
+  /** Final top edge + height once the bar has fully grown. */
+  y: number;
+  height: number;
+  total: number;
+}
+
+export interface BarChartScales {
+  bars: BarDatum[];
+  yTicks: AxisTick[];
+  /** Plot-space y of the bar baseline (zero line). */
+  baseline: number;
+}
+
+/**
+ * Bar geometry: a `scaleBand` over repos for the x positions and a niced
+ * `scaleLinear([0, maxTotal])` for the heights. `maxTotal === 0` is guarded so
+ * a zero-star set still lays out cleanly (flat bars on the baseline).
+ */
+export function buildBarScales(series: RepoSeries[], layout: Layout): BarChartScales {
+  const { plot } = layout;
+  const totals = series.map(repoTotal);
+  const maxTotal = totals.length ? Math.max(...totals) : 0;
+
+  const x = scaleBand<number>()
+    .domain(series.map((_, i) => i))
+    .range([plot.x0, plot.x1])
+    .padding(0.3);
+
+  const y = scaleLinear()
+    .domain([0, maxTotal || 1])
+    .nice()
+    .range([plot.y1, plot.y0]);
+
+  const bandWidth = x.bandwidth();
+  const bars: BarDatum[] = series.map((s, i) => {
+    const top = y(totals[i]);
+    return {
+      series: s,
+      x: x(i) ?? plot.x0,
+      width: bandWidth,
+      y: top,
+      height: plot.y1 - top,
+      total: totals[i],
+    };
+  });
+
+  const yTicks: AxisTick[] = y
+    .ticks(5)
+    .map((v) => ({ pos: y(v), label: formatStars(v) }));
+
+  return { bars, yTicks, baseline: plot.y1 };
+}
+
+export interface PolarLayout {
+  width: number;
+  height: number;
+  /** Disc center + the radius of the available drawing area below the legend. */
+  cx: number;
+  cy: number;
+  radius: number;
+}
+
+/**
+ * Polar layout for the radial / pie charts: the disc is centered in the space
+ * left below the legend, its radius the largest that fits with a small margin.
+ * `legendTop` is `planLegend(...).topMargin` — keeps the disc clear of badges.
+ * When `half` is set the chart is a 180° gauge: a semicircle is only `R` tall
+ * (vs `2R` for a full disc), so it can use the whole band and is re-centered.
+ */
+export function buildPolarLayout(legendTop = MARGIN.top, half = false): PolarLayout {
+  const width = CHART_WIDTH;
+  const height = CHART_HEIGHT;
+  // Vertical band between the legend and the footer credit.
+  const top = Math.max(legendTop, MARGIN.top);
+  const bottom = height - MARGIN.bottom + 30;
+  const availableH = bottom - top;
+  const cx = width / 2;
+
+  if (half) {
+    // A semicircle spans `R` vertically and `2R` horizontally — bound by both.
+    const radius = Math.max(10, Math.min(availableH, width / 2 - MARGIN.right) - 14);
+    // Center the semicircle's [cy - R, cy] extent in the band.
+    const cy = (top + bottom) / 2 + radius / 2;
+    return { width, height, cx, cy, radius };
+  }
+
+  const cy = top + availableH / 2;
+  // 14px breathing room; also cap against the horizontal half-width.
+  const radius = Math.max(10, Math.min(availableH / 2, width / 2 - MARGIN.right) - 14);
+  return { width, height, cx, cy, radius };
+}
+
+/**
+ * A `Layout` for the polar charts — `surface`, `drawBackground` and `drawFooter`
+ * are cartesian helpers, so the polar charts hand them a plot box. The box keeps
+ * the standard side margins so the footer credit aligns with the other charts.
+ */
+export function polarChartLayout(): Layout {
+  const width = CHART_WIDTH;
+  const height = CHART_HEIGHT;
+  const x0 = MARGIN.left;
+  const x1 = width - MARGIN.right;
+  const y1 = height - MARGIN.bottom;
+  return { width, height, plot: { x0, y0: MARGIN.top, x1, y1, width: x1 - x0, height: y1 - MARGIN.top } };
 }

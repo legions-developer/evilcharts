@@ -97,6 +97,7 @@ export async function GET(req: NextRequest) {
 
     const options: StarHistoryOptions = {
       theme: query.theme,
+      chartType: query.chartType,
       axis: query.axis,
       background: resolveBackground(query.theme, query.transparent, query.background),
       animate: query.animate,
@@ -110,6 +111,8 @@ export async function GET(req: NextRequest) {
       strokeVariant: query.strokeVariant,
       backgroundPattern: query.backgroundPattern,
       backgroundPatternOpacity: query.backgroundPatternOpacity,
+      radialRingWidth: query.radialRingWidth,
+      pieInnerRadius: query.pieInnerRadius,
       colors: query.colors,
       from: query.from,
       to: query.to,

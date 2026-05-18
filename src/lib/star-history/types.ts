@@ -2,6 +2,8 @@
 
 export type ThemeName = "light" | "dark";
 export type AxisType = "date" | "timeline";
+/** Chart shape: cumulative line, or total-stars bar/radial/pie comparison. */
+export type ChartType = "line" | "bar" | "radial" | "radial-half" | "pie";
 /** Area fill style under the chart line. */
 export type FillPattern = "gradient" | "solid" | "hatched" | "lines" | "dotted";
 /** Chart line stroke style. */
@@ -43,6 +45,8 @@ export interface RepoSeries {
 /** Options consumed by the SVG generator. */
 export interface StarHistoryOptions {
   theme: ThemeName;
+  /** Chart shape — `line` plots cumulative history, the rest compare totals. */
+  chartType: ChartType;
   axis: AxisType;
   /** Resolved background fill, or `null` for a transparent chart. */
   background: string | null;
@@ -70,6 +74,10 @@ export interface StarHistoryOptions {
   backgroundPattern: BackgroundPattern;
   /** Opacity of the background pattern as a percent (0–100). */
   backgroundPatternOpacity: number;
+  /** Band thickness (px) of each ring — radial / radial-half only. */
+  radialRingWidth: number;
+  /** Pie donut-hole radius as a percent of the outer radius (0 = full pie). */
+  pieInnerRadius: number;
   /** Per-series colors; falls back to the default palette by index. */
   colors: string[];
   /** Optional custom date-range clamp (ms). */

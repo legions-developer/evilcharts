@@ -5,12 +5,14 @@ import { z } from "zod";
 import type {
   AxisType,
   BackgroundPattern,
+  ChartType,
   FillPattern,
   StrokeVariant,
   ThemeName,
 } from "./types";
 
 export const THEMES = ["light", "dark"] as const;
+export const CHART_TYPES = ["line", "bar", "radial", "radial-half", "pie"] as const;
 export const AXIS_TYPES = ["date", "timeline"] as const;
 export const FILL_PATTERNS = ["gradient", "solid", "hatched", "lines", "dotted"] as const;
 export const STROKE_VARIANTS = ["solid", "dashed", "animated-dashed"] as const;
@@ -38,6 +40,11 @@ export const MAX_STROKE_WIDTH = 4;
 export const MIN_DOT_SIZE = 0;
 export const MAX_DOT_SIZE = 8;
 export const DEFAULT_DOT_SIZE = 3;
+// Radial ring band thickness (px) and the pie donut-hole percent.
+export const MIN_RING_WIDTH = 5;
+export const MAX_RING_WIDTH = 48;
+export const DEFAULT_RING_WIDTH = 18;
+export const MAX_PIE_INNER_RADIUS = 80;
 export const MAX_FILL_OPACITY = 100;
 
 const hexColor = z
@@ -53,6 +60,7 @@ export const starHistoryQuerySchema = z.object({
     .max(MAX_REPOS, `At most ${MAX_REPOS} repositories`),
   colors: z.array(hexColor),
   theme: z.enum(THEMES),
+  chartType: z.enum(CHART_TYPES),
   axis: z.enum(AXIS_TYPES),
   transparent: z.boolean(),
   animate: z.boolean(),
@@ -72,6 +80,8 @@ export const starHistoryQuerySchema = z.object({
   strokeVariant: z.enum(STROKE_VARIANTS),
   backgroundPattern: z.enum(BACKGROUND_PATTERNS),
   backgroundPatternOpacity: z.number().int().min(0).max(MAX_FILL_OPACITY),
+  radialRingWidth: z.number().int().min(MIN_RING_WIDTH).max(MAX_RING_WIDTH),
+  pieInnerRadius: z.number().int().min(0).max(MAX_PIE_INNER_RADIUS),
   /** Background fill override — the in-app preview uses it to swap the dark
    *  GitHub canvas for the site surface. Omitted = theme default. */
   background: hexColor.optional(),
@@ -129,6 +139,20 @@ function parseLoopInterval(raw: string | null): number {
   return (LOOP_INTERVALS as readonly number[]).includes(n) ? n : 0;
 }
 
+/** Parse the radial ring-width param (px), clamped to range (default when absent). */
+function clampRingWidth(raw: string | null): number {
+  const n = Number.parseInt(raw ?? "", 10);
+  if (Number.isNaN(n)) return DEFAULT_RING_WIDTH;
+  return Math.min(Math.max(n, MIN_RING_WIDTH), MAX_RING_WIDTH);
+}
+
+/** Parse the pie inner-radius param (percent), clamped to 0–80 (0 when absent). */
+function clampPieInnerRadius(raw: string | null): number {
+  const n = Number.parseInt(raw ?? "", 10);
+  if (Number.isNaN(n)) return 0;
+  return Math.min(Math.max(n, 0), MAX_PIE_INNER_RADIUS);
+}
+
 /** Parse + validate an incoming request's query params. */
 export function parseStarHistoryQuery(params: URLSearchParams) {
   const dateToMs = (key: string): number | undefined => {
@@ -142,6 +166,7 @@ export function parseStarHistoryQuery(params: URLSearchParams) {
     repos: params.getAll("repo"),
     colors: params.getAll("color"),
     theme: params.get("theme") ?? "light",
+    chartType: params.get("chart") ?? "line",
     axis: params.get("axis") ?? "date",
     transparent: params.get("transparent") === "1",
     animate: params.get("animate") !== "0",
@@ -155,6 +180,8 @@ export function parseStarHistoryQuery(params: URLSearchParams) {
     strokeVariant: params.get("strokeVariant") ?? "solid",
     backgroundPattern: params.get("bgPattern") ?? "none",
     backgroundPatternOpacity: clampBgPatternOpacity(params.get("bgPatternOpacity")),
+    radialRingWidth: clampRingWidth(params.get("ringWidth")),
+    pieInnerRadius: clampPieInnerRadius(params.get("pieHole")),
     background: params.get("bg") ?? undefined,
     from: dateToMs("from"),
     to: dateToMs("to"),
@@ -165,6 +192,8 @@ export interface StarHistoryUrlInput {
   /** Each repo carries its color so `repo`/`color` params stay positionally aligned. */
   repos: { value: string; color: string }[];
   theme: ThemeName;
+  /** Chart shape — line / bar / radial / pie. */
+  chartType: ChartType;
   axis: AxisType;
   transparent: boolean;
   animate: boolean;
@@ -188,6 +217,10 @@ export interface StarHistoryUrlInput {
   backgroundPattern: BackgroundPattern;
   /** Opacity of the background pattern as a percent (0–100). */
   backgroundPatternOpacity: number;
+  /** Band thickness (px) of each radial ring. */
+  radialRingWidth: number;
+  /** Pie donut-hole radius as a percent of the outer radius (0 = full pie). */
+  pieInnerRadius: number;
   /** Background override (`#rrggbb`) — omit to use the theme default. */
   background?: string;
   /** ISO date strings (YYYY-MM-DD) when a custom range is active. */
@@ -205,6 +238,7 @@ export function buildStarHistoryUrl(input: StarHistoryUrlInput, base = ""): stri
     params.append("color", repo.color);
   }
   params.set("theme", input.theme);
+  if (input.chartType !== "line") params.set("chart", input.chartType);
   params.set("axis", input.axis);
   params.set("animate", input.animate ? "1" : "0");
   if (input.animate && input.loopInterval > 0) {
@@ -225,6 +259,14 @@ export function buildStarHistoryUrl(input: StarHistoryUrlInput, base = ""): stri
     if (input.backgroundPatternOpacity !== 100) {
       params.set("bgPatternOpacity", String(input.backgroundPatternOpacity));
     }
+  }
+  if (input.chartType === "radial" || input.chartType === "radial-half") {
+    if (input.radialRingWidth !== DEFAULT_RING_WIDTH) {
+      params.set("ringWidth", String(input.radialRingWidth));
+    }
+  }
+  if (input.chartType === "pie" && input.pieInnerRadius > 0) {
+    params.set("pieHole", String(input.pieInnerRadius));
   }
   if (input.background) params.set("bg", input.background);
   if (input.from) params.set("from", input.from);

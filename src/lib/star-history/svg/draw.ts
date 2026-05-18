@@ -11,19 +11,20 @@ import { wordmark, wordmarkWidth } from "./wordmark";
 
 const FONT = "'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
 
-// Animation timing (seconds).
-const DRAW_BEGIN = 0.15;
-const DRAW_DUR = 1.6;
-const SERIES_STAGGER = 0.18;
+// Animation timing (seconds). Shared by every chart type's reveal.
+export const DRAW_BEGIN = 0.15;
+export const DRAW_DUR = 1.6;
+export const SERIES_STAGGER = 0.18;
 const DOT_DUR = 0.3;
 const DOT_STAGGER = 0.03;
 /** Cubic-bézier "ease-out" for the line draw-on. */
-const EASE_OUT = [0.4, 0, 0.2, 1] as const;
+export const EASE_OUT = [0.4, 0, 0.2, 1] as const;
 
-const round2 = (n: number): number => Math.round(n * 100) / 100;
+export const round2 = (n: number): number => Math.round(n * 100) / 100;
 
 /** When series `index` starts animating — staggered so series draw in sequence. */
-const seriesBegin = (index: number): number => round2(DRAW_BEGIN + index * SERIES_STAGGER);
+export const seriesBegin = (index: number): number =>
+  round2(DRAW_BEGIN + index * SERIES_STAGGER);
 
 const lineGen = line<ProjectedPoint>()
   .x((p) => p.px)
@@ -146,21 +147,30 @@ function seriesFillDef(
   return { def, id };
 }
 
-/** Per-series fill defs + the plot clip-path. */
-export function drawDefs(
-  layout: Layout,
+/**
+ * Per-series fill defs (`sh-grad-${i}`), shared by every chart type — the bar
+ * fills, ring fills and slice fills all reference these. `fillOpacity` (0–100)
+ * scales `baseOpacity`: the line/area passes the subtle `FILL_BASE_OPACITY`
+ * (the fill only washes under the line), the comparison charts pass `1` since
+ * the fill *is* the mark and must read at full strength.
+ */
+export function drawFillDefs(
   count: number,
   colors: string[],
   fillPattern: FillPattern,
   fillOpacity: number,
+  baseOpacity: number = FILL_BASE_OPACITY,
 ): string {
-  const { plot } = layout;
-  const topOpacity = (fillOpacity / 100) * FILL_BASE_OPACITY;
-  const fills = Array.from({ length: count }, (_, i) =>
+  const topOpacity = (fillOpacity / 100) * baseOpacity;
+  return Array.from({ length: count }, (_, i) =>
     seriesFillDef(fillPattern, i, seriesColor(colors, i), topOpacity).def,
   ).join("");
+}
 
-  const clip = el(
+/** The plot clip-path — line/bar only, keeps custom ranges tidy at the edges. */
+export function plotClip(layout: Layout): string {
+  const { plot } = layout;
+  return el(
     "clipPath",
     { id: "sh-plot-clip" },
     el("rect", {
@@ -170,8 +180,22 @@ export function drawDefs(
       height: plot.height + 16,
     }),
   );
+}
 
-  return el("defs", {}, fills + clip);
+/** Per-series fill defs + the plot clip-path — the line/bar `<defs>` block. */
+export function drawDefs(
+  layout: Layout,
+  count: number,
+  colors: string[],
+  fillPattern: FillPattern,
+  fillOpacity: number,
+  baseOpacity?: number,
+): string {
+  return el(
+    "defs",
+    {},
+    drawFillDefs(count, colors, fillPattern, fillOpacity, baseOpacity) + plotClip(layout),
+  );
 }
 
 export function drawGrid(layout: Layout, palette: Palette, yTicks: AxisTick[]): string {

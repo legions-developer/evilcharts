@@ -1,11 +1,12 @@
 // Client-side config model for the star-history tool.
 
 import type { DateRangeValue } from "@/components/ui/date-range-picker";
-import { DEFAULT_DOT_SIZE } from "@/lib/star-history/query-schema";
+import { DEFAULT_DOT_SIZE, DEFAULT_RING_WIDTH } from "@/lib/star-history/query-schema";
 import { DEFAULT_COLORS } from "@/lib/star-history/svg/theme";
 import type {
   AxisType,
   BackgroundPattern,
+  ChartType,
   FillPattern,
   StrokeVariant,
   ThemeName,
@@ -22,6 +23,8 @@ export interface RepoEntry {
 export interface StarHistoryConfig {
   repos: RepoEntry[];
   theme: ThemeName;
+  /** Chart shape — line / bar / radial / pie. */
+  chartType: ChartType;
   axis: AxisType;
   transparent: boolean;
   animate: boolean;
@@ -44,6 +47,10 @@ export interface StarHistoryConfig {
   backgroundPattern: BackgroundPattern;
   /** Opacity of the background pattern as a percent (0–100). */
   backgroundPatternOpacity: number;
+  /** Band thickness (px) of each radial ring. */
+  radialRingWidth: number;
+  /** Pie donut-hole radius as a percent of the outer radius. */
+  pieInnerRadius: number;
   range: DateRangeValue;
 }
 
@@ -63,6 +70,7 @@ export function createDefaultConfig(): StarHistoryConfig {
   return {
     repos: [],
     theme: "light",
+    chartType: "line",
     axis: "date",
     transparent: false,
     animate: true,
@@ -76,6 +84,8 @@ export function createDefaultConfig(): StarHistoryConfig {
     strokeVariant: "solid",
     backgroundPattern: "none",
     backgroundPatternOpacity: 100,
+    radialRingWidth: DEFAULT_RING_WIDTH,
+    pieInnerRadius: 0,
     range: { mode: "lifetime" },
   };
 }

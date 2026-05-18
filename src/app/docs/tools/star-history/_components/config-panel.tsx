@@ -1,6 +1,16 @@
 "use client";
 
-import { Calendar03Icon, Clock01Icon, Moon02Icon, Sun01Icon } from "@hugeicons/core-free-icons";
+import {
+  Calendar03Icon,
+  ChartColumnIcon,
+  ChartLineData01Icon,
+  ChartRingIcon,
+  Clock01Icon,
+  DashboardSpeed01Icon,
+  Moon02Icon,
+  PieChartIcon,
+  Sun01Icon,
+} from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import type { ReactNode } from "react";
 
@@ -14,6 +24,7 @@ import {
 import type {
   AxisType,
   BackgroundPattern,
+  ChartType,
   FillPattern,
   StrokeVariant,
   ThemeName,
@@ -26,7 +37,10 @@ import {
   LOOP_INTERVALS,
   MAX_AXIS_LABEL_OFFSET,
   MAX_DOT_SIZE,
+  MAX_PIE_INNER_RADIUS,
+  MAX_RING_WIDTH,
   MIN_DOT_SIZE,
+  MIN_RING_WIDTH,
   STROKE_VARIANTS,
 } from "@/lib/star-history/query-schema";
 
@@ -38,9 +52,25 @@ interface ConfigPanelProps {
   onChange: (config: StarHistoryConfig) => void;
 }
 
+/** Chart-type options, each with a matching hugeicon for the select. */
+const CHART_TYPE_OPTIONS: { value: ChartType; label: string; icon: typeof PieChartIcon }[] = [
+  { value: "line", label: "Line", icon: ChartLineData01Icon },
+  { value: "bar", label: "Bar", icon: ChartColumnIcon },
+  { value: "radial", label: "Radial", icon: ChartRingIcon },
+  { value: "radial-half", label: "Radial (half)", icon: DashboardSpeed01Icon },
+  { value: "pie", label: "Pie", icon: PieChartIcon },
+];
+
 /** Repositories + appearance config. */
 export function ConfigPanel({ config, onChange }: ConfigPanelProps) {
   const update = (patch: Partial<StarHistoryConfig>) => onChange({ ...config, ...patch });
+
+  // Line plots cumulative history; bar/radial/pie compare totals. The axis and
+  // stroke controls only apply to a subset, so several rows are conditional.
+  const isLine = config.chartType === "line";
+  const isRadial = config.chartType === "radial" || config.chartType === "radial-half";
+  const isPie = config.chartType === "pie";
+  const showStrokeSection = config.chartType === "line" || config.chartType === "bar";
 
   return (
     <div className="flex flex-col gap-8">
@@ -50,6 +80,25 @@ export function ConfigPanel({ config, onChange }: ConfigPanelProps) {
 
       <Section title="Config">
         <Card>
+          <Row label="Chart type" description="Line history, or a bar/radial/pie total.">
+            <Select
+              value={config.chartType}
+              onValueChange={(chartType) => update({ chartType: chartType as ChartType })}
+            >
+              <SelectTrigger size="sm" className="w-40">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent position="popper">
+                {CHART_TYPE_OPTIONS.map((opt) => (
+                  <SelectItem key={opt.value} value={opt.value} className="h-8">
+                    <HugeiconsIcon icon={opt.icon} className="size-3.5" />
+                    {opt.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Row>
+
           <Row label="Theme" description="Light or dark color scheme for the chart.">
             <Select
               value={config.theme}
@@ -71,40 +120,79 @@ export function ConfigPanel({ config, onChange }: ConfigPanelProps) {
             </Select>
           </Row>
 
-          <Row label="X axis" description="Plot stars by calendar date or repo age.">
-            <Select
-              value={config.axis}
-              onValueChange={(axis) => update({ axis: axis as AxisType })}
+          {isRadial && (
+            <Row label="Ring width" description="Band thickness of each radial ring.">
+              <div className="flex w-40 items-center gap-3">
+                <Slider
+                  value={[config.radialRingWidth]}
+                  min={MIN_RING_WIDTH}
+                  max={MAX_RING_WIDTH}
+                  step={1}
+                  onValueChange={([radialRingWidth]) => update({ radialRingWidth })}
+                />
+                <span className="text-muted-foreground w-8 text-right text-xs tabular-nums">
+                  {config.radialRingWidth}
+                </span>
+              </div>
+            </Row>
+          )}
+
+          {isPie && (
+            <Row label="Donut hole" description="Inner radius — 0% is a full pie.">
+              <div className="flex w-40 items-center gap-3">
+                <Slider
+                  value={[config.pieInnerRadius]}
+                  min={0}
+                  max={MAX_PIE_INNER_RADIUS}
+                  step={5}
+                  onValueChange={([pieInnerRadius]) => update({ pieInnerRadius })}
+                />
+                <span className="text-muted-foreground w-9 text-right text-xs tabular-nums">
+                  {config.pieInnerRadius}%
+                </span>
+              </div>
+            </Row>
+          )}
+
+          {/* Axis controls only apply to the time-based line chart. */}
+          {isLine && (
+            <Row label="X axis" description="Plot stars by calendar date or repo age.">
+              <Select
+                value={config.axis}
+                onValueChange={(axis) => update({ axis: axis as AxisType })}
+              >
+                <SelectTrigger size="sm" className="w-40">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent position="popper">
+                  <SelectItem value="date" className="h-8">
+                    <HugeiconsIcon icon={Calendar03Icon} className="size-3.5" />
+                    Date
+                  </SelectItem>
+                  <SelectItem value="timeline" className="h-8">
+                    <HugeiconsIcon icon={Clock01Icon} className="size-3.5" />
+                    Timeline
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </Row>
+          )}
+
+          {isLine && (
+            <Row
+              label="Axis labels"
+              description="Show axis titles beside the date and star ticks."
+              htmlFor="sh-axis-labels"
             >
-              <SelectTrigger size="sm" className="w-40">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent position="popper">
-                <SelectItem value="date" className="h-8">
-                  <HugeiconsIcon icon={Calendar03Icon} className="size-3.5" />
-                  Date
-                </SelectItem>
-                <SelectItem value="timeline" className="h-8">
-                  <HugeiconsIcon icon={Clock01Icon} className="size-3.5" />
-                  Timeline
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </Row>
+              <Switch
+                id="sh-axis-labels"
+                checked={config.axisLabels}
+                onCheckedChange={(axisLabels) => update({ axisLabels })}
+              />
+            </Row>
+          )}
 
-          <Row
-            label="Axis labels"
-            description="Show axis titles beside the date and star ticks."
-            htmlFor="sh-axis-labels"
-          >
-            <Switch
-              id="sh-axis-labels"
-              checked={config.axisLabels}
-              onCheckedChange={(axisLabels) => update({ axisLabels })}
-            />
-          </Row>
-
-          {config.axisLabels && (
+          {isLine && config.axisLabels && (
             <Row
               label="Label offset"
               description="Push the axis titles further from the chart."
@@ -186,69 +274,84 @@ export function ConfigPanel({ config, onChange }: ConfigPanelProps) {
         </Card>
       </Section>
 
-      <Section title="Stroke">
-        <Card>
-          <Row label="Stroke width" description="Thickness of the chart line in pixels.">
-            <Select
-              value={String(config.strokeWidth)}
-              onValueChange={(value) => update({ strokeWidth: Number(value) })}
-            >
-              <SelectTrigger size="sm" className="w-40">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent position="popper">
-                {[1, 2, 3, 4].map((w) => (
-                  <SelectItem key={w} value={String(w)} className="h-8">
-                    {w}px
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </Row>
-
-          <Row label="Stroke style" description="Solid, dashed or animated dashed line.">
-            <Select
-              value={config.strokeVariant}
-              onValueChange={(value) =>
-                update({ strokeVariant: value as StrokeVariant })
+      {/* Stroke only applies to the line and bar outlines — radial/pie use a
+          fixed hairline separator, so the whole section is hidden for them. */}
+      {showStrokeSection && (
+        <Section title="Stroke">
+          <Card>
+            <Row
+              label="Stroke width"
+              description={
+                isLine
+                  ? "Thickness of the chart line in pixels."
+                  : "Thickness of the bar outline in pixels."
               }
             >
-              <SelectTrigger size="sm" className="w-40">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent position="popper">
-                {STROKE_VARIANTS.map((v) => (
-                  <SelectItem key={v} value={v} className="h-8">
-                    {labelize(v)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </Row>
-        </Card>
-      </Section>
+              <Select
+                value={String(config.strokeWidth)}
+                onValueChange={(value) => update({ strokeWidth: Number(value) })}
+              >
+                <SelectTrigger size="sm" className="w-40">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent position="popper">
+                  {[1, 2, 3, 4].map((w) => (
+                    <SelectItem key={w} value={String(w)} className="h-8">
+                      {w}px
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Row>
 
-      <Section title="Dots">
-        <Card>
-          <Row
-            label="Dot size"
-            description="Radius of the per-point dots — set to 0 to hide them."
-          >
-            <div className="flex w-40 items-center gap-3">
-              <Slider
-                value={[config.dotSize]}
-                min={MIN_DOT_SIZE}
-                max={MAX_DOT_SIZE}
-                step={1}
-                onValueChange={([dotSize]) => update({ dotSize })}
-              />
-              <span className="text-muted-foreground w-8 text-right text-xs tabular-nums">
-                {config.dotSize}
-              </span>
-            </div>
-          </Row>
-        </Card>
-      </Section>
+            {isLine && (
+              <Row label="Stroke style" description="Solid, dashed or animated dashed line.">
+                <Select
+                  value={config.strokeVariant}
+                  onValueChange={(value) =>
+                    update({ strokeVariant: value as StrokeVariant })
+                  }
+                >
+                  <SelectTrigger size="sm" className="w-40">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent position="popper">
+                    {STROKE_VARIANTS.map((v) => (
+                      <SelectItem key={v} value={v} className="h-8">
+                        {labelize(v)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </Row>
+            )}
+          </Card>
+        </Section>
+      )}
+
+      {isLine && (
+        <Section title="Dots">
+          <Card>
+            <Row
+              label="Dot size"
+              description="Radius of the per-point dots — set to 0 to hide them."
+            >
+              <div className="flex w-40 items-center gap-3">
+                <Slider
+                  value={[config.dotSize]}
+                  min={MIN_DOT_SIZE}
+                  max={MAX_DOT_SIZE}
+                  step={1}
+                  onValueChange={([dotSize]) => update({ dotSize })}
+                />
+                <span className="text-muted-foreground w-8 text-right text-xs tabular-nums">
+                  {config.dotSize}
+                </span>
+              </div>
+            </Row>
+          </Card>
+        </Section>
+      )}
 
       <Section title="Fill">
         <Card>

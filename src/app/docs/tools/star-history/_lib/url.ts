@@ -27,6 +27,7 @@ function toUrlInput(config: StarHistoryConfig): StarHistoryUrlInput {
       .filter((r) => r.value.trim())
       .map((r) => ({ value: r.value.trim(), color: r.color })),
     theme: config.theme,
+    chartType: config.chartType,
     axis: config.axis,
     transparent: config.transparent,
     animate: config.animate,
@@ -40,6 +41,8 @@ function toUrlInput(config: StarHistoryConfig): StarHistoryUrlInput {
     strokeVariant: config.strokeVariant,
     backgroundPattern: config.backgroundPattern,
     backgroundPatternOpacity: config.backgroundPatternOpacity,
+    radialRingWidth: config.radialRingWidth,
+    pieInnerRadius: config.pieInnerRadius,
     from: useRange && from ? toIso(from) : undefined,
     to: useRange && to ? toIso(to) : undefined,
   };
