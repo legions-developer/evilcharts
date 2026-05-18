@@ -5,14 +5,11 @@
 
 import type { BackgroundPattern } from "../types";
 import type { Layout } from "./scales";
+import type { SvgIds } from "./ids";
 import { el } from "./el";
 
 /** Builds the `<pattern>` tile for one variant, in the given border-grey color. */
 type PatternBuilder = (id: string, color: string) => string;
-
-const PATTERN_ID = "sh-bg-pattern";
-const MASK_ID = "sh-bg-mask";
-const BLUR_ID = "sh-bg-blur";
 
 /** Shorthand for a `<pattern>` tile with a userSpaceOnUse coordinate system. */
 function tile(id: string, w: number, h: number, body: string, transform?: string): string {
@@ -32,8 +29,7 @@ function tile(id: string, w: number, h: number, body: string, transform?: string
 }
 
 const BUILDERS: Record<Exclude<BackgroundPattern, "none">, PatternBuilder> = {
-  dots: (id, color) =>
-    tile(id, 20, 20, el("circle", { cx: 2, cy: 2, r: 1, fill: color })),
+  dots: (id, color) => tile(id, 20, 20, el("circle", { cx: 2, cy: 2, r: 1, fill: color })),
 
   grid: (id, color) =>
     tile(
@@ -170,6 +166,7 @@ const BUILDERS: Record<Exclude<BackgroundPattern, "none">, PatternBuilder> = {
  * `color` is the theme's border-grey — see `Palette.pattern`.
  */
 export function drawBackground(
+  ids: SvgIds,
   layout: Layout,
   variant: BackgroundPattern,
   color: string,
@@ -180,18 +177,18 @@ export function drawBackground(
   const defs = el(
     "defs",
     {},
-    BUILDERS[variant](PATTERN_ID, color) +
-      el("filter", { id: BLUR_ID }, el("feGaussianBlur", { stdDeviation: 25 })) +
+    BUILDERS[variant](ids.bgPattern, color) +
+      el("filter", { id: ids.bgBlur }, el("feGaussianBlur", { stdDeviation: 25 })) +
       el(
         "mask",
-        { id: MASK_ID, maskUnits: "userSpaceOnUse" },
+        { id: ids.bgMask, maskUnits: "userSpaceOnUse" },
         el("rect", {
           x: "8%",
           y: "20%",
           width: "85%",
           height: "60%",
           fill: "white",
-          filter: `url(#${BLUR_ID})`,
+          filter: `url(#${ids.bgBlur})`,
         }),
       ),
   );
@@ -199,8 +196,8 @@ export function drawBackground(
   const fill = el("rect", {
     width: layout.width,
     height: layout.height,
-    fill: `url(#${PATTERN_ID})`,
-    mask: `url(#${MASK_ID})`,
+    fill: `url(#${ids.bgPattern})`,
+    mask: `url(#${ids.bgMask})`,
     opacity: opacity < 100 ? opacity / 100 : undefined,
   });
 

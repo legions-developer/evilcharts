@@ -3,7 +3,6 @@
 
 import { arc } from "d3-shape";
 
-import type { RepoSeries, StarHistoryOptions } from "../../types";
 import {
   drawFillDefs,
   drawFooter,
@@ -13,10 +12,12 @@ import {
   surface,
   svgRoot,
 } from "../draw";
-import { drawBackground } from "../backgrounds";
-import { animate, el } from "../el";
 import { buildPolarLayout, CHART_WIDTH, polarChartLayout, repoTotal } from "../scales";
+import type { RepoSeries, StarHistoryOptions } from "../../types";
 import { PALETTES, seriesColor } from "../theme";
+import { drawBackground } from "../backgrounds";
+import { createSvgIds } from "../ids";
+import { animate, el } from "../el";
 
 const TAU = Math.PI * 2;
 /** Per-ring reveal duration (seconds). */
@@ -35,17 +36,15 @@ function roundPath(d: string): string {
  * Shared radial builder. `half` switches between a full ring and a 180° gauge —
  * the only differences are the angular range and the (re-centered) layout.
  */
-function generateRadial(
-  series: RepoSeries[],
-  options: StarHistoryOptions,
-  half: boolean,
-): string {
+function generateRadial(series: RepoSeries[], options: StarHistoryOptions, half: boolean): string {
   const legend = planLegend(CHART_WIDTH, series, options.colors);
   const { cx, cy, radius } = buildPolarLayout(legend.topMargin, half);
   const layout = polarChartLayout();
   const palette = PALETTES[options.theme];
   const truncated = series.some((s) => s.truncated);
   const loopInterval = options.animate ? options.loopInterval : 0;
+  // Per-render ID namespace so inlined charts never share <defs>.
+  const ids = createSvgIds();
 
   const totals = series.map(repoTotal);
   const maxTotal = Math.max(0, ...totals);
@@ -108,7 +107,7 @@ function generateRadial(
         {
           d: roundPath(valueD),
           transform: `translate(${cx} ${cy})`,
-          fill: `url(#sh-grad-${i})`,
+          fill: `url(#${ids.grad(i)})`,
           // Hairline outline — radial rings ignore the stroke-width config.
           stroke: color,
           "stroke-width": 1,
@@ -126,10 +125,11 @@ function generateRadial(
     el(
       "defs",
       {},
-      drawFillDefs(series.length, options.colors, options.fillPattern, options.fillOpacity, 1),
+      drawFillDefs(ids, series.length, options.colors, options.fillPattern, options.fillOpacity, 1),
     ) +
     surface(layout, options.background) +
     drawBackground(
+      ids,
       layout,
       options.backgroundPattern,
       palette.pattern,
@@ -143,17 +143,11 @@ function generateRadial(
 }
 
 /** Full-circle radial chart. */
-export function generateRadialChart(
-  series: RepoSeries[],
-  options: StarHistoryOptions,
-): string {
+export function generateRadialChart(series: RepoSeries[], options: StarHistoryOptions): string {
   return generateRadial(series, options, false);
 }
 
 /** Half-circle (gauge) radial chart. */
-export function generateRadialHalfChart(
-  series: RepoSeries[],
-  options: StarHistoryOptions,
-): string {
+export function generateRadialHalfChart(series: RepoSeries[], options: StarHistoryOptions): string {
   return generateRadial(series, options, true);
 }

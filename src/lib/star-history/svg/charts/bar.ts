@@ -1,6 +1,5 @@
 // Bar chart: compares repos by total stars — one vertical bar per repo.
 
-import type { RepoSeries, StarHistoryOptions } from "../../types";
 import {
   drawDefs,
   drawFooter,
@@ -12,11 +11,13 @@ import {
   surface,
   svgRoot,
 } from "../draw";
+import { buildBarScales, buildLayout, CHART_WIDTH, type BarDatum } from "../scales";
+import type { RepoSeries, StarHistoryOptions } from "../../types";
+import { PALETTES, seriesColor, type Palette } from "../theme";
+import { escapeXml, formatStars } from "../escape";
+import { createSvgIds, type SvgIds } from "../ids";
 import { drawBackground } from "../backgrounds";
 import { animate, el } from "../el";
-import { escapeXml, formatStars } from "../escape";
-import { buildBarScales, buildLayout, CHART_WIDTH, type BarDatum } from "../scales";
-import { PALETTES, seriesColor, type Palette } from "../theme";
 
 /** Bar grow-in duration (seconds) — matches the line draw-on feel. */
 const BAR_DUR = 0.7;
@@ -25,6 +26,7 @@ const LABEL_DUR = 0.3;
 
 /** One bar: a filled rect that grows from the baseline + a value label above it. */
 function drawBar(
+  ids: SvgIds,
   bar: BarDatum,
   index: number,
   colors: string[],
@@ -65,7 +67,7 @@ function drawBar(
       width: bar.width,
       height: animated ? 0 : bar.height,
       rx: 3,
-      fill: `url(#sh-grad-${index})`,
+      fill: `url(#${ids.grad(index)})`,
       stroke: seriesColor(colors, index),
       "stroke-width": strokeWidth,
     },
@@ -102,10 +104,7 @@ function drawBar(
 }
 
 /** Build the complete bar-chart SVG string. */
-export function generateBarChart(
-  series: RepoSeries[],
-  options: StarHistoryOptions,
-): string {
+export function generateBarChart(series: RepoSeries[], options: StarHistoryOptions): string {
   // Legend pushes the plot down exactly like the line chart.
   const legend = planLegend(CHART_WIDTH, series, options.colors);
   // Bars need no axis titles, so a plain cartesian layout below the legend.
@@ -114,6 +113,8 @@ export function generateBarChart(
   const { bars, yTicks, baseline } = buildBarScales(series, layout);
   const truncated = series.some((s) => s.truncated);
   const loopInterval = options.animate ? options.loopInterval : 0;
+  // Per-render ID namespace so inlined charts never share <defs>.
+  const ids = createSvgIds();
 
   // A background pattern replaces the grid lines (same rule as the line chart).
   const hasBgPattern = options.backgroundPattern !== "none";
@@ -145,6 +146,7 @@ export function generateBarChart(
   const barContent = bars
     .map((bar, i) =>
       drawBar(
+        ids,
         bar,
         i,
         options.colors,
@@ -158,9 +160,18 @@ export function generateBarChart(
     .join("");
 
   const body =
-    drawDefs(layout, series.length, options.colors, options.fillPattern, options.fillOpacity, 1) +
+    drawDefs(
+      ids,
+      layout,
+      series.length,
+      options.colors,
+      options.fillPattern,
+      options.fillOpacity,
+      1,
+    ) +
     surface(layout, options.background) +
     drawBackground(
+      ids,
       layout,
       options.backgroundPattern,
       palette.pattern,

@@ -4,10 +4,11 @@
 import { area, curveMonotoneX, line } from "d3-shape";
 
 import type { AxisTick, Layout, ProjectedPoint, ProjectedSeries } from "./scales";
-import { seriesColor, type Palette } from "./theme";
 import type { FillPattern, RepoSeries, StrokeVariant } from "../types";
-import { animate, el, text } from "./el";
 import { wordmark, wordmarkWidth } from "./wordmark";
+import { seriesColor, type Palette } from "./theme";
+import { animate, el, text } from "./el";
+import type { SvgIds } from "./ids";
 
 const FONT = "'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
 
@@ -23,8 +24,7 @@ export const EASE_OUT = [0.4, 0, 0.2, 1] as const;
 export const round2 = (n: number): number => Math.round(n * 100) / 100;
 
 /** When series `index` starts animating — staggered so series draw in sequence. */
-export const seriesBegin = (index: number): number =>
-  round2(DRAW_BEGIN + index * SERIES_STAGGER);
+export const seriesBegin = (index: number): number => round2(DRAW_BEGIN + index * SERIES_STAGGER);
 
 const lineGen = line<ProjectedPoint>()
   .x((p) => p.px)
@@ -68,18 +68,11 @@ export function surface(layout: Layout, background: string | null): string {
 const FILL_BASE_OPACITY = 0.22;
 
 /**
- * Build the area-fill def for one series. Returns the `<def>` markup and the
- * `id` `drawSeriesArea` should reference. `pattern` picks the fill style;
- * `opacity` (0–1) scales it. Patterns mirror the area-chart registry textures.
+ * Build the area-fill def for one series, registered under `id`. `pattern`
+ * picks the fill style; `opacity` (0–1) scales it. Patterns mirror the
+ * area-chart registry textures.
  */
-function seriesFillDef(
-  pattern: FillPattern,
-  index: number,
-  color: string,
-  opacity: number,
-): { def: string; id: string } {
-  const id = `sh-grad-${index}`;
-
+function seriesFillDef(pattern: FillPattern, id: string, color: string, opacity: number): string {
   // Solid: a flat color fill at the chosen opacity (no vertical fade).
   if (pattern === "solid") {
     const def = el(
@@ -88,7 +81,7 @@ function seriesFillDef(
       el("stop", { offset: "0%", "stop-color": color, "stop-opacity": opacity }) +
         el("stop", { offset: "100%", "stop-color": color, "stop-opacity": opacity }),
     );
-    return { def, id };
+    return def;
   }
 
   // Texture patterns: a tile of the series color shapes, scaled by `opacity`.
@@ -134,7 +127,7 @@ function seriesFillDef(
         el("rect", { width: 4, height: 8, fill: color, "fill-opacity": opacity }),
       );
     }
-    return { def: tile, id };
+    return tile;
   }
 
   // Gradient (default): vertical fade, top stop scaled by `opacity`.
@@ -144,17 +137,18 @@ function seriesFillDef(
     el("stop", { offset: "0%", "stop-color": color, "stop-opacity": opacity }) +
       el("stop", { offset: "100%", "stop-color": color, "stop-opacity": 0 }),
   );
-  return { def, id };
+  return def;
 }
 
 /**
- * Per-series fill defs (`sh-grad-${i}`), shared by every chart type — the bar
+ * Per-series fill defs (`ids.grad(i)`), shared by every chart type — the bar
  * fills, ring fills and slice fills all reference these. `fillOpacity` (0–100)
  * scales `baseOpacity`: the line/area passes the subtle `FILL_BASE_OPACITY`
  * (the fill only washes under the line), the comparison charts pass `1` since
  * the fill *is* the mark and must read at full strength.
  */
 export function drawFillDefs(
+  ids: SvgIds,
   count: number,
   colors: string[],
   fillPattern: FillPattern,
@@ -163,16 +157,16 @@ export function drawFillDefs(
 ): string {
   const topOpacity = (fillOpacity / 100) * baseOpacity;
   return Array.from({ length: count }, (_, i) =>
-    seriesFillDef(fillPattern, i, seriesColor(colors, i), topOpacity).def,
+    seriesFillDef(fillPattern, ids.grad(i), seriesColor(colors, i), topOpacity),
   ).join("");
 }
 
 /** The plot clip-path — line/bar only, keeps custom ranges tidy at the edges. */
-export function plotClip(layout: Layout): string {
+export function plotClip(ids: SvgIds, layout: Layout): string {
   const { plot } = layout;
   return el(
     "clipPath",
-    { id: "sh-plot-clip" },
+    { id: ids.plotClip },
     el("rect", {
       x: plot.x0 - 6,
       y: plot.y0 - 10,
@@ -184,6 +178,7 @@ export function plotClip(layout: Layout): string {
 
 /** Per-series fill defs + the plot clip-path — the line/bar `<defs>` block. */
 export function drawDefs(
+  ids: SvgIds,
   layout: Layout,
   count: number,
   colors: string[],
@@ -194,7 +189,7 @@ export function drawDefs(
   return el(
     "defs",
     {},
-    drawFillDefs(count, colors, fillPattern, fillOpacity, baseOpacity) + plotClip(layout),
+    drawFillDefs(ids, count, colors, fillPattern, fillOpacity, baseOpacity) + plotClip(ids, layout),
   );
 }
 
@@ -326,20 +321,26 @@ export interface LegendPlan {
  * chart width. `topMargin` reports how much vertical room the rows need so the
  * plot can be pushed down to clear them.
  */
-export function planLegend(
-  width: number,
-  series: RepoSeries[],
-  colors: string[],
-): LegendPlan {
-  const items = series.map((s, i) => ({
-    label: s.label,
-    color: seriesColor(colors, i),
-    width:
-      LEGEND.PAD_X * 2 + LEGEND.SWATCH + LEGEND.SWATCH_GAP + s.label.length * LEGEND_CHAR_W,
-  }));
+export function planLegend(width: number, series: RepoSeries[], colors: string[]): LegendPlan {
+  // Width of a badge's fixed chrome (padding + swatch), excluding the label.
+  const fixed = LEGEND.PAD_X * 2 + LEGEND.SWATCH + LEGEND.SWATCH_GAP;
+  const maxRowWidth = width - LEGEND.EDGE * 2;
+  // A single badge can never exceed one row — truncate over-long labels so
+  // `rowTotal` stays within `maxRowWidth` and the right-aligned x never goes
+  // negative (which would push the legend off-canvas).
+  const maxLabelChars = Math.max(1, Math.floor((maxRowWidth - fixed) / LEGEND_CHAR_W));
+
+  const items = series.map((s, i) => {
+    const label =
+      s.label.length > maxLabelChars ? `${s.label.slice(0, maxLabelChars - 1)}…` : s.label;
+    return {
+      label,
+      color: seriesColor(colors, i),
+      width: fixed + label.length * LEGEND_CHAR_W,
+    };
+  });
 
   // Greedy wrap into rows that fit within the chart's inner width.
-  const maxRowWidth = width - LEGEND.EDGE * 2;
   const rows: (typeof items)[] = [];
   let row: typeof items = [];
   let rowWidth = 0;
@@ -358,8 +359,7 @@ export function planLegend(
   // Place each row right-aligned to the chart's right edge.
   const badges: LegendBadge[] = [];
   rows.forEach((r, ri) => {
-    const rowTotal =
-      r.reduce((sum, it) => sum + it.width, 0) + LEGEND.BADGE_GAP * (r.length - 1);
+    const rowTotal = r.reduce((sum, it) => sum + it.width, 0) + LEGEND.BADGE_GAP * (r.length - 1);
     let x = width - LEGEND.EDGE - rowTotal;
     const y = LEGEND.TOP_INSET + ri * (LEGEND.BADGE_H + LEGEND.ROW_GAP);
     for (const it of r) {
@@ -412,6 +412,7 @@ export function drawLegend(plan: LegendPlan, palette: Palette): string {
 }
 
 export function drawSeriesArea(
+  ids: SvgIds,
   ps: ProjectedSeries,
   index: number,
   layout: Layout,
@@ -438,7 +439,7 @@ export function drawSeriesArea(
 
   return el(
     "path",
-    { d: roundPath(d), fill: `url(#sh-grad-${index})`, opacity: animated ? 0 : undefined },
+    { d: roundPath(d), fill: `url(#${ids.grad(index)})`, opacity: animated ? 0 : undefined },
     reveal,
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
-import { useClipboard } from "@mantine/hooks";
 import { CheckIcon, CopyIcon } from "lucide-react";
+import { useClipboard } from "@mantine/hooks";
 import { toast } from "sonner";
 
 import { SvgActions } from "./svg-actions";
@@ -22,6 +22,17 @@ export function EmbedSnippets({ embedUrl, origin, fetchSvg, hasRepos }: EmbedSni
     return (
       <div className="text-muted-foreground flex aspect-video items-center justify-center p-6 text-xs">
         Add a repository below to generate an embeddable chart.
+      </div>
+    );
+  }
+
+  // `origin` is empty until the client hydrates (useSyncExternalStore). Until
+  // it resolves, every snippet URL would be relative — hold the panel so a
+  // reader can't copy a broken embed.
+  if (!origin) {
+    return (
+      <div className="text-muted-foreground flex aspect-video items-center justify-center p-6 text-xs">
+        Preparing embed snippets…
       </div>
     );
   }
@@ -73,9 +84,7 @@ function Snippet({ label, code }: { label: string; code: string }) {
     <div className="space-y-1.5">
       <p className="text-muted-foreground text-xs font-medium">{label}</p>
       <div className="bg-muted/40 flex items-center gap-2 rounded-md border p-3">
-        <code className="text-foreground/90 min-w-0 flex-1 truncate font-mono text-xs">
-          {code}
-        </code>
+        <code className="text-foreground/90 min-w-0 flex-1 truncate font-mono text-xs">{code}</code>
         <button
           type="button"
           onClick={copy}

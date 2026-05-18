@@ -15,24 +15,6 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import type { ReactNode } from "react";
 
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import type {
-  AxisType,
-  BackgroundPattern,
-  ChartType,
-  FillPattern,
-  StrokeVariant,
-  ThemeName,
-} from "@/lib/star-history/types";
-import { Switch } from "@/components/ui/switch";
-import { Slider } from "@/components/ui/slider";
-import { Label } from "@/components/ui/label";
-import {
   BACKGROUND_PATTERNS,
   LOOP_INTERVALS,
   MAX_AXIS_LABEL_OFFSET,
@@ -43,6 +25,24 @@ import {
   MIN_RING_WIDTH,
   STROKE_VARIANTS,
 } from "@/lib/star-history/query-schema";
+import type {
+  AxisType,
+  BackgroundPattern,
+  ChartType,
+  FillPattern,
+  StrokeVariant,
+  ThemeName,
+} from "@/lib/star-history/types";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Slider } from "@/components/ui/slider";
+import { Label } from "@/components/ui/label";
 
 import type { StarHistoryConfig } from "../_lib/state";
 import { RepoInputList } from "./repo-input-list";
@@ -193,10 +193,7 @@ export function ConfigPanel({ config, onChange }: ConfigPanelProps) {
           )}
 
           {isLine && config.axisLabels && (
-            <Row
-              label="Label offset"
-              description="Push the axis titles further from the chart."
-            >
+            <Row label="Label offset" description="Push the axis titles further from the chart.">
               <div className="flex w-40 items-center gap-3">
                 <Slider
                   value={[config.axisLabelOffset]}
@@ -218,9 +215,7 @@ export function ConfigPanel({ config, onChange }: ConfigPanelProps) {
           >
             <Select
               value={config.backgroundPattern}
-              onValueChange={(value) =>
-                update({ backgroundPattern: value as BackgroundPattern })
-              }
+              onValueChange={(value) => update({ backgroundPattern: value as BackgroundPattern })}
             >
               <SelectTrigger size="sm" className="w-40">
                 <SelectValue />
@@ -242,15 +237,13 @@ export function ConfigPanel({ config, onChange }: ConfigPanelProps) {
             >
               <Select
                 value={String(config.backgroundPatternOpacity)}
-                onValueChange={(value) =>
-                  update({ backgroundPatternOpacity: Number(value) })
-                }
+                onValueChange={(value) => update({ backgroundPatternOpacity: Number(value) })}
               >
                 <SelectTrigger size="sm" className="w-40">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent position="popper">
-                  {[25, 50, 75, 100].map((o) => (
+                  {[0, 25, 50, 75, 100].map((o) => (
                     <SelectItem key={o} value={String(o)} className="h-8">
                       {o}%
                     </SelectItem>
@@ -308,9 +301,7 @@ export function ConfigPanel({ config, onChange }: ConfigPanelProps) {
               <Row label="Stroke style" description="Solid, dashed or animated dashed line.">
                 <Select
                   value={config.strokeVariant}
-                  onValueChange={(value) =>
-                    update({ strokeVariant: value as StrokeVariant })
-                  }
+                  onValueChange={(value) => update({ strokeVariant: value as StrokeVariant })}
                 >
                   <SelectTrigger size="sm" className="w-40">
                     <SelectValue />
@@ -450,7 +441,7 @@ export function ConfigPanel({ config, onChange }: ConfigPanelProps) {
  * a real Card would leave the separators inset.
  */
 function Card({ children }: { children: ReactNode }) {
-  return <div className="bg-muted/20 divide-y rounded-lg border">{children}</div>;
+  return <div className="bg-muted dark:bg-muted/20 divide-y rounded-lg">{children}</div>;
 }
 
 /** "cross-hatch" → "Cross hatch" — turns a kebab-case option into a label. */

@@ -108,7 +108,7 @@ export function RepoInputList({ repos, onChange }: RepoInputListProps) {
           {repos.map((repo) => (
             <Tooltip key={repo.id}>
               <TooltipTrigger asChild>
-                <span className="group bg-muted/60 text-foreground/80 hover:bg-muted relative flex max-w-[220px] items-center gap-1.5 overflow-hidden rounded-md border px-1 py-1 pr-2 text-xs whitespace-nowrap transition-colors">
+                <span className="group bg-muted/60 text-foreground/80 hover:bg-muted relative flex max-w-[220px] items-center gap-1.5 overflow-hidden rounded-md px-1.5 py-1.5 pr-2.5 text-xs whitespace-nowrap transition-colors">
                   <span
                     className="size-4 shrink-0 rounded-[3px]"
                     style={{ backgroundColor: repo.color }}

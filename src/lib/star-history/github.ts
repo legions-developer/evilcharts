@@ -55,7 +55,10 @@ async function ghFetch(path: string, accept: string, slug: string): Promise<Gith
     throw new NetworkError();
   }
 
-  if (res.status === 403 || res.status === 429) {
+  // 401 = the token is invalid/expired; 403/429 = rate limited. Either way the
+  // token is unusable — bench it so it leaves the rotation and a retry can pick
+  // a fresh one, rather than reusing the bad token and failing again.
+  if (res.status === 401 || res.status === 403 || res.status === 429) {
     if (token) benchToken(token);
     throw new RateLimitedError();
   }

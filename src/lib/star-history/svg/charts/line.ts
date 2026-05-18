@@ -1,6 +1,5 @@
 // Line chart: cumulative star history — one line/area per repo over time.
 
-import type { RepoSeries, StarHistoryOptions } from "../../types";
 import {
   drawAxes,
   drawAxisTitles,
@@ -15,16 +14,15 @@ import {
   surface,
   svgRoot,
 } from "../draw";
-import { drawBackground } from "../backgrounds";
-import { el } from "../el";
+import type { RepoSeries, StarHistoryOptions } from "../../types";
 import { buildLayout, buildScales, CHART_WIDTH } from "../scales";
+import { drawBackground } from "../backgrounds";
+import { createSvgIds } from "../ids";
 import { PALETTES } from "../theme";
+import { el } from "../el";
 
 /** Build the complete line-chart SVG string. */
-export function generateLineChart(
-  series: RepoSeries[],
-  options: StarHistoryOptions,
-): string {
+export function generateLineChart(series: RepoSeries[], options: StarHistoryOptions): string {
   // The legend wraps to as many rows as it needs; its height pushes the plot
   // down so badges never overlap the chart.
   const legend = planLegend(CHART_WIDTH, series, options.colors);
@@ -32,6 +30,8 @@ export function generateLineChart(
   const palette = PALETTES[options.theme];
   const { projected, xTicks, yTicks } = buildScales(series, options, layout);
   const truncated = series.some((s) => s.truncated);
+  // Per-render ID namespace so inlined charts never share <defs>.
+  const ids = createSvgIds();
 
   // Auto-replay: when an interval is set, the draw-on animations repeat on
   // that cycle instead of running once. Only meaningful while animating.
@@ -41,7 +41,7 @@ export function generateLineChart(
   const plotContent = projected
     .map(
       (ps, i) =>
-        drawSeriesArea(ps, i, layout, options.animate, options.fillOpacity, loopInterval) +
+        drawSeriesArea(ids, ps, i, layout, options.animate, options.fillOpacity, loopInterval) +
         drawSeriesLine(
           ps,
           i,
@@ -68,9 +68,10 @@ export function generateLineChart(
   const hasBgPattern = options.backgroundPattern !== "none";
 
   const body =
-    drawDefs(layout, series.length, options.colors, options.fillPattern, options.fillOpacity) +
+    drawDefs(ids, layout, series.length, options.colors, options.fillPattern, options.fillOpacity) +
     surface(layout, options.background) +
     drawBackground(
+      ids,
       layout,
       options.backgroundPattern,
       palette.pattern,
@@ -86,7 +87,7 @@ export function generateLineChart(
           options.axisLabelOffset,
         )
       : "") +
-    el("g", { "clip-path": "url(#sh-plot-clip)" }, plotContent) +
+    el("g", { "clip-path": `url(#${ids.plotClip})` }, plotContent) +
     drawLegend(legend, palette) +
     drawFooter(layout, palette, truncated);
 

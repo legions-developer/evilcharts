@@ -2,7 +2,6 @@
 
 import { arc, pie, type PieArcDatum } from "d3-shape";
 
-import type { RepoSeries, StarHistoryOptions } from "../../types";
 import {
   drawFillDefs,
   drawFooter,
@@ -12,10 +11,12 @@ import {
   surface,
   svgRoot,
 } from "../draw";
+import { buildPolarLayout, CHART_WIDTH, polarChartLayout, repoTotal } from "../scales";
+import type { RepoSeries, StarHistoryOptions } from "../../types";
+import { PALETTES, seriesColor, type Palette } from "../theme";
+import { createSvgIds, type SvgIds } from "../ids";
 import { drawBackground } from "../backgrounds";
 import { animate, el } from "../el";
-import { buildPolarLayout, CHART_WIDTH, polarChartLayout, repoTotal } from "../scales";
-import { PALETTES, seriesColor, type Palette } from "../theme";
 
 /** Per-slice reveal duration (seconds). */
 const SLICE_DUR = 0.7;
@@ -31,6 +32,7 @@ const round2 = (n: number): number => Math.round(n * 100) / 100;
 
 /** One pie slice: a filled wedge + an optional centroid percentage label. */
 function drawSlice(
+  ids: SvgIds,
   datum: PieArcDatum<number>,
   index: number,
   arcGen: ReturnType<typeof arc<PieArcDatum<number>>>,
@@ -39,6 +41,7 @@ function drawSlice(
   palette: Palette,
   animated: boolean,
   loopInterval: number,
+  showLabels: boolean,
 ): string {
   const d = arcGen(datum) ?? "";
   if (!d) return "";
@@ -60,7 +63,7 @@ function drawSlice(
     {
       d: roundPath(d),
       transform: `translate(${cx} ${cy})`,
-      fill: `url(#sh-grad-${index})`,
+      fill: `url(#${ids.grad(index)})`,
       // Thin separator stroke between slices — ignores the stroke-width config.
       stroke: seriesColor(colors, index),
       "stroke-width": 1.5,
@@ -70,10 +73,11 @@ function drawSlice(
     reveal,
   );
 
-  // Percentage label at the slice centroid — only when the slice is big enough
-  // to hold it, so thin slivers stay uncluttered.
+  // Percentage label at the slice centroid — only for slices big enough to
+  // hold it, and never for the all-zero fallback (its angles are synthetic, so
+  // the percentages would be meaningless).
   const fraction = (datum.endAngle - datum.startAngle) / (Math.PI * 2);
-  if (fraction < LABEL_MIN_FRACTION) return slice;
+  if (!showLabels || fraction < LABEL_MIN_FRACTION) return slice;
 
   const [lx, ly] = arcGen.centroid(datum);
   const labelReveal = animated
@@ -106,23 +110,24 @@ function drawSlice(
 }
 
 /** Build the complete pie-chart SVG string. */
-export function generatePieChart(
-  series: RepoSeries[],
-  options: StarHistoryOptions,
-): string {
+export function generatePieChart(series: RepoSeries[], options: StarHistoryOptions): string {
   const legend = planLegend(CHART_WIDTH, series, options.colors);
   const { cx, cy, radius } = buildPolarLayout(legend.topMargin);
   const layout = polarChartLayout();
   const palette = PALETTES[options.theme];
   const truncated = series.some((s) => s.truncated);
   const loopInterval = options.animate ? options.loopInterval : 0;
+  // Per-render ID namespace so inlined charts never share <defs>.
+  const ids = createSvgIds();
 
   const totals = series.map(repoTotal);
   const grandTotal = totals.reduce((sum, t) => sum + t, 0);
 
   // Slice angles — `sort(null)` keeps repos in input order, the value is each
   // repo's total. A degenerate all-zero set falls back to one full slice.
-  const layoutPie = pie<number>().sort(null).value((v) => v);
+  const layoutPie = pie<number>()
+    .sort(null)
+    .value((v) => v);
   const arcs: PieArcDatum<number>[] = layoutPie(grandTotal > 0 ? totals : totals.map(() => 1));
 
   // `pieInnerRadius` (percent) carves out a donut hole — 0 keeps a full pie.
@@ -132,6 +137,7 @@ export function generatePieChart(
   const slices = arcs
     .map((datum, i) =>
       drawSlice(
+        ids,
         datum,
         i,
         arcGen,
@@ -140,14 +146,20 @@ export function generatePieChart(
         palette,
         options.animate,
         loopInterval,
+        grandTotal > 0,
       ),
     )
     .join("");
 
   const body =
-    el("defs", {}, drawFillDefs(series.length, options.colors, options.fillPattern, options.fillOpacity, 1)) +
+    el(
+      "defs",
+      {},
+      drawFillDefs(ids, series.length, options.colors, options.fillPattern, options.fillOpacity, 1),
+    ) +
     surface(layout, options.background) +
     drawBackground(
+      ids,
       layout,
       options.backgroundPattern,
       palette.pattern,
