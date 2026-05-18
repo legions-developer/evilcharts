@@ -24,6 +24,8 @@ interface PreviewPanelProps {
   title: string;
   embedUrl: string;
   origin: string;
+  /** Fetches the exported SVG markup — used by the embed tab's actions. */
+  fetchSvg: () => Promise<string>;
 }
 
 /**
@@ -52,6 +54,7 @@ export function PreviewPanel({
   title,
   embedUrl,
   origin,
+  fetchSvg,
 }: PreviewPanelProps) {
   // Bumping this remounts the SVG, replaying its SMIL draw-on animation.
   const [replayKey, setReplayKey] = useState(0);
@@ -122,7 +125,12 @@ export function PreviewPanel({
             </TabsPanel>
 
             <TabsPanel value="embed">
-              <EmbedSnippets embedUrl={embedUrl} origin={origin} hasRepos={hasRepos} />
+              <EmbedSnippets
+                embedUrl={embedUrl}
+                origin={origin}
+                fetchSvg={fetchSvg}
+                hasRepos={hasRepos}
+              />
             </TabsPanel>
           </div>
         </div>

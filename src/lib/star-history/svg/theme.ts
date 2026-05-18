@@ -8,6 +8,8 @@ export interface Palette {
   muted: string;
   grid: string;
   axis: string;
+  /** Solid border-grey for background pattern shapes. */
+  pattern: string;
 }
 
 /**
@@ -23,6 +25,7 @@ export const PALETTES: Record<ThemeName, Palette> = {
     muted: "#8a8a8a",
     grid: "#ececec",
     axis: "#d4d4d4",
+    pattern: "#d4d4d4",
   },
   dark: {
     background: "#0c1117",
@@ -31,6 +34,7 @@ export const PALETTES: Record<ThemeName, Palette> = {
     muted: "#6e7681",
     grid: "rgba(255, 255, 255, 0.06)",
     axis: "rgba(255, 255, 255, 0.12)",
+    pattern: "#30363d",
   },
 };
 

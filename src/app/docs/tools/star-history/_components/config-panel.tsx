@@ -11,11 +11,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { AxisType, FillPattern, ThemeName } from "@/lib/star-history/types";
+import type {
+  AxisType,
+  BackgroundPattern,
+  FillPattern,
+  StrokeVariant,
+  ThemeName,
+} from "@/lib/star-history/types";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
-import { MAX_AXIS_LABEL_OFFSET } from "@/lib/star-history/query-schema";
+import {
+  BACKGROUND_PATTERNS,
+  LOOP_INTERVALS,
+  MAX_AXIS_LABEL_OFFSET,
+  MAX_DOT_SIZE,
+  MIN_DOT_SIZE,
+  STROKE_VARIANTS,
+} from "@/lib/star-history/query-schema";
 
 import type { StarHistoryConfig } from "../_lib/state";
 import { RepoInputList } from "./repo-input-list";
@@ -36,9 +49,7 @@ export function ConfigPanel({ config, onChange }: ConfigPanelProps) {
       </Section>
 
       <Section title="Config">
-        {/* Hand-rolled card: each row pads itself so `divide-y` lines run edge
-            to edge — a real Card would leave the separators inset. */}
-        <div className="bg-muted/20 divide-y rounded-lg border">
+        <Card>
           <Row label="Theme" description="Light or dark color scheme for the chart.">
             <Select
               value={config.theme}
@@ -113,6 +124,70 @@ export function ConfigPanel({ config, onChange }: ConfigPanelProps) {
             </Row>
           )}
 
+          <Row
+            label="Background pattern"
+            description="Decorative texture behind the chart — replaces grid lines."
+          >
+            <Select
+              value={config.backgroundPattern}
+              onValueChange={(value) =>
+                update({ backgroundPattern: value as BackgroundPattern })
+              }
+            >
+              <SelectTrigger size="sm" className="w-40">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent position="popper">
+                {BACKGROUND_PATTERNS.map((p) => (
+                  <SelectItem key={p} value={p} className="h-8">
+                    {labelize(p)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Row>
+
+          {config.backgroundPattern !== "none" && (
+            <Row
+              label="Background pattern opacity"
+              description="Opacity of the decorative pattern behind the chart."
+            >
+              <Select
+                value={String(config.backgroundPatternOpacity)}
+                onValueChange={(value) =>
+                  update({ backgroundPatternOpacity: Number(value) })
+                }
+              >
+                <SelectTrigger size="sm" className="w-40">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent position="popper">
+                  {[25, 50, 75, 100].map((o) => (
+                    <SelectItem key={o} value={String(o)} className="h-8">
+                      {o}%
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Row>
+          )}
+
+          <Row
+            label="Transparent background"
+            description="Drop the background fill from the exported SVG."
+            htmlFor="sh-transparent"
+          >
+            <Switch
+              id="sh-transparent"
+              checked={config.transparent}
+              onCheckedChange={(transparent) => update({ transparent })}
+            />
+          </Row>
+        </Card>
+      </Section>
+
+      <Section title="Stroke">
+        <Card>
           <Row label="Stroke width" description="Thickness of the chart line in pixels.">
             <Select
               value={String(config.strokeWidth)}
@@ -131,6 +206,52 @@ export function ConfigPanel({ config, onChange }: ConfigPanelProps) {
             </Select>
           </Row>
 
+          <Row label="Stroke style" description="Solid, dashed or animated dashed line.">
+            <Select
+              value={config.strokeVariant}
+              onValueChange={(value) =>
+                update({ strokeVariant: value as StrokeVariant })
+              }
+            >
+              <SelectTrigger size="sm" className="w-40">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent position="popper">
+                {STROKE_VARIANTS.map((v) => (
+                  <SelectItem key={v} value={v} className="h-8">
+                    {labelize(v)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Row>
+        </Card>
+      </Section>
+
+      <Section title="Dots">
+        <Card>
+          <Row
+            label="Dot size"
+            description="Radius of the per-point dots — set to 0 to hide them."
+          >
+            <div className="flex w-40 items-center gap-3">
+              <Slider
+                value={[config.dotSize]}
+                min={MIN_DOT_SIZE}
+                max={MAX_DOT_SIZE}
+                step={1}
+                onValueChange={([dotSize]) => update({ dotSize })}
+              />
+              <span className="text-muted-foreground w-8 text-right text-xs tabular-nums">
+                {config.dotSize}
+              </span>
+            </div>
+          </Row>
+        </Card>
+      </Section>
+
+      <Section title="Fill">
+        <Card>
           <Row label="Fill opacity" description="Opacity of the area fill under the line.">
             <Select
               value={String(config.fillOpacity)}
@@ -176,7 +297,11 @@ export function ConfigPanel({ config, onChange }: ConfigPanelProps) {
               </SelectContent>
             </Select>
           </Row>
+        </Card>
+      </Section>
 
+      <Section title="Animation">
+        <Card>
           <Row
             label="Enable animations"
             description="Draw the chart on with a reveal animation."
@@ -189,21 +314,46 @@ export function ConfigPanel({ config, onChange }: ConfigPanelProps) {
             />
           </Row>
 
-          <Row
-            label="Transparent background"
-            description="Drop the background fill from the exported SVG."
-            htmlFor="sh-transparent"
-          >
-            <Switch
-              id="sh-transparent"
-              checked={config.transparent}
-              onCheckedChange={(transparent) => update({ transparent })}
-            />
-          </Row>
-        </div>
+          {config.animate && (
+            <Row
+              label="Auto replay"
+              description="Re-run the draw-on animation on a loop so the chart keeps animating."
+            >
+              <Select
+                value={String(config.loopInterval)}
+                onValueChange={(value) => update({ loopInterval: Number(value) })}
+              >
+                <SelectTrigger size="sm" className="w-40">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent position="popper">
+                  {LOOP_INTERVALS.map((seconds) => (
+                    <SelectItem key={seconds} value={String(seconds)} className="h-8">
+                      {seconds === 0 ? "Off" : `Every ${seconds}s`}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </Row>
+          )}
+        </Card>
       </Section>
     </div>
   );
+}
+
+/**
+ * Hand-rolled card: each Row pads itself so `divide-y` lines run edge to edge —
+ * a real Card would leave the separators inset.
+ */
+function Card({ children }: { children: ReactNode }) {
+  return <div className="bg-muted/20 divide-y rounded-lg border">{children}</div>;
+}
+
+/** "cross-hatch" → "Cross hatch" — turns a kebab-case option into a label. */
+function labelize(value: string): string {
+  const spaced = value.replace(/-/g, " ");
+  return spaced.charAt(0).toUpperCase() + spaced.slice(1);
 }
 
 /** A titled config section — big heading over its controls. */

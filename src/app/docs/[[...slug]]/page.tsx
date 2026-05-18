@@ -97,7 +97,7 @@ export default async function Page(props: { params: Promise<{ slug: string[] }> 
               </p>
             </blockquote>
             {doc.description && (
-              <p className="text-muted-foreground text-[15px]">{doc.description}</p>
+              <p className="text-muted-foreground text-sm">{doc.description}</p>
             )}
             {links && (
               <div className="mt-3 flex flex-row gap-3 select-none">

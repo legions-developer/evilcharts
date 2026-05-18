@@ -14,7 +14,7 @@ export interface Layout {
 }
 
 // Fixed 16:9 chart canvas — matches the preview card's aspect-video frame.
-const CHART_WIDTH = 800;
+export const CHART_WIDTH = 800;
 const CHART_HEIGHT = 450;
 
 const MARGIN = { top: 54, right: 20, bottom: 78, left: 68 };
@@ -23,11 +23,16 @@ const MARGIN = { top: 54, right: 20, bottom: 78, left: 68 };
 // user's offset is added on top of this.
 const AXIS_LABEL_PAD = { left: 14, bottom: 6 };
 
-export function buildLayout(axisLabels: boolean, axisLabelOffset = 0): Layout {
+export function buildLayout(
+  axisLabels: boolean,
+  axisLabelOffset = 0,
+  topMargin = MARGIN.top,
+): Layout {
   const width = CHART_WIDTH;
   const height = CHART_HEIGHT;
   const x0 = MARGIN.left + (axisLabels ? AXIS_LABEL_PAD.left + axisLabelOffset : 0);
-  const y0 = MARGIN.top;
+  // Plot starts below the legend block — `topMargin` grows when it wraps.
+  const y0 = Math.max(topMargin, MARGIN.top);
   const x1 = width - MARGIN.right;
   const y1 = height - MARGIN.bottom - (axisLabels ? AXIS_LABEL_PAD.bottom + axisLabelOffset : 0);
   return { width, height, plot: { x0, y0, x1, y1, width: x1 - x0, height: y1 - y0 } };

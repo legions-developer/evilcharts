@@ -15,7 +15,6 @@ import { DateRangePicker } from "@/components/ui/date-range-picker";
 
 import { createDefaultConfig, type StarHistoryConfig } from "../_lib/state";
 import { buildEmbedUrl, buildPreviewUrl } from "../_lib/url";
-import { ActionsBar } from "./actions-bar";
 import { ConfigPanel } from "./config-panel";
 import { PreviewPanel } from "./preview-panel";
 
@@ -88,7 +87,7 @@ function StarHistoryToolInner() {
           <h1 className="scroll-m-20 text-3xl font-semibold tracking-tight xl:text-4xl">
             GitHub Star History
           </h1>
-          <p className="text-muted-foreground max-w-xl text-[15px]">
+          <p className="text-muted-foreground max-w-xl text-sm">
             Generate an animated SVG of a GitHub repo&apos;s star history. Compare multiple
             repos, tweak colors and animation, then copy or embed it anywhere.
           </p>
@@ -109,16 +108,10 @@ function StarHistoryToolInner() {
         title={title}
         embedUrl={embedUrl}
         origin={origin}
+        fetchSvg={fetchExportSvg}
       />
 
       <ConfigPanel config={config} onChange={setConfig} />
-
-      <ActionsBar
-        embedUrl={embedUrl}
-        origin={origin}
-        fetchSvg={fetchExportSvg}
-        hasRepos={hasRepos}
-      />
     </div>
   );
 }

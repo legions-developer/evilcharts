@@ -4,6 +4,22 @@ export type ThemeName = "light" | "dark";
 export type AxisType = "date" | "timeline";
 /** Area fill style under the chart line. */
 export type FillPattern = "gradient" | "solid" | "hatched" | "lines" | "dotted";
+/** Chart line stroke style. */
+export type StrokeVariant = "solid" | "dashed" | "animated-dashed";
+/** Decorative pattern drawn behind the chart — "none" disables it. */
+export type BackgroundPattern =
+  | "none"
+  | "dots"
+  | "grid"
+  | "cross-hatch"
+  | "diagonal-lines"
+  | "plus"
+  | "falling-triangles"
+  | "4-pointed-star"
+  | "tiny-checkers"
+  | "overlapping-circles"
+  | "wiggle-lines"
+  | "bubbles";
 
 /** One sampled point of a repo's star history. */
 export interface StarRecord {
@@ -31,16 +47,29 @@ export interface StarHistoryOptions {
   /** Resolved background fill, or `null` for a transparent chart. */
   background: string | null;
   animate: boolean;
+  /**
+   * Seconds between automatic replays of the draw-on animation — the SVG
+   * re-runs its reveal on a loop. 0 disables it (animate once and hold).
+   */
+  loopInterval: number;
   /** Draw axis titles ("GitHub Stars" / the x-axis name) beside the ticks. */
   axisLabels: boolean;
   /** Extra gap (px) between the axis titles and the chart — shared by both axes. */
   axisLabelOffset: number;
   /** Chart line stroke width (px). */
   strokeWidth: number;
+  /** Radius (px) of the per-point dots — 0 hides them entirely. */
+  dotSize: number;
   /** Area fill opacity as a percent (0–100). */
   fillOpacity: number;
   /** Area fill style. */
   fillPattern: FillPattern;
+  /** Chart line stroke style. */
+  strokeVariant: StrokeVariant;
+  /** Decorative pattern drawn behind the chart (replaces grid lines when set). */
+  backgroundPattern: BackgroundPattern;
+  /** Opacity of the background pattern as a percent (0–100). */
+  backgroundPatternOpacity: number;
   /** Per-series colors; falls back to the default palette by index. */
   colors: string[];
   /** Optional custom date-range clamp (ms). */

@@ -5,7 +5,7 @@ import { area, curveMonotoneX, line } from "d3-shape";
 
 import type { AxisTick, Layout, ProjectedPoint, ProjectedSeries } from "./scales";
 import { seriesColor, type Palette } from "./theme";
-import type { FillPattern, RepoSeries } from "../types";
+import type { FillPattern, RepoSeries, StrokeVariant } from "../types";
 import { animate, el, text } from "./el";
 import { wordmark, wordmarkWidth } from "./wordmark";
 
@@ -268,65 +268,122 @@ export function drawAxisTitles(
 }
 
 /** Badge-styled legend, anchored to the top-right of the chart. */
-export function drawLegend(
-  layout: Layout,
-  palette: Palette,
+// Legend badge geometry — shared by `planLegend` and `drawLegend`.
+const LEGEND = {
+  FONT_SIZE: 12,
+  SWATCH: 10,
+  SWATCH_GAP: 7,
+  PAD_X: 10,
+  BADGE_H: 24,
+  BADGE_GAP: 8,
+  ROW_GAP: 8,
+  TOP_INSET: 14,
+  BOTTOM_GAP: 14,
+  EDGE: 14,
+};
+const LEGEND_CHAR_W = LEGEND.FONT_SIZE * 0.6; // rough advance width per character
+
+export interface LegendBadge {
+  x: number;
+  y: number;
+  width: number;
+  label: string;
+  color: string;
+}
+
+export interface LegendPlan {
+  badges: LegendBadge[];
+  /** Y where the plot should start — the full height of the legend block. */
+  topMargin: number;
+}
+
+/**
+ * Lay out the legend badges, wrapping to a new row whenever they'd exceed the
+ * chart width. `topMargin` reports how much vertical room the rows need so the
+ * plot can be pushed down to clear them.
+ */
+export function planLegend(
+  width: number,
   series: RepoSeries[],
   colors: string[],
-): string {
-  const FONT_SIZE = 12;
-  const SWATCH = 10;
-  const SWATCH_GAP = 7;
-  const BADGE_PAD_X = 10;
-  const BADGE_H = 24;
-  const BADGE_GAP = 10;
-  const CHAR_W = FONT_SIZE * 0.6; // rough advance width per character
+): LegendPlan {
+  const items = series.map((s, i) => ({
+    label: s.label,
+    color: seriesColor(colors, i),
+    width:
+      LEGEND.PAD_X * 2 + LEGEND.SWATCH + LEGEND.SWATCH_GAP + s.label.length * LEGEND_CHAR_W,
+  }));
 
-  const items = series.map((s, i) => {
-    const inner = SWATCH + SWATCH_GAP + s.label.length * CHAR_W;
-    return {
-      label: s.label,
-      color: seriesColor(colors, i),
-      width: inner + BADGE_PAD_X * 2,
-    };
+  // Greedy wrap into rows that fit within the chart's inner width.
+  const maxRowWidth = width - LEGEND.EDGE * 2;
+  const rows: (typeof items)[] = [];
+  let row: typeof items = [];
+  let rowWidth = 0;
+  for (const it of items) {
+    const extra = (row.length ? LEGEND.BADGE_GAP : 0) + it.width;
+    if (row.length && rowWidth + extra > maxRowWidth) {
+      rows.push(row);
+      row = [];
+      rowWidth = 0;
+    }
+    rowWidth += (row.length ? LEGEND.BADGE_GAP : 0) + it.width;
+    row.push(it);
+  }
+  if (row.length) rows.push(row);
+
+  // Place each row right-aligned to the chart's right edge.
+  const badges: LegendBadge[] = [];
+  rows.forEach((r, ri) => {
+    const rowTotal =
+      r.reduce((sum, it) => sum + it.width, 0) + LEGEND.BADGE_GAP * (r.length - 1);
+    let x = width - LEGEND.EDGE - rowTotal;
+    const y = LEGEND.TOP_INSET + ri * (LEGEND.BADGE_H + LEGEND.ROW_GAP);
+    for (const it of r) {
+      badges.push({ x, y, width: it.width, label: it.label, color: it.color });
+      x += it.width + LEGEND.BADGE_GAP;
+    }
   });
 
-  const total =
-    items.reduce((sum, it) => sum + it.width, 0) + BADGE_GAP * Math.max(0, items.length - 1);
+  const rowCount = Math.max(1, rows.length);
+  const topMargin =
+    LEGEND.TOP_INSET +
+    rowCount * LEGEND.BADGE_H +
+    (rowCount - 1) * LEGEND.ROW_GAP +
+    LEGEND.BOTTOM_GAP;
 
-  const y = 18; // top edge of the badge row
-  let x = layout.width - 14 - total; // 14px right inset
+  return { badges, topMargin };
+}
 
-  return items
-    .map((it) => {
-      const badge =
+/** Render the (possibly multi-row) legend from a `planLegend` result. */
+export function drawLegend(plan: LegendPlan, palette: Palette): string {
+  return plan.badges
+    .map(
+      (b) =>
         el("rect", {
-          x,
-          y,
-          width: it.width,
-          height: BADGE_H,
+          x: b.x,
+          y: b.y,
+          width: b.width,
+          height: LEGEND.BADGE_H,
           rx: 6,
           fill: palette.grid,
           "fill-opacity": 0.6,
         }) +
         el("rect", {
-          x: x + BADGE_PAD_X,
-          y: y + (BADGE_H - SWATCH) / 2,
-          width: SWATCH,
-          height: SWATCH,
+          x: b.x + LEGEND.PAD_X,
+          y: b.y + (LEGEND.BADGE_H - LEGEND.SWATCH) / 2,
+          width: LEGEND.SWATCH,
+          height: LEGEND.SWATCH,
           rx: 2.5,
-          fill: it.color,
+          fill: b.color,
         }) +
-        text(it.label, {
-          x: x + BADGE_PAD_X + SWATCH + SWATCH_GAP,
-          y: y + BADGE_H / 2,
+        text(b.label, {
+          x: b.x + LEGEND.PAD_X + LEGEND.SWATCH + LEGEND.SWATCH_GAP,
+          y: b.y + LEGEND.BADGE_H / 2,
           "dominant-baseline": "middle",
-          "font-size": FONT_SIZE,
+          "font-size": LEGEND.FONT_SIZE,
           fill: palette.text,
-        });
-      x += it.width + BADGE_GAP;
-      return badge;
-    })
+        }),
+    )
     .join("");
 }
 
@@ -336,6 +393,7 @@ export function drawSeriesArea(
   layout: Layout,
   animated: boolean,
   fillOpacity: number,
+  loopInterval: number,
 ): string {
   if (ps.points.length < 2) return "";
   // 0% fill opacity — skip the area path entirely.
@@ -344,7 +402,14 @@ export function drawSeriesArea(
   if (!d) return "";
 
   const reveal = animated
-    ? animate({ attr: "opacity", from: 0, to: 1, dur: DRAW_DUR, begin: seriesBegin(index) })
+    ? animate({
+        attr: "opacity",
+        from: 0,
+        to: 1,
+        dur: DRAW_DUR,
+        begin: seriesBegin(index),
+        loopInterval,
+      })
     : undefined;
 
   return el(
@@ -360,37 +425,80 @@ export function drawSeriesLine(
   colors: string[],
   animated: boolean,
   strokeWidth: number,
+  variant: StrokeVariant,
+  loopInterval: number,
 ): string {
   if (ps.points.length < 2) return "";
   const d = lineGen(ps.points);
   if (!d) return "";
 
-  // pathLength="1" normalizes the path so stroke-dashoffset 1→0 draws it on.
+  const base = {
+    d: roundPath(d),
+    fill: "none",
+    stroke: seriesColor(colors, index),
+    "stroke-width": strokeWidth,
+    "stroke-linecap": "round" as const,
+    "stroke-linejoin": "round" as const,
+  };
+
+  // Solid: the path-draw reveal — pathLength="1" normalizes the path so
+  // stroke-dashoffset 1→0 draws it on.
+  if (variant === "solid") {
+    const reveal = animated
+      ? animate({
+          attr: "stroke-dashoffset",
+          from: 1,
+          to: 0,
+          dur: DRAW_DUR,
+          begin: seriesBegin(index),
+          easing: EASE_OUT,
+          loopInterval,
+        })
+      : undefined;
+    return el(
+      "path",
+      {
+        ...base,
+        pathLength: animated ? 1 : undefined,
+        "stroke-dasharray": animated ? "1 1" : undefined,
+        "stroke-dashoffset": animated ? 1 : undefined,
+      },
+      reveal,
+    );
+  }
+
+  // Dashed variants: a real dash pattern, scaled to the stroke width. The
+  // path-draw trick would consume the dash array, so reveal with an opacity
+  // fade instead. "animated-dashed" adds a perpetual marching-ants offset.
+  // Dash length + a wider gap, both scaled to the stroke width.
+  const dashLen = strokeWidth * 3;
+  const dashGap = strokeWidth * 5;
+  const dash = `${round2(dashLen)} ${round2(dashGap)}`;
   const reveal = animated
     ? animate({
-        attr: "stroke-dashoffset",
-        from: 1,
-        to: 0,
+        attr: "opacity",
+        from: 0,
+        to: 1,
         dur: DRAW_DUR,
         begin: seriesBegin(index),
-        easing: EASE_OUT,
+        loopInterval,
       })
-    : undefined;
+    : "";
+  const marching =
+    variant === "animated-dashed"
+      ? el("animate", {
+          attributeName: "stroke-dashoffset",
+          from: 0,
+          to: -round2(dashLen + dashGap),
+          dur: "0.9s",
+          repeatCount: "indefinite",
+        })
+      : "";
 
   return el(
     "path",
-    {
-      d: roundPath(d),
-      fill: "none",
-      stroke: seriesColor(colors, index),
-      "stroke-width": strokeWidth,
-      "stroke-linecap": "round",
-      "stroke-linejoin": "round",
-      pathLength: animated ? 1 : undefined,
-      "stroke-dasharray": animated ? "1 1" : undefined,
-      "stroke-dashoffset": animated ? 1 : undefined,
-    },
-    reveal,
+    { ...base, "stroke-dasharray": dash, opacity: animated ? 0 : undefined },
+    reveal + marching,
   );
 }
 
@@ -400,7 +508,11 @@ export function drawSeriesDots(
   colors: string[],
   background: string | null,
   animated: boolean,
+  dotSize: number,
+  loopInterval: number,
 ): string {
+  // 0 — dots disabled, skip the circles entirely.
+  if (dotSize <= 0) return "";
   const color = seriesColor(colors, index);
   const lineDone = DRAW_BEGIN + index * SERIES_STAGGER + DRAW_DUR;
 
@@ -417,6 +529,7 @@ export function drawSeriesDots(
             to: 1,
             dur: DOT_DUR,
             begin: round2(lineDone + j * DOT_STAGGER),
+            loopInterval,
           })
         : undefined;
 
@@ -425,7 +538,7 @@ export function drawSeriesDots(
         {
           cx: p.px,
           cy: p.py,
-          r: 3.2,
+          r: dotSize,
           fill: color,
           // The halo only reads against a solid fill; skip it when transparent.
           stroke: background ?? undefined,
