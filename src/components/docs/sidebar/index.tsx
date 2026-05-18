@@ -2,6 +2,7 @@ import {
   getStartedOptions,
   ChartComponentOptions,
   DocumentationOptions,
+  ToolsOptions,
 } from "@/globals/constants/docs-sidebar";
 import {
   Sidebar,
@@ -27,6 +28,7 @@ export function DocsSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) 
         <NavMain tree={source.pageTree} />
         <RenderDefaultOptions options={ChartComponentOptions} label="Chart Components" />
         <RenderDefaultOptions options={DocumentationOptions} label="Documentation" />
+        <RenderDefaultOptions options={ToolsOptions} label="Tools" />
       </SidebarContent>
     </Sidebar>
   );

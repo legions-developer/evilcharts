@@ -2,6 +2,7 @@ import { Analytics as VercelAnalytics } from "@vercel/analytics/next";
 import { JetBrains_Mono, Geist, Inter } from "next/font/google";
 import type { Metadata, Viewport } from "next";
 import { ThemeProvider } from "next-themes";
+import { Toaster } from "@/components/ui/sonner";
 import { cn, SITE_URL } from "@/lib/utils";
 import {
   SITE_DESCRIPTION,
@@ -112,6 +113,7 @@ export default function RootLayout({
         <ThemeProvider defaultTheme="system" attribute="class">
           <VercelAnalytics />
           {children}
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>

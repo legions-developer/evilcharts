@@ -2,6 +2,7 @@ import {
   BackgroundIcon,
   ChartConfigIcon,
   ChartLegendIcon,
+  HistoryIcon,
   HouseIcon,
   ShapesIcon,
   SquareAddonIcon,
@@ -61,5 +62,13 @@ export const DocumentationOptions: SidebarOption[] = [
     name: "Chart Config",
     url: "/docs/chart-config",
     icon: <ChartConfigIcon />,
+  },
+];
+
+export const ToolsOptions: SidebarOption[] = [
+  {
+    name: "GitHub Star History",
+    url: "/docs/tools/star-history",
+    icon: <HistoryIcon />,
   },
 ];
