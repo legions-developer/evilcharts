@@ -53,7 +53,8 @@ export function ColorPicker({ value, onChange, className }: ColorPickerProps) {
             "focus-visible:border-ring/80 focus-visible:ring-ring/30 size-9 shrink-0 rounded-sm border shadow-xs transition-shadow outline-none",
             className,
           )}
-          style={{ backgroundColor: value }}
+          // Guard the swatch against a malformed `value` reaching the DOM.
+          style={{ backgroundColor: HEX_RE.test(value) ? value : undefined }}
         />
       </PopoverTrigger>
       <PopoverContent align="start" className="w-56 space-y-3">

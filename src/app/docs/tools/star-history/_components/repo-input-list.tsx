@@ -83,6 +83,7 @@ export function RepoInputList({ repos, onChange }: RepoInputListProps) {
             autoCorrect="off"
             aria-label="GitHub repository"
             aria-invalid={error ? true : undefined}
+            aria-describedby={error ? "sh-repo-error" : undefined}
             className="pr-9 pl-8"
           />
           <button
@@ -95,7 +96,11 @@ export function RepoInputList({ repos, onChange }: RepoInputListProps) {
             <ArrowRightIcon className="size-4" />
           </button>
         </div>
-        {error && <p className="text-destructive mt-1.5 text-xs">{error}</p>}
+        {error && (
+          <p id="sh-repo-error" role="alert" className="text-destructive mt-1.5 text-xs">
+            {error}
+          </p>
+        )}
       </div>
 
       {repos.length > 0 && (

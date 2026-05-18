@@ -542,9 +542,10 @@ export function drawSeriesDots(
 
   return ps.points
     .map((p, j) => {
-      // Skip the first point — it sits on the axis origin and the dot would
-      // be clipped in half by the plot box.
-      if (j === 0) return "";
+      // Skip the first point of a multi-point series — it sits on the axis
+      // origin and the dot would be clipped in half by the plot box. A lone
+      // single point still renders, else the series shows no mark at all.
+      if (j === 0 && ps.points.length > 1) return "";
 
       const reveal = animated
         ? animate({

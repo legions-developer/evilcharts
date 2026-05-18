@@ -17,7 +17,15 @@ export const PREVIEW_SURFACE: Record<ThemeName, string> = {
   dark: "#0a0a0a",
 };
 
-const toIso = (date: Date): string => date.toISOString().slice(0, 10);
+/**
+ * Local-date `YYYY-MM-DD`. The calendar yields local-midnight Dates, so
+ * `toISOString()` would shift the day in non-UTC timezones — read the local
+ * date parts instead.
+ */
+const toIso = (date: Date): string => {
+  const pad = (n: number): string => String(n).padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+};
 
 function toUrlInput(config: StarHistoryConfig): StarHistoryUrlInput {
   const { mode, from, to } = config.range;

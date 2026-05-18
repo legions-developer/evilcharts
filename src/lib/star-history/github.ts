@@ -146,13 +146,13 @@ export async function fetchStarRecords(repo: ParsedRepo): Promise<RepoSeries> {
       records.push({ date: new Date(all[i].starred_at).getTime(), stars: i + 1 });
     }
   } else {
-    // Large repo: page p's first stargazer ≈ the (p-1)*100-th star.
+    // Large repo: page p's first stargazer is the (p-1)*100+1-th star.
     for (const p of pages) {
       const entries = pageData.get(p);
       if (entries && entries.length > 0) {
         records.push({
           date: new Date(entries[0].starred_at).getTime(),
-          stars: PER_PAGE * (p - 1),
+          stars: PER_PAGE * (p - 1) + 1,
         });
       }
     }
