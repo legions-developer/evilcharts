@@ -68,7 +68,7 @@ export const DocumentationOptions: SidebarOption[] = [
 export const ToolsOptions: SidebarOption[] = [
   {
     name: "GitHub Star History",
-    url: "/docs/tools/star-history",
+    url: "/tools/star-history",
     icon: <HistoryIcon />,
   },
 ];

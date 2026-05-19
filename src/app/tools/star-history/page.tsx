@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title: "GitHub Star History",
   description:
     "Generate an animated SVG chart of GitHub star history for any repository — compare repos, customize colors, and embed it anywhere.",
-  alternates: { canonical: "/docs/tools/star-history" },
+  alternates: { canonical: "/tools/star-history" },
 };
 
 export default function StarHistoryPage() {

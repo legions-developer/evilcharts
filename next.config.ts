@@ -86,6 +86,12 @@ const nextConfig: NextConfig = {
         destination: "/docs/installation",
         permanent: true,
       },
+      // The star-history tool moved out of /docs into its own /tools route.
+      {
+        source: "/docs/tools/star-history",
+        destination: "/tools/star-history",
+        permanent: true,
+      },
     ];
   },
   rewrites() {
