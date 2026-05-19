@@ -19,6 +19,7 @@ import {
   LOOP_INTERVALS,
   MAX_AXIS_LABEL_OFFSET,
   MAX_DOT_SIZE,
+  MAX_FILL_OPACITY,
   MAX_PIE_INNER_RADIUS,
   MAX_RING_WIDTH,
   MIN_DOT_SIZE,
@@ -235,35 +236,23 @@ export function ConfigPanel({ config, onChange }: ConfigPanelProps) {
               label="Background pattern opacity"
               description="Opacity of the decorative pattern behind the chart."
             >
-              <Select
-                value={String(config.backgroundPatternOpacity)}
-                onValueChange={(value) => update({ backgroundPatternOpacity: Number(value) })}
-              >
-                <SelectTrigger size="sm" className="w-40">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent position="popper">
-                  {[0, 25, 50, 75, 100].map((o) => (
-                    <SelectItem key={o} value={String(o)} className="h-8">
-                      {o}%
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="flex w-40 items-center gap-3">
+                <Slider
+                  value={[config.backgroundPatternOpacity]}
+                  min={0}
+                  max={MAX_FILL_OPACITY}
+                  step={1}
+                  onValueChange={([backgroundPatternOpacity]) =>
+                    update({ backgroundPatternOpacity })
+                  }
+                />
+                <span className="text-muted-foreground w-9 text-right text-xs tabular-nums">
+                  {config.backgroundPatternOpacity}%
+                </span>
+              </div>
             </Row>
           )}
 
-          <Row
-            label="Transparent background"
-            description="Drop the background fill from the exported SVG."
-            htmlFor="sh-transparent"
-          >
-            <Switch
-              id="sh-transparent"
-              checked={config.transparent}
-              onCheckedChange={(transparent) => update({ transparent })}
-            />
-          </Row>
         </Card>
       </Section>
 
@@ -347,22 +336,39 @@ export function ConfigPanel({ config, onChange }: ConfigPanelProps) {
       <Section title="Fill">
         <Card>
           <Row label="Fill opacity" description="Opacity of the area fill under the line.">
-            <Select
-              value={String(config.fillOpacity)}
-              onValueChange={(value) => update({ fillOpacity: Number(value) })}
-            >
-              <SelectTrigger size="sm" className="w-40">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent position="popper">
-                {[0, 25, 50, 75, 100].map((o) => (
-                  <SelectItem key={o} value={String(o)} className="h-8">
-                    {o}%
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="flex w-40 items-center gap-3">
+              <Slider
+                value={[config.fillOpacity]}
+                min={0}
+                max={MAX_FILL_OPACITY}
+                step={1}
+                onValueChange={([fillOpacity]) => update({ fillOpacity })}
+              />
+              <span className="text-muted-foreground w-9 text-right text-xs tabular-nums">
+                {config.fillOpacity}%
+              </span>
+            </div>
           </Row>
+
+          {isLine && (
+            <Row
+              label="Fill fade"
+              description="Dissolve the lower part of the fill — at 50%, only the top half stays visible."
+            >
+              <div className="flex w-40 items-center gap-3">
+                <Slider
+                  value={[config.fillFade]}
+                  min={0}
+                  max={MAX_FILL_OPACITY}
+                  step={1}
+                  onValueChange={([fillFade]) => update({ fillFade })}
+                />
+                <span className="text-muted-foreground w-9 text-right text-xs tabular-nums">
+                  {config.fillFade}%
+                </span>
+              </div>
+            </Row>
+          )}
 
           <Row label="Fill pattern" description="Style of the area fill under the line.">
             <Select

@@ -9,7 +9,6 @@ import {
   drawLegend,
   planLegend,
   seriesBegin,
-  surface,
   svgRoot,
 } from "../draw";
 import { buildPolarLayout, CHART_WIDTH, polarChartLayout, repoTotal } from "../scales";
@@ -127,7 +126,6 @@ function generateRadial(series: RepoSeries[], options: StarHistoryOptions, half:
       {},
       drawFillDefs(ids, series.length, options.colors, options.fillPattern, options.fillOpacity, 1),
     ) +
-    surface(layout, options.background) +
     drawBackground(
       ids,
       layout,

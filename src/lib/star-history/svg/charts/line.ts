@@ -11,7 +11,6 @@ import {
   drawSeriesDots,
   drawSeriesLine,
   planLegend,
-  surface,
   svgRoot,
 } from "../draw";
 import type { RepoSeries, StarHistoryOptions } from "../../types";
@@ -41,7 +40,16 @@ export function generateLineChart(series: RepoSeries[], options: StarHistoryOpti
   const plotContent = projected
     .map(
       (ps, i) =>
-        drawSeriesArea(ids, ps, i, layout, options.animate, options.fillOpacity, loopInterval) +
+        drawSeriesArea(
+          ids,
+          ps,
+          i,
+          layout,
+          options.animate,
+          options.fillOpacity,
+          options.fillFade,
+          loopInterval,
+        ) +
         drawSeriesLine(
           ps,
           i,
@@ -51,15 +59,7 @@ export function generateLineChart(series: RepoSeries[], options: StarHistoryOpti
           options.strokeVariant,
           loopInterval,
         ) +
-        drawSeriesDots(
-          ps,
-          i,
-          options.colors,
-          options.background,
-          options.animate,
-          options.dotSize,
-          loopInterval,
-        ),
+        drawSeriesDots(ps, i, options.colors, options.animate, options.dotSize, loopInterval),
     )
     .join("");
 
@@ -68,8 +68,15 @@ export function generateLineChart(series: RepoSeries[], options: StarHistoryOpti
   const hasBgPattern = options.backgroundPattern !== "none";
 
   const body =
-    drawDefs(ids, layout, series.length, options.colors, options.fillPattern, options.fillOpacity) +
-    surface(layout, options.background) +
+    drawDefs(
+      ids,
+      layout,
+      series.length,
+      options.colors,
+      options.fillPattern,
+      options.fillOpacity,
+      options.fillFade,
+    ) +
     drawBackground(
       ids,
       layout,

@@ -48,8 +48,6 @@ export interface StarHistoryOptions {
   /** Chart shape — `line` plots cumulative history, the rest compare totals. */
   chartType: ChartType;
   axis: AxisType;
-  /** Resolved background fill, or `null` for a transparent chart. */
-  background: string | null;
   animate: boolean;
   /**
    * Seconds between automatic replays of the draw-on animation — the SVG
@@ -66,6 +64,8 @@ export interface StarHistoryOptions {
   dotSize: number;
   /** Area fill opacity as a percent (0–100). */
   fillOpacity: number;
+  /** Percent of the area fill, from the baseline up, that dissolves to transparent (0 = no fade). */
+  fillFade: number;
   /** Area fill style. */
   fillPattern: FillPattern;
   /** Chart line stroke style. */

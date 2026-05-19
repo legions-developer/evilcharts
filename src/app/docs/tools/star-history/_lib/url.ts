@@ -1,6 +1,6 @@
-// URL builders for the star-history tool. The in-app preview and the exported
-// embed differ only in the dark background: the preview blends into the site,
-// the embed bakes GitHub's canvas color so it sits flush inside a README.
+// URL builder for the star-history tool. The chart SVG is always transparent,
+// so the in-app preview and the exported embed fetch the exact same URL — the
+// preview just renders it on a theme-matched surface.
 
 import { buildStarHistoryUrl, type StarHistoryUrlInput } from "@/lib/star-history/query-schema";
 import type { ThemeName } from "@/lib/star-history/types";
@@ -8,9 +8,9 @@ import type { ThemeName } from "@/lib/star-history/types";
 import type { StarHistoryConfig } from "./state";
 
 /**
- * Surface the in-app preview renders the chart on. Mirrors the exported
- * background, except dark uses the site's near-black instead of GitHub's
- * #0c1117 — so the preview card blends into evilcharts.com.
+ * Surface the in-app preview renders the (transparent) chart on, per chart
+ * theme — light is white, dark is the site's near-black. This is only a
+ * viewing canvas; the exported SVG carries no background of its own.
  */
 export const PREVIEW_SURFACE: Record<ThemeName, string> = {
   light: "#ffffff",
@@ -37,7 +37,6 @@ function toUrlInput(config: StarHistoryConfig): StarHistoryUrlInput {
     theme: config.theme,
     chartType: config.chartType,
     axis: config.axis,
-    transparent: config.transparent,
     animate: config.animate,
     loopInterval: config.loopInterval,
     axisLabels: config.axisLabels,
@@ -45,6 +44,7 @@ function toUrlInput(config: StarHistoryConfig): StarHistoryUrlInput {
     strokeWidth: config.strokeWidth,
     dotSize: config.dotSize,
     fillOpacity: config.fillOpacity,
+    fillFade: config.fillFade,
     fillPattern: config.fillPattern,
     strokeVariant: config.strokeVariant,
     backgroundPattern: config.backgroundPattern,
@@ -56,15 +56,7 @@ function toUrlInput(config: StarHistoryConfig): StarHistoryUrlInput {
   };
 }
 
-/** URL the in-app preview fetches — a dark chart sits on the site surface. */
-export function buildPreviewUrl(config: StarHistoryConfig): string {
-  return buildStarHistoryUrl({
-    ...toUrlInput(config),
-    background: config.transparent ? undefined : PREVIEW_SURFACE[config.theme],
-  });
-}
-
-/** URL for embedding / export — a dark chart uses GitHub's #0c1117 canvas. */
-export function buildEmbedUrl(config: StarHistoryConfig): string {
+/** Build the /api/star-history URL for the current config — used for both the preview and the embed. */
+export function buildChartUrl(config: StarHistoryConfig): string {
   return buildStarHistoryUrl(toUrlInput(config));
 }

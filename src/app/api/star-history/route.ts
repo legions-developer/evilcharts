@@ -4,7 +4,7 @@
 import type { NextRequest } from "next/server";
 import { fetchStarRecords } from "@/lib/star-history/github";
 import { parseRepo } from "@/lib/star-history/parse-repo";
-import { parseHexParam, parseStarHistoryQuery } from "@/lib/star-history/query-schema";
+import { parseStarHistoryQuery } from "@/lib/star-history/query-schema";
 import { generateErrorSvg, generateStarHistorySvg } from "@/lib/star-history/svg";
 import { PALETTES } from "@/lib/star-history/svg/theme";
 import {
@@ -19,21 +19,9 @@ export const runtime = "nodejs";
 const DAY = 86_400;
 
 /**
- * Resolve the chart's background fill: nothing when transparent, the caller's
- * `bg` override when valid, otherwise the theme default (white / GitHub dark).
- */
-function resolveBackground(
-  theme: ThemeName,
-  transparent: boolean,
-  override: string | undefined,
-): string | null {
-  if (transparent) return null;
-  return override ?? PALETTES[theme].background;
-}
-
-/**
- * Wrap the SVG in an HTML document whose page background matches the chart —
- * used when the URL is opened directly (so the browser canvas isn't white).
+ * Wrap the SVG in an HTML document with a theme-matched page background — the
+ * chart SVG itself is transparent, so a direct open still needs a readable
+ * canvas (light text on the dark theme would vanish on a white browser page).
  */
 function htmlShell(svg: string, pageBg: string): string {
   return `<!doctype html><html><head><meta charset="utf-8"><title>GitHub Star History</title><style>html,body{margin:0;min-height:100%}body{background:${pageBg}}svg{max-width:100%;height:auto}</style></head><body>${svg}</body></html>`;
@@ -65,28 +53,20 @@ function svgResponse(
 export async function GET(req: NextRequest) {
   const params = req.nextUrl.searchParams;
 
-  // Error SVGs still need a theme/background, even when the query is invalid.
+  // The theme only drives the page canvas now — the chart SVG is transparent.
   const theme: ThemeName = params.get("theme") === "dark" ? "dark" : "light";
-  const errorOpts = {
-    theme,
-    background: resolveBackground(
-      theme,
-      params.get("transparent") === "1",
-      parseHexParam(params.get("bg")),
-    ),
-  };
 
   // `Sec-Fetch-Dest: document` means the URL was opened directly (not via an
-  // <img> embed) — serve an HTML page so the browser canvas matches the chart.
+  // <img> embed) — serve an HTML page so the browser canvas matches the theme.
   const asDocument = req.headers.get("sec-fetch-dest") === "document";
-  const pageBg = errorOpts.background ?? PALETTES[theme].background;
+  const pageBg = PALETTES[theme].background;
   const respond = (svg: string, ok: boolean) =>
     svgResponse(svg, ok, { asDocument, pageBg });
 
   const parsed = parseStarHistoryQuery(params);
   if (!parsed.success) {
     const message = parsed.error.issues[0]?.message ?? "Invalid request parameters";
-    return respond(generateErrorSvg(message, errorOpts), false);
+    return respond(generateErrorSvg(message), false);
   }
 
   const query = parsed.data;
@@ -99,7 +79,6 @@ export async function GET(req: NextRequest) {
       theme: query.theme,
       chartType: query.chartType,
       axis: query.axis,
-      background: resolveBackground(query.theme, query.transparent, query.background),
       animate: query.animate,
       loopInterval: query.loopInterval,
       axisLabels: query.axisLabels,
@@ -107,6 +86,7 @@ export async function GET(req: NextRequest) {
       strokeWidth: query.strokeWidth,
       dotSize: query.dotSize,
       fillOpacity: query.fillOpacity,
+      fillFade: query.fillFade,
       fillPattern: query.fillPattern,
       strokeVariant: query.strokeVariant,
       backgroundPattern: query.backgroundPattern,
@@ -121,6 +101,6 @@ export async function GET(req: NextRequest) {
   } catch (err) {
     const message =
       err instanceof StarHistoryError ? err.userMessage : "Something went wrong";
-    return respond(generateErrorSvg(message, errorOpts), false);
+    return respond(generateErrorSvg(message), false);
   }
 }

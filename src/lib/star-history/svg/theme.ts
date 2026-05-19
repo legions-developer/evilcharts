@@ -1,7 +1,11 @@
 import type { ThemeName } from "../types";
 
 export interface Palette {
-  /** Default background fill for the theme — used when no override is given. */
+  /**
+   * Page-canvas color for the theme. The chart SVG itself is always
+   * transparent — this is only used by the directly-opened HTML wrapper so a
+   * transparent chart stays readable instead of landing on a white browser page.
+   */
   background: string;
   title: string;
   text: string;

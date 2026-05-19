@@ -9,6 +9,10 @@ export interface SvgIds {
   grad: (index: number) => string;
   /** Plot-area clip-path (line and bar charts). */
   plotClip: string;
+  /** Vertical fade mask over the area fill (line chart). */
+  fillMask: string;
+  /** Linear gradient feeding the area-fill fade mask. */
+  fillMaskGrad: string;
   /** Background-pattern tile. */
   bgPattern: string;
   /** Soft edge-fade mask over the background pattern. */
@@ -29,6 +33,8 @@ export function createSvgIds(): SvgIds {
   return {
     grad: (index) => `${ns}-grad-${index}`,
     plotClip: `${ns}-plot-clip`,
+    fillMask: `${ns}-fill-mask`,
+    fillMaskGrad: `${ns}-fill-mask-grad`,
     bgPattern: `${ns}-bg-pattern`,
     bgMask: `${ns}-bg-mask`,
     bgBlur: `${ns}-bg-blur`,

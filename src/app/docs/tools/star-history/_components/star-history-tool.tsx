@@ -14,7 +14,7 @@ import {
 import { DateRangePicker } from "@/components/ui/date-range-picker";
 
 import { createDefaultConfig, type StarHistoryConfig } from "../_lib/state";
-import { buildEmbedUrl, buildPreviewUrl } from "../_lib/url";
+import { buildChartUrl } from "../_lib/url";
 import { ConfigPanel } from "./config-panel";
 import { PreviewPanel } from "./preview-panel";
 
@@ -52,12 +52,11 @@ function StarHistoryToolInner() {
   // Static card title — the repo value is shown in the inputs, not the header.
   const title = "GitHub Star History";
 
-  // The preview blends into the site; the embed URL bakes GitHub's dark canvas.
-  const previewUrl = hasRepos ? buildPreviewUrl(config) : "";
-  const embedUrl = hasRepos ? buildEmbedUrl(config) : "";
+  // The chart SVG is transparent — preview and embed fetch the same URL.
+  const chartUrl = hasRepos ? buildChartUrl(config) : "";
 
   // Debounce so typing / dragging a color doesn't spam the API.
-  const [debouncedPreviewUrl] = useDebouncedValue(previewUrl, 400);
+  const [debouncedPreviewUrl] = useDebouncedValue(chartUrl, 400);
 
   // React Query is the single source for the preview SVG — cached per config,
   // with no-flicker updates while a new request is in flight.
@@ -69,15 +68,15 @@ function StarHistoryToolInner() {
     staleTime: 5 * 60 * 1000,
   });
 
-  // Copy/download read the exported (GitHub-canvas) SVG — fetched once, cached.
+  // Copy/download read the exported SVG — fetched once, cached.
   const fetchExportSvg = useCallback(
     () =>
       queryClient.fetchQuery({
-        queryKey: ["star-history-export", embedUrl],
-        queryFn: () => fetchSvg(embedUrl),
+        queryKey: ["star-history-export", chartUrl],
+        queryFn: () => fetchSvg(chartUrl),
         staleTime: 5 * 60 * 1000,
       }),
-    [queryClient, embedUrl],
+    [queryClient, chartUrl],
   );
 
   return (
@@ -104,9 +103,8 @@ function StarHistoryToolInner() {
         isError={svgQuery.isError}
         hasRepos={hasRepos}
         theme={config.theme}
-        transparent={config.transparent}
         title={title}
-        embedUrl={embedUrl}
+        embedUrl={chartUrl}
         origin={origin}
         fetchSvg={fetchExportSvg}
       />

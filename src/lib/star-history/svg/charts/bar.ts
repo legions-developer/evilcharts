@@ -8,7 +8,6 @@ import {
   planLegend,
   round2,
   seriesBegin,
-  surface,
   svgRoot,
 } from "../draw";
 import { buildBarScales, buildLayout, CHART_WIDTH, type BarDatum } from "../scales";
@@ -167,9 +166,9 @@ export function generateBarChart(series: RepoSeries[], options: StarHistoryOptio
       options.colors,
       options.fillPattern,
       options.fillOpacity,
+      0,
       1,
     ) +
-    surface(layout, options.background) +
     drawBackground(
       ids,
       layout,

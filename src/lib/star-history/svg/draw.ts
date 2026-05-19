@@ -58,12 +58,6 @@ export function svgRoot(layout: Layout, children: string): string {
   );
 }
 
-/** Full-bleed background rect — omitted entirely when `background` is null. */
-export function surface(layout: Layout, background: string | null): string {
-  if (!background) return "";
-  return el("rect", { width: layout.width, height: layout.height, fill: background });
-}
-
 /** Base top-stop opacity of the gradient fill, scaled by the chosen percent. */
 const FILL_BASE_OPACITY = 0.22;
 
@@ -161,6 +155,45 @@ export function drawFillDefs(
   ).join("");
 }
 
+/**
+ * Vertical fade mask for the area fill. `fillFade` (0–100) is the percent of
+ * the fill — measured from the baseline up — that dissolves: the top
+ * `100 - fillFade` percent stays fully solid, then the remaining bottom band
+ * fades linearly to transparent at the baseline. So `fillFade` 50 keeps the
+ * top half of the fill solid and fades the bottom half out, letting any fill
+ * pattern (solid, hatched, lines, dotted) pick up a gradient. Returns the
+ * mask + gradient defs, or "" when there's nothing to fade.
+ */
+export function fillMaskDef(ids: SvgIds, layout: Layout, fillFade: number): string {
+  if (fillFade <= 0) return "";
+  const { plot, width, height } = layout;
+  // Where the solid region ends and the fade band begins, as a % of plot height.
+  const solidEnd = round2(100 - Math.min(fillFade, 100));
+
+  const grad = el(
+    "linearGradient",
+    {
+      id: ids.fillMaskGrad,
+      gradientUnits: "userSpaceOnUse",
+      x1: 0,
+      y1: plot.y0,
+      x2: 0,
+      y2: plot.y1,
+    },
+    el("stop", { offset: "0%", "stop-color": "#fff", "stop-opacity": 1 }) +
+      el("stop", { offset: `${solidEnd}%`, "stop-color": "#fff", "stop-opacity": 1 }) +
+      el("stop", { offset: "100%", "stop-color": "#fff", "stop-opacity": 0 }),
+  );
+
+  const mask = el(
+    "mask",
+    { id: ids.fillMask, maskUnits: "userSpaceOnUse", x: 0, y: 0, width, height },
+    el("rect", { width, height, fill: `url(#${ids.fillMaskGrad})` }),
+  );
+
+  return grad + mask;
+}
+
 /** The plot clip-path — line/bar only, keeps custom ranges tidy at the edges. */
 export function plotClip(ids: SvgIds, layout: Layout): string {
   const { plot } = layout;
@@ -176,7 +209,10 @@ export function plotClip(ids: SvgIds, layout: Layout): string {
   );
 }
 
-/** Per-series fill defs + the plot clip-path — the line/bar `<defs>` block. */
+/**
+ * Per-series fill defs + the plot clip-path + the area-fill fade mask — the
+ * line/bar `<defs>` block. `fillFade` 0 skips the mask entirely.
+ */
 export function drawDefs(
   ids: SvgIds,
   layout: Layout,
@@ -184,12 +220,15 @@ export function drawDefs(
   colors: string[],
   fillPattern: FillPattern,
   fillOpacity: number,
+  fillFade: number,
   baseOpacity?: number,
 ): string {
   return el(
     "defs",
     {},
-    drawFillDefs(ids, count, colors, fillPattern, fillOpacity, baseOpacity) + plotClip(ids, layout),
+    drawFillDefs(ids, count, colors, fillPattern, fillOpacity, baseOpacity) +
+      plotClip(ids, layout) +
+      fillMaskDef(ids, layout, fillFade),
   );
 }
 
@@ -418,6 +457,7 @@ export function drawSeriesArea(
   layout: Layout,
   animated: boolean,
   fillOpacity: number,
+  fillFade: number,
   loopInterval: number,
 ): string {
   if (ps.points.length < 2) return "";
@@ -437,9 +477,16 @@ export function drawSeriesArea(
       })
     : undefined;
 
+  // The fade mask is static — it clips the fill without touching the opacity
+  // reveal, so the draw-on animation still plays underneath it.
   return el(
     "path",
-    { d: roundPath(d), fill: `url(#${ids.grad(index)})`, opacity: animated ? 0 : undefined },
+    {
+      d: roundPath(d),
+      fill: `url(#${ids.grad(index)})`,
+      mask: fillFade > 0 ? `url(#${ids.fillMask})` : undefined,
+      opacity: animated ? 0 : undefined,
+    },
     reveal,
   );
 }
@@ -531,7 +578,6 @@ export function drawSeriesDots(
   ps: ProjectedSeries,
   index: number,
   colors: string[],
-  background: string | null,
   animated: boolean,
   dotSize: number,
   loopInterval: number,
@@ -566,9 +612,6 @@ export function drawSeriesDots(
           cy: p.py,
           r: dotSize,
           fill: color,
-          // The halo only reads against a solid fill; skip it when transparent.
-          stroke: background ?? undefined,
-          "stroke-width": background ? 1.5 : undefined,
           opacity: animated ? 0 : undefined,
         },
         reveal,

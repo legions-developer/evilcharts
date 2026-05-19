@@ -26,7 +26,6 @@ export interface StarHistoryConfig {
   /** Chart shape — line / bar / radial / pie. */
   chartType: ChartType;
   axis: AxisType;
-  transparent: boolean;
   animate: boolean;
   /** Seconds between automatic replays of the draw-on animation — 0 disables it. */
   loopInterval: number;
@@ -39,6 +38,8 @@ export interface StarHistoryConfig {
   dotSize: number;
   /** Area fill opacity as a percent (0–100). */
   fillOpacity: number;
+  /** Percent of the area fill, from the baseline up, that dissolves to transparent (0 = no fade). */
+  fillFade: number;
   /** Area fill style. */
   fillPattern: FillPattern;
   /** Chart line stroke style. */
@@ -72,7 +73,6 @@ export function createDefaultConfig(): StarHistoryConfig {
     theme: "light",
     chartType: "line",
     axis: "date",
-    transparent: false,
     animate: true,
     loopInterval: 0,
     axisLabels: false,
@@ -80,6 +80,7 @@ export function createDefaultConfig(): StarHistoryConfig {
     strokeWidth: 2,
     dotSize: DEFAULT_DOT_SIZE,
     fillOpacity: 25,
+    fillFade: 0,
     fillPattern: "gradient",
     strokeVariant: "solid",
     backgroundPattern: "none",

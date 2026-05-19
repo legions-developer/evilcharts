@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 interface SvgActionsProps {
-  /** Relative /api/star-history embed URL (GitHub-canvas background). */
+  /** Relative /api/star-history embed URL — a transparent chart SVG. */
   embedUrl: string;
   /** Absolute origin, resolved client-side; empty before mount. */
   origin: string;

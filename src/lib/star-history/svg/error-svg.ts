@@ -1,19 +1,14 @@
-// Renders a graceful error card as an SVG so <img> embeds never break.
+// Renders a graceful error card as an SVG so <img> embeds never break. The
+// card is transparent and theme-agnostic — a muted grey accent reads on both
+// the light and dark page canvases.
 
-import type { ThemeName } from "../types";
-import { surface, svgRoot } from "./draw";
+import { svgRoot } from "./draw";
 import { el, text } from "./el";
 import { buildLayout } from "./scales";
 import { wordmark, wordmarkWidth } from "./wordmark";
 
 /** Muted grey accent — used for the icon, message, and footer credit. */
 const ERROR_ACCENT = "#828282";
-
-export interface ErrorSvgOptions {
-  theme: ThemeName;
-  /** Resolved background fill, or null for a transparent card. */
-  background: string | null;
-}
 
 /** Greedy word-wrap, capped at `maxLines` (last line gets an ellipsis if cut). */
 function wrapText(content: string, maxChars: number, maxLines: number): string[] {
@@ -37,7 +32,7 @@ function wrapText(content: string, maxChars: number, maxLines: number): string[]
   return lines;
 }
 
-export function generateErrorSvg(message: string, options: ErrorSvgOptions): string {
+export function generateErrorSvg(message: string): string {
   const layout = buildLayout(false);
   const cx = layout.width / 2;
   const cy = layout.height / 2;
@@ -88,5 +83,5 @@ export function generateErrorSvg(message: string, options: ErrorSvgOptions): str
       fill: ERROR_ACCENT,
     }) + wordmark(cx - markWidth / 2, layout.height - 24, markHeight, ERROR_ACCENT);
 
-  return svgRoot(layout, surface(layout, options.background) + icon + lines + brand);
+  return svgRoot(layout, icon + lines + brand);
 }

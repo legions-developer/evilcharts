@@ -1,7 +1,7 @@
 "use client";
 
 import { RotateCwIcon, StarIcon } from "lucide-react";
-import { useState, type CSSProperties } from "react";
+import { useState } from "react";
 
 import { Tabs, TabsList, TabsPanel, TabsTab } from "@/components/ui/tabs";
 import type { ThemeName } from "@/lib/star-history/types";
@@ -19,28 +19,12 @@ interface PreviewPanelProps {
   hasRepos: boolean;
   /** Chart theme — drives the surface the preview sits on. */
   theme: ThemeName;
-  transparent: boolean;
   /** Card title — always "GitHub Star History". */
   title: string;
   embedUrl: string;
   origin: string;
   /** Fetches the exported SVG markup — used by the embed tab's actions. */
   fetchSvg: () => Promise<string>;
-}
-
-/**
- * Background for the preview surface: a solid theme color, or a checkerboard
- * when the export is transparent (the universal "no background" cue).
- */
-function surfaceStyle(theme: ThemeName, transparent: boolean): CSSProperties {
-  const base = PREVIEW_SURFACE[theme];
-  if (!transparent) return { background: base };
-  const tile = theme === "dark" ? "#161b22" : "#e8e8e8";
-  return {
-    backgroundColor: base,
-    backgroundImage: `repeating-conic-gradient(${tile} 0% 25%, ${base} 0% 50%)`,
-    backgroundSize: "16px 16px",
-  };
 }
 
 /** The big preview card — mirrors the docs chart-preview styling 1:1. */
@@ -50,7 +34,6 @@ export function PreviewPanel({
   isError,
   hasRepos,
   theme,
-  transparent,
   title,
   embedUrl,
   origin,
@@ -98,7 +81,11 @@ export function PreviewPanel({
                 // The chart-theme surface only applies once a chart is actually
                 // rendered; idle/loading/error states blend into the site so a
                 // light-themed export doesn't flash a white card in dark mode.
-                style={svg && hasRepos && !isError ? surfaceStyle(theme, transparent) : undefined}
+                style={
+                  svg && hasRepos && !isError
+                    ? { background: PREVIEW_SURFACE[theme] }
+                    : undefined
+                }
               >
                 {!hasRepos ? (
                   <p className="text-muted-foreground text-xs">
