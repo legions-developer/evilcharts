@@ -11,9 +11,9 @@ import {
   svgRoot,
 } from "../draw";
 import { buildBarScales, buildLayout, CHART_WIDTH, type BarDatum } from "../scales";
-import type { RepoSeries, StarHistoryOptions } from "../../types";
+import type { ChartSeries, ChartOptions } from "../../types";
 import { PALETTES, seriesColor, type Palette } from "../theme";
-import { escapeXml, formatStars } from "../escape";
+import { escapeXml, formatCompact } from "../escape";
 import { createSvgIds, type SvgIds } from "../ids";
 import { drawBackground } from "../backgrounds";
 import { animate, el } from "../el";
@@ -96,14 +96,14 @@ function drawBar(
       fill: palette.title,
       opacity: animated ? 0 : undefined,
     },
-    escapeXml(formatStars(bar.total)) + labelReveal,
+    escapeXml(formatCompact(bar.total)) + labelReveal,
   );
 
   return rect + label;
 }
 
 /** Build the complete bar-chart SVG string. */
-export function generateBarChart(series: RepoSeries[], options: StarHistoryOptions): string {
+export function generateBarChart(series: ChartSeries[], options: ChartOptions): string {
   // Legend pushes the plot down exactly like the line chart.
   const legend = planLegend(CHART_WIDTH, series, options.colors);
   // Bars need no axis titles, so a plain cartesian layout below the legend.
@@ -181,7 +181,7 @@ export function generateBarChart(series: RepoSeries[], options: StarHistoryOptio
     yLabels +
     barContent +
     drawLegend(legend, palette) +
-    drawFooter(layout, palette, truncated);
+    drawFooter(layout, palette, truncated ? options.truncationNote : "");
 
   return svgRoot(layout, body);
 }

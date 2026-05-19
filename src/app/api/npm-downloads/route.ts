@@ -1,19 +1,24 @@
-// GET /api/star-history — fetches GitHub star history and returns an animated SVG.
-// Any failure returns an error-card SVG at HTTP 200 so <img> embeds degrade gracefully.
+// GET /api/npm-downloads — fetches npm package download history and returns an
+// animated SVG. Any failure returns an error-card SVG at HTTP 200 so <img>
+// embeds degrade gracefully. The npm downloads API needs no authentication.
 
 import type { NextRequest } from "next/server";
-import { fetchStarRecords } from "@/lib/star-history/github";
-import { parseRepo } from "@/lib/star-history/parse-repo";
-import { parseStarHistoryQuery } from "@/lib/star-history/query-schema";
 import { generateChartSvg, generateErrorSvg } from "@/lib/chart-svg/svg";
 import { PALETTES } from "@/lib/chart-svg/svg/theme";
 import type { ChartOptions, ChartSeries, ThemeName } from "@/lib/chart-svg/types";
-import { StarHistoryError } from "@/lib/star-history/types";
+import { applyMetric, metricAxisTitle } from "@/lib/npm-downloads/metrics";
+import { fetchPackageDownloads } from "@/lib/npm-downloads/npm-api";
+import { parsePackage } from "@/lib/npm-downloads/parse-package";
+import { parseNpmDownloadsQuery } from "@/lib/npm-downloads/query-schema";
+import { NpmDownloadsError } from "@/lib/npm-downloads/types";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 const DAY = 86_400;
+const DAY_MS = 86_400_000;
+/** Window fetched when the request carries no explicit date range. */
+const DEFAULT_RANGE_DAYS = 365;
 
 /**
  * Wrap the SVG in an HTML document with a theme-matched page background — the
@@ -21,7 +26,7 @@ const DAY = 86_400;
  * canvas (light text on the dark theme would vanish on a white browser page).
  */
 function htmlShell(svg: string, pageBg: string): string {
-  return `<!doctype html><html><head><meta charset="utf-8"><title>GitHub Star History</title><style>html,body{margin:0;min-height:100%}body{background:${pageBg}}svg{max-width:100%;height:auto}</style></head><body>${svg}</body></html>`;
+  return `<!doctype html><html><head><meta charset="utf-8"><title>npm Download Trends</title><style>html,body{margin:0;min-height:100%}body{background:${pageBg}}svg{max-width:100%;height:auto}</style></head><body>${svg}</body></html>`;
 }
 
 function svgResponse(
@@ -50,7 +55,7 @@ function svgResponse(
 export async function GET(req: NextRequest) {
   const params = req.nextUrl.searchParams;
 
-  // The theme only drives the page canvas now — the chart SVG is transparent.
+  // The theme only drives the page canvas — the chart SVG is transparent.
   const theme: ThemeName = params.get("theme") === "dark" ? "dark" : "light";
 
   // `Sec-Fetch-Dest: document` means the URL was opened directly (not via an
@@ -60,7 +65,7 @@ export async function GET(req: NextRequest) {
   const respond = (svg: string, ok: boolean) =>
     svgResponse(svg, ok, { asDocument, pageBg });
 
-  const parsed = parseStarHistoryQuery(params);
+  const parsed = parseNpmDownloadsQuery(params);
   if (!parsed.success) {
     const message = parsed.error.issues[0]?.message ?? "Invalid request parameters";
     return respond(generateErrorSvg(message), false);
@@ -69,15 +74,22 @@ export async function GET(req: NextRequest) {
   const query = parsed.data;
 
   try {
-    const repos = query.repos.map(parseRepo);
-    const repoSeries = await Promise.all(repos.map((repo) => fetchStarRecords(repo)));
+    // The npm range API needs a concrete window — default to the last year.
+    const to = query.to ?? Date.now();
+    const from = Math.min(query.from ?? to - DEFAULT_RANGE_DAYS * DAY_MS, to);
 
-    // Star records are cumulative — the headline total is the latest count.
-    const series: ChartSeries[] = repoSeries.map((s) => ({
-      label: s.label,
-      records: s.records.map((r) => ({ date: r.date, value: r.stars })),
-      total: Math.max(0, ...s.records.map((r) => r.stars)),
-      truncated: s.truncated,
+    const packages = query.packages.map(parsePackage);
+    const downloads = await Promise.all(
+      packages.map((pkg) => fetchPackageDownloads(pkg, from, to)),
+    );
+
+    // Shape each package's daily counts by the chosen metric. `total` stays the
+    // raw sum so the bar / pie comparison is meaningful for every metric.
+    const series: ChartSeries[] = downloads.map((d) => ({
+      label: d.label,
+      records: applyMetric(d.daily, query.metric),
+      total: d.total,
+      truncated: false,
     }));
 
     const options: ChartOptions = {
@@ -99,17 +111,17 @@ export async function GET(req: NextRequest) {
       radialRingWidth: query.radialRingWidth,
       pieInnerRadius: query.pieInnerRadius,
       colors: query.colors,
-      from: query.from,
-      to: query.to,
-      valueAxisTitle: "GitHub Stars",
+      from,
+      to,
+      valueAxisTitle: metricAxisTitle(query.metric),
       dateAxisTitle: "Date",
-      timelineAxisTitle: "Repository age",
-      truncationNote: "~ approximate (40k+ stars)",
+      timelineAxisTitle: "Package age",
+      truncationNote: "",
     };
     return respond(generateChartSvg(series, options), true);
   } catch (err) {
     const message =
-      err instanceof StarHistoryError ? err.userMessage : "Something went wrong";
+      err instanceof NpmDownloadsError ? err.userMessage : "Something went wrong";
     return respond(generateErrorSvg(message), false);
   }
 }

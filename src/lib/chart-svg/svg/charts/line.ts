@@ -1,4 +1,4 @@
-// Line chart: cumulative star history — one line/area per repo over time.
+// Line chart: one line/area per series, plotted over time.
 
 import {
   drawAxes,
@@ -13,7 +13,7 @@ import {
   planLegend,
   svgRoot,
 } from "../draw";
-import type { RepoSeries, StarHistoryOptions } from "../../types";
+import type { ChartSeries, ChartOptions } from "../../types";
 import { buildLayout, buildScales, CHART_WIDTH } from "../scales";
 import { drawBackground } from "../backgrounds";
 import { createSvgIds } from "../ids";
@@ -21,7 +21,7 @@ import { PALETTES } from "../theme";
 import { el } from "../el";
 
 /** Build the complete line-chart SVG string. */
-export function generateLineChart(series: RepoSeries[], options: StarHistoryOptions): string {
+export function generateLineChart(series: ChartSeries[], options: ChartOptions): string {
   // The legend wraps to as many rows as it needs; its height pushes the plot
   // down so badges never overlap the chart.
   const legend = planLegend(CHART_WIDTH, series, options.colors);
@@ -90,13 +90,14 @@ export function generateLineChart(series: RepoSeries[], options: StarHistoryOpti
       ? drawAxisTitles(
           layout,
           palette,
-          options.axis === "timeline" ? "Repository age" : "Date",
+          options.valueAxisTitle,
+          options.axis === "timeline" ? options.timelineAxisTitle : options.dateAxisTitle,
           options.axisLabelOffset,
         )
       : "") +
     el("g", { "clip-path": `url(#${ids.plotClip})` }, plotContent) +
     drawLegend(legend, palette) +
-    drawFooter(layout, palette, truncated);
+    drawFooter(layout, palette, truncated ? options.truncationNote : "");
 
   return svgRoot(layout, body);
 }

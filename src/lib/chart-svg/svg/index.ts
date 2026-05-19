@@ -1,7 +1,7 @@
-// Pure entry point: turns sampled star series into a self-contained SVG string.
+// Pure entry point: turns a series set into a self-contained SVG string.
 // Dispatches to the per-type chart builder selected by `options.chartType`.
 
-import type { RepoSeries, StarHistoryOptions } from "../types";
+import type { ChartSeries, ChartOptions } from "../types";
 import { generateBarChart } from "./charts/bar";
 import { generateLineChart } from "./charts/line";
 import { generatePieChart } from "./charts/pie";
@@ -9,10 +9,10 @@ import { generateRadialChart, generateRadialHalfChart } from "./charts/radial";
 
 export { generateErrorSvg } from "./error-svg";
 
-/** Render the star-history chart, picking the builder for the chosen type. */
-export function generateStarHistorySvg(
-  series: RepoSeries[],
-  options: StarHistoryOptions,
+/** Render the chart, picking the builder for the chosen type. */
+export function generateChartSvg(
+  series: ChartSeries[],
+  options: ChartOptions,
 ): string {
   switch (options.chartType) {
     case "bar":

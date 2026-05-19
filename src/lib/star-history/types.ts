@@ -1,27 +1,14 @@
-// Shared types and error classes for the star-history tool.
+// Star-history-specific types and error classes. The chart styling/option
+// types are shared across tools — see `@/lib/chart-svg/types`.
 
-export type ThemeName = "light" | "dark";
-export type AxisType = "date" | "timeline";
-/** Chart shape: cumulative line, or total-stars bar/radial/pie comparison. */
-export type ChartType = "line" | "bar" | "radial" | "radial-half" | "pie";
-/** Area fill style under the chart line. */
-export type FillPattern = "gradient" | "solid" | "hatched" | "lines" | "dotted";
-/** Chart line stroke style. */
-export type StrokeVariant = "solid" | "dashed" | "animated-dashed";
-/** Decorative pattern drawn behind the chart — "none" disables it. */
-export type BackgroundPattern =
-  | "none"
-  | "dots"
-  | "grid"
-  | "cross-hatch"
-  | "diagonal-lines"
-  | "plus"
-  | "falling-triangles"
-  | "4-pointed-star"
-  | "tiny-checkers"
-  | "overlapping-circles"
-  | "wiggle-lines"
-  | "bubbles";
+export type {
+  ThemeName,
+  AxisType,
+  ChartType,
+  FillPattern,
+  StrokeVariant,
+  BackgroundPattern,
+} from "@/lib/chart-svg/types";
 
 /** One sampled point of a repo's star history. */
 export interface StarRecord {
@@ -40,49 +27,6 @@ export interface RepoSeries {
   records: StarRecord[];
   /** True when GitHub's 400-page pagination cap truncated the history. */
   truncated: boolean;
-}
-
-/** Options consumed by the SVG generator. */
-export interface StarHistoryOptions {
-  theme: ThemeName;
-  /** Chart shape — `line` plots cumulative history, the rest compare totals. */
-  chartType: ChartType;
-  axis: AxisType;
-  animate: boolean;
-  /**
-   * Seconds between automatic replays of the draw-on animation — the SVG
-   * re-runs its reveal on a loop. 0 disables it (animate once and hold).
-   */
-  loopInterval: number;
-  /** Draw axis titles ("GitHub Stars" / the x-axis name) beside the ticks. */
-  axisLabels: boolean;
-  /** Extra gap (px) between the axis titles and the chart — shared by both axes. */
-  axisLabelOffset: number;
-  /** Chart line stroke width (px). */
-  strokeWidth: number;
-  /** Radius (px) of the per-point dots — 0 hides them entirely. */
-  dotSize: number;
-  /** Area fill opacity as a percent (0–100). */
-  fillOpacity: number;
-  /** Percent of the area fill, from the baseline up, that dissolves to transparent (0 = no fade). */
-  fillFade: number;
-  /** Area fill style. */
-  fillPattern: FillPattern;
-  /** Chart line stroke style. */
-  strokeVariant: StrokeVariant;
-  /** Decorative pattern drawn behind the chart (replaces grid lines when set). */
-  backgroundPattern: BackgroundPattern;
-  /** Opacity of the background pattern as a percent (0–100). */
-  backgroundPatternOpacity: number;
-  /** Band thickness (px) of each ring — radial / radial-half only. */
-  radialRingWidth: number;
-  /** Pie donut-hole radius as a percent of the outer radius (0 = full pie). */
-  pieInnerRadius: number;
-  /** Per-series colors; falls back to the default palette by index. */
-  colors: string[];
-  /** Optional custom date-range clamp (ms). */
-  from?: number;
-  to?: number;
 }
 
 /** Base error — carries a short, user-facing message rendered into the error SVG. */

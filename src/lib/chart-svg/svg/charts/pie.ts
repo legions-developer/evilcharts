@@ -10,8 +10,8 @@ import {
   seriesBegin,
   svgRoot,
 } from "../draw";
-import { buildPolarLayout, CHART_WIDTH, polarChartLayout, repoTotal } from "../scales";
-import type { RepoSeries, StarHistoryOptions } from "../../types";
+import { buildPolarLayout, CHART_WIDTH, polarChartLayout, seriesTotal } from "../scales";
+import type { ChartSeries, ChartOptions } from "../../types";
 import { PALETTES, seriesColor, type Palette } from "../theme";
 import { createSvgIds, type SvgIds } from "../ids";
 import { drawBackground } from "../backgrounds";
@@ -109,7 +109,7 @@ function drawSlice(
 }
 
 /** Build the complete pie-chart SVG string. */
-export function generatePieChart(series: RepoSeries[], options: StarHistoryOptions): string {
+export function generatePieChart(series: ChartSeries[], options: ChartOptions): string {
   const legend = planLegend(CHART_WIDTH, series, options.colors);
   const { cx, cy, radius } = buildPolarLayout(legend.topMargin);
   const layout = polarChartLayout();
@@ -119,7 +119,7 @@ export function generatePieChart(series: RepoSeries[], options: StarHistoryOptio
   // Per-render ID namespace so inlined charts never share <defs>.
   const ids = createSvgIds();
 
-  const totals = series.map(repoTotal);
+  const totals = series.map(seriesTotal);
   const grandTotal = totals.reduce((sum, t) => sum + t, 0);
 
   // Slice angles — `sort(null)` keeps repos in input order, the value is each
@@ -165,7 +165,7 @@ export function generatePieChart(series: RepoSeries[], options: StarHistoryOptio
     ) +
     slices +
     drawLegend(legend, palette) +
-    drawFooter(layout, palette, truncated);
+    drawFooter(layout, palette, truncated ? options.truncationNote : "");
 
   return svgRoot(layout, body);
 }

@@ -4,6 +4,7 @@ import {
   ChartLegendIcon,
   HistoryIcon,
   HouseIcon,
+  NpmIcon,
   ShapesIcon,
   SquareAddonIcon,
   TooltipIcon,
@@ -70,5 +71,10 @@ export const ToolsOptions: SidebarOption[] = [
     name: "GitHub Star History",
     url: "/tools/star-history",
     icon: <HistoryIcon />,
+  },
+  {
+    name: "Npm Download Trends",
+    url: "/tools/npm-downloads",
+    icon: <NpmIcon />,
   },
 ];

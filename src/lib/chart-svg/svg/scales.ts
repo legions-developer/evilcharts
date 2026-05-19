@@ -2,8 +2,8 @@
 
 import { scaleBand, scaleLinear, scaleTime } from "d3-scale";
 import { timeFormat } from "d3-time-format";
-import type { AxisType, RepoSeries, StarHistoryOptions } from "../types";
-import { formatStars } from "./escape";
+import type { AxisType, ChartSeries, ChartOptions } from "../types";
+import { formatCompact } from "./escape";
 
 const DAY_MS = 86_400_000;
 
@@ -44,7 +44,7 @@ export interface ProjectedPoint {
 }
 
 export interface ProjectedSeries {
-  series: RepoSeries;
+  series: ChartSeries;
   points: ProjectedPoint[];
 }
 
@@ -62,7 +62,7 @@ export interface ChartScales {
 const formatMonth = timeFormat("%b %Y");
 
 /** X values for a series: absolute date (ms), or relative days for the timeline axis. */
-function seriesXValues(series: RepoSeries, axis: AxisType): number[] {
+function seriesXValues(series: ChartSeries, axis: AxisType): number[] {
   if (axis === "timeline") {
     const start = series.records.length ? series.records[0].date : 0;
     return series.records.map((r) => (r.date - start) / DAY_MS);
@@ -77,14 +77,14 @@ function formatDays(days: number): string {
 }
 
 export function buildScales(
-  series: RepoSeries[],
-  options: StarHistoryOptions,
+  series: ChartSeries[],
+  options: ChartOptions,
   layout: Layout,
 ): ChartScales {
   const { plot } = layout;
   const xValuesBySeries = series.map((s) => seriesXValues(s, options.axis));
   const allX = xValuesBySeries.flat();
-  const allStars = series.flatMap((s) => s.records.map((r) => r.stars));
+  const allValues = series.flatMap((s) => s.records.map((r) => r.value));
 
   let xMin = allX.length ? Math.min(...allX) : 0;
   let xMax = allX.length ? Math.max(...allX) : 1;
@@ -94,7 +94,7 @@ export function buildScales(
   }
   if (xMin >= xMax) xMax = xMin + (options.axis === "date" ? DAY_MS : 1);
 
-  const yMax = allStars.length ? Math.max(...allStars) : 1;
+  const yMax = allValues.length ? Math.max(...allValues) : 1;
   const yScale = scaleLinear()
     .domain([0, yMax || 1])
     .nice()
@@ -117,29 +117,29 @@ export function buildScales(
     series: s,
     points: s.records.map((r, j) => ({
       px: projectX(xValuesBySeries[i][j]),
-      py: yScale(r.stars),
+      py: yScale(r.value),
     })),
   }));
 
   const yTicks: AxisTick[] = yScale
     .ticks(5)
-    .map((v) => ({ pos: yScale(v), label: formatStars(v) }));
+    .map((v) => ({ pos: yScale(v), label: formatCompact(v) }));
 
   return { projected, xTicks, yTicks };
 }
 
-// --- Total-stars comparison charts (bar / radial / pie) ----------------------
+// --- Total-value comparison charts (bar / radial / pie) ----------------------
 
 /**
- * Per-repo total stars. Records are cumulative, so the latest equals the max —
- * `Math.max` is robust to any out-of-order sampling. Clamped to ≥ 0.
+ * Per-series headline total — set explicitly by the data layer so it stays
+ * meaningful no matter how `records` is shaped. Clamped to ≥ 0.
  */
-export function repoTotal(series: RepoSeries): number {
-  return Math.max(0, ...series.records.map((r) => r.stars));
+export function seriesTotal(series: ChartSeries): number {
+  return Math.max(0, series.total);
 }
 
 export interface BarDatum {
-  series: RepoSeries;
+  series: ChartSeries;
   /** Bar rect, already projected into plot coordinates. */
   x: number;
   width: number;
@@ -161,9 +161,9 @@ export interface BarChartScales {
  * `scaleLinear([0, maxTotal])` for the heights. `maxTotal === 0` is guarded so
  * a zero-star set still lays out cleanly (flat bars on the baseline).
  */
-export function buildBarScales(series: RepoSeries[], layout: Layout): BarChartScales {
+export function buildBarScales(series: ChartSeries[], layout: Layout): BarChartScales {
   const { plot } = layout;
-  const totals = series.map(repoTotal);
+  const totals = series.map(seriesTotal);
   const maxTotal = totals.length ? Math.max(...totals) : 0;
 
   const x = scaleBand<number>()
@@ -191,7 +191,7 @@ export function buildBarScales(series: RepoSeries[], layout: Layout): BarChartSc
 
   const yTicks: AxisTick[] = y
     .ticks(5)
-    .map((v) => ({ pos: y(v), label: formatStars(v) }));
+    .map((v) => ({ pos: y(v), label: formatCompact(v) }));
 
   return { bars, yTicks, baseline: plot.y1 };
 }

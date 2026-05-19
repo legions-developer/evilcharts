@@ -1,7 +1,7 @@
-// Client-side config model for the star-history tool.
+// Client-side config model for the npm-downloads tool.
 
 import type { DateRangeValue } from "@/components/ui/date-range-picker";
-import { DEFAULT_DOT_SIZE, DEFAULT_RING_WIDTH } from "@/lib/star-history/query-schema";
+import { DEFAULT_METRIC, DEFAULT_RING_WIDTH } from "@/lib/npm-downloads/query-schema";
 import { DEFAULT_COLORS } from "@/lib/chart-svg/svg/theme";
 import type {
   AxisType,
@@ -10,18 +10,21 @@ import type {
   FillPattern,
   StrokeVariant,
   ThemeName,
-} from "@/lib/star-history/types";
+} from "@/lib/chart-svg/types";
+import type { DownloadMetric } from "@/lib/npm-downloads/types";
 
-export interface RepoEntry {
+export interface PackageEntry {
   /** Stable key for React lists. */
   id: string;
-  /** "owner/repo" or a GitHub URL. */
+  /** A package name ("react", "@scope/pkg") or an npmjs.com URL. */
   value: string;
   color: string;
 }
 
-export interface StarHistoryConfig {
-  repos: RepoEntry[];
+export interface NpmDownloadsConfig {
+  packages: PackageEntry[];
+  /** How the raw daily downloads are shaped before plotting. */
+  metric: DownloadMetric;
   theme: ThemeName;
   /** Chart shape — line / bar / radial / pie. */
   chartType: ChartType;
@@ -58,18 +61,19 @@ export interface StarHistoryConfig {
 let idCounter = 0;
 
 /** Deterministic id — counter resets per module load, so SSR and client agree. */
-export function newRepoId(): string {
+export function newPackageId(): string {
   idCounter += 1;
-  return `repo-${idCounter}`;
+  return `pkg-${idCounter}`;
 }
 
 export function defaultColor(index: number): string {
   return DEFAULT_COLORS[index % DEFAULT_COLORS.length];
 }
 
-export function createDefaultConfig(): StarHistoryConfig {
+export function createDefaultConfig(): NpmDownloadsConfig {
   return {
-    repos: [],
+    packages: [],
+    metric: DEFAULT_METRIC,
     theme: "light",
     chartType: "line",
     axis: "date",
@@ -78,7 +82,8 @@ export function createDefaultConfig(): StarHistoryConfig {
     axisLabels: false,
     axisLabelOffset: 12,
     strokeWidth: 2,
-    dotSize: DEFAULT_DOT_SIZE,
+    // Daily downloads can run to hundreds of points — dots off reads cleaner.
+    dotSize: 0,
     fillOpacity: 25,
     fillFade: 0,
     fillPattern: "gradient",

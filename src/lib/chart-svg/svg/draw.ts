@@ -4,7 +4,7 @@
 import { area, curveMonotoneX, line } from "d3-shape";
 
 import type { AxisTick, Layout, ProjectedPoint, ProjectedSeries } from "./scales";
-import type { FillPattern, RepoSeries, StrokeVariant } from "../types";
+import type { FillPattern, ChartSeries, StrokeVariant } from "../types";
 import { wordmark, wordmarkWidth } from "./wordmark";
 import { seriesColor, type Palette } from "./theme";
 import { animate, el, text } from "./el";
@@ -296,6 +296,7 @@ export function drawAxes(
 export function drawAxisTitles(
   layout: Layout,
   palette: Palette,
+  yTitle: string,
   xTitle: string,
   offset: number,
 ): string {
@@ -303,7 +304,7 @@ export function drawAxisTitles(
   const yx = plot.x0 - (47 + offset);
   const yy = (plot.y0 + plot.y1) / 2;
 
-  const yTitle = text("GitHub Stars", {
+  const yLabel = text(yTitle, {
     x: yx,
     y: yy,
     transform: `rotate(-90 ${yx} ${yy})`,
@@ -322,7 +323,7 @@ export function drawAxisTitles(
     fill: palette.title,
   });
 
-  return yTitle + xLabel;
+  return yLabel + xLabel;
 }
 
 /** Badge-styled legend, anchored to the top-right of the chart. */
@@ -360,7 +361,7 @@ export interface LegendPlan {
  * chart width. `topMargin` reports how much vertical room the rows need so the
  * plot can be pushed down to clear them.
  */
-export function planLegend(width: number, series: RepoSeries[], colors: string[]): LegendPlan {
+export function planLegend(width: number, series: ChartSeries[], colors: string[]): LegendPlan {
   // Width of a badge's fixed chrome (padding + swatch), excluding the label.
   const fixed = LEGEND.PAD_X * 2 + LEGEND.SWATCH + LEGEND.SWATCH_GAP;
   const maxRowWidth = width - LEGEND.EDGE * 2;
@@ -620,7 +621,7 @@ export function drawSeriesDots(
     .join("");
 }
 
-export function drawFooter(layout: Layout, palette: Palette, truncated: boolean): string {
+export function drawFooter(layout: Layout, palette: Palette, truncationNote: string): string {
   // Footer credit: "Generated with" stacked above the evilcharts wordmark,
   // aligned to the chart's right edge in a muted grey so it stays unobtrusive.
   const markHeight = 12;
@@ -634,8 +635,9 @@ export function drawFooter(layout: Layout, palette: Palette, truncated: boolean)
       "font-size": 9,
       fill: palette.muted,
     }) + wordmark(right - markWidth, layout.height - 23, markHeight, palette.muted);
-  const note = truncated
-    ? text("~ approximate (40k+ stars)", {
+  // Optional left-aligned note (e.g. a truncation caveat) — "" hides it.
+  const note = truncationNote
+    ? text(truncationNote, {
         x: 14,
         y: layout.height - 14,
         "font-size": 10,

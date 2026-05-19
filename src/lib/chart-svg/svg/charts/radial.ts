@@ -11,8 +11,8 @@ import {
   seriesBegin,
   svgRoot,
 } from "../draw";
-import { buildPolarLayout, CHART_WIDTH, polarChartLayout, repoTotal } from "../scales";
-import type { RepoSeries, StarHistoryOptions } from "../../types";
+import { buildPolarLayout, CHART_WIDTH, polarChartLayout, seriesTotal } from "../scales";
+import type { ChartSeries, ChartOptions } from "../../types";
 import { PALETTES, seriesColor } from "../theme";
 import { drawBackground } from "../backgrounds";
 import { createSvgIds } from "../ids";
@@ -35,7 +35,7 @@ function roundPath(d: string): string {
  * Shared radial builder. `half` switches between a full ring and a 180° gauge —
  * the only differences are the angular range and the (re-centered) layout.
  */
-function generateRadial(series: RepoSeries[], options: StarHistoryOptions, half: boolean): string {
+function generateRadial(series: ChartSeries[], options: ChartOptions, half: boolean): string {
   const legend = planLegend(CHART_WIDTH, series, options.colors);
   const { cx, cy, radius } = buildPolarLayout(legend.topMargin, half);
   const layout = polarChartLayout();
@@ -45,7 +45,7 @@ function generateRadial(series: RepoSeries[], options: StarHistoryOptions, half:
   // Per-render ID namespace so inlined charts never share <defs>.
   const ids = createSvgIds();
 
-  const totals = series.map(repoTotal);
+  const totals = series.map(seriesTotal);
   const maxTotal = Math.max(0, ...totals);
 
   // Angular range — a full turn, or the top semicircle (9 → 3 o'clock).
@@ -135,17 +135,17 @@ function generateRadial(series: RepoSeries[], options: StarHistoryOptions, half:
     ) +
     rings +
     drawLegend(legend, palette) +
-    drawFooter(layout, palette, truncated);
+    drawFooter(layout, palette, truncated ? options.truncationNote : "");
 
   return svgRoot(layout, body);
 }
 
 /** Full-circle radial chart. */
-export function generateRadialChart(series: RepoSeries[], options: StarHistoryOptions): string {
+export function generateRadialChart(series: ChartSeries[], options: ChartOptions): string {
   return generateRadial(series, options, false);
 }
 
 /** Half-circle (gauge) radial chart. */
-export function generateRadialHalfChart(series: RepoSeries[], options: StarHistoryOptions): string {
+export function generateRadialHalfChart(series: ChartSeries[], options: ChartOptions): string {
   return generateRadial(series, options, true);
 }
