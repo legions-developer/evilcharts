@@ -44,14 +44,14 @@ export function EmbedSnippets({ embedUrl, origin, fetchSvg, hasPackages }: Embed
   const lightUrl = fullUrl.replace(/([?&]theme=)[^&]*/, "$1light");
 
   const snippets = [
-    { label: "Markdown", code: `![npm Download Trends](${fullUrl})` },
-    { label: "HTML", code: `<img src="${fullUrl}" alt="npm Download Trends" />` },
+    { label: "Markdown", code: `![Npm Download Trends](${fullUrl})` },
+    { label: "HTML", code: `<img src="${fullUrl}" alt="Npm Download Trends" />` },
     {
       label: "Themed HTML",
       code: `<picture>
   <source media="(prefers-color-scheme: dark)" srcset="${darkUrl}" />
   <source media="(prefers-color-scheme: light)" srcset="${lightUrl}" />
-  <img alt="npm Download Trends" src="${lightUrl}" />
+  <img alt="Npm Download Trends" src="${lightUrl}" />
 </picture>`,
     },
     { label: "Direct URL", code: fullUrl },

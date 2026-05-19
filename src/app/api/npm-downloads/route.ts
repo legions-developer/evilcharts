@@ -26,7 +26,7 @@ const DEFAULT_RANGE_DAYS = 365;
  * canvas (light text on the dark theme would vanish on a white browser page).
  */
 function htmlShell(svg: string, pageBg: string): string {
-  return `<!doctype html><html><head><meta charset="utf-8"><title>npm Download Trends</title><style>html,body{margin:0;min-height:100%}body{background:${pageBg}}svg{max-width:100%;height:auto}</style></head><body>${svg}</body></html>`;
+  return `<!doctype html><html><head><meta charset="utf-8"><title>Npm Download Trends</title><style>html,body{margin:0;min-height:100%}body{background:${pageBg}}svg{max-width:100%;height:auto}</style></head><body>${svg}</body></html>`;
 }
 
 function svgResponse(

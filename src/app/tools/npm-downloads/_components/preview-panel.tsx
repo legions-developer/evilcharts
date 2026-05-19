@@ -19,7 +19,7 @@ interface PreviewPanelProps {
   hasPackages: boolean;
   /** Chart theme — drives the surface the preview sits on. */
   theme: ThemeName;
-  /** Card title — always "npm Download Trends". */
+  /** Card title — always "Npm Download Trends". */
   title: string;
   embedUrl: string;
   origin: string;

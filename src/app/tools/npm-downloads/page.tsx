@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { NpmDownloadsTool } from "./_components/npm-downloads-tool";
 
 export const metadata: Metadata = {
-  title: "npm Download Trends",
+  title: "Npm Download Trends",
   description:
     "Generate an animated SVG chart of npm package download trends — compare packages, switch between daily, weekly and cumulative metrics, customize the style, and embed it anywhere.",
   alternates: { canonical: "/tools/npm-downloads" },
