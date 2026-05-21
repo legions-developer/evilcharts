@@ -166,6 +166,18 @@ Add `isClickable` to any `<Line>` (and to `<Legend>`) to make those series selec
   </AlertContent>
 </Alert>
 
+### Dense Data
+
+For long time ranges, render a smaller data set with `downsampleExtrema` before passing it to the chart. Unlike average-based downsampling, this keeps the first row, last row, minimum row, and maximum row from each bucket, so short spikes and dips remain visible while the SVG stays light enough to animate smoothly.
+
+```tsx
+import { downsampleExtrema } from "@/components/evilcharts/ui/chart";
+
+const visibleData = downsampleExtrema(data, 500, ["desktop", "mobile"]);
+```
+
+Use a lower target for compact previews and sparklines, and a higher target when the chart has enough room or when preserving short-lived peaks is more important than reducing visual density.
+
 ## Examples
 
 Below are some examples of the line chart with different `variants`. where you can change the `curveType` & `strokeVariant`. 

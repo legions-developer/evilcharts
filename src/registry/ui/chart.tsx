@@ -252,6 +252,49 @@ export const getLoadingData = (points: number = 10, min: number = 0, max: number
   }));
 };
 
+export function downsampleExtrema<TData extends Record<string, unknown>>(
+  rows: TData[],
+  targetCount: number,
+  valueKeys: (keyof TData & string)[],
+): TData[] {
+  if (targetCount <= 0) return [];
+  if (rows.length <= targetCount) return rows;
+
+  const bucketSize = Math.ceil(rows.length / targetCount);
+  const sampled: TData[] = [];
+
+  for (let startIndex = 0; startIndex < rows.length; startIndex += bucketSize) {
+    const bucket = rows.slice(startIndex, startIndex + bucketSize);
+    const picks = new Map<number, TData>();
+    const add = (row: TData | undefined, rowIndex: number) => {
+      if (row) picks.set(rowIndex, row);
+    };
+
+    add(bucket[0], startIndex);
+    add(bucket[bucket.length - 1], startIndex + bucket.length - 1);
+
+    valueKeys.forEach((key) => {
+      const valid = bucket
+        .map((row, offset) => ({
+          row,
+          rowIndex: startIndex + offset,
+          value: Number(row[key]),
+        }))
+        .filter((item) => Number.isFinite(item.value));
+
+      if (!valid.length) return;
+      const min = valid.reduce((best, item) => (item.value < best.value ? item : best), valid[0]);
+      const max = valid.reduce((best, item) => (item.value > best.value ? item : best), valid[0]);
+      add(min.row, min.rowIndex);
+      add(max.row, max.rowIndex);
+    });
+
+    sampled.push(...[...picks.entries()].sort(([a], [b]) => a - b).map(([, row]) => row));
+  }
+
+  return sampled;
+}
+
 export {
   ChartContainer,
   ChartStyle,
