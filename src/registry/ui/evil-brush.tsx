@@ -83,6 +83,7 @@ interface DragState {
   type: DragType;
   originX: number;
   originRange: EvilBrushRange;
+  width: number;
 }
 
 function useBrushDrag({
@@ -97,26 +98,42 @@ function useBrushDrag({
   commit: (next: EvilBrushRange, mode?: DragType) => void;
 }) {
   const dragRef = React.useRef<DragState | null>(null);
+  const frameRef = React.useRef<number | null>(null);
+  const pendingCommitRef = React.useRef<{ next: EvilBrushRange; mode?: DragType } | null>(null);
   const [isDragging, setIsDragging] = React.useState(false);
 
   const toIndexDelta = useCallback(
-    (px: number) => {
-      if (!containerRef.current || totalPoints <= 1) return 0;
-      return Math.round(
-        (px / containerRef.current.getBoundingClientRect().width) * (totalPoints - 1),
-      );
+    (px: number, width: number) => {
+      if (totalPoints <= 1 || !width) return 0;
+      return Math.round((px / width) * (totalPoints - 1));
     },
-    [totalPoints, containerRef],
+    [totalPoints],
+  );
+
+  const scheduleCommit = useCallback(
+    (next: EvilBrushRange, mode?: DragType) => {
+      pendingCommitRef.current = { next, mode };
+      if (frameRef.current) return;
+
+      frameRef.current = window.requestAnimationFrame(() => {
+        frameRef.current = null;
+        const pending = pendingCommitRef.current;
+        pendingCommitRef.current = null;
+        if (pending) commit(pending.next, pending.mode);
+      });
+    },
+    [commit],
   );
 
   const onPointerDown = useCallback(
     (e: React.PointerEvent, type: DragType) => {
       e.preventDefault();
-      (e.target as HTMLElement).setPointerCapture(e.pointerId);
-      dragRef.current = { type, originX: e.clientX, originRange: { ...range } };
+      (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+      const width = Math.max(1, containerRef.current?.getBoundingClientRect().width ?? 1);
+      dragRef.current = { type, originX: e.clientX, originRange: { ...range }, width };
       setIsDragging(true);
     },
-    [range],
+    [containerRef, range],
   );
 
   const onPointerMove = useCallback(
@@ -124,13 +141,13 @@ function useBrushDrag({
       const d = dragRef.current;
       if (!d) return;
 
-      const delta = toIndexDelta(e.clientX - d.originX);
+      const delta = toIndexDelta(e.clientX - d.originX, d.width);
       const { type, originRange: o } = d;
 
       if (type === "left") {
-        commit({ startIndex: o.startIndex + delta, endIndex: o.endIndex }, "left");
+        scheduleCommit({ startIndex: o.startIndex + delta, endIndex: o.endIndex }, "left");
       } else if (type === "right") {
-        commit({ startIndex: o.startIndex, endIndex: o.endIndex + delta }, "right");
+        scheduleCommit({ startIndex: o.startIndex, endIndex: o.endIndex + delta }, "right");
       } else {
         const span = o.endIndex - o.startIndex;
         let s = o.startIndex + delta;
@@ -143,17 +160,36 @@ function useBrushDrag({
           e2 = totalPoints - 1;
           s = Math.max(0, e2 - span);
         }
-        commit({ startIndex: s, endIndex: e2 }, "middle");
+        scheduleCommit({ startIndex: s, endIndex: e2 }, "middle");
       }
     },
-    [toIndexDelta, totalPoints, commit],
+    [toIndexDelta, totalPoints, scheduleCommit],
   );
 
-  const onPointerUp = useCallback((e: React.PointerEvent) => {
-    (e.target as HTMLElement).releasePointerCapture(e.pointerId);
-    dragRef.current = null;
-    setIsDragging(false);
-  }, []);
+  const onPointerUp = useCallback(
+    (e: React.PointerEvent) => {
+      (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+      if (frameRef.current) {
+        window.cancelAnimationFrame(frameRef.current);
+        frameRef.current = null;
+      }
+
+      const pending = pendingCommitRef.current;
+      pendingCommitRef.current = null;
+      if (pending) commit(pending.next, pending.mode);
+
+      dragRef.current = null;
+      setIsDragging(false);
+    },
+    [commit],
+  );
+
+  useEffect(
+    () => () => {
+      if (frameRef.current) window.cancelAnimationFrame(frameRef.current);
+    },
+    [],
+  );
 
   // Helper to bind all three pointer handlers for a given drag type
   const bind = useCallback(
