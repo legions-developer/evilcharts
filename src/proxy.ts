@@ -34,6 +34,19 @@ export function proxy(request: NextRequest, event: NextFetchEvent) {
   const slug = pathname.replace(/^\/docs\/?/, "");
   url.pathname = slug ? `/llm/${slug}` : "/llm";
 
+  if (axiom) {
+    axiom.ingest(AXIOM_DATASET, [
+      {
+        event: "docs_markdown_fetch",
+        slug: slug || "index",
+        userAgent: request.headers.get("user-agent"),
+        country: request.headers.get("x-vercel-ip-country"),
+        referer: request.headers.get("referer"),
+      },
+    ]);
+    event.waitUntil(axiom.flush());
+  }
+
   return NextResponse.rewrite(url);
 }
 
