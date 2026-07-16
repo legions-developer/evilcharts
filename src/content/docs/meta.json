@@ -1,20 +1,4 @@
 {
   "root": true,
-  "pages": [
-    "index",
-    "installation",
-    "components",
-    "area-chart",
-    "line-chart",
-    "bar-chart",
-    "composed-chart",
-    "radar-chart",
-    "pie-chart",
-    "radial-chart",
-    "sankey-chart",
-    "ui/background",
-    "ui/tooltip",
-    "ui/legend",
-    "chart-config"
-  ]
+  "pages": ["index", "chart-config", "recharts", "echarts"]
 }

@@ -9,26 +9,28 @@ import {
   SankeyChartIcon,
 } from "@/assets/icons";
 
-// Custom icons for each item in the sidebar of MDX files
+// Custom icons for each item in the sidebar of MDX files.
+//
+// Keyed by chart name rather than by full page-tree id. Chart folders sit under a
+// provider segment, so their ids read "root:recharts/area-chart" — matching on the
+// last segment keeps one icon per chart type across every provider, and means a new
+// provider needs no entries here.
+const CHART_ICONS: Record<string, React.ReactNode> = {
+  "area-chart": <ChartStackedAreaIcon />,
+  "line-chart": <ChartStackedLineIcon />,
+  "bar-chart": <BarChartIcon />,
+  "composed-chart": <ComposedChartIcon />,
+  "pie-chart": <PieChartIcon />,
+  "radial-chart": <RadialChartIcon />,
+  "radar-chart": <RadarChartIcon />,
+  "sankey-chart": <SankeyChartIcon />,
+};
+
 export function getNavItemIcon(tag?: string) {
-  switch (tag) {
-    case "root:area-chart":
-      return <ChartStackedAreaIcon />;
-    case "root:line-chart":
-      return <ChartStackedLineIcon />;
-    case "root:bar-chart":
-      return <BarChartIcon />;
-    case "root:composed-chart":
-      return <ComposedChartIcon />;
-    case "root:pie-chart":
-      return <PieChartIcon />;
-    case "root:radial-chart":
-      return <RadialChartIcon />;
-    case "root:radar-chart":
-      return <RadarChartIcon />;
-    case "root:sankey-chart":
-      return <SankeyChartIcon />;
-    default:
-      return null;
-  }
+  if (!tag) return null;
+
+  // "root:recharts/area-chart" → "area-chart"
+  const chartName = tag.split("/").pop();
+
+  return (chartName && CHART_ICONS[chartName]) ?? null;
 }

@@ -14,11 +14,12 @@ import {
 } from "@/components/ui/sidebar";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { getNavItemIcon } from "@/globals/functions/getNavItemIcon";
-import { EXCLUDED_PAGES } from "@/globals/constants/docs-sidebar";
+import { isExcludedPage } from "@/globals/constants/docs-sidebar";
+import type { Root as PageTreeRoot } from "fumadocs-core/page-tree";
+import type { Provider } from "@/globals/constants/providers";
 import { CaretRight } from "@carbon/icons-react";
 import { usePathname } from "next/navigation";
 import { motion } from "motion/react";
-import { source } from "@/lib/source";
 import { cn } from "@/lib/utils";
 import { useMemo } from "react";
 import Link from "next/link";
@@ -119,7 +120,11 @@ interface ActiveTriggerProps {
 
 export function NavMain({
   tree,
-}: React.ComponentProps<typeof Sidebar> & { tree: typeof source.pageTree }) {
+  provider,
+}: React.ComponentProps<typeof Sidebar> & {
+  tree: PageTreeRoot;
+  provider: Provider;
+}) {
   const pathname = usePathname();
   const { isMobile, setOpenMobile } = useSidebar();
 
@@ -129,12 +134,22 @@ export function NavMain({
     }
   };
 
+  // Charts now sit one level deeper, under a provider folder, so the chart folders
+  // are this node's children rather than the tree root's.
+  const providerChildren = useMemo(() => {
+    const node = tree.children.find(
+      (child) => child.type === "folder" && child.$id === `root:${provider}`,
+    );
+
+    return node?.type === "folder" ? node.children : [];
+  }, [tree.children, provider]);
+
   // Derive activeTrigger from pathname - automatically resets when navigating away
   const activeTrigger = useMemo<ActiveTriggerProps>(() => {
     // Index every folder page by url once, so the active page is an O(1) lookup.
     const pageIndex = new Map<string, { index: number; id?: string }>();
 
-    for (const item of tree.children) {
+    for (const item of providerChildren) {
       if (item.type !== "folder") continue;
       item.children.forEach((child, index) => {
         if (child.type === "page") {
@@ -150,18 +165,23 @@ export function NavMain({
       index: active ? active.index : -1,
       id: active?.id,
     };
-  }, [pathname, tree.children]);
+  }, [pathname, providerChildren]);
+
+  // A provider with no chart folders yet would render a bare "Components" heading.
+  if (!providerChildren.some((item) => item.type === "folder")) {
+    return null;
+  }
 
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Components</SidebarGroupLabel>
       <SidebarMenu>
-        {tree.children.map((item) => {
+        {providerChildren.map((item) => {
           if (item.type !== "folder") return null;
 
-          // Filter out pages that are in EXCLUDED_PAGES
+          // Filter out pages surfaced by the hardcoded sidebar groups
           const visibleChildren = item.children.filter(
-            (child) => child.type === "page" && !EXCLUDED_PAGES.includes(child.url),
+            (child) => child.type === "page" && !isExcludedPage(child.url),
           );
 
           // Skip folder if no visible children
@@ -235,7 +255,7 @@ export function NavMain({
                     />
                     {item.children.map((subItem) => {
                       if (subItem.type !== "page") return null;
-                      if (EXCLUDED_PAGES.includes(subItem.url)) return null;
+                      if (isExcludedPage(subItem.url)) return null;
 
                       const isActive = activeTrigger.url === subItem.url;
 
