@@ -17,6 +17,8 @@ bun run clean            # rm node_modules, .next, .source
 
 There is no test suite. Verification is: `bun run lint`, then `bun run dev` and view the affected docs page.
 
+> IMPORTANT: Always use Claude Fable model for research purposes & Always use Claude Opus 4.8 model for workflows/subagents.
+
 ## Architecture
 
 EvilCharts is a **shadcn-style component registry** shipped as a Next.js docs site. Users don't install a
@@ -136,7 +138,7 @@ Custom (shadcn `Sidebar` + `source.pageTree`), not Fumadocs' `DocsLayout` — so
 Layout Tabs behavior is unused, and provider filtering is done manually in `NavMain`.
 
 **`DocsSidebar` must stay a server component.** `source` reaches into Fumadocs' server code, which imports
-`fs/promises`; referencing it as a *value* from a `"use client"` module pulls that into the browser bundle and
+`fs/promises`; referencing it as a _value_ from a `"use client"` module pulls that into the browser bundle and
 the build fails to resolve `fs`. Pathname-dependent logic lives in `sidebar-sections.tsx` (client), which
 receives the tree as a serializable prop. `NavMain` gets away with `import { source }` only because it uses it
 solely in a type position (`typeof source.pageTree`), which TypeScript erases — prefer the explicit
