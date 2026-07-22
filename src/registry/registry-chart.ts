@@ -4,6 +4,21 @@ const TARGET_BASE_PATH = "components/evilcharts/charts";
 
 export const charts: Registry["items"] = [
   {
+    // ECharts twin of area-chart. Self-contained on purpose: no @evilcharts/*
+    // registryDependencies, so installing it never drags in recharts.
+    name: "echarts-area-chart",
+    description: "Area chart component rendered with Apache ECharts",
+    dependencies: ["echarts", "motion"],
+    type: "registry:component",
+    files: [
+      {
+        path: "charts/echarts/area-chart.tsx",
+        type: "registry:component",
+        target: TARGET_BASE_PATH + "/echarts/area-chart.tsx",
+      },
+    ],
+  },
+  {
     name: "area-chart",
     description: "Area chart component",
     registryDependencies: [
