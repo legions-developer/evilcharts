@@ -125,6 +125,7 @@ export interface EChartsAreaChartProps<TData extends Record<string, unknown>> {
   className?: string; // extra classes for the chart container
   curveType?: CurveType; // default curve interpolation each <Area> inherits
   stackType?: StackType; // how multiple areas combine
+  animation?: boolean; // master switch for the intro draw-in — false renders instantly
   animationType?: AreaAnimationType; // default intro reveal (first <Area> overrides)
   enableHoverHighlight?: boolean; // hovering a series dims the others, like a temporary selection
   defaultSelectedDataKey?: string | null; // series selected on first render
@@ -1023,6 +1024,7 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
   className,
   curveType = "linear",
   stackType = "default",
+  animation = true,
   animationType = "left-to-right",
   enableHoverHighlight = false,
   defaultSelectedDataKey = null,
@@ -1785,7 +1787,8 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
     if (isLoading) hasRevealedRef.current = false;
     const shouldReveal = !hasRevealedRef.current && !isLoading;
     if (shouldReveal) hasRevealedRef.current = true;
-    const revealEnabled = shouldReveal && effectiveAnimation !== "none" && !shouldReduceMotion;
+    const revealEnabled =
+      animation && shouldReveal && effectiveAnimation !== "none" && !shouldReduceMotion;
     if (revealEnabled) revealEndsAtRef.current = performance.now() + REVEAL_DURATION;
     push(revealEnabled);
 
@@ -1800,6 +1803,7 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
     buildOption,
     chartOptions,
     isLoading,
+    animation,
     effectiveAnimation,
     shouldReduceMotion,
     config,

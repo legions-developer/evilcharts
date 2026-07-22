@@ -157,6 +157,9 @@ The root container. It owns the data, the shared selection state, the loading sk
   <ApiRow name="curveType" type='"linear" | "smooth" | "bump" | "monotone" | "monotoneX" | "monotoneY" | "natural" | "step"' default='"linear"'>
     Default curve interpolation inherited by every `<Area />`.
   </ApiRow>
+  <ApiRow name="animation" type="boolean" default="true">
+    Master switch for the intro draw-in. Pass `false` to render the chart instantly, regardless of `animationType`.
+  </ApiRow>
   <ApiRow name="animationType" type='"none" | "left-to-right" | "right-to-left" | "center-out" | "edges-in"' default='"left-to-right"'>
     The intro animation inherited by every `<Area />` — any value other than `"none"` plays ECharts' native progressive draw-in (the line traces in and dots pop up as its front passes; the direction values exist for API parity with the Recharts twin). `"none"` disables it — devices with the OS reduce-motion preference fall back to `"none"` automatically.
   </ApiRow>
