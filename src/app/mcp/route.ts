@@ -38,7 +38,7 @@ const tools = [
       properties: {
         path: {
           type: "string",
-          description: "Documentation path, for example /docs/bar-chart/static.",
+          description: "Documentation path, for example /docs/recharts/bar-chart/static.",
         },
       },
       required: ["path"],

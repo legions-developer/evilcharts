@@ -1,0 +1,49 @@
+---
+title: Recharts
+description: The SVG rendering engine behind EvilCharts — composable, themeable, React all the way down
+image: /og/og-image.png
+---
+
+Every Evil chart is built on <Link href="https://recharts.github.io/" _blank={true}>Recharts</Link>, which
+renders to SVG through React. That's what makes the Evil look possible: every gradient, pattern, dot, and
+glow is a real DOM node, styled with the same CSS you use everywhere else.
+
+## What that buys you
+
+- **Themeable without JavaScript.** Series colors compile to CSS variables scoped to each chart, so light
+  and dark mode swap with a class — no re-render, no flash.
+- **Composable.** Charts are built from parts, not props. Drop in a `<Grid />`, a `<Legend />`, or a second
+  `<Area />` and it just works.
+- **Inspectable.** Open devtools and every element of the chart is right there.
+
+## Where to start
+
+<Steps>
+  <Step>
+    <StepTitle>Install</StepTitle>
+    <StepDescription>
+      Point the shadcn CLI at the EvilCharts registry — see <Link href="/docs/recharts/installation">Installation</Link>.
+    </StepDescription>
+  </Step>
+  <Step>
+    <StepTitle>Pick a chart</StepTitle>
+    <StepDescription>
+      Browse every chart in <Link href="/docs/recharts/components">Components</Link>, then copy it in with
+      `npx shadcn@latest add @evilcharts/{"{chart-name}"}`.
+    </StepDescription>
+  </Step>
+  <Step>
+    <StepTitle>Configure it</StepTitle>
+    <StepDescription>
+      Labels, colors, and icons all live in one object — see <Link href="/docs/chart-config">Chart Config</Link>.
+    </StepDescription>
+  </Step>
+</Steps>
+
+## Choosing an engine
+
+Recharts is the default, and the right choice for almost every dashboard. Its ceiling is SVG itself: past a
+few thousand points the DOM gets heavy, and some chart types simply aren't in the library.
+
+That's what the <Link href="/docs/echarts">ECharts</Link> provider is for. You install one engine or the
+other per chart — never both — so you only ship what you use.

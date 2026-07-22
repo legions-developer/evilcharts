@@ -9,13 +9,16 @@ import { AreaPreview } from "@/components/docs/svg-previews/area-preview";
 import { PiePreview } from "@/components/docs/svg-previews/pie-preview";
 import { BarPreview } from "@/components/docs/svg-previews/bar-preview";
 import { Grid } from "@/components/docs/svg-previews/background-grid";
+import { DEFAULT_PROVIDER, providerFromPathname } from "@/globals/constants/providers";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 
 interface Chart {
   name: string;
   description: string;
   Component: React.ComponentType;
-  url: string;
+  /** Chart folder name; the provider segment is prepended at render time. */
+  slug: string;
 }
 
 const CHARTS: Chart[] = [
@@ -23,49 +26,49 @@ const CHARTS: Chart[] = [
     name: "Area Chart",
     description: "Highlight trends with filled area ranges.",
     Component: AreaPreview,
-    url: "/docs/area-chart",
+    slug: "area-chart",
   },
   {
     name: "Line Chart",
     description: "Track change over time with lines.",
     Component: LinePreview,
-    url: "/docs/line-chart",
+    slug: "line-chart",
   },
   {
     name: "Bar Chart",
     description: "Compare categories quickly with bold bars.",
     Component: BarPreview,
-    url: "/docs/bar-chart",
+    slug: "bar-chart",
   },
   {
     name: "Composed Chart",
     description: "Mix lines, bars, areas in one.",
     Component: ComposedPreview,
-    url: "/docs/composed-chart",
+    slug: "composed-chart",
   },
   {
     name: "Radar Chart",
     description: "Compare multi-metric profiles on radial axes.",
     Component: RadarPreview,
-    url: "/docs/radar-chart",
+    slug: "radar-chart",
   },
   {
     name: "Pie Chart",
     description: "Show parts of a whole, clearly.",
     Component: PiePreview,
-    url: "/docs/pie-chart",
+    slug: "pie-chart",
   },
   {
     name: "Radial Chart",
     description: "Visualize totals in a circular layout.",
     Component: RadialPreview,
-    url: "/docs/radial-chart",
+    slug: "radial-chart",
   },
   {
     name: "Sankey Chart",
     description: "Show flows between stages with weighted links.",
     Component: SankeyPreview,
-    url: "/docs/sankey-chart",
+    slug: "sankey-chart",
   },
 ];
 
@@ -94,14 +97,21 @@ const ShowcaseItem = ({ name, description, url, Component }: ShowcaseItemProps) 
 };
 
 const ShowcaseGrid = () => {
+  const pathname = usePathname();
+
+  // This grid renders inside a provider's Components page, so link within that
+  // provider. Deriving it from the URL means a new provider needs no changes here
+  // and no prop threading through MDX.
+  const provider = providerFromPathname(pathname) ?? DEFAULT_PROVIDER;
+
   return (
     <div className="mt-6 grid grid-flow-row grid-cols-1 gap-8 sm:grid-cols-2">
-      {CHARTS.map(({ name, description, url, Component }) => (
+      {CHARTS.map(({ name, description, slug, Component }) => (
         <ShowcaseItem
           key={name}
           name={name}
           description={description}
-          url={url}
+          url={`/docs/${provider}/${slug}`}
           Component={Component}
         />
       ))}

@@ -1,21 +1,18 @@
 import {
-  getStartedOptions,
-  ChartComponentOptions,
-  DocumentationOptions,
-} from "@/globals/constants/docs-sidebar";
-import {
   Sidebar,
   SidebarContent,
   // SidebarFooter,
   SidebarHeader,
 } from "@/components/ui/sidebar";
-import { RenderDefaultOptions } from "./render-default-options";
+import { SidebarSections } from "./sidebar-sections";
 import EvilChartWordmark from "@/assets/logos/evilchart";
 import { source } from "@/lib/source";
-import { NavMain } from "./nav-main";
 import { cn } from "@/lib/utils";
 import * as React from "react";
 
+// DocsSidebar must stay a server component — `source` transitively imports
+// fs/promises; referencing it from a "use client" module breaks the browser
+// bundle. The page tree crosses into SidebarSections as a serializable prop.
 export function DocsSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -23,10 +20,7 @@ export function DocsSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) 
         <EvilChartWordmark height="20" width="130" className="z-10" />
       </SidebarHeader>
       <SidebarContent className={cn("scroll-fade select-none", "pt-2 pb-14")}>
-        <RenderDefaultOptions options={getStartedOptions} label="Get Started" />
-        <NavMain tree={source.pageTree} />
-        <RenderDefaultOptions options={ChartComponentOptions} label="Chart Components" />
-        <RenderDefaultOptions options={DocumentationOptions} label="Documentation" />
+        <SidebarSections tree={source.pageTree} />
       </SidebarContent>
     </Sidebar>
   );
