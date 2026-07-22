@@ -6,6 +6,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 EvilCharts (evilcharts.com) — a shadcn-compatible registry of animated Recharts chart components, plus the Next.js docs site that serves it. The installable components are the product; the site documents them and serves the registry JSON, markdown-for-LLMs docs, an MCP endpoint, and agent skills.
 
+Deep context documents for specific subsystems live in `.contexts/` — read `.contexts/echarts-provider.md` BEFORE working on anything under `src/registry/charts/echarts/` or the provider/docs-split infrastructure.
+
 ## Model usecase
 
 - Always use Fable for main task/research and use opus 4.8 model for subagents/workflows always.
