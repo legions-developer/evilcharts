@@ -22,7 +22,7 @@ export function DocsSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) 
       <SidebarHeader className="p-4 pt-6">
         <EvilChartWordmark height="20" width="130" className="z-10" />
       </SidebarHeader>
-      <SidebarContent className={cn("docs-sidebar-top-fade select-none", "pt-2 pb-14")}>
+      <SidebarContent className={cn("scroll-fade select-none", "pt-2 pb-14")}>
         <RenderDefaultOptions options={getStartedOptions} label="Get Started" />
         <NavMain tree={source.pageTree} />
         <RenderDefaultOptions options={ChartComponentOptions} label="Chart Components" />
