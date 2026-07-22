@@ -20,8 +20,19 @@ import { usePathname } from "next/navigation";
 import { motion } from "motion/react";
 import { source } from "@/lib/source";
 import { cn } from "@/lib/utils";
-import { useMemo } from "react";
+import { useMemo, useState, type ComponentProps } from "react";
 import Link from "next/link";
+
+function NavFolderCollapsible({
+  defaultOpen,
+  ...props
+}: ComponentProps<typeof Collapsible>) {
+  // Base UI warns if an uncontrolled Collapsible's defaultOpen changes after
+  // init (hasActiveChild flips on navigation); freeze the first value to keep
+  // Radix's mount-only defaultOpen semantics.
+  const [initialOpen] = useState(defaultOpen);
+  return <Collapsible defaultOpen={initialOpen} {...props} />;
+}
 
 function TreeIndicator({
   activeTrigger,
@@ -200,7 +211,7 @@ export function NavMain({
           }
 
           return (
-            <Collapsible
+            <NavFolderCollapsible
               key={item.$id}
               render={<SidebarMenuItem />}
               className="group/collapsible"
@@ -264,7 +275,7 @@ export function NavMain({
                   })}
                 </SidebarMenuSub>
               </CollapsibleContent>
-            </Collapsible>
+            </NavFolderCollapsible>
           );
         })}
       </SidebarMenu>
