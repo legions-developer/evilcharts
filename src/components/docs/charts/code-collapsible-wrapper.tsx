@@ -4,7 +4,7 @@ import {
   Collapsible,
   CollapsibleTrigger,
   CollapsiblePanel,
-} from "@/components/ui/base-collapsible";
+} from "@/components/ui/collapsible";
 import type { ComponentProps } from "react";
 import { cn } from "@/lib/utils";
 

@@ -43,17 +43,15 @@ export function RenderDefaultOptions({ options, label }: RenderDefaultOptionsPro
           return (
             <SidebarMenuItem key={item.name}>
               <SidebarMenuButton
-                asChild
+                render={<Link href={item.url} onClick={handleLinkClick} />}
                 className={cn(
                   !isActive &&
                     "dark:text-muted-foreground/80 text-muted-foreground/90 hover:text-primary dark:hover:text-primary",
                 )}
                 isActive={isActive}
               >
-                <Link href={item.url} onClick={handleLinkClick}>
-                  {item.icon}
-                  <span>{item.name}</span>
-                </Link>
+                {item.icon}
+                <span>{item.name}</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
           );
