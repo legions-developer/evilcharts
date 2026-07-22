@@ -1,0 +1,289 @@
+---
+title: Area Chart
+description: Simple static & beautifully designed area charts, powered by Apache ECharts
+image: /og/og-image.png
+links:
+  github: https://github.com/legions-developer/evilcharts/blob/main/src/registry/charts/echarts/area-chart.tsx
+  doc: https://echarts.apache.org/en/index.html
+  api: https://echarts.apache.org/en/option.html
+---
+
+<ComponentPreview title="Basic Chart" name="ex-echarts-area-chart"  />
+
+## Installation
+
+<CodeTabs>
+  <TabsList variant="underline">
+    <TabsTab value="cli">CLI</TabsTab>
+    <TabsTab value="manual">Manual</TabsTab>
+  </TabsList>
+  <TabsPanel value="cli">
+    <CliBlock commands={["@evilcharts/echarts-area-chart"]} />
+  </TabsPanel>
+  <TabsPanel value="manual">
+    <Steps>
+      <Step>
+        <StepTitle>Install the following dependencies:</StepTitle>
+        <StepContent>
+          <CommandBlock commands={["echarts", "motion"]} />
+        </StepContent>
+      </Step>
+      <Step>
+        <StepTitle>Copy and paste the following code snippets into your project.</StepTitle>
+        <StepDescription>
+          To use the chart, first create the folder `evilcharts` and a subfolder called `charts` (with an `echarts` folder inside) in your `components` directory.
+          Then, copy the following area-chart code into a new file in that folder. Unlike the Recharts twin, this component is fully self-contained — it ships everything ECharts needs in a single file, so there are no extra `ui` sub-components to add.
+        </StepDescription>
+        <StepContent>
+          <ComponentSource
+            name="echarts-area-chart"
+            title="components/evilcharts/charts/echarts/area-chart.tsx"
+          />
+        </StepContent>
+      </Step>
+    </Steps>
+  </TabsPanel>
+</CodeTabs>
+
+## Usage
+
+The ECharts area chart is composible, with the same API shape as the Recharts twin. `<EChartsAreaChart>` is the container, and you compose only the parts you need — `<Grid>`, `<XAxis>`, `<YAxis>`, `<Legend>`, `<Tooltip>`, and one or more `<Area>` — as its children. Each `<Area>` carries its own `variant`, `strokeVariant`, and `isClickable`, so a single chart can mix fill styles, stroke styles, and make only some series interactive.
+
+```tsx
+import {
+  EChartsAreaChart,
+  Area,
+  XAxis,
+  Grid,
+  Tooltip,
+  Legend,
+} from "@/components/evilcharts/charts/echarts/area-chart";
+```
+
+```tsx
+<EChartsAreaChart data={data} config={chartConfig} stackType="stacked">
+  <Grid />
+  <XAxis dataKey="month" />
+  <Legend isClickable />
+  <Tooltip />
+  <Area dataKey="desktop" variant="gradient" strokeVariant="dashed" isClickable />
+  <Area dataKey="mobile" variant="hatched" strokeVariant="solid" isClickable />
+</EChartsAreaChart>
+```
+
+The one honest difference from the Recharts twin is under the hood: ECharts renders to a `<canvas>`, so these children never mount as DOM. The root walks them, reads their props, and compiles them into the ECharts option object — same JSX, same presence semantics (omit a part and it doesn't render), same behavior, but the children are declarative config rather than live DOM nodes.
+
+The `config` is the same contract as every EvilCharts chart — each key maps a data key to a `label` and a per-theme `colors` array. See <Link href="/docs/chart-config">Chart Config</Link> for the full shape. Colors resolve from your CSS variables at runtime, so dark mode just works with no extra wiring.
+
+<Alert>
+  <AlertContent>
+    Rendering to canvas means two small departures from the Recharts twin: multi-color gradients are baked into a texture at render size (visually equivalent, rebuilt on resize), and the zoom brush is a themed mini chart driven by ECharts' native `dataZoom` rather than the custom `EvilBrush`.
+  </AlertContent>
+</Alert>
+
+### Loading State
+
+<ComponentPreview className="mb-0" title="isLoading='true'" name="ex-loading-state-echarts-area-chart"  />
+<Alert>
+  <AlertContent>
+    The area chart supports a loading state. Pass the `isLoading` prop to show an animated skeleton, and use `loadingPoints` to control how many points the skeleton draws.
+  </AlertContent>
+</Alert>
+
+## Examples
+
+Below are some examples of the area chart with different settings. Change `variant` and `strokeVariant` on an `<Area>`, or set `curveType` and `stackType` on the chart, to restyle it.
+
+### Hover Highlight
+
+<ComponentPreview title="enableHoverHighlight='true'" name="ex-hover-highlight-echarts-area-chart" />
+
+### Gradient Colors
+
+<ComponentPreview className="mb-0" title="gradient colors" name="ex-gradient-colors-echarts-area-chart"  />
+<ComponentPreview title="gradient colors - bump" name="ex-gradient-colors-bump-echarts-area-chart"  />
+
+### Curve Types
+
+<ComponentPreview className="mb-0" title="curveType='bump'" name="ex-bump-curve-type-echarts-area-chart"  />
+<ComponentPreview className="mb-0" title="curveType='step'" name="ex-step-curve-type-echarts-area-chart"  />
+<ComponentPreview title="curveType='monotoneY'" name="ex-monotoney-curve-type-echarts-area-chart"  />
+
+### Stack Types
+
+<ComponentPreview className="mb-0" title="stackType='default'" name="ex-default-type-echarts-area-chart"  />
+<ComponentPreview className="mb-0" title="stackType='stacked'" name="ex-stacked-type-echarts-area-chart"  />
+<ComponentPreview title="stackType='expanded'" name="ex-expanded-type-echarts-area-chart"  />
+
+### Stroke Variants
+
+<ComponentPreview className="mb-0" title="strokeVariant='solid'" name="ex-solid-stroke-echarts-area-chart"  />
+<ComponentPreview className="mb-0" title="strokeVariant='dashed'" name="ex-dashed-stroke-echarts-area-chart"  />
+<ComponentPreview title="strokeVariant='animated-dashed'" name="ex-animated-dashed-stroke-echarts-area-chart"  />
+
+### Area Variants
+
+<ComponentPreview className="mb-0" title="variant='gradient'" name="ex-gradient-area-variant-echarts-area-chart"  />
+<ComponentPreview className="mb-0" title="variant='gradient-reverse'" name="ex-gradient-reverse-area-variant-echarts-area-chart"  />
+<ComponentPreview className="mb-0" title="variant='solid'" name="ex-solid-area-variant-echarts-area-chart"  />
+<ComponentPreview className="mb-0" title="variant='dotted'" name="ex-dotted-area-variant-echarts-area-chart"  />
+<ComponentPreview className="mb-0" title="variant='lines'" name="ex-lines-area-variant-echarts-area-chart"  />
+<ComponentPreview title="variant='hatched'" name="ex-hatched-area-variant-echarts-area-chart"  />
+
+## API Reference
+
+The chart is composed of several parts. The props below are grouped by the part they belong to. On canvas each part is declarative config the root compiles, but the API mirrors the Recharts twin one-to-one.
+
+<ApiHeading>EChartsAreaChart</ApiHeading>
+
+The root container. It owns the data, the shared selection state, the loading skeleton, and the optional native `dataZoom` brush. Everything visual is composed as its children and compiled into the ECharts option.
+
+<ApiTable>
+  <ApiRow name="data" type="TData[]" required>
+    Data used to display the chart — an array of objects where each object is a data point (`TData extends Record<string, unknown>`).
+  </ApiRow>
+  <ApiRow name="config" type="ChartConfig" required>
+    Defines the chart's series. Each key matches a data key, with a `label` and a per-theme `colors` array. Same contract as every EvilCharts chart — see <Link href="/docs/chart-config">Chart Config</Link>.
+  </ApiRow>
+  <ApiRow name="children" type="ReactNode" required>
+    The composed chart parts — `<Grid />`, `<XAxis />`, `<YAxis />`, `<Legend />`, `<Tooltip />`, and one or more `<Area />`.
+  </ApiRow>
+  <ApiRow name="className" type="string">
+    Additional CSS classes for the chart container.
+  </ApiRow>
+  <ApiRow name="xDataKey" type="keyof TData & string">
+    The data key used for the x-axis categories.
+  </ApiRow>
+  <ApiRow name="curveType" type='"linear" | "smooth" | "bump" | "monotone" | "monotoneX" | "monotoneY" | "natural" | "step"' default='"linear"'>
+    Default curve interpolation inherited by every `<Area />`.
+  </ApiRow>
+  <ApiRow name="animationType" type='"none" | "left-to-right" | "right-to-left" | "center-out" | "edges-in"' default='"left-to-right"'>
+    The intro animation inherited by every `<Area />` — any value other than `"none"` plays ECharts' native progressive draw-in (the line traces in and dots pop up as its front passes; the direction values exist for API parity with the Recharts twin). `"none"` disables it — devices with the OS reduce-motion preference fall back to `"none"` automatically.
+  </ApiRow>
+  <ApiRow name="enableHoverHighlight" type="boolean" default="false">
+    Highlights the hovered series by dimming every other one — the hover twin of the click selection. Dim levels match the selection styling.
+  </ApiRow>
+  <ApiRow name="stackType" type='"default" | "stacked" | "expanded"' default='"default"'>
+    How multiple areas combine — independent, stacked, or normalized to 100%.
+  </ApiRow>
+  <ApiRow name="defaultSelectedDataKey" type="string | null" default="null">
+    The series selected on first render.
+  </ApiRow>
+  <ApiRow name="onSelectionChange" type="(key: string | null) => void">
+    Fires when a series is selected or deselected via a clickable `<Area />` or `<Legend />`.
+  </ApiRow>
+  <ApiRow name="isLoading" type="boolean" default="false">
+    Shows the animated loading skeleton.
+  </ApiRow>
+  <ApiRow name="loadingPoints" type="number" default="14">
+    Number of points in the loading skeleton.
+  </ApiRow>
+  <ApiRow name="showBrush" type="boolean" default="false">
+    Renders ECharts' native `dataZoom` brush below the chart.
+  </ApiRow>
+  <ApiRow name="brushHeight" type="number" default="56">
+    Height of the brush preview in pixels.
+  </ApiRow>
+  <ApiRow name="brushFormatLabel" type="(value: string | number, index: number) => string">
+    Formats the brush axis labels.
+  </ApiRow>
+  <ApiRow name="onBrushChange" type="(range: { startIndex: number; endIndex: number }) => void">
+    Fires when the brush selection range changes.
+  </ApiRow>
+  <ApiRow name="chartOptions" type="Record<string, unknown>">
+    Escape hatch deep-merged into the underlying ECharts option object. See the <Link href="https://echarts.apache.org/en/option.html" _blank>ECharts option documentation</Link>.
+  </ApiRow>
+</ApiTable>
+
+<ApiHeading>Area</ApiHeading>
+
+A single area series. Each `<Area />` carries its own fill and stroke config, so a chart can hold any number of areas — each with its own variant, stroke, and clickability.
+
+<ApiTable>
+  <ApiRow name="dataKey" type="string" required>
+    The series key. Must exist on both the data rows and the chart `config`.
+  </ApiRow>
+  <ApiRow name="variant" type='"gradient" | "gradient-reverse" | "solid" | "dotted" | "lines" | "hatched"' default='"gradient"'>
+    The visual style of the area fill. Applies to this area only. Multi-color configs render the full horizontal gradient faded vertically, matching the Recharts twin.
+  </ApiRow>
+  <ApiRow name="strokeVariant" type='"solid" | "dashed" | "animated-dashed"' default='"dashed"'>
+    The stroke style for this area.
+  </ApiRow>
+  <ApiRow name="curveType" type='"linear" | "smooth" | "bump" | "monotone" | "monotoneX" | "monotoneY" | "natural" | "step"'>
+    The curve interpolation for this area. Falls back to the chart's `curveType` when omitted.
+  </ApiRow>
+  <ApiRow name="animationType" type='"none" | "left-to-right" | "right-to-left" | "center-out" | "edges-in"'>
+    The intro draw-in for this area (the first `<Area />`'s value drives the chart). Falls back to the chart's `animationType` when omitted.
+  </ApiRow>
+  <ApiRow name="connectNulls" type="boolean" default="false">
+    Whether to connect line segments across null or missing values.
+  </ApiRow>
+  <ApiRow name="isClickable" type="boolean" default="false">
+    Lets this area be selected by clicking it. When any area is selected, unselected areas become semi-transparent.
+  </ApiRow>
+  <ApiRow name="children" type="ReactNode">
+    Optional `<Dot />` and `<ActiveDot />` config that adds point markers to this area.
+  </ApiRow>
+</ApiTable>
+
+<ApiHeading>Dot and ActiveDot</ApiHeading>
+
+Point markers composed inside an `<Area />`. `<Dot />` is the resting marker; `<ActiveDot />` is the hovered marker. They render nothing on their own — the parent `<Area />` reads their `variant`.
+
+<ApiTable>
+  <ApiRow name="variant" type='"default" | "border" | "colored-border"' default='"default"'>
+    The visual style of the point marker.
+  </ApiRow>
+</ApiTable>
+
+<ApiHeading>XAxis and YAxis</ApiHeading>
+
+The category and value axes. Include `<XAxis />` to show the x-axis labels and `<YAxis />` to show the y-axis; omit either to hide it. Both are hidden automatically while the chart is loading, and `<YAxis />` formats ticks as percentages when `stackType="expanded"`.
+
+<ApiTable>
+  <ApiRow name="dataKey" type="string">
+    The data key for the axis values.
+  </ApiRow>
+  <ApiRow name="tickFormatter" type="(value: string | number, index: number) => string">
+    Formats the axis tick labels.
+  </ApiRow>
+</ApiTable>
+
+<ApiHeading>Grid</ApiHeading>
+
+The background grid lines. Its presence renders the dashed horizontal split lines; omit it and they don't draw. It takes no props.
+
+<ApiHeading>Tooltip</ApiHeading>
+
+The hover tooltip. Its presence enables the tooltip; omit it and none shows. It reads the chart's selection state so its content dims unselected series.
+
+<ApiTable>
+  <ApiRow name="variant" type='"default" | "frosted-glass"' default='"default"'>
+    The visual style of the tooltip surface.
+  </ApiRow>
+  <ApiRow name="roundness" type='"sm" | "md" | "lg" | "xl"' default='"lg"'>
+    Controls the border-radius of the tooltip.
+  </ApiRow>
+  <ApiRow name="cursor" type="boolean" default="true">
+    Whether the vertical cursor line follows the pointer on hover.
+  </ApiRow>
+</ApiTable>
+
+<ApiHeading>Legend</ApiHeading>
+
+The series legend, rendered as HTML above the canvas. Its presence enables the legend; omit it and none shows. When `isClickable` is set, each entry toggles selection of its series.
+
+<ApiTable>
+  <ApiRow name="variant" type='"square" | "circle" | "circle-outline" | "rounded-square" | "rounded-square-outline" | "vertical-bar" | "horizontal-bar"'>
+    The visual style of the legend indicators.
+  </ApiRow>
+  <ApiRow name="align" type='"left" | "center" | "right"' default='"right"'>
+    Horizontal placement of the legend.
+  </ApiRow>
+  <ApiRow name="verticalAlign" type='"top" | "middle" | "bottom"' default='"top"'>
+    Vertical placement of the legend.
+  </ApiRow>
+  <ApiRow name="isClickable" type="boolean" default="false">
+    Lets each legend entry toggle selection of its series.
+  </ApiRow>
+</ApiTable>
