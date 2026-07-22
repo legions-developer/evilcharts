@@ -185,15 +185,15 @@ export function NavMain({
                       "text-muted-foreground/90 dark:text-muted-foreground/80 hover:text-primary dark:hover:text-primary",
                   )}
                   isActive={isActive}
-                  asChild
+                  render={
+                    <Link
+                      href={singleChild.type === "page" ? singleChild.url : "#"}
+                      onClick={handleLinkClick}
+                    />
+                  }
                 >
-                  <Link
-                    href={singleChild.type === "page" ? singleChild.url : "#"}
-                    onClick={handleLinkClick}
-                  >
-                    {getNavItemIcon(item.$id)}
-                    <span className="capitalize">{item.name}</span>
-                  </Link>
+                  {getNavItemIcon(item.$id)}
+                  <span className="capitalize">{item.name}</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             );
@@ -202,12 +202,12 @@ export function NavMain({
           return (
             <Collapsible
               key={item.$id}
-              asChild
+              render={<SidebarMenuItem />}
               className="group/collapsible"
               defaultOpen={hasActiveChild}
             >
-              <SidebarMenuItem>
-                <CollapsibleTrigger asChild>
+              <CollapsibleTrigger
+                render={
                   <SidebarMenuButton
                     className={
                       !hasActiveChild
@@ -215,57 +215,55 @@ export function NavMain({
                         : ""
                     }
                     isActive={hasActiveChild}
-                  >
-                    {getNavItemIcon(item.$id)}
-                    <span className="capitalize">{item.name}</span>
-                    <CaretRight
-                      className={cn(
-                        "ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90",
-                        !hasActiveChild ? "opacity-60" : "opacity-100",
-                      )}
-                    />
-                  </SidebarMenuButton>
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                  <SidebarMenuSub>
-                    <TreeIndicator
-                      activeTrigger={activeTrigger}
-                      hasActiveChild={hasActiveChild}
-                      key={item.$id}
-                    />
-                    {item.children.map((subItem) => {
-                      if (subItem.type !== "page") return null;
-                      if (EXCLUDED_PAGES.includes(subItem.url)) return null;
+                  />
+                }
+              >
+                {getNavItemIcon(item.$id)}
+                <span className="capitalize">{item.name}</span>
+                <CaretRight
+                  className={cn(
+                    "ml-auto transition-transform duration-200 group-data-open/collapsible:rotate-90",
+                    !hasActiveChild ? "opacity-60" : "opacity-100",
+                  )}
+                />
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <SidebarMenuSub>
+                  <TreeIndicator
+                    activeTrigger={activeTrigger}
+                    hasActiveChild={hasActiveChild}
+                    key={item.$id}
+                  />
+                  {item.children.map((subItem) => {
+                    if (subItem.type !== "page") return null;
+                    if (EXCLUDED_PAGES.includes(subItem.url)) return null;
 
-                      const isActive = activeTrigger.url === subItem.url;
+                    const isActive = activeTrigger.url === subItem.url;
 
-                      if (item.name == subItem.name) {
-                        subItem.name = "Default"; // for base charts
-                      }
+                    if (item.name == subItem.name) {
+                      subItem.name = "Default"; // for base charts
+                    }
 
-                      return (
-                        <SidebarMenuSubItem
-                          key={subItem.$id}
-                          className={cn("relative flex w-full")}
+                    return (
+                      <SidebarMenuSubItem
+                        key={subItem.$id}
+                        className={cn("relative flex w-full")}
+                      >
+                        <SidebarMenuSubButton
+                          className={cn(
+                            "w-full pl-8",
+                            !isActive &&
+                              "text-muted-foreground/90 dark:text-muted-foreground/80 hover:text-primary dark:hover:text-primary",
+                          )}
+                          render={<Link href={subItem.url} onClick={handleLinkClick} />}
                         >
-                          <SidebarMenuSubButton
-                            className={cn(
-                              "w-full pl-8",
-                              !isActive &&
-                                "text-muted-foreground/90 dark:text-muted-foreground/80 hover:text-primary dark:hover:text-primary",
-                            )}
-                            asChild
-                          >
-                            <Link href={subItem.url} onClick={handleLinkClick}>
-                              <span>{subItem.name}</span>
-                            </Link>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      );
-                    })}
-                  </SidebarMenuSub>
-                </CollapsibleContent>
-              </SidebarMenuItem>
+                          <span>{subItem.name}</span>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    );
+                  })}
+                </SidebarMenuSub>
+              </CollapsibleContent>
             </Collapsible>
           );
         })}

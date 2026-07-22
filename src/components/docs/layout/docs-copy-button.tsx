@@ -165,16 +165,14 @@ export function DocsCopyPage({ mdx, url }: { mdx: string; url: string }) {
           <span className={cn("absolute opacity-0", copied && "opacity-100")}>Copied</span>
         </Button>
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
+          <DropdownMenuTrigger render={trigger} />
           <DropdownMenuContent align="end" className="bg-background rounded-lg">
             {Object.entries(menuItems).map(([key, value]) => (
               <DropdownMenuItem
                 className="hover:bg-muted/50! text-muted-foreground/80 hover:text-primary! cursor-pointer text-[13px]"
                 key={key}
-                asChild
-              >
-                {value(url)}
-              </DropdownMenuItem>
+                render={value(url)}
+              />
             ))}
           </DropdownMenuContent>
         </DropdownMenu>
