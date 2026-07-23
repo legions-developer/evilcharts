@@ -1,6 +1,16 @@
 "use client";
 
 import {
+  resolveTooltipPosition,
+  roundnessClass,
+  tooltipIndicatorHtml,
+  tooltipRow,
+  tooltipVariantClass,
+  type TooltipPosition,
+  type TooltipRoundness,
+  type TooltipVariant,
+} from "@/registry/ui/echarts/tooltip";
+import {
   Children,
   isValidElement,
   useCallback,
@@ -9,22 +19,42 @@ import {
   useMemo,
   useRef,
   useState,
-  type ComponentType,
   type CSSProperties,
   type FC,
   type ReactNode,
 } from "react";
+import {
+  buildChartCss,
+  getColorsCount,
+  resolveColors,
+  withAlpha,
+  type ChartConfig,
+  type ResolvedColors,
+} from "@/registry/ui/echarts/chart";
 import {
   RadarComponent,
   TooltipComponent,
   type RadarComponentOption,
   type TooltipComponentOption,
 } from "echarts/components";
+import { dotStyle, sampleGradient, type DotVariant } from "@/registry/ui/echarts/dot";
+import { LegendOverlay, type LegendVariant } from "@/registry/ui/echarts/legend";
 import { RadarChart, type RadarSeriesOption } from "echarts/charts";
 import { motion, useReducedMotion } from "motion/react";
 import { CanvasRenderer } from "echarts/renderers";
 import type { ComposeOption } from "echarts/core";
 import * as echarts from "echarts/core";
+
+// Re-export the shared types that were previously declared inline here, so
+// existing consumers/examples keep importing them from the chart module.
+export type {
+  ChartConfig,
+  DotVariant,
+  LegendVariant,
+  TooltipPosition,
+  TooltipRoundness,
+  TooltipVariant,
+};
 
 // Modular registration keeps the bundle lean — only the pieces this chart needs.
 // `RadarComponent` is the polar coordinate system (indicators, rings, spokes);
@@ -46,16 +76,6 @@ type EChartsOption = ComposeOption<
 // single radar coordinate system is built.
 type ArrayItem<T> = T extends readonly (infer U)[] ? U : T;
 type RadarOption = ArrayItem<NonNullable<EChartsOption["radar"]>>;
-
-// One radar series carries exactly one polygon (one data item), so all of its
-// styling lives at the series level. This is the marker paint for its vertex
-// symbols — structurally assignable to the series `itemStyle`.
-type DotItemStyleOption = {
-  color?: string;
-  borderColor?: string;
-  borderWidth?: number;
-  opacity?: number;
-};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
@@ -97,42 +117,15 @@ const LOADING_SHIMMER_MAX_OPACITY = 0.05; // fill inside the window, × foregrou
 const LOADING_SHIMMER_BAND = 0.2; // window half-width, fraction of chart width
 const LOADING_SHIMMER_FEATHER = 0.2; // eased edge softening of the clip window
 
-// Theme selectors mirror the repo's <ChartStyle>: light is the bare root, dark is `.dark`.
-const THEMES = { light: "", dark: ".dark" } as const;
-type ThemeKey = keyof typeof THEMES;
-const THEME_KEYS = Object.keys(THEMES) as ThemeKey[];
-
 // ─────────────────────────────────────────────────────────────────────────────
 // Public types
 // ─────────────────────────────────────────────────────────────────────────────
 
 export type RadarVariant = "filled" | "lines";
 export type GridType = "polygon" | "circle";
-export type DotVariant = "none" | "default" | "border" | "colored-border";
-export type TooltipVariant = "default" | "frosted-glass";
-export type TooltipRoundness = "sm" | "md" | "lg" | "xl";
-export type LegendVariant =
-  | "square"
-  | "circle"
-  | "circle-outline"
-  | "rounded-square"
-  | "rounded-square-outline"
-  | "vertical-bar"
-  | "horizontal-bar";
-
-// Require at least one theme key — identical constraint to the repo's ChartConfig.
-type AtLeastOneThemeColor =
-  | { light: string[]; dark?: string[] }
-  | { light?: string[]; dark: string[] };
-
-export type ChartConfig = Record<
-  string,
-  {
-    label?: ReactNode;
-    icon?: ComponentType;
-    colors?: AtLeastOneThemeColor;
-  }
->;
+// DotVariant, TooltipVariant, TooltipRoundness, TooltipPosition, LegendVariant,
+// and ChartConfig now live in the shared @/registry/ui/echarts/* modules and are
+// imported + re-exported at the top of this file.
 
 export interface EChartsRadarChartProps<TData extends Record<string, unknown>> {
   data: TData[]; // rows rendered by the chart — each row is one angle-axis category
@@ -203,6 +196,7 @@ export const PolarRadiusAxis: FC = () => null;
 export interface TooltipProps {
   variant?: TooltipVariant; // visual style of the tooltip surface
   roundness?: TooltipRoundness; // border-radius of the tooltip
+  position?: TooltipPosition; // "variable" follows the pointer (default); "fixed" pins the tooltip near the top and tracks the pointer's X
   // Data index shown by default with no hover. On canvas the radar tooltip is
   // item-triggered (per polygon), so this selects the DEFAULT SERIES to reveal
   // — see the note in the sync effect.
@@ -244,6 +238,7 @@ type TooltipSlot = {
   present: boolean;
   variant: TooltipVariant;
   roundness: TooltipRoundness;
+  position: TooltipPosition;
   defaultIndex?: number;
 };
 type LegendSlot = {
@@ -268,7 +263,12 @@ function collectConfig(children: ReactNode): CollectedConfig {
   let grid: PolarGridSlot = { present: false, gridType: "polygon" };
   let angleAxis: PolarAngleAxisSlot = { present: false };
   let radiusAxis: PolarRadiusAxisSlot = { present: false };
-  let tooltip: TooltipSlot = { present: false, variant: "default", roundness: "lg" };
+  let tooltip: TooltipSlot = {
+    present: false,
+    variant: "default",
+    roundness: "lg",
+    position: "variable",
+  };
   let legend: LegendSlot = {
     present: false,
     variant: "rounded-square",
@@ -315,6 +315,7 @@ function collectConfig(children: ReactNode): CollectedConfig {
         present: true,
         variant: props.variant ?? "default",
         roundness: props.roundness ?? "lg",
+        position: props.position ?? "variable",
         defaultIndex: props.defaultIndex,
       };
     } else if (type === Legend) {
@@ -332,142 +333,9 @@ function collectConfig(children: ReactNode): CollectedConfig {
   return { radars, grid, angleAxis, radiusAxis, tooltip, legend };
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Color plumbing — replicated from the repo's <ChartStyle> so this file stays
-// self-contained (no @/registry/ui imports). Identical to the area chart's.
-// ─────────────────────────────────────────────────────────────────────────────
-
-// Max slots a key needs = longest color array across themes (min 1). Both themes
-// always emit the same number of `--color-{key}-{n}` vars.
-function getColorsCount(item: ChartConfig[string]): number {
-  if (!item.colors) return 1;
-  const counts = THEME_KEYS.map((theme) => item.colors?.[theme]?.length ?? 0);
-  return Math.max(...counts, 1);
-}
-
-// Distribute colors evenly across slots; extra slots go to the LAST color(s).
-// 2 colors / 4 slots → [c0, c0, c1, c1]; 3 colors / 4 slots → [c0, c1, c2, c2].
-function distributeColors(colors: string[], maxCount: number): string[] {
-  const available = colors.length;
-  if (available >= maxCount) return colors.slice(0, maxCount);
-
-  const result: string[] = [];
-  const baseSlots = Math.floor(maxCount / available);
-  const extraSlots = maxCount % available;
-
-  for (let i = 0; i < available; i++) {
-    const isExtra = i >= available - extraSlots;
-    const slots = baseSlots + (isExtra ? 1 : 0);
-    for (let j = 0; j < slots; j++) result.push(colors[i]);
-  }
-
-  return result;
-}
-
-// Emits the same CSS <ChartStyle> would: `--color-{key}-{n}` scoped to
-// `[data-chart={id}]` (light) and `.dark [data-chart={id}]` (dark).
-function buildChartCss(id: string, config: ChartConfig): string {
-  const colorConfig = Object.entries(config).filter(([, item]) => item.colors);
-  if (!colorConfig.length) return "";
-
-  const varsFor = (theme: ThemeKey) =>
-    colorConfig
-      .flatMap(([key, item]) => {
-        const authored = item.colors?.[theme];
-        if (!authored || authored.length === 0) return [];
-        return distributeColors(authored, getColorsCount(item)).map(
-          (color, index) => `  --color-${key}-${index}: ${color};`,
-        );
-      })
-      .join("\n");
-
-  return Object.entries(THEMES)
-    .map(([theme, prefix]) => `${prefix} [data-chart=${id}] {\n${varsFor(theme as ThemeKey)}\n}`)
-    .join("\n");
-}
-
-// A single reusable 1×1 canvas normalizes ANY CSS color (hex, named, oklch, …)
-// to a concrete rgba string by painting it and reading the pixel back.
-let normalizerCtx: CanvasRenderingContext2D | null = null;
-function normalizeColor(value: string): string {
-  const raw = value.trim();
-  if (!raw || typeof document === "undefined") return raw;
-
-  if (!normalizerCtx) {
-    const canvas = document.createElement("canvas");
-    canvas.width = 1;
-    canvas.height = 1;
-    normalizerCtx = canvas.getContext("2d", { willReadFrequently: true });
-  }
-  if (!normalizerCtx) return raw;
-
-  normalizerCtx.clearRect(0, 0, 1, 1);
-  normalizerCtx.fillStyle = "#000";
-  normalizerCtx.fillStyle = raw; // invalid values leave the sentinel in place
-  normalizerCtx.fillRect(0, 0, 1, 1);
-  const [r, g, b, a] = normalizerCtx.getImageData(0, 0, 1, 1).data;
-  return `rgba(${r}, ${g}, ${b}, ${(a / 255).toFixed(3)})`;
-}
-
-// Scales the alpha of a normalized `rgba(r, g, b, a)` string. Multiplying (not
-// replacing) keeps translucent theme tokens honest: a border that is 10%-white
-// at `withAlpha(border, 0.5)` lands at 5%, matching Tailwind's `border/50`.
-function withAlpha(color: string, alpha: number): string {
-  const match = color.match(/rgba?\(([^)]+)\)/);
-  if (!match) return color;
-  const [r, g, b, a] = match[1].split(",").map((p) => p.trim());
-  const base = a === undefined ? 1 : Number.parseFloat(a) || 0;
-  return `rgba(${r}, ${g}, ${b}, ${(base * alpha).toFixed(3)})`;
-}
-
-type ResolvedColors = {
-  series: Record<string, string[]>; // normalized `--color-{key}-{n}` slots per key
-  tokens: {
-    mutedForeground: string;
-    border: string;
-    foreground: string;
-    background: string;
-  };
-};
-
-// Reads the injected CSS vars + theme tokens from the live DOM. Series slots come
-// from `getComputedStyle` on the container; tokens are read off a throwaway probe
-// carrying the matching Tailwind class (robust to the var naming a theme uses).
-function resolveColors(
-  container: HTMLElement,
-  config: ChartConfig,
-  seriesKeys: string[],
-): ResolvedColors {
-  const computed = getComputedStyle(container);
-  const series: Record<string, string[]> = {};
-
-  for (const key of seriesKeys) {
-    const count = getColorsCount(config[key] ?? {});
-    const slots: string[] = [];
-    for (let n = 0; n < count; n++) {
-      const raw = computed.getPropertyValue(`--color-${key}-${n}`).trim();
-      slots.push(raw ? normalizeColor(raw) : "rgba(120, 120, 120, 1)");
-    }
-    series[key] = slots;
-  }
-
-  const probe = document.createElement("span");
-  probe.style.cssText = "position:absolute;width:0;height:0;visibility:hidden;pointer-events:none;";
-  container.appendChild(probe);
-  const readToken = (className: string) => {
-    probe.className = className;
-    return normalizeColor(getComputedStyle(probe).color);
-  };
-  const tokens = {
-    mutedForeground: readToken("text-muted-foreground"),
-    border: readToken("text-border"),
-    foreground: readToken("text-foreground"),
-    background: readToken("text-background"),
-  };
-  container.removeChild(probe);
-
-  return { series, tokens };
-}
+// Color plumbing (ChartConfig, getColorsCount, distributeColors, buildChartCss,
+// normalizeColor, withAlpha, ResolvedColors, resolveColors) now lives in the shared
+// @/registry/ui/echarts/chart module, imported at the top of this file.
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Radar paints — the ECharts analogue of the twin's SVG gradients.
@@ -508,65 +376,11 @@ function radarFillPaint(slots: string[]): echarts.graphic.RadialGradient {
   );
 }
 
-// The color the stroke gradient shows at position t ∈ [0, 1]. A radar series is a
-// SINGLE data item, so every vertex symbol shares one itemStyle — unlike the area
-// chart's per-datum dots, we cannot tint each vertex individually (a gradient
-// itemStyle would paint the whole rainbow inside every dot, per the echarts
-// gotcha). So multi-color radars give ALL dots one representative color sampled
-// from the middle of the run. Documented approximation vs the twin's SVG dots.
-function sampleGradient(slots: string[], t: number): string {
-  if (slots.length <= 1) return slots[0] ?? GRAY;
-
-  const parse = (color: string) =>
-    color
-      .match(/rgba?\(([^)]+)\)/)?.[1]
-      .split(",")
-      .map(Number) ?? [120, 120, 120, 1];
-
-  const position = t * (slots.length - 1);
-  const index = Math.min(Math.floor(position), slots.length - 2);
-  const fraction = position - index;
-  const [r1, g1, b1, a1 = 1] = parse(slots[index]);
-  const [r2, g2, b2, a2 = 1] = parse(slots[index + 1]);
-  const lerp = (from: number, to: number) => from + (to - from) * fraction;
-
-  return `rgba(${Math.round(lerp(r1, r2))}, ${Math.round(lerp(g1, g2))}, ${Math.round(lerp(b1, b2))}, ${lerp(a1, a2).toFixed(3)})`;
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Dots — map the resting/active variants onto ECharts symbols (twin's DotVariant).
-// ─────────────────────────────────────────────────────────────────────────────
-
-type DotStyle = { size: number; itemStyle: DotItemStyleOption };
-
-function dotItemStyle(variant: DotVariant, paint: string, background: string): DotItemStyleOption {
-  switch (variant) {
-    case "border":
-      // Series-colored core with a thick background halo (Recharts r6 / sw5).
-      return { color: paint, borderColor: background, borderWidth: 2 };
-    case "colored-border":
-      // Background-filled core with a thin colored ring (Recharts r3 / sw1).
-      return { color: background, borderColor: paint, borderWidth: 1 };
-    case "default":
-      return { color: paint, borderWidth: 0 };
-    default:
-      return {};
-  }
-}
-
-// Sizes mirror the Recharts markers: default r3, border r6 (mostly halo), and
-// colored-border r3+ring. Flattening these to one size makes the hover swap read
-// wrong — the opposite of the Recharts twin.
-const DOT_SIZES: Record<DotVariant, number> = {
-  none: 0,
-  default: 6,
-  border: 8,
-  "colored-border": 6,
-};
-
-function dotStyle(variant: DotVariant, paint: string, background: string): DotStyle {
-  return { size: DOT_SIZES[variant], itemStyle: dotItemStyle(variant, paint, background) };
-}
+// Vertex dots (dotStyle/dotItemStyle/DOT_SIZES) and gradient sampling (sampleGradient)
+// now live in the shared @/registry/ui/echarts/dot module, imported at the top of this
+// file. A radar series is a SINGLE data item, so every vertex shares one itemStyle:
+// multi-color radars give all dots one representative color via sampleGradient(slots,
+// 0.5) rather than tinting each vertex individually.
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Selection opacity — the twin only dims a CLICKABLE radar that isn't selected;
@@ -640,83 +454,11 @@ function shimmerWindowStops(center: number, color: string, peak: number) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Tooltip / legend HTML — the tooltip DOM lives inside `[data-chart={id}]`, so the
-// injected `--color-*` vars and Tailwind classes resolve directly (no color read).
+// Tooltip + legend HTML — the tooltip shell styling (roundnessClass,
+// tooltipVariantClass, tooltipRow, tooltipIndicatorHtml) and the legend overlay
+// (LegendOverlay + its indicators) now live in the shared
+// @/registry/ui/echarts/{tooltip,legend} modules, imported at the top of this file.
 // ─────────────────────────────────────────────────────────────────────────────
-
-const roundnessClass: Record<TooltipRoundness, string> = {
-  sm: "rounded-sm",
-  md: "rounded-md",
-  lg: "rounded-lg",
-  xl: "rounded-xl",
-};
-
-const tooltipVariantClass: Record<TooltipVariant, string> = {
-  default: "bg-background",
-  "frosted-glass": "bg-background/70 backdrop-blur-sm",
-};
-
-// Solid var / gradient of vars for a series indicator — mirrors getIndicatorColorStyle.
-function indicatorBackground(key: string, colorsCount: number): string {
-  if (colorsCount <= 1) return `var(--color-${key}-0)`;
-  const stops = Array.from({ length: colorsCount }, (_, i) => {
-    const offset = (i / (colorsCount - 1)) * 100;
-    return `var(--color-${key}-${i}) ${offset}%`;
-  }).join(", ");
-  return `linear-gradient(to right, ${stops})`;
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Legend overlay (React) — replicates ChartLegendContent + its 7 indicators.
-// ─────────────────────────────────────────────────────────────────────────────
-
-function legendFillStyle(key: string, colorsCount: number): CSSProperties {
-  if (colorsCount <= 1) return { backgroundColor: `var(--color-${key}-0)` };
-  return { background: indicatorBackground(key, colorsCount) };
-}
-
-// Punches out the centre with a mask-composite so only the "border" shows —
-// works with gradients and border-radius, unlike plain border-color.
-function legendOutlineStyle(key: string, colorsCount: number): CSSProperties {
-  const mask: CSSProperties = {
-    WebkitMask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-    WebkitMaskComposite: "xor",
-    mask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-    maskComposite: "exclude",
-  };
-  return { ...legendFillStyle(key, colorsCount), ...mask };
-}
-
-function LegendIndicator({
-  variant,
-  dataKey,
-  colorsCount,
-}: {
-  variant: LegendVariant;
-  dataKey: string;
-  colorsCount: number;
-}) {
-  const fill = legendFillStyle(dataKey, colorsCount);
-  const outline = legendOutlineStyle(dataKey, colorsCount);
-
-  switch (variant) {
-    case "square":
-      return <div className="h-2 w-2 shrink-0" style={fill} />;
-    case "circle":
-      return <div className="h-2 w-2 shrink-0 rounded-full" style={fill} />;
-    case "circle-outline":
-      return <div className="h-2.5 w-2.5 shrink-0 rounded-full p-[1.5px]" style={outline} />;
-    case "vertical-bar":
-      return <div className="h-3 w-1 shrink-0 rounded-[2px]" style={fill} />;
-    case "horizontal-bar":
-      return <div className="h-1 w-3 shrink-0 rounded-[2px]" style={fill} />;
-    case "rounded-square-outline":
-      return <div className="h-2.5 w-2.5 shrink-0 rounded-[3px] p-[1.5px]" style={outline} />;
-    case "rounded-square":
-    default:
-      return <div className="h-2 w-2 shrink-0 rounded-[2px]" style={fill} />;
-  }
-}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Option builders — pure functions from a snapshot context to ECharts option
@@ -826,20 +568,26 @@ function createTooltipFormatter(ctx: OptionBuildContext) {
     const values = Array.isArray(param.value) ? param.value : [];
     const dimmed = selectedDataKey != null && selectedDataKey !== key ? " opacity-30" : "";
 
+    // One row per angle-axis category. Radar rows share the area chart's
+    // indicator + label + value shape, so they reuse the shared tooltipRow +
+    // tooltipIndicatorHtml. dimmed is "" per row because a radar tooltip is a
+    // single series — the dim is applied to the whole shell below instead.
     const body = categories
       .map((category, i) => {
         const raw = values[i];
         const value = typeof raw === "number" ? raw.toLocaleString() : String(raw ?? "");
-        return `<div class="flex w-full flex-wrap items-center gap-2">
-          <div class="h-2.5 w-2.5 shrink-0 rounded-[2px]" style="background:${indicatorBackground(key, colorsCount)}"></div>
-          <div class="flex flex-1 items-center justify-between gap-4 leading-none">
-            <span class="text-muted-foreground">${category}</span>
-            <span class="text-foreground font-mono font-medium tabular-nums">${value}</span>
-          </div>
-        </div>`;
+        return tooltipRow({
+          indicatorHtml: tooltipIndicatorHtml(key, colorsCount),
+          labelText: category,
+          valueText: value,
+          dimmed: "",
+        });
       })
       .join("");
 
+    // Custom shell (not the shared tooltipShell): a radar tooltip dims the WHOLE
+    // surface for a non-selected series and keeps a foreground-colored header (no
+    // text-primary) — both byte-identical to the pre-refactor markup.
     return `<div class="grid min-w-32 items-start gap-1.5 border border-border/50 px-2.5 py-1.5 text-xs shadow-xl${dimmed} ${roundnessClass[tooltipSlot.roundness]} ${tooltipVariantClass[tooltipSlot.variant]}">
       <div class="font-medium">${labelText}</div>
       <div class="grid gap-1.5">${body}</div>
@@ -852,12 +600,17 @@ function buildTooltipOption(ctx: OptionBuildContext): TooltipComponentOption {
 
   return {
     show: tooltipSlot.present && !isLoading,
+    // Radar tooltips are item-triggered (per polygon), so this chart does NOT use
+    // the shared tooltipBaseOption (which builds an axis-triggered tooltip with an
+    // axis pointer). It shares only resolveTooltipPosition to wire the position
+    // prop: "variable" → default follow behavior, "fixed" → pinned near the top.
     trigger: "item",
     confine: true,
     backgroundColor: "transparent",
     borderWidth: 0,
     padding: 0,
     extraCssText: "box-shadow:none;",
+    position: resolveTooltipPosition(tooltipSlot.position),
     formatter: createTooltipFormatter(ctx),
   };
 }
@@ -1438,13 +1191,6 @@ export function EChartsRadarChart<TData extends Record<string, unknown>>({
         : { top: "50%", transform: "translateY(-50%)" }),
   };
 
-  const legendJustify =
-    legendSlot.align === "left"
-      ? "justify-start"
-      : legendSlot.align === "center"
-        ? "justify-center"
-        : "justify-end";
-
   return (
     <div
       ref={containerRef}
@@ -1458,33 +1204,18 @@ export function EChartsRadarChart<TData extends Record<string, unknown>>({
       </div>
 
       {legendSlot.present && !isLoading && (
-        <div style={legendStyle} className={`flex items-center gap-4 select-none ${legendJustify}`}>
-          {seriesKeys.map((key) => {
-            const item = config[key];
-            const colorsCount = item ? getColorsCount(item) : 1;
-            const isSelected = selectedDataKey === null || selectedDataKey === key;
-            return (
-              // No entrance here — the Recharts legend appears instantly, and a
-              // fade-in reads as disconnected from the canvas draw-in.
-              <div
-                key={key}
-                className={`flex items-center gap-1.5 transition-opacity ${
-                  !isSelected ? "opacity-30" : ""
-                } ${legendSlot.isClickable ? "cursor-pointer" : ""}`}
-                onClick={() => {
-                  if (legendSlot.isClickable) toggleSelection(key);
-                }}
-              >
-                <LegendIndicator
-                  variant={legendSlot.variant}
-                  dataKey={key}
-                  colorsCount={colorsCount}
-                />
-                {item?.label}
-              </div>
-            );
-          })}
-        </div>
+        <LegendOverlay
+          seriesKeys={seriesKeys}
+          config={config}
+          variant={legendSlot.variant}
+          align={legendSlot.align}
+          verticalAlign={legendSlot.verticalAlign}
+          selectedKey={selectedDataKey}
+          hoveredKey={null}
+          isClickable={legendSlot.isClickable}
+          onToggle={toggleSelection}
+          style={legendStyle}
+        />
       )}
 
       {isLoading && (

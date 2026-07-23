@@ -1,6 +1,24 @@
 "use client";
 
 import {
+  resolveTooltipPosition,
+  roundnessClass,
+  tooltipIndicatorHtml,
+  tooltipRow,
+  tooltipVariantClass,
+  type TooltipPosition,
+  type TooltipRoundness,
+  type TooltipVariant,
+} from "@/registry/ui/echarts/tooltip";
+import {
+  buildChartCss,
+  getColorsCount,
+  resolveColors,
+  withAlpha,
+  type ChartConfig,
+  type ResolvedColors,
+} from "@/registry/ui/echarts/chart";
+import {
   Children,
   isValidElement,
   useCallback,
@@ -9,8 +27,6 @@ import {
   useMemo,
   useRef,
   useState,
-  type ComponentType,
-  type CSSProperties,
   type FC,
   type ReactNode,
 } from "react";
@@ -20,11 +36,16 @@ import {
   type PolarComponentOption,
   type TooltipComponentOption,
 } from "echarts/components";
+import { LegendIndicator, type LegendVariant } from "@/registry/ui/echarts/legend";
 import { BarChart, type BarSeriesOption } from "echarts/charts";
 import { motion, useReducedMotion } from "motion/react";
 import { CanvasRenderer } from "echarts/renderers";
 import type { ComposeOption } from "echarts/core";
 import * as echarts from "echarts/core";
+
+// Re-export the shared types that were previously declared inline here, so
+// existing consumers/examples keep importing them from the chart module.
+export type { ChartConfig, LegendVariant, TooltipPosition, TooltipRoundness, TooltipVariant };
 
 // Modular registration keeps the bundle lean — only the pieces this chart needs.
 // `PolarComponent` bundles the polar coordinate system together with its
@@ -104,11 +125,6 @@ const LOADING_SHIMMER_MAX_OPACITY = 0.4; // shimmer arc peak, × foreground alph
 const LOADING_SHIMMER_BAND = 0.2; // window half-width, fraction of the sweep axis
 const LOADING_SHIMMER_FEATHER = 0.2; // eased edge softening of the clip window
 
-// Theme selectors mirror the repo's <ChartStyle>: light is the bare root, dark is `.dark`.
-const THEMES = { light: "", dark: ".dark" } as const;
-type ThemeKey = keyof typeof THEMES;
-const THEME_KEYS = Object.keys(THEMES) as ThemeKey[];
-
 // Stable series ids. `__`-prefixed ids are internal (background track, skeleton)
 // and stay silent; the main ring series is the only one that reports clicks and
 // feeds the tooltip.
@@ -125,30 +141,9 @@ const FALLBACK_COLOR = "rgba(120, 120, 120, 1)";
 // ─────────────────────────────────────────────────────────────────────────────
 
 export type RadialVariant = "full" | "semi";
-export type TooltipVariant = "default" | "frosted-glass";
-export type TooltipRoundness = "sm" | "md" | "lg" | "xl";
-export type LegendVariant =
-  | "square"
-  | "circle"
-  | "circle-outline"
-  | "rounded-square"
-  | "rounded-square-outline"
-  | "vertical-bar"
-  | "horizontal-bar";
-
-// Require at least one theme key — identical constraint to the repo's ChartConfig.
-type AtLeastOneThemeColor =
-  | { light: string[]; dark?: string[] }
-  | { light?: string[]; dark: string[] };
-
-export type ChartConfig = Record<
-  string,
-  {
-    label?: ReactNode;
-    icon?: ComponentType;
-    colors?: AtLeastOneThemeColor;
-  }
->;
+// TooltipVariant, TooltipRoundness, TooltipPosition, LegendVariant, and
+// ChartConfig now live in the shared @/registry/ui/echarts/* modules and are
+// imported + re-exported at the top of this file.
 
 export interface EChartsRadialChartProps<TData extends Record<string, unknown>> {
   data: TData[]; // rows rendered by the chart — one bar (ring) per row
@@ -193,6 +188,7 @@ export interface TooltipProps {
   variant?: TooltipVariant; // visual style of the tooltip surface
   roundness?: TooltipRoundness; // border-radius of the tooltip
   defaultIndex?: number; // data index shown by default with no hover
+  position?: TooltipPosition; // "variable" follows the pointer (default); "fixed" pins the tooltip near the top and tracks the pointer's X
 }
 
 /** Presence enables the hover tooltip. Renders nothing. */
@@ -227,6 +223,7 @@ type TooltipSlot = {
   variant: TooltipVariant;
   roundness: TooltipRoundness;
   defaultIndex?: number;
+  position: TooltipPosition;
 };
 type LegendSlot = {
   present: boolean;
@@ -258,6 +255,7 @@ function collectConfig(children: ReactNode): CollectedConfig {
     present: false,
     variant: "default",
     roundness: "lg",
+    position: "variable",
   };
   let legend: LegendSlot = {
     present: false,
@@ -289,6 +287,7 @@ function collectConfig(children: ReactNode): CollectedConfig {
         variant: props.variant ?? "default",
         roundness: props.roundness ?? "lg",
         defaultIndex: props.defaultIndex,
+        position: props.position ?? "variable",
       };
     } else if (type === Legend) {
       const props = child.props as LegendProps;
@@ -306,141 +305,11 @@ function collectConfig(children: ReactNode): CollectedConfig {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Color plumbing — replicated from the repo's <ChartStyle> so this file stays
-// self-contained (no @/registry/ui imports).
+// Color plumbing (ChartConfig, getColorsCount, distributeColors, buildChartCss,
+// normalizeColor, withAlpha, ResolvedColors, resolveColors, indicatorBackground)
+// now lives in @/registry/ui/echarts/chart and is imported at the top of this
+// file. Only barPaint below is chart-specific — see its note.
 // ─────────────────────────────────────────────────────────────────────────────
-
-// Max slots a key needs = longest color array across themes (min 1). Both themes
-// always emit the same number of `--color-{key}-{n}` vars.
-function getColorsCount(item: ChartConfig[string]): number {
-  if (!item.colors) return 1;
-  const counts = THEME_KEYS.map((theme) => item.colors?.[theme]?.length ?? 0);
-  return Math.max(...counts, 1);
-}
-
-// Distribute colors evenly across slots; extra slots go to the LAST color(s).
-// 2 colors / 4 slots → [c0, c0, c1, c1]; 3 colors / 4 slots → [c0, c1, c2, c2].
-function distributeColors(colors: string[], maxCount: number): string[] {
-  const available = colors.length;
-  if (available >= maxCount) return colors.slice(0, maxCount);
-
-  const result: string[] = [];
-  const baseSlots = Math.floor(maxCount / available);
-  const extraSlots = maxCount % available;
-
-  for (let i = 0; i < available; i++) {
-    const isExtra = i >= available - extraSlots;
-    const slots = baseSlots + (isExtra ? 1 : 0);
-    for (let j = 0; j < slots; j++) result.push(colors[i]);
-  }
-
-  return result;
-}
-
-// Emits the same CSS <ChartStyle> would: `--color-{key}-{n}` scoped to
-// `[data-chart={id}]` (light) and `.dark [data-chart={id}]` (dark).
-function buildChartCss(id: string, config: ChartConfig): string {
-  const colorConfig = Object.entries(config).filter(([, item]) => item.colors);
-  if (!colorConfig.length) return "";
-
-  const varsFor = (theme: ThemeKey) =>
-    colorConfig
-      .flatMap(([key, item]) => {
-        const authored = item.colors?.[theme];
-        if (!authored || authored.length === 0) return [];
-        return distributeColors(authored, getColorsCount(item)).map(
-          (color, index) => `  --color-${key}-${index}: ${color};`,
-        );
-      })
-      .join("\n");
-
-  return Object.entries(THEMES)
-    .map(([theme, prefix]) => `${prefix} [data-chart=${id}] {\n${varsFor(theme as ThemeKey)}\n}`)
-    .join("\n");
-}
-
-// A single reusable 1×1 canvas normalizes ANY CSS color (hex, named, oklch, …)
-// to a concrete rgba string by painting it and reading the pixel back.
-let normalizerCtx: CanvasRenderingContext2D | null = null;
-function normalizeColor(value: string): string {
-  const raw = value.trim();
-  if (!raw || typeof document === "undefined") return raw;
-
-  if (!normalizerCtx) {
-    const canvas = document.createElement("canvas");
-    canvas.width = 1;
-    canvas.height = 1;
-    normalizerCtx = canvas.getContext("2d", { willReadFrequently: true });
-  }
-  if (!normalizerCtx) return raw;
-
-  normalizerCtx.clearRect(0, 0, 1, 1);
-  normalizerCtx.fillStyle = "#000";
-  normalizerCtx.fillStyle = raw; // invalid values leave the sentinel in place
-  normalizerCtx.fillRect(0, 0, 1, 1);
-  const [r, g, b, a] = normalizerCtx.getImageData(0, 0, 1, 1).data;
-  return `rgba(${r}, ${g}, ${b}, ${(a / 255).toFixed(3)})`;
-}
-
-// Scales the alpha of a normalized `rgba(r, g, b, a)` string. Multiplying (not
-// replacing) keeps translucent theme tokens honest: a border that is 10%-white
-// at `withAlpha(border, 0.5)` lands at 5%, matching Tailwind's `border/50`.
-function withAlpha(color: string, alpha: number): string {
-  const match = color.match(/rgba?\(([^)]+)\)/);
-  if (!match) return color;
-  const [r, g, b, a] = match[1].split(",").map((p) => p.trim());
-  const base = a === undefined ? 1 : Number.parseFloat(a) || 0;
-  return `rgba(${r}, ${g}, ${b}, ${(base * alpha).toFixed(3)})`;
-}
-
-type ResolvedColors = {
-  series: Record<string, string[]>; // normalized `--color-{key}-{n}` slots per key
-  tokens: {
-    mutedForeground: string;
-    border: string;
-    foreground: string;
-    background: string;
-  };
-};
-
-// Reads the injected CSS vars + theme tokens from the live DOM. Series slots come
-// from `getComputedStyle` on the container; tokens are read off a throwaway probe
-// carrying the matching Tailwind class (robust to the var naming a theme uses).
-function resolveColors(
-  container: HTMLElement,
-  config: ChartConfig,
-  seriesKeys: string[],
-): ResolvedColors {
-  const computed = getComputedStyle(container);
-  const series: Record<string, string[]> = {};
-
-  for (const key of seriesKeys) {
-    const count = getColorsCount(config[key] ?? {});
-    const slots: string[] = [];
-    for (let n = 0; n < count; n++) {
-      const raw = computed.getPropertyValue(`--color-${key}-${n}`).trim();
-      slots.push(raw ? normalizeColor(raw) : FALLBACK_COLOR);
-    }
-    series[key] = slots;
-  }
-
-  const probe = document.createElement("span");
-  probe.style.cssText = "position:absolute;width:0;height:0;visibility:hidden;pointer-events:none;";
-  container.appendChild(probe);
-  const readToken = (className: string) => {
-    probe.className = className;
-    return normalizeColor(getComputedStyle(probe).color);
-  };
-  const tokens = {
-    mutedForeground: readToken("text-muted-foreground"),
-    border: readToken("text-border"),
-    foreground: readToken("text-foreground"),
-    background: readToken("text-background"),
-  };
-  container.removeChild(probe);
-
-  return { series, tokens };
-}
 
 // Diagonal multi-stop color for a bar — a solid string when there is only one
 // color, else a top-left→bottom-right LinearGradient across the bar's bounding
@@ -538,80 +407,12 @@ function shimmerWindowStops(center: number, color: string, peak: number) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Tooltip / legend HTML — the tooltip DOM lives inside `[data-chart={id}]`, so
-// the injected `--color-*` vars and Tailwind classes resolve directly (no color
-// read needed here).
+// Tooltip / legend HTML primitives (roundnessClass, tooltipVariantClass,
+// indicatorBackground, legendFillStyle, legendOutlineStyle, LegendIndicator) now
+// live in the shared @/registry/ui/echarts/{tooltip,legend} modules and are
+// imported at the top of this file. The tooltip shell + item row below compose
+// those shared primitives; the legend overlay uses the shared LegendIndicator.
 // ─────────────────────────────────────────────────────────────────────────────
-
-const roundnessClass: Record<TooltipRoundness, string> = {
-  sm: "rounded-sm",
-  md: "rounded-md",
-  lg: "rounded-lg",
-  xl: "rounded-xl",
-};
-
-const tooltipVariantClass: Record<TooltipVariant, string> = {
-  default: "bg-background",
-  "frosted-glass": "bg-background/70 backdrop-blur-sm",
-};
-
-// Solid var / gradient of vars for a bar indicator — mirrors getIndicatorColorStyle.
-function indicatorBackground(key: string, colorsCount: number): string {
-  if (colorsCount <= 1) return `var(--color-${key}-0)`;
-  const stops = Array.from({ length: colorsCount }, (_, i) => {
-    const offset = (i / (colorsCount - 1)) * 100;
-    return `var(--color-${key}-${i}) ${offset}%`;
-  }).join(", ");
-  return `linear-gradient(to right, ${stops})`;
-}
-
-function legendFillStyle(key: string, colorsCount: number): CSSProperties {
-  if (colorsCount <= 1) return { backgroundColor: `var(--color-${key}-0)` };
-  return { background: indicatorBackground(key, colorsCount) };
-}
-
-// Punches out the centre with a mask-composite so only the "border" shows —
-// works with gradients and border-radius, unlike plain border-color.
-function legendOutlineStyle(key: string, colorsCount: number): CSSProperties {
-  const mask: CSSProperties = {
-    WebkitMask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-    WebkitMaskComposite: "xor",
-    mask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-    maskComposite: "exclude",
-  };
-  return { ...legendFillStyle(key, colorsCount), ...mask };
-}
-
-function LegendIndicator({
-  variant,
-  dataKey,
-  colorsCount,
-}: {
-  variant: LegendVariant;
-  dataKey: string;
-  colorsCount: number;
-}) {
-  const fill = legendFillStyle(dataKey, colorsCount);
-  const outline = legendOutlineStyle(dataKey, colorsCount);
-
-  switch (variant) {
-    case "square":
-      return <div className="h-2 w-2 shrink-0" style={fill} />;
-    case "circle":
-      return <div className="h-2 w-2 shrink-0 rounded-full" style={fill} />;
-    case "circle-outline":
-      return <div className="h-2.5 w-2.5 shrink-0 rounded-full p-[1.5px]" style={outline} />;
-    case "vertical-bar":
-      return <div className="h-3 w-1 shrink-0 rounded-[2px]" style={fill} />;
-    case "horizontal-bar":
-      return <div className="h-1 w-3 shrink-0 rounded-[2px]" style={fill} />;
-    case "rounded-square-outline":
-      return <div className="h-2.5 w-2.5 shrink-0 rounded-[3px] p-[1.5px]" style={outline} />;
-    case "rounded-square":
-    default:
-      return <div className="h-2 w-2 shrink-0 rounded-[2px]" style={fill} />;
-  }
-}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Background patterns — a self-contained port of <ChartBackground>. The Recharts
@@ -1022,13 +823,16 @@ function buildTooltipOption(ctx: OptionBuildContext): TooltipComponentOption {
     const labelText = typeof item?.label === "string" ? item.label : key;
     const value = typeof p.value === "number" ? p.value.toLocaleString() : String(p.value ?? "");
 
-    const row = `<div class="flex w-full flex-wrap items-center gap-2">
-      <div class="h-2.5 w-2.5 shrink-0 rounded-[2px]" style="background:${indicatorBackground(key, colorsCount)}"></div>
-      <div class="flex flex-1 items-center justify-between gap-4 leading-none">
-        <span class="text-muted-foreground">${labelText}</span>
-        <span class="text-foreground font-mono font-medium tabular-nums">${value}</span>
-      </div>
-    </div>`;
+    // Item-trigger tooltip: one ring per hover, with no separate header row
+    // (hideLabel parity), so the shared tooltipShell — which always renders a
+    // label div — is intentionally NOT used. The row shape matches the shared
+    // indicator + label + value, so tooltipRow/tooltipIndicatorHtml build it.
+    const row = tooltipRow({
+      indicatorHtml: tooltipIndicatorHtml(key, colorsCount),
+      labelText,
+      valueText: value,
+      dimmed: "",
+    });
 
     return `<div class="grid min-w-32 items-start gap-1.5 border border-border/50 px-2.5 py-1.5 text-xs shadow-xl ${roundnessClass[tooltipSlot.roundness]} ${tooltipVariantClass[tooltipSlot.variant]}">
       <div class="grid gap-1.5">${row}</div>
@@ -1043,6 +847,9 @@ function buildTooltipOption(ctx: OptionBuildContext): TooltipComponentOption {
     borderWidth: 0,
     padding: 0,
     extraCssText: "box-shadow:none;",
+    // "variable" → undefined (ECharts default item anchoring, current behavior);
+    // "fixed" → pin near the top, tracking the pointer's X only.
+    position: resolveTooltipPosition(tooltipSlot.position),
     formatter,
   };
 }

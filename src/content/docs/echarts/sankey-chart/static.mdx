@@ -334,6 +334,9 @@ The hover tooltip. Its presence enables it; omit it and none shows. Hovering a n
   <ApiRow name="roundness" type='"sm" | "md" | "lg" | "xl"' default='"lg"'>
     Controls the border-radius of the tooltip.
   </ApiRow>
+  <ApiRow name="position" type='"fixed" | "variable"' default='"variable"'>
+    Controls how the tooltip is anchored. `"variable"` follows the pointer (ECharts' default); `"fixed"` pins the tooltip near the top and only tracks the pointer's X.
+  </ApiRow>
   <ApiRow name="defaultIndex" type="number">
     Accepted for parity with the Recharts twin. ECharts does not surface a default-visible tooltip for sankey, so this prop has no effect.
   </ApiRow>

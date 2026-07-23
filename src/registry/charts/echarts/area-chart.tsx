@@ -9,11 +9,19 @@ import {
   useMemo,
   useRef,
   useState,
-  type ComponentType,
   type CSSProperties,
   type FC,
   type ReactNode,
 } from "react";
+import {
+  tooltipBaseOption,
+  tooltipIndicatorHtml,
+  tooltipRow,
+  tooltipShell,
+  type TooltipPosition,
+  type TooltipRoundness,
+  type TooltipVariant,
+} from "@/registry/ui/echarts/tooltip";
 import {
   DataZoomComponent,
   GridComponent,
@@ -22,11 +30,41 @@ import {
   type GridComponentOption,
   type TooltipComponentOption,
 } from "echarts/components";
+import {
+  buildChartCss,
+  flattenColor,
+  getColorsCount,
+  resolveColors,
+  seriesPaint,
+  withAlpha,
+  type ChartConfig,
+  type ResolvedColors,
+} from "@/registry/ui/echarts/chart";
+import {
+  buildBrushDataZoom,
+  syncBrushOverlay,
+  type BrushGeometry,
+  type BrushOverlayElements,
+  type BrushRange,
+} from "@/registry/ui/echarts/evil-brush";
+import { dotItemStyle, dotStyle, sampleGradient, type DotVariant } from "@/registry/ui/echarts/dot";
+import { LegendOverlay, type LegendVariant } from "@/registry/ui/echarts/legend";
 import type { ComposeOption, ImagePatternObject } from "echarts/core";
 import { LineChart, type LineSeriesOption } from "echarts/charts";
 import { motion, useReducedMotion } from "motion/react";
 import { CanvasRenderer } from "echarts/renderers";
 import * as echarts from "echarts/core";
+
+// Re-export the shared types that were previously declared inline here, so
+// existing consumers/examples keep importing them from the chart module.
+export type {
+  ChartConfig,
+  DotVariant,
+  LegendVariant,
+  TooltipPosition,
+  TooltipRoundness,
+  TooltipVariant,
+};
 
 // Modular registration keeps the bundle lean — only the pieces this chart needs.
 // `DataZoomComponent` bundles both the slider (brush footer) and inside (wheel/drag)
@@ -49,16 +87,6 @@ type EChartsOption = ComposeOption<
 type ArrayItem<T> = T extends readonly (infer U)[] ? U : T;
 type XAxisOption = ArrayItem<NonNullable<EChartsOption["xAxis"]>>;
 type YAxisOption = ArrayItem<NonNullable<EChartsOption["yAxis"]>>;
-
-// Dot marker paint — structurally assignable to BOTH the series-level and the
-// per-datum itemStyle (the per-datum variant forbids callback color paints, so
-// the broader LineSeriesOption["itemStyle"] cannot be reused for it).
-type DotItemStyleOption = {
-  color?: string | echarts.graphic.LinearGradient;
-  borderColor?: string | echarts.graphic.LinearGradient;
-  borderWidth?: number;
-  opacity?: number;
-};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
@@ -93,13 +121,7 @@ const LOADING_SHIMMER_BAND = 0.2; // window half-width, fraction of chart width
 const LOADING_SHIMMER_FEATHER = 0.2; // eased edge softening of the clip window
 const BRUSH_STROKE_OPACITY = 0.5; // mini-chart series stroke
 const BRUSH_FILL_OPACITY = 0.15; // mini-chart series fade, at the top stop
-const BRUSH_BORDER_OPACITY = 1; // brush frame, × border alpha (evil-brush uses the full token)
 const BRUSH_FILLER_OPACITY = 0; // selected-range wash — evil-brush draws none
-
-// Theme selectors mirror the repo's <ChartStyle>: light is the bare root, dark is `.dark`.
-const THEMES = { light: "", dark: ".dark" } as const;
-type ThemeKey = keyof typeof THEMES;
-const THEME_KEYS = Object.keys(THEMES) as ThemeKey[];
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Public types
@@ -129,31 +151,9 @@ export type CurveType =
   | "monotoneY"
   | "natural"
   | "step";
-export type DotVariant = "none" | "default" | "border" | "colored-border";
-export type TooltipVariant = "default" | "frosted-glass";
-export type TooltipRoundness = "sm" | "md" | "lg" | "xl";
-export type LegendVariant =
-  | "square"
-  | "circle"
-  | "circle-outline"
-  | "rounded-square"
-  | "rounded-square-outline"
-  | "vertical-bar"
-  | "horizontal-bar";
-
-// Require at least one theme key — identical constraint to the repo's ChartConfig.
-type AtLeastOneThemeColor =
-  | { light: string[]; dark?: string[] }
-  | { light?: string[]; dark: string[] };
-
-export type ChartConfig = Record<
-  string,
-  {
-    label?: ReactNode;
-    icon?: ComponentType;
-    colors?: AtLeastOneThemeColor;
-  }
->;
+// DotVariant, TooltipVariant, TooltipRoundness, LegendVariant, and ChartConfig
+// now live in the shared @/registry/ui/echarts/* modules and are imported +
+// re-exported at the top of this file.
 
 export interface EChartsAreaChartProps<TData extends Record<string, unknown>> {
   data: TData[]; // rows rendered by the chart
@@ -240,6 +240,7 @@ export interface TooltipProps {
   variant?: TooltipVariant; // visual style of the tooltip surface
   roundness?: TooltipRoundness; // border-radius of the tooltip
   cursor?: boolean; // whether the vertical cursor line follows the pointer
+  position?: TooltipPosition; // "variable" follows both axes (default); "fixed" pins the tooltip near the top and tracks the pointer's X
 }
 
 /** Presence enables the hover tooltip. Renders nothing. */
@@ -290,6 +291,7 @@ type TooltipSlot = {
   variant: TooltipVariant;
   roundness: TooltipRoundness;
   cursor: boolean;
+  position: TooltipPosition;
 };
 type LegendSlot = {
   present: boolean;
@@ -318,6 +320,7 @@ function collectConfig(children: ReactNode): CollectedConfig {
     variant: "default",
     roundness: "lg",
     cursor: true,
+    position: "variable",
   };
   let legend: LegendSlot = {
     present: false,
@@ -379,6 +382,7 @@ function collectConfig(children: ReactNode): CollectedConfig {
         variant: props.variant ?? "default",
         roundness: props.roundness ?? "lg",
         cursor: props.cursor ?? true,
+        position: props.position ?? "variable",
       };
     } else if (type === Legend) {
       const props = child.props as LegendProps;
@@ -395,151 +399,9 @@ function collectConfig(children: ReactNode): CollectedConfig {
   return { areas, xAxis, yAxis, showGrid, tooltip, legend };
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Color plumbing — replicated from the repo's <ChartStyle> so this file stays
-// self-contained (no @/registry/ui imports).
-// ─────────────────────────────────────────────────────────────────────────────
-
-// Max slots a key needs = longest color array across themes (min 1). Both themes
-// always emit the same number of `--color-{key}-{n}` vars.
-function getColorsCount(item: ChartConfig[string]): number {
-  if (!item.colors) return 1;
-  const counts = THEME_KEYS.map((theme) => item.colors?.[theme]?.length ?? 0);
-  return Math.max(...counts, 1);
-}
-
-// Distribute colors evenly across slots; extra slots go to the LAST color(s).
-// 2 colors / 4 slots → [c0, c0, c1, c1]; 3 colors / 4 slots → [c0, c1, c2, c2].
-function distributeColors(colors: string[], maxCount: number): string[] {
-  const available = colors.length;
-  if (available >= maxCount) return colors.slice(0, maxCount);
-
-  const result: string[] = [];
-  const baseSlots = Math.floor(maxCount / available);
-  const extraSlots = maxCount % available;
-
-  for (let i = 0; i < available; i++) {
-    const isExtra = i >= available - extraSlots;
-    const slots = baseSlots + (isExtra ? 1 : 0);
-    for (let j = 0; j < slots; j++) result.push(colors[i]);
-  }
-
-  return result;
-}
-
-// Emits the same CSS <ChartStyle> would: `--color-{key}-{n}` scoped to
-// `[data-chart={id}]` (light) and `.dark [data-chart={id}]` (dark).
-function buildChartCss(id: string, config: ChartConfig): string {
-  const colorConfig = Object.entries(config).filter(([, item]) => item.colors);
-  if (!colorConfig.length) return "";
-
-  const varsFor = (theme: ThemeKey) =>
-    colorConfig
-      .flatMap(([key, item]) => {
-        const authored = item.colors?.[theme];
-        if (!authored || authored.length === 0) return [];
-        return distributeColors(authored, getColorsCount(item)).map(
-          (color, index) => `  --color-${key}-${index}: ${color};`,
-        );
-      })
-      .join("\n");
-
-  return Object.entries(THEMES)
-    .map(([theme, prefix]) => `${prefix} [data-chart=${id}] {\n${varsFor(theme as ThemeKey)}\n}`)
-    .join("\n");
-}
-
-// A single reusable 1×1 canvas normalizes ANY CSS color (hex, named, oklch, …)
-// to a concrete rgba string by painting it and reading the pixel back.
-let normalizerCtx: CanvasRenderingContext2D | null = null;
-function normalizeColor(value: string): string {
-  const raw = value.trim();
-  if (!raw || typeof document === "undefined") return raw;
-
-  if (!normalizerCtx) {
-    const canvas = document.createElement("canvas");
-    canvas.width = 1;
-    canvas.height = 1;
-    normalizerCtx = canvas.getContext("2d", { willReadFrequently: true });
-  }
-  if (!normalizerCtx) return raw;
-
-  normalizerCtx.clearRect(0, 0, 1, 1);
-  normalizerCtx.fillStyle = "#000";
-  normalizerCtx.fillStyle = raw; // invalid values leave the sentinel in place
-  normalizerCtx.fillRect(0, 0, 1, 1);
-  const [r, g, b, a] = normalizerCtx.getImageData(0, 0, 1, 1).data;
-  return `rgba(${r}, ${g}, ${b}, ${(a / 255).toFixed(3)})`;
-}
-
-// Scales the alpha of a normalized `rgba(r, g, b, a)` string. Multiplying (not
-// replacing) keeps translucent theme tokens honest: a border that is 10%-white
-// at `withAlpha(border, 0.5)` lands at 5%, matching Tailwind's `border/50`.
-function withAlpha(color: string, alpha: number): string {
-  const match = color.match(/rgba?\(([^)]+)\)/);
-  if (!match) return color;
-  const [r, g, b, a] = match[1].split(",").map((p) => p.trim());
-  const base = a === undefined ? 1 : Number.parseFloat(a) || 0;
-  return `rgba(${r}, ${g}, ${b}, ${(base * alpha).toFixed(3)})`;
-}
-
-type ResolvedColors = {
-  series: Record<string, string[]>; // normalized `--color-{key}-{n}` slots per key
-  tokens: {
-    mutedForeground: string;
-    border: string;
-    foreground: string;
-    background: string;
-  };
-};
-
-// Reads the injected CSS vars + theme tokens from the live DOM. Series slots come
-// from `getComputedStyle` on the container; tokens are read off a throwaway probe
-// carrying the matching Tailwind class (robust to the var naming a theme uses).
-function resolveColors(
-  container: HTMLElement,
-  config: ChartConfig,
-  seriesKeys: string[],
-): ResolvedColors {
-  const computed = getComputedStyle(container);
-  const series: Record<string, string[]> = {};
-
-  for (const key of seriesKeys) {
-    const count = getColorsCount(config[key] ?? {});
-    const slots: string[] = [];
-    for (let n = 0; n < count; n++) {
-      const raw = computed.getPropertyValue(`--color-${key}-${n}`).trim();
-      slots.push(raw ? normalizeColor(raw) : "rgba(120, 120, 120, 1)");
-    }
-    series[key] = slots;
-  }
-
-  const probe = document.createElement("span");
-  probe.style.cssText = "position:absolute;width:0;height:0;visibility:hidden;pointer-events:none;";
-  container.appendChild(probe);
-  const readToken = (className: string) => {
-    probe.className = className;
-    return normalizeColor(getComputedStyle(probe).color);
-  };
-  const tokens = {
-    mutedForeground: readToken("text-muted-foreground"),
-    border: readToken("text-border"),
-    foreground: readToken("text-foreground"),
-    background: readToken("text-background"),
-  };
-  container.removeChild(probe);
-
-  return { series, tokens };
-}
-
-// Horizontal multi-stop color for a series — a solid string when there is only
-// one color, else an evenly-distributed left→right LinearGradient. Reused for the
-// stroke, symbol fills, and as the base tint for the area fill.
-function seriesPaint(slots: string[]): string | echarts.graphic.LinearGradient {
-  if (slots.length <= 1) return slots[0] ?? "rgba(120, 120, 120, 1)";
-  const stops = slots.map((color, i) => ({ offset: i / (slots.length - 1), color }));
-  return new echarts.graphic.LinearGradient(0, 0, 1, 0, stops);
-}
+// Color plumbing (ChartConfig, getColorsCount, distributeColors, buildChartCss,
+// normalizeColor, withAlpha, ResolvedColors, resolveColors, seriesPaint) now
+// lives in @/registry/ui/echarts/chart and is imported at the top of this file.
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Fill paints — the ECharts analogue of the Recharts fill variants (§1.1).
@@ -695,226 +557,6 @@ function fillPaint(
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Dots — map the resting/active variants onto ECharts symbols (§1.5).
-// ─────────────────────────────────────────────────────────────────────────────
-
-type DotStyle = { size: number; itemStyle: DotItemStyleOption };
-
-function dotItemStyle(
-  variant: DotVariant,
-  paint: string | echarts.graphic.LinearGradient,
-  background: string,
-): DotItemStyleOption {
-  switch (variant) {
-    case "border":
-      // Series-colored core with a thick background halo (Recharts r6 / sw5).
-      return { color: paint, borderColor: background, borderWidth: 2 };
-    case "colored-border":
-      // Background-filled core with a thin colored ring (Recharts r3 / sw1).
-      return { color: background, borderColor: paint, borderWidth: 1 };
-    case "default":
-      return { color: paint, borderWidth: 0 };
-    default:
-      return {};
-  }
-}
-
-// Sizes mirror the Recharts markers: default r3, border r6 (mostly halo), and
-// colored-border r3+ring. Flattening these to one size makes the hover ring read
-// LARGER than a haloed resting dot — the opposite of the Recharts twin.
-const DOT_SIZES: Record<DotVariant, number> = {
-  none: 0,
-  default: 6,
-  border: 8,
-  "colored-border": 6,
-};
-
-function dotStyle(
-  variant: DotVariant,
-  paint: string | echarts.graphic.LinearGradient,
-  background: string,
-): DotStyle {
-  return { size: DOT_SIZES[variant], itemStyle: dotItemStyle(variant, paint, background) };
-}
-
-// The color the horizontal series gradient shows at position t ∈ [0, 1]. ECharts
-// paints a gradient itemStyle relative to each symbol's own bounding box — a full
-// rainbow inside every dot — while the Recharts dots clip a chart-wide gradient,
-// so each takes the gradient's color at its x-position. Sampling reproduces that.
-function sampleGradient(slots: string[], t: number): string {
-  if (slots.length <= 1) return slots[0] ?? "rgba(120, 120, 120, 1)";
-
-  const parse = (color: string) =>
-    color
-      .match(/rgba?\(([^)]+)\)/)?.[1]
-      .split(",")
-      .map(Number) ?? [120, 120, 120, 1];
-
-  const position = t * (slots.length - 1);
-  const index = Math.min(Math.floor(position), slots.length - 2);
-  const fraction = position - index;
-  const [r1, g1, b1, a1 = 1] = parse(slots[index]);
-  const [r2, g2, b2, a2 = 1] = parse(slots[index + 1]);
-  const lerp = (from: number, to: number) => from + (to - from) * fraction;
-
-  return `rgba(${Math.round(lerp(r1, r2))}, ${Math.round(lerp(g1, g2))}, ${Math.round(lerp(b1, b2))}, ${lerp(a1, a2).toFixed(3)})`;
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Brush overlays — the evil-brush look: a rounded border around the SELECTED
-// range, dimmed unselected sides, centered grip-dot handle pills, and range
-// label pills below the frame. None of that is a dataZoom capability. They are
-// raw zrender elements updated imperatively — routing them through setOption
-// re-renders the dataZoom component mid-drag, resetting its drag anchor (the
-// handle progressively lags the pointer).
-// ─────────────────────────────────────────────────────────────────────────────
-
-type BrushRange = { start: number; end: number };
-type BrushGeometry = { bottom: number; height: number };
-
-type BrushOverlayParams = {
-  range: BrushRange;
-  geom: BrushGeometry;
-  size: { width: number; height: number };
-  tokens: ResolvedColors["tokens"];
-  labels: { start: string; end: string } | null;
-  showLabels: boolean;
-  hover: { left: boolean; right: boolean };
-};
-
-type ZrRect = InstanceType<typeof echarts.graphic.Rect>;
-type ZrCircle = InstanceType<typeof echarts.graphic.Circle>;
-type ZrText = InstanceType<typeof echarts.graphic.Text>;
-
-type BrushOverlayElements = {
-  dimLeft: ZrRect;
-  dimRight: ZrRect;
-  frame: ZrRect;
-  pillLeft: ZrRect;
-  pillRight: ZrRect;
-  grips: ZrCircle[]; // 3 left + 3 right
-  labelStart: ZrText;
-  labelEnd: ZrText;
-};
-
-function syncBrushOverlay(
-  chart: EChartsInstance,
-  store: { brushOverlay: BrushOverlayElements | null },
-  params: BrushOverlayParams | null,
-) {
-  const zr = chart.getZr();
-  if (!zr) return;
-
-  if (!params) {
-    if (store.brushOverlay) {
-      const { grips, ...rest } = store.brushOverlay;
-      [...Object.values(rest), ...grips].forEach((el) => zr.remove(el));
-      store.brushOverlay = null;
-    }
-    return;
-  }
-
-  if (!store.brushOverlay) {
-    const rect = (z: number) => new echarts.graphic.Rect({ silent: true, z, shape: {} });
-    const els: BrushOverlayElements = {
-      dimLeft: rect(100),
-      dimRight: rect(100),
-      frame: rect(101),
-      pillLeft: rect(102),
-      pillRight: rect(102),
-      grips: Array.from(
-        { length: 6 },
-        () => new echarts.graphic.Circle({ silent: true, z: 103, shape: {} }),
-      ),
-      labelStart: new echarts.graphic.Text({ silent: true, z: 104 }),
-      labelEnd: new echarts.graphic.Text({ silent: true, z: 104 }),
-    };
-    const { grips, ...rest } = els;
-    [...Object.values(rest), ...grips].forEach((el) => zr.add(el));
-    store.brushOverlay = els;
-  }
-
-  const els = store.brushOverlay;
-  const { range, geom, size, tokens, labels, showLabels, hover } = params;
-
-  const trackLeft = 8;
-  const trackRight = Math.max(size.width - 8, trackLeft);
-  const trackWidth = trackRight - trackLeft;
-  const top = size.height - geom.bottom - geom.height;
-  const centerY = top + geom.height / 2;
-  const selectionLeft = trackLeft + (trackWidth * range.start) / 100;
-  const selectionRight = trackLeft + (trackWidth * range.end) / 100;
-
-  const dimFill = withAlpha(tokens.background, 0.7);
-  els.dimLeft.setShape({
-    x: trackLeft,
-    y: top,
-    width: Math.max(selectionLeft - trackLeft, 0),
-    height: geom.height,
-  });
-  els.dimLeft.setStyle({ fill: dimFill });
-  els.dimRight.setShape({
-    x: selectionRight,
-    y: top,
-    width: Math.max(trackRight - selectionRight, 0),
-    height: geom.height,
-  });
-  els.dimRight.setStyle({ fill: dimFill });
-
-  els.frame.setShape({
-    x: selectionLeft,
-    y: top,
-    width: Math.max(selectionRight - selectionLeft, 0),
-    height: geom.height,
-    r: 6,
-  });
-  els.frame.setStyle({
-    fill: "none",
-    stroke: withAlpha(tokens.border, BRUSH_BORDER_OPACITY),
-    lineWidth: 1,
-  });
-
-  // Handle pills: evil-brush's 6×16 grip pill, centered on the selection edge,
-  // brightening to foreground on hover/drag.
-  const pill = (el: ZrRect, x: number, hovered: boolean) => {
-    el.setShape({ x: x - 3, y: centerY - 8, width: 6, height: 16, r: 3 });
-    el.setStyle({ fill: hovered ? tokens.foreground : tokens.mutedForeground });
-  };
-  pill(els.pillLeft, selectionLeft, hover.left);
-  pill(els.pillRight, selectionRight, hover.right);
-
-  const gripFill = withAlpha(tokens.background, 0.7);
-  [-4, 0, 4].forEach((offset, i) => {
-    els.grips[i].setShape({ cx: selectionLeft, cy: centerY + offset, r: 1 });
-    els.grips[i].setStyle({ fill: gripFill });
-    els.grips[i + 3].setShape({ cx: selectionRight, cy: centerY + offset, r: 1 });
-    els.grips[i + 3].setStyle({ fill: gripFill });
-  });
-
-  // Range label pills straddle the frame's bottom line — an overlay, so they
-  // occupy no layout space; half the pill sits above the line, half below. Each
-  // pill grows INWARD from its handle with a small inset, like the Recharts
-  // labels, instead of hanging past the frame edge.
-  const label = (el: ZrText, text: string, x: number, align: "left" | "right") => {
-    el.setStyle({
-      text,
-      x: align === "left" ? Math.max(x + 6, trackLeft + 2) : Math.min(x - 6, trackRight - 2),
-      y: top + geom.height,
-      align,
-      verticalAlign: "middle",
-      fill: tokens.background,
-      backgroundColor: tokens.foreground,
-      padding: [2, 5],
-      borderRadius: 4,
-      font: "500 9px system-ui, sans-serif",
-    });
-    el.attr("invisible", !showLabels || !text);
-  };
-  label(els.labelStart, labels?.start ?? "", selectionLeft, "left");
-  label(els.labelEnd, labels?.end ?? "", selectionRight, "right");
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
 // Curve mapping — linear → straight, step → step:"end", everything else → smooth.
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -988,85 +630,6 @@ function shimmerWindowStops(center: number, color: string, peak: number) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Tooltip / legend HTML — the tooltip DOM lives inside `[data-chart={id}]`, so the
-// injected `--color-*` vars and Tailwind classes resolve directly (no color read).
-// ─────────────────────────────────────────────────────────────────────────────
-
-const roundnessClass: Record<TooltipRoundness, string> = {
-  sm: "rounded-sm",
-  md: "rounded-md",
-  lg: "rounded-lg",
-  xl: "rounded-xl",
-};
-
-const tooltipVariantClass: Record<TooltipVariant, string> = {
-  default: "bg-background",
-  "frosted-glass": "bg-background/70 backdrop-blur-sm",
-};
-
-// Solid var / gradient of vars for a series indicator — mirrors getIndicatorColorStyle.
-function indicatorBackground(key: string, colorsCount: number): string {
-  if (colorsCount <= 1) return `var(--color-${key}-0)`;
-  const stops = Array.from({ length: colorsCount }, (_, i) => {
-    const offset = (i / (colorsCount - 1)) * 100;
-    return `var(--color-${key}-${i}) ${offset}%`;
-  }).join(", ");
-  return `linear-gradient(to right, ${stops})`;
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Legend overlay (React) — replicates ChartLegendContent + its 7 indicators.
-// ─────────────────────────────────────────────────────────────────────────────
-
-function legendFillStyle(key: string, colorsCount: number): CSSProperties {
-  if (colorsCount <= 1) return { backgroundColor: `var(--color-${key}-0)` };
-  return { background: indicatorBackground(key, colorsCount) };
-}
-
-// Punches out the centre with a mask-composite so only the "border" shows —
-// works with gradients and border-radius, unlike plain border-color.
-function legendOutlineStyle(key: string, colorsCount: number): CSSProperties {
-  const mask: CSSProperties = {
-    WebkitMask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-    WebkitMaskComposite: "xor",
-    mask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-    maskComposite: "exclude",
-  };
-  return { ...legendFillStyle(key, colorsCount), ...mask };
-}
-
-function LegendIndicator({
-  variant,
-  dataKey,
-  colorsCount,
-}: {
-  variant: LegendVariant;
-  dataKey: string;
-  colorsCount: number;
-}) {
-  const fill = legendFillStyle(dataKey, colorsCount);
-  const outline = legendOutlineStyle(dataKey, colorsCount);
-
-  switch (variant) {
-    case "square":
-      return <div className="h-2 w-2 shrink-0" style={fill} />;
-    case "circle":
-      return <div className="h-2 w-2 shrink-0 rounded-full" style={fill} />;
-    case "circle-outline":
-      return <div className="h-2.5 w-2.5 shrink-0 rounded-full p-[1.5px]" style={outline} />;
-    case "vertical-bar":
-      return <div className="h-3 w-1 shrink-0 rounded-[2px]" style={fill} />;
-    case "horizontal-bar":
-      return <div className="h-1 w-3 shrink-0 rounded-[2px]" style={fill} />;
-    case "rounded-square-outline":
-      return <div className="h-2.5 w-2.5 shrink-0 rounded-[3px] p-[1.5px]" style={outline} />;
-    case "rounded-square":
-    default:
-      return <div className="h-2 w-2 shrink-0 rounded-[2px]" style={fill} />;
-  }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
 // Option builders — pure functions from a snapshot context to ECharts option
 // fragments. The component reads its refs and renderer size ONCE per build into
 // this context; nothing below touches React state or the chart instance, so
@@ -1123,22 +686,6 @@ function buildChartLayout({ legendSlot, xAxisSlot, showBrush, brushHeight }: Opt
     },
     brushBottom: legendBottom ? 34 : 6,
   };
-}
-
-// Composites a translucent color over an opaque base into a FLAT color. The
-// tick dots need this: a translucent stroke double-paints where its round caps
-// overlap the line body, which reads as two stacked colors.
-function flattenColor(color: string, base: string): string {
-  const parse = (value: string) =>
-    value
-      .match(/rgba?\(([^)]+)\)/)?.[1]
-      .split(",")
-      .map((part) => Number.parseFloat(part)) ?? [0, 0, 0, 1];
-  const [r, g, b, a = 1] = parse(color);
-  const [baseR, baseG, baseB] = parse(base);
-  const mix = (channel: number, baseChannel: number) =>
-    Math.round(channel * a + baseChannel * (1 - a));
-  return `rgb(${mix(r, baseR)}, ${mix(g, baseG)}, ${mix(b, baseB)})`;
 }
 
 function buildMainAxes(ctx: OptionBuildContext): { xAxis: XAxisOption; yAxis: YAxisOption } {
@@ -1263,20 +810,21 @@ function createTooltipFormatter(ctx: OptionBuildContext) {
         const value =
           typeof p.value === "number" ? p.value.toLocaleString() : String(p.value ?? "");
 
-        return `<div class="flex w-full flex-wrap items-center gap-2${dimmed}">
-          <div class="h-2.5 w-2.5 shrink-0 rounded-[2px]" style="background:${indicatorBackground(key, colorsCount)}"></div>
-          <div class="flex flex-1 items-center justify-between gap-4 leading-none">
-            <span class="text-muted-foreground">${labelText}</span>
-            <span class="text-foreground font-mono font-medium tabular-nums">${value}</span>
-          </div>
-        </div>`;
+        return tooltipRow({
+          indicatorHtml: tooltipIndicatorHtml(key, colorsCount),
+          labelText,
+          valueText: value,
+          dimmed,
+        });
       })
       .join("");
 
-    return `<div class="grid min-w-32 items-start gap-1.5 border border-border/50 px-2.5 py-1.5 text-xs shadow-xl ${roundnessClass[tooltipSlot.roundness]} ${tooltipVariantClass[tooltipSlot.variant]}">
-      <div class="font-medium text-primary">${label}</div>
-      <div class="grid gap-1.5">${body}</div>
-    </div>`;
+    return tooltipShell({
+      label,
+      body,
+      roundness: tooltipSlot.roundness,
+      variant: tooltipSlot.variant,
+    });
   };
 }
 
@@ -1285,23 +833,14 @@ function buildTooltipOption(ctx: OptionBuildContext): TooltipComponentOption {
   const { tokens } = ctx.resolved;
 
   return {
-    show: tooltipSlot.present && !isLoading,
-    trigger: "axis",
-    confine: true,
-    backgroundColor: "transparent",
-    borderWidth: 0,
-    padding: 0,
-    extraCssText: "box-shadow:none;",
-    axisPointer: tooltipSlot.cursor
-      ? {
-          type: "line",
-          lineStyle: {
-            color: withAlpha(tokens.border, AXIS_POINTER_OPACITY),
-            width: STROKE_WIDTH,
-            type: [3, 3] as [number, number],
-          },
-        }
-      : { type: "none" },
+    ...tooltipBaseOption({
+      present: tooltipSlot.present && !isLoading,
+      cursor: tooltipSlot.cursor,
+      tokens,
+      position: tooltipSlot.position,
+      axisPointerColor: withAlpha(tokens.border, AXIS_POINTER_OPACITY),
+      strokeWidth: STROKE_WIDTH,
+    }),
     formatter: createTooltipFormatter(ctx),
   };
 }
@@ -1381,41 +920,12 @@ function buildBrushOption(
     };
   });
 
-  const dataZoom: DataZoomComponentOption[] = [
-    {
-      type: "slider",
-      show: true,
-      xAxisIndex: [0],
-      left: 8,
-      right: 8,
-      bottom: brushBottom,
-      height: brushHeight,
-      // Carry the live range through every rebuild — a notMerge push
-      // without start/end would reset the zoom to the full extent.
-      start: ctx.brushRange.start,
-      end: ctx.brushRange.end,
-      brushSelect: false,
-      // Range labels are overlay pills below the frame (see
-      // syncBrushOverlay) — the native detail text renders INSIDE the
-      // track, which is not the evil-brush look.
-      showDetail: false,
-      backgroundColor: "transparent",
-      // The visible frame is the graphic overlay riding the selection —
-      // the component's own static border stays hidden.
-      borderColor: "transparent",
-      fillerColor: withAlpha(tokens.foreground, BRUSH_FILLER_OPACITY),
-      dataBackground: { lineStyle: { opacity: 0 }, areaStyle: { opacity: 0 } },
-      selectedDataBackground: { lineStyle: { opacity: 0 }, areaStyle: { opacity: 0 } },
-      // Interaction only — the visible pills are graphic overlays (see
-      // syncBrushOverlay). Kept generous for an easy grab target.
-      handleIcon: "path://M -3 -5 L -3 5 A 3 3 0 0 0 3 5 L 3 -5 A 3 3 0 0 0 -3 -5 Z",
-      handleSize: "35%",
-      handleStyle: { opacity: 0 },
-      moveHandleSize: 0,
-      emphasis: { handleStyle: { opacity: 0 } },
-    },
-    { type: "inside", xAxisIndex: [0] },
-  ];
+  const dataZoom = buildBrushDataZoom({
+    brushBottom,
+    brushHeight,
+    brushRange: ctx.brushRange,
+    fillerColor: withAlpha(tokens.foreground, BRUSH_FILLER_OPACITY),
+  });
 
   return { miniGrid, miniXAxis, miniYAxis, miniSeries, dataZoom };
 }
@@ -2320,13 +1830,6 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
         : { top: "50%", transform: "translateY(-50%)" }),
   };
 
-  const legendJustify =
-    legendSlot.align === "left"
-      ? "justify-start"
-      : legendSlot.align === "center"
-        ? "justify-center"
-        : "justify-end";
-
   return (
     <div
       ref={containerRef}
@@ -2340,35 +1843,18 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
       </div>
 
       {legendSlot.present && !isLoading && (
-        <div style={legendStyle} className={`flex items-center gap-4 select-none ${legendJustify}`}>
-          {seriesKeys.map((key) => {
-            const item = config[key];
-            const colorsCount = item ? getColorsCount(item) : 1;
-            const isSelected =
-              (selectedDataKey === null || selectedDataKey === key) &&
-              (hoveredDataKey === null || hoveredDataKey === key);
-            return (
-              // No entrance here — the Recharts legend appears instantly, and a
-              // fade-in reads as disconnected from the canvas draw-in.
-              <div
-                key={key}
-                className={`flex items-center gap-1.5 transition-opacity ${
-                  !isSelected ? "opacity-30" : ""
-                } ${legendSlot.isClickable ? "cursor-pointer" : ""}`}
-                onClick={() => {
-                  if (legendSlot.isClickable) toggleSelection(key);
-                }}
-              >
-                <LegendIndicator
-                  variant={legendSlot.variant}
-                  dataKey={key}
-                  colorsCount={colorsCount}
-                />
-                {item?.label}
-              </div>
-            );
-          })}
-        </div>
+        <LegendOverlay
+          seriesKeys={seriesKeys}
+          config={config}
+          variant={legendSlot.variant}
+          align={legendSlot.align}
+          verticalAlign={legendSlot.verticalAlign}
+          selectedKey={selectedDataKey}
+          hoveredKey={hoveredDataKey}
+          isClickable={legendSlot.isClickable}
+          onToggle={toggleSelection}
+          style={legendStyle}
+        />
       )}
 
       {isLoading && (

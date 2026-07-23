@@ -363,6 +363,9 @@ The hover tooltip. Include it to enable the tooltip; omit it and none shows. It 
   <ApiRow name="cursor" type="boolean" default="true">
     Whether the vertical cursor line follows the pointer on hover.
   </ApiRow>
+  <ApiRow name="position" type='"fixed" | "variable"' default='"variable"'>
+    How the tooltip is anchored. `variable` follows both axes (default); `fixed` pins the tooltip near the top and only tracks the pointer's X.
+  </ApiRow>
 </ApiTable>
 
 <ApiHeading>Legend</ApiHeading>

@@ -283,6 +283,9 @@ The hover tooltip. Its presence enables the tooltip; omit it and none shows. On 
   <ApiRow name="roundness" type='"sm" | "md" | "lg" | "xl"' default='"lg"'>
     Controls the border-radius of the tooltip.
   </ApiRow>
+  <ApiRow name="position" type='"fixed" | "variable"' default='"variable"'>
+    Anchoring of the tooltip. `"variable"` follows the pointer (default). `"fixed"` pins the tooltip near the top and only tracks the pointer's X.
+  </ApiRow>
   <ApiRow name="defaultIndex" type="number">
     Shows a tooltip by default with no hover. Because the radar tooltip is item-triggered, this selects the series (by index) whose tooltip is revealed.
   </ApiRow>

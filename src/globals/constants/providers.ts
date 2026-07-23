@@ -1,5 +1,5 @@
 // The rendering engine a chart is built on. EvilCharts ships one file per chart per
-// provider — you install `@evilcharts/area-chart` or its ECharts counterpart, never
+// provider — you install `@evilcharts/recharts-area-chart` or `@evilcharts/echarts-area-chart`, never
 // both — so this is an install-time choice, not a runtime prop.
 //
 // Docs mirror that split: everything provider-specific lives under /docs/<provider>/*.

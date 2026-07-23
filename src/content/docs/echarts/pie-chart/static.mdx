@@ -291,6 +291,9 @@ The hover tooltip. Its presence enables the tooltip; omit it and none shows. Hid
   <ApiRow name="defaultIndex" type="number">
     When set, the tooltip is visible by default at the specified sector index.
   </ApiRow>
+  <ApiRow name="position" type='"fixed" | "variable"' default='"variable"'>
+    How the tooltip is anchored. `"variable"` follows the pointer (the default); `"fixed"` pins the tooltip near the top and only tracks the pointer's X.
+  </ApiRow>
 </ApiTable>
 
 <ApiHeading>Legend</ApiHeading>

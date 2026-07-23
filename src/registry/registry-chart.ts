@@ -4,10 +4,17 @@ const TARGET_BASE_PATH = "components/evilcharts/charts";
 
 export const charts: Registry["items"] = [
   {
-    // ECharts twin of area-chart. Self-contained on purpose: no @evilcharts/*
-    // registryDependencies, so installing it never drags in recharts.
+    // ECharts twin of area-chart. Its shared UI (tooltip/legend/dot/brush + the
+    // color core) lives in @evilcharts/echarts-* modules — never any recharts dep.
     name: "echarts-area-chart",
     description: "Area chart component rendered with Apache ECharts",
+    registryDependencies: [
+      "@evilcharts/echarts-chart",
+      "@evilcharts/echarts-tooltip",
+      "@evilcharts/echarts-legend",
+      "@evilcharts/echarts-dot",
+      "@evilcharts/echarts-brush",
+    ],
     dependencies: ["echarts", "motion"],
     type: "registry:component",
     files: [
@@ -21,6 +28,13 @@ export const charts: Registry["items"] = [
   {
     name: "echarts-line-chart",
     description: "Line chart component rendered with Apache ECharts",
+    registryDependencies: [
+      "@evilcharts/echarts-chart",
+      "@evilcharts/echarts-dot",
+      "@evilcharts/echarts-tooltip",
+      "@evilcharts/echarts-legend",
+      "@evilcharts/echarts-brush",
+    ],
     dependencies: ["echarts", "motion"],
     type: "registry:component",
     files: [
@@ -34,6 +48,13 @@ export const charts: Registry["items"] = [
   {
     name: "echarts-bar-chart",
     description: "Bar chart component rendered with Apache ECharts",
+    registryDependencies: [
+      "@evilcharts/echarts-chart",
+      "@evilcharts/echarts-tooltip",
+      "@evilcharts/echarts-dot",
+      "@evilcharts/echarts-legend",
+      "@evilcharts/echarts-brush",
+    ],
     dependencies: ["echarts", "motion"],
     type: "registry:component",
     files: [
@@ -47,6 +68,13 @@ export const charts: Registry["items"] = [
   {
     name: "echarts-composed-chart",
     description: "Composed chart component rendered with Apache ECharts",
+    registryDependencies: [
+      "@evilcharts/echarts-chart",
+      "@evilcharts/echarts-tooltip",
+      "@evilcharts/echarts-dot",
+      "@evilcharts/echarts-legend",
+      "@evilcharts/echarts-brush",
+    ],
     dependencies: ["echarts", "motion"],
     type: "registry:component",
     files: [
@@ -60,6 +88,12 @@ export const charts: Registry["items"] = [
   {
     name: "echarts-radar-chart",
     description: "Radar chart component rendered with Apache ECharts",
+    registryDependencies: [
+      "@evilcharts/echarts-chart",
+      "@evilcharts/echarts-tooltip",
+      "@evilcharts/echarts-dot",
+      "@evilcharts/echarts-legend",
+    ],
     dependencies: ["echarts", "motion"],
     type: "registry:component",
     files: [
@@ -73,6 +107,11 @@ export const charts: Registry["items"] = [
   {
     name: "echarts-pie-chart",
     description: "Pie chart component rendered with Apache ECharts",
+    registryDependencies: [
+      "@evilcharts/echarts-chart",
+      "@evilcharts/echarts-tooltip",
+      "@evilcharts/echarts-legend",
+    ],
     dependencies: ["echarts", "motion"],
     type: "registry:component",
     files: [
@@ -86,6 +125,11 @@ export const charts: Registry["items"] = [
   {
     name: "echarts-radial-chart",
     description: "Radial chart component rendered with Apache ECharts",
+    registryDependencies: [
+      "@evilcharts/echarts-chart",
+      "@evilcharts/echarts-tooltip",
+      "@evilcharts/echarts-legend",
+    ],
     dependencies: ["echarts", "motion"],
     type: "registry:component",
     files: [
@@ -99,6 +143,11 @@ export const charts: Registry["items"] = [
   {
     name: "echarts-sankey-chart",
     description: "Sankey chart component rendered with Apache ECharts",
+    registryDependencies: [
+      "@evilcharts/echarts-chart",
+      "@evilcharts/echarts-tooltip",
+      "@evilcharts/echarts-dot",
+    ],
     dependencies: ["echarts", "motion"],
     type: "registry:component",
     files: [
@@ -110,157 +159,161 @@ export const charts: Registry["items"] = [
     ],
   },
   {
-    name: "area-chart",
+    name: "recharts-area-chart",
     description: "Area chart component",
     registryDependencies: [
-      "@evilcharts/chart",
-      "@evilcharts/tooltip",
-      "@evilcharts/legend",
-      "@evilcharts/dot",
-      "@evilcharts/evil-brush",
-      "@evilcharts/background",
+      "@evilcharts/recharts-chart",
+      "@evilcharts/recharts-tooltip",
+      "@evilcharts/recharts-legend",
+      "@evilcharts/recharts-dot",
+      "@evilcharts/recharts-brush",
+      "@evilcharts/recharts-background",
     ],
     dependencies: ["recharts", "motion"],
     type: "registry:component",
     files: [
       {
-        path: "charts/area-chart.tsx",
+        path: "charts/recharts/area-chart.tsx",
         type: "registry:component",
-        target: TARGET_BASE_PATH + "/area-chart.tsx",
+        target: TARGET_BASE_PATH + "/recharts/area-chart.tsx",
       },
     ],
   },
   {
-    name: "line-chart",
+    name: "recharts-line-chart",
     description: "Line chart component",
     registryDependencies: [
-      "@evilcharts/chart",
-      "@evilcharts/tooltip",
-      "@evilcharts/legend",
-      "@evilcharts/dot",
-      "@evilcharts/evil-brush",
-      "@evilcharts/background",
+      "@evilcharts/recharts-chart",
+      "@evilcharts/recharts-tooltip",
+      "@evilcharts/recharts-legend",
+      "@evilcharts/recharts-dot",
+      "@evilcharts/recharts-brush",
+      "@evilcharts/recharts-background",
     ],
     dependencies: ["recharts", "motion"],
     type: "registry:component",
     files: [
       {
-        path: "charts/line-chart.tsx",
+        path: "charts/recharts/line-chart.tsx",
         type: "registry:component",
-        target: TARGET_BASE_PATH + "/line-chart.tsx",
+        target: TARGET_BASE_PATH + "/recharts/line-chart.tsx",
       },
     ],
   },
   {
-    name: "bar-chart",
+    name: "recharts-bar-chart",
     description: "Bar chart component",
     registryDependencies: [
-      "@evilcharts/chart",
-      "@evilcharts/tooltip",
-      "@evilcharts/legend",
-      "@evilcharts/evil-brush",
-      "@evilcharts/background",
+      "@evilcharts/recharts-chart",
+      "@evilcharts/recharts-tooltip",
+      "@evilcharts/recharts-legend",
+      "@evilcharts/recharts-brush",
+      "@evilcharts/recharts-background",
     ],
     dependencies: ["recharts", "motion"],
     type: "registry:component",
     files: [
       {
-        path: "charts/bar-chart.tsx",
+        path: "charts/recharts/bar-chart.tsx",
         type: "registry:component",
-        target: TARGET_BASE_PATH + "/bar-chart.tsx",
+        target: TARGET_BASE_PATH + "/recharts/bar-chart.tsx",
       },
     ],
   },
   {
-    name: "composed-chart",
+    name: "recharts-composed-chart",
     description: "Composed chart component combining bar and line charts",
     registryDependencies: [
-      "@evilcharts/chart",
-      "@evilcharts/tooltip",
-      "@evilcharts/legend",
-      "@evilcharts/dot",
-      "@evilcharts/evil-brush",
-      "@evilcharts/background",
+      "@evilcharts/recharts-chart",
+      "@evilcharts/recharts-tooltip",
+      "@evilcharts/recharts-legend",
+      "@evilcharts/recharts-dot",
+      "@evilcharts/recharts-brush",
+      "@evilcharts/recharts-background",
     ],
     dependencies: ["recharts", "motion"],
     type: "registry:component",
     files: [
       {
-        path: "charts/composed-chart.tsx",
+        path: "charts/recharts/composed-chart.tsx",
         type: "registry:component",
-        target: TARGET_BASE_PATH + "/composed-chart.tsx",
+        target: TARGET_BASE_PATH + "/recharts/composed-chart.tsx",
       },
     ],
   },
   {
-    name: "pie-chart",
+    name: "recharts-pie-chart",
     description: "Pie chart component with donut, gradient, and glow effects",
     registryDependencies: [
-      "@evilcharts/chart",
-      "@evilcharts/tooltip",
-      "@evilcharts/legend",
-      "@evilcharts/background",
+      "@evilcharts/recharts-chart",
+      "@evilcharts/recharts-tooltip",
+      "@evilcharts/recharts-legend",
+      "@evilcharts/recharts-background",
     ],
     dependencies: ["recharts", "motion"],
     type: "registry:component",
     files: [
       {
-        path: "charts/pie-chart.tsx",
+        path: "charts/recharts/pie-chart.tsx",
         type: "registry:component",
-        target: TARGET_BASE_PATH + "/pie-chart.tsx",
+        target: TARGET_BASE_PATH + "/recharts/pie-chart.tsx",
       },
     ],
   },
   {
-    name: "radial-chart",
+    name: "recharts-radial-chart",
     description: "Radial bar chart component with full and semi-circle variants",
     registryDependencies: [
-      "@evilcharts/chart",
-      "@evilcharts/tooltip",
-      "@evilcharts/legend",
-      "@evilcharts/background",
+      "@evilcharts/recharts-chart",
+      "@evilcharts/recharts-tooltip",
+      "@evilcharts/recharts-legend",
+      "@evilcharts/recharts-background",
     ],
     dependencies: ["recharts", "motion"],
     type: "registry:component",
     files: [
       {
-        path: "charts/radial-chart.tsx",
+        path: "charts/recharts/radial-chart.tsx",
         type: "registry:component",
-        target: TARGET_BASE_PATH + "/radial-chart.tsx",
+        target: TARGET_BASE_PATH + "/recharts/radial-chart.tsx",
       },
     ],
   },
   {
-    name: "radar-chart",
+    name: "recharts-radar-chart",
     description: "Radar chart component with filled and lines variants",
     registryDependencies: [
-      "@evilcharts/chart",
-      "@evilcharts/tooltip",
-      "@evilcharts/legend",
-      "@evilcharts/dot",
-      "@evilcharts/background",
+      "@evilcharts/recharts-chart",
+      "@evilcharts/recharts-tooltip",
+      "@evilcharts/recharts-legend",
+      "@evilcharts/recharts-dot",
+      "@evilcharts/recharts-background",
     ],
     dependencies: ["recharts", "motion"],
     type: "registry:component",
     files: [
       {
-        path: "charts/radar-chart.tsx",
+        path: "charts/recharts/radar-chart.tsx",
         type: "registry:component",
-        target: TARGET_BASE_PATH + "/radar-chart.tsx",
+        target: TARGET_BASE_PATH + "/recharts/radar-chart.tsx",
       },
     ],
   },
   {
-    name: "sankey-chart",
+    name: "recharts-sankey-chart",
     description: "Sankey chart component for visualizing flow data with nodes and links",
-    registryDependencies: ["@evilcharts/chart", "@evilcharts/tooltip", "@evilcharts/background"],
+    registryDependencies: [
+      "@evilcharts/recharts-chart",
+      "@evilcharts/recharts-tooltip",
+      "@evilcharts/recharts-background",
+    ],
     dependencies: ["recharts", "motion"],
     type: "registry:component",
     files: [
       {
-        path: "charts/sankey-chart.tsx",
+        path: "charts/recharts/sankey-chart.tsx",
         type: "registry:component",
-        target: TARGET_BASE_PATH + "/sankey-chart.tsx",
+        target: TARGET_BASE_PATH + "/recharts/sankey-chart.tsx",
       },
     ],
   },

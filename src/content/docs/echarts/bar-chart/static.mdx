@@ -308,6 +308,9 @@ The hover tooltip. Include it to enable the tooltip; omit it and none shows. It 
   <ApiRow name="defaultIndex" type="number">
     Shows the tooltip by default at the given data point index, with no hover.
   </ApiRow>
+  <ApiRow name="position" type='"fixed" | "variable"' default='"variable"'>
+    How the tooltip is anchored. `"variable"` lets it follow the pointer, and `"fixed"` pins it near the top of the chart while only tracking the pointer's X.
+  </ApiRow>
 </ApiTable>
 
 <ApiHeading>Legend</ApiHeading>

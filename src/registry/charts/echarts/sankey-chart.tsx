@@ -1,6 +1,24 @@
 "use client";
 
 import {
+  resolveTooltipPosition,
+  roundnessClass,
+  tooltipIndicatorHtml,
+  tooltipRow,
+  tooltipVariantClass,
+  type TooltipPosition,
+  type TooltipRoundness,
+  type TooltipVariant,
+} from "@/registry/ui/echarts/tooltip";
+import {
+  buildChartCss,
+  getColorsCount,
+  resolveColors,
+  withAlpha,
+  type ChartConfig,
+  type ResolvedColors,
+} from "@/registry/ui/echarts/chart";
+import {
   Children,
   isValidElement,
   useCallback,
@@ -9,16 +27,20 @@ import {
   useMemo,
   useRef,
   useState,
-  type ComponentType,
   type FC,
   type ReactNode,
 } from "react";
 import { TooltipComponent, type TooltipComponentOption } from "echarts/components";
 import { SankeyChart, type SankeySeriesOption } from "echarts/charts";
+import { sampleGradient } from "@/registry/ui/echarts/dot";
 import { motion, useReducedMotion } from "motion/react";
 import { CanvasRenderer } from "echarts/renderers";
 import type { ComposeOption } from "echarts/core";
 import * as echarts from "echarts/core";
+
+// Re-export the shared types that were previously declared inline here, so
+// existing consumers/examples keep importing them from the chart module.
+export type { ChartConfig, TooltipPosition, TooltipRoundness, TooltipVariant };
 
 // Modular registration keeps the bundle lean — only the pieces this chart needs.
 // A sankey draws its own node/link geometry, so there is no grid, axis, or
@@ -112,37 +134,21 @@ const SKELETON_LINKS = [
   { source: "m2", target: "e1", value: 8 },
 ];
 
-// Theme selectors mirror the repo's <ChartStyle>: light is the bare root, dark is `.dark`.
-const THEMES = { light: "", dark: ".dark" } as const;
-type ThemeKey = keyof typeof THEMES;
-const THEME_KEYS = Object.keys(THEMES) as ThemeKey[];
-
 // ─────────────────────────────────────────────────────────────────────────────
 // Public types
 // ─────────────────────────────────────────────────────────────────────────────
 
 export type LinkVariant = "gradient" | "solid" | "source" | "target";
 export type NodeLabelPosition = "inside" | "outside";
-export type TooltipVariant = "default" | "frosted-glass";
-export type TooltipRoundness = "sm" | "md" | "lg" | "xl";
+// TooltipVariant and TooltipRoundness now live in @/registry/ui/echarts/tooltip and
+// are imported + re-exported at the top of this file.
 // Sankey has no directional draw-in — only "default" (echarts' native reveal) and
 // "none" (off). Kept as a small union for copy-paste parity with the other
 // EvilCharts entrance off-switches rather than a directional alias.
 export type SankeyAnimationType = "none" | "default";
 
-// Require at least one theme key — identical constraint to the repo's ChartConfig.
-type AtLeastOneThemeColor =
-  | { light: string[]; dark?: string[] }
-  | { light?: string[]; dark: string[] };
-
-export type ChartConfig = Record<
-  string,
-  {
-    label?: ReactNode;
-    icon?: ComponentType;
-    colors?: AtLeastOneThemeColor;
-  }
->;
+// ChartConfig (and its AtLeastOneThemeColor constraint) now lives in the shared
+// @/registry/ui/echarts/chart module and is imported + re-exported at the top.
 
 // A single flow node. `icon` mirrors the Recharts twin's data shape for source
 // compatibility, but canvas can't mount a React node, so it is not rendered.
@@ -238,6 +244,7 @@ export const Link: FC<LinkProps> = () => null;
 export interface TooltipProps {
   variant?: TooltipVariant; // visual style of the tooltip surface
   roundness?: TooltipRoundness; // border-radius of the tooltip
+  position?: TooltipPosition; // "variable" follows the pointer (default); "fixed" pins the tooltip near the top and tracks the pointer's X
   defaultIndex?: number; // reserved for parity with the Recharts twin (see notes)
 }
 
@@ -268,6 +275,7 @@ type TooltipSlot = {
   present: boolean;
   variant: TooltipVariant;
   roundness: TooltipRoundness;
+  position: TooltipPosition;
   defaultIndex?: number;
 };
 
@@ -282,7 +290,12 @@ function collectConfig(children: ReactNode): CollectedConfig {
   let nodeConfig: NodeSlot = { radius: 0, isClickable: false, glow: [] };
   let nodeLabel: NodeLabelSlot | null = null;
   let linkConfig: LinkSlot = { variant: "gradient", verticalPadding: 0, glow: [] };
-  let tooltip: TooltipSlot = { present: false, variant: "default", roundness: "lg" };
+  let tooltip: TooltipSlot = {
+    present: false,
+    variant: "default",
+    roundness: "lg",
+    position: "variable",
+  };
 
   Children.forEach(children, (child) => {
     if (!isValidElement(child)) return;
@@ -318,6 +331,7 @@ function collectConfig(children: ReactNode): CollectedConfig {
         present: true,
         variant: props.variant ?? "default",
         roundness: props.roundness ?? "lg",
+        position: props.position ?? "variable",
         defaultIndex: props.defaultIndex,
       };
     }
@@ -326,142 +340,11 @@ function collectConfig(children: ReactNode): CollectedConfig {
   return { nodeConfig, nodeLabel, linkConfig, tooltip };
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Color plumbing — replicated from the repo's <ChartStyle> so this file stays
-// self-contained (no @/registry/ui imports).
-// ─────────────────────────────────────────────────────────────────────────────
-
-// Max slots a key needs = longest color array across themes (min 1). Both themes
-// always emit the same number of `--color-{key}-{n}` vars.
-function getColorsCount(item: ChartConfig[string]): number {
-  if (!item.colors) return 1;
-  const counts = THEME_KEYS.map((theme) => item.colors?.[theme]?.length ?? 0);
-  return Math.max(...counts, 1);
-}
-
-// Distribute colors evenly across slots; extra slots go to the LAST color(s).
-// 2 colors / 4 slots → [c0, c0, c1, c1]; 3 colors / 4 slots → [c0, c1, c2, c2].
-function distributeColors(colors: string[], maxCount: number): string[] {
-  const available = colors.length;
-  if (available >= maxCount) return colors.slice(0, maxCount);
-
-  const result: string[] = [];
-  const baseSlots = Math.floor(maxCount / available);
-  const extraSlots = maxCount % available;
-
-  for (let i = 0; i < available; i++) {
-    const isExtra = i >= available - extraSlots;
-    const slots = baseSlots + (isExtra ? 1 : 0);
-    for (let j = 0; j < slots; j++) result.push(colors[i]);
-  }
-
-  return result;
-}
-
-// Emits the same CSS <ChartStyle> would: `--color-{key}-{n}` scoped to
-// `[data-chart={id}]` (light) and `.dark [data-chart={id}]` (dark).
-function buildChartCss(id: string, config: ChartConfig): string {
-  const colorConfig = Object.entries(config).filter(([, item]) => item.colors);
-  if (!colorConfig.length) return "";
-
-  const varsFor = (theme: ThemeKey) =>
-    colorConfig
-      .flatMap(([key, item]) => {
-        const authored = item.colors?.[theme];
-        if (!authored || authored.length === 0) return [];
-        return distributeColors(authored, getColorsCount(item)).map(
-          (color, index) => `  --color-${key}-${index}: ${color};`,
-        );
-      })
-      .join("\n");
-
-  return Object.entries(THEMES)
-    .map(([theme, prefix]) => `${prefix} [data-chart=${id}] {\n${varsFor(theme as ThemeKey)}\n}`)
-    .join("\n");
-}
-
-// A single reusable 1×1 canvas normalizes ANY CSS color (hex, named, oklch, …)
-// to a concrete rgba string by painting it and reading the pixel back.
-let normalizerCtx: CanvasRenderingContext2D | null = null;
-function normalizeColor(value: string): string {
-  const raw = value.trim();
-  if (!raw || typeof document === "undefined") return raw;
-
-  if (!normalizerCtx) {
-    const canvas = document.createElement("canvas");
-    canvas.width = 1;
-    canvas.height = 1;
-    normalizerCtx = canvas.getContext("2d", { willReadFrequently: true });
-  }
-  if (!normalizerCtx) return raw;
-
-  normalizerCtx.clearRect(0, 0, 1, 1);
-  normalizerCtx.fillStyle = "#000";
-  normalizerCtx.fillStyle = raw; // invalid values leave the sentinel in place
-  normalizerCtx.fillRect(0, 0, 1, 1);
-  const [r, g, b, a] = normalizerCtx.getImageData(0, 0, 1, 1).data;
-  return `rgba(${r}, ${g}, ${b}, ${(a / 255).toFixed(3)})`;
-}
-
-// Scales the alpha of a normalized `rgba(r, g, b, a)` string. Multiplying (not
-// replacing) keeps translucent theme tokens honest: a background that is
-// 60%-white at `withAlpha(background, 0.55)` lands at 33%, like Tailwind's `/55`.
-function withAlpha(color: string, alpha: number): string {
-  const match = color.match(/rgba?\(([^)]+)\)/);
-  if (!match) return color;
-  const [r, g, b, a] = match[1].split(",").map((p) => p.trim());
-  const base = a === undefined ? 1 : Number.parseFloat(a) || 0;
-  return `rgba(${r}, ${g}, ${b}, ${(base * alpha).toFixed(3)})`;
-}
-
-type ResolvedColors = {
-  series: Record<string, string[]>; // normalized `--color-{key}-{n}` slots per node name
-  tokens: {
-    mutedForeground: string;
-    border: string;
-    foreground: string;
-    background: string;
-  };
-};
-
-// Reads the injected CSS vars + theme tokens from the live DOM. Node slots come
-// from `getComputedStyle` on the container; tokens are read off a throwaway probe
-// carrying the matching Tailwind class (robust to the var naming a theme uses).
-function resolveColors(
-  container: HTMLElement,
-  config: ChartConfig,
-  nodeNames: string[],
-): ResolvedColors {
-  const computed = getComputedStyle(container);
-  const series: Record<string, string[]> = {};
-
-  for (const key of nodeNames) {
-    const count = getColorsCount(config[key] ?? {});
-    const slots: string[] = [];
-    for (let n = 0; n < count; n++) {
-      const raw = computed.getPropertyValue(`--color-${key}-${n}`).trim();
-      slots.push(raw ? normalizeColor(raw) : GRAY);
-    }
-    series[key] = slots;
-  }
-
-  const probe = document.createElement("span");
-  probe.style.cssText = "position:absolute;width:0;height:0;visibility:hidden;pointer-events:none;";
-  container.appendChild(probe);
-  const readToken = (className: string) => {
-    probe.className = className;
-    return normalizeColor(getComputedStyle(probe).color);
-  };
-  const tokens = {
-    mutedForeground: readToken("text-muted-foreground"),
-    border: readToken("text-border"),
-    foreground: readToken("text-foreground"),
-    background: readToken("text-background"),
-  };
-  container.removeChild(probe);
-
-  return { series, tokens };
-}
+// Color plumbing (ChartConfig, getColorsCount, distributeColors, buildChartCss,
+// normalizeColor, withAlpha, ResolvedColors, resolveColors) now lives in
+// @/registry/ui/echarts/chart and is imported at the top of this file. `resolveColors`
+// falls back to GRAY (rgba(120, 120, 120, 1)) for an unresolved node slot, matching
+// this file's GRAY constant.
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Paint helpers — the ECharts analogue of the Recharts SVG paints. Node fills are
@@ -507,29 +390,11 @@ function edgeColor(
   }
 }
 
-// The concrete color a node's/link's gradient shows at position t ∈ [0, 1]. A
-// canvas shadow can only be cast in a SOLID color (a gradient casts nothing), so
-// the glow samples the element's OWN paint at a representative point instead of a
-// foreign tint — a single-color node samples back to its exact color, and a
-// multi-stop node samples its mid color, keeping the glow in the node's own hue.
-function sampleGradient(slots: string[], t: number): string {
-  if (slots.length <= 1) return slots[0] ?? GRAY;
-
-  const parse = (color: string) =>
-    color
-      .match(/rgba?\(([^)]+)\)/)?.[1]
-      .split(",")
-      .map(Number) ?? [120, 120, 120, 1];
-
-  const position = t * (slots.length - 1);
-  const index = Math.min(Math.floor(position), slots.length - 2);
-  const fraction = position - index;
-  const [r1, g1, b1, a1 = 1] = parse(slots[index]);
-  const [r2, g2, b2, a2 = 1] = parse(slots[index + 1]);
-  const lerp = (from: number, to: number) => from + (to - from) * fraction;
-
-  return `rgba(${Math.round(lerp(r1, r2))}, ${Math.round(lerp(g1, g2))}, ${Math.round(lerp(b1, b2))}, ${lerp(a1, a2).toFixed(3)})`;
-}
+// `sampleGradient` — the concrete color a node's/link's gradient shows at position
+// t ∈ [0, 1] — now lives in @/registry/ui/echarts/dot and is imported at the top.
+// A canvas shadow can only be cast in a SOLID color, so the glow samples the
+// element's OWN paint at a representative point (its mid color) instead of a
+// foreign tint, keeping the glow in the node's own hue.
 
 // The solid glow color for a link band, following its <Link> variant: the source
 // or target node's mid color for the node-colored variants (and for `gradient`,
@@ -631,33 +496,11 @@ function shimmerWindowStops(center: number, color: string, floor: number, peak: 
   return stops;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Tooltip HTML — the tooltip DOM lives inside `[data-chart={id}]`, so the injected
-// `--color-*` vars and Tailwind classes resolve directly (no color read).
-// ─────────────────────────────────────────────────────────────────────────────
-
-const roundnessClass: Record<TooltipRoundness, string> = {
-  sm: "rounded-sm",
-  md: "rounded-md",
-  lg: "rounded-lg",
-  xl: "rounded-xl",
-};
-
-const tooltipVariantClass: Record<TooltipVariant, string> = {
-  default: "bg-background",
-  "frosted-glass": "bg-background/70 backdrop-blur-sm",
-};
-
-// Solid var / gradient of vars for a node's indicator swatch — mirrors the repo's
-// getIndicatorColorStyle.
-function indicatorBackground(key: string, colorsCount: number): string {
-  if (colorsCount <= 1) return `var(--color-${key}-0)`;
-  const stops = Array.from({ length: colorsCount }, (_, i) => {
-    const offset = (i / (colorsCount - 1)) * 100;
-    return `var(--color-${key}-${i}) ${offset}%`;
-  }).join(", ");
-  return `linear-gradient(to right, ${stops})`;
-}
+// Tooltip HTML primitives (roundnessClass, tooltipVariantClass, tooltipIndicatorHtml,
+// tooltipRow, resolveTooltipPosition, indicatorBackground) now live in
+// @/registry/ui/echarts/tooltip and are imported at the top. The tooltip DOM lives
+// inside `[data-chart={id}]`, so the injected `--color-*` vars and Tailwind classes
+// resolve directly (no color read).
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Option builders — pure functions from a snapshot context to ECharts option
@@ -1020,19 +863,13 @@ function createTooltipFormatter(ctx: OptionBuildContext) {
     return typeof label === "string" ? label : name;
   };
   const colorsOf = (name: string) => (config[name] ? getColorsCount(config[name]) : 1);
-  const wrap = (body: string, title?: string) =>
-    `<div class="grid min-w-32 items-start gap-1.5 border border-border/50 px-2.5 py-1.5 text-xs shadow-xl ${roundnessClass[tooltipSlot.roundness]} ${tooltipVariantClass[tooltipSlot.variant]}">${
-      title ? `<div class="font-medium">${title}</div>` : ""
-    }<div class="grid gap-1.5">${body}</div></div>`;
-
-  const row = (indicator: string, label: string, value: string) =>
-    `<div class="flex w-full flex-wrap items-center gap-2">
-      <div class="h-2.5 w-2.5 shrink-0 rounded-[2px]" style="background:${indicator}"></div>
-      <div class="flex flex-1 items-center justify-between gap-4 leading-none">
-        <span class="text-muted-foreground">${label}</span>
-        <span class="text-foreground font-mono font-medium tabular-nums">${value}</span>
-      </div>
-    </div>`;
+  // A sankey tooltip carries no axis title — each hovered node/link surfaces a
+  // single indicator+label+value row. The shared tooltipShell always renders a
+  // title slot, so the outer surface stays a chart-local, title-less wrapper
+  // (reusing the shared roundness/variant classes); the row itself is the shared
+  // tooltipRow with the shared indicator swatch and no per-row dim.
+  const wrap = (body: string) =>
+    `<div class="grid min-w-32 items-start gap-1.5 border border-border/50 px-2.5 py-1.5 text-xs shadow-xl ${roundnessClass[tooltipSlot.roundness]} ${tooltipVariantClass[tooltipSlot.variant]}"><div class="grid gap-1.5">${body}</div></div>`;
 
   return (params: unknown): string => {
     const p = params as {
@@ -1046,17 +883,25 @@ function createTooltipFormatter(ctx: OptionBuildContext) {
       const target = String(p.data?.target ?? "");
       const value = typeof p.data?.value === "number" ? p.data.value.toLocaleString() : "";
       return wrap(
-        row(
-          indicatorBackground(source, colorsOf(source)),
-          `${labelOf(source)} → ${labelOf(target)}`,
-          value,
-        ),
+        tooltipRow({
+          indicatorHtml: tooltipIndicatorHtml(source, colorsOf(source)),
+          labelText: `${labelOf(source)} → ${labelOf(target)}`,
+          valueText: value,
+          dimmed: "",
+        }),
       );
     }
 
     const name = String(p.name ?? "");
     const value = (nodeValues[name] ?? 0).toLocaleString();
-    return wrap(row(indicatorBackground(name, colorsOf(name)), labelOf(name), value));
+    return wrap(
+      tooltipRow({
+        indicatorHtml: tooltipIndicatorHtml(name, colorsOf(name)),
+        labelText: labelOf(name),
+        valueText: value,
+        dimmed: "",
+      }),
+    );
   };
 }
 
@@ -1070,6 +915,12 @@ function buildTooltipOption(ctx: OptionBuildContext): TooltipComponentOption {
     borderWidth: 0,
     padding: 0,
     extraCssText: "box-shadow:none;",
+    // "variable" (default) keeps ECharts' item-follow position — the current
+    // behavior; "fixed" pins the tooltip near the top and tracks only the
+    // pointer's X. The sankey tooltip is item-triggered (nodes/links, no axis),
+    // so it wires the position directly through resolveTooltipPosition rather
+    // than tooltipBaseOption, which is trigger:"axis" only.
+    position: resolveTooltipPosition(tooltipSlot.position),
     formatter: createTooltipFormatter(ctx),
   };
 }

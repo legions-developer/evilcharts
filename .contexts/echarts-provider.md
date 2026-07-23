@@ -38,21 +38,33 @@ chart types SVG can't reach and for scale (tens of thousands of points).
    `<Dot/>`, `<ActiveDot/>` children. The children render `null`; the root walks
    them with `Children.forEach` comparing `child.type === Area` etc. and compiles
    one ECharts option. Presence semantics: omit a child → that part doesn't render.
-3. **Self-contained single file.** Only npm deps `echarts` (modular
-   `echarts/core` + `echarts.use([...])`) and `motion` (DOM touches only). No
-   `@/registry/ui/*` imports, no `@evilcharts/*` registryDependencies — installing
-   an echarts chart must never drag in recharts. The file defines and exports its
-   own `ChartConfig` type (identical shape to `src/registry/ui/chart.tsx`).
+3. **Shared UI modules, echarts-only.** Charts import their tooltip/legend/dot/
+   brush + color core from `src/registry/ui/echarts/{chart,tooltip,legend,dot,evil-brush}.tsx`
+   (registered as `@evilcharts/echarts-*`) and declare matching
+   `registryDependencies` — mirroring the recharts side (`ui/recharts/*`). NEVER
+   import `@/registry/ui/recharts/*` or any recharts registryDependency: installing
+   an echarts chart must never drag in recharts. npm deps stay `echarts` (modular
+   `echarts/core` + `echarts.use([...])`) + `motion`. `ChartConfig` and the color
+   plumbing live in `ui/echarts/chart.tsx`; charts re-export `ChartConfig` for
+   their examples. (Historical note: charts were originally one self-contained
+   file each; the shared modules were extracted afterward with zero behavior
+   change — area-chart is the reference for how to consume them.)
 4. **Same authored `chartConfig`** as recharts. Colors resolve from CSS variables
    at runtime (see §4) — never ask the consumer for literal colors.
+5. **Install names are `{provider}-{chart}`.** `@evilcharts/echarts-area-chart`,
+   `@evilcharts/recharts-area-chart`; shared ui is `@evilcharts/echarts-tooltip`
+   etc. Recharts sources live under `charts/recharts/*` + `ui/recharts/*`,
+   echarts under `charts/echarts/*` + `ui/echarts/*`; examples/blocks split by
+   provider subfolder. Install targets mirror the provider folders.
 
 ## 3. File map
 
 | Path                                                | Role                                                                                                                                                                                                                                                                                                                 |
 | --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/registry/charts/echarts/area-chart.tsx`        | The whole chart. ~2200 lines, one file, on purpose. **Reference implementation for every future echarts chart.** Section order: constants/knobs → public types → compound parts + children collection → color plumbing → fills/dots → brush overlay → misc helpers → pure option builders → `LiveState` → component. |
-| `src/registry/registry-chart.ts`                    | `echarts-area-chart` entry: `dependencies: ["echarts", "motion"]`, no registryDependencies, target `components/evilcharts/charts/echarts/area-chart.tsx`                                                                                                                                                             |
-| `src/registry/examples/ex-*-echarts-area-chart.tsx` | 20 examples, near-verbatim copies of the recharts twins (import swap + `EChartsExampleAreaChart` export)                                                                                                                                                                                                             |
+| `src/registry/charts/echarts/area-chart.tsx`        | ~1875 lines. **Reference implementation for every future echarts chart** and for how to consume the shared ui/echarts modules. Chart-specific code only now (compound parts, collectConfig, `LiveState`, `buildOption` + builders, loading shimmer, hit-testing); tooltip/legend/dot/brush/color-core come from the shared modules. Section order: constants/knobs → public types → compound parts + children collection → chart-specific option builders → `LiveState` → component. |
+| `src/registry/ui/echarts/{chart,tooltip,legend,dot,evil-brush}.tsx` | **Shared echarts UI** (`@evilcharts/echarts-*`). `chart` = color/config core (`ChartConfig`, `buildChartCss`, `resolveColors`, `withAlpha`, `flattenColor`, `seriesPaint`, `indicatorBackground`, …). `tooltip` = `tooltipBaseOption`/`tooltipShell`/`tooltipRow`/`tooltipIndicatorHtml` + the `position` prop (`resolveTooltipPosition`: "variable" follows pointer, "fixed" pins Y & tracks X). `legend` = `LegendOverlay`/`LegendIndicator`. `dot` = `dotStyle`/`sampleGradient`/`DOT_SIZES`. `evil-brush` = `syncBrushOverlay`/`buildBrushDataZoom`. |
+| `src/registry/registry-chart.ts`                    | `echarts-area-chart` entry: `dependencies: ["echarts", "motion"]`, `registryDependencies` on the `@evilcharts/echarts-*` modules it uses, target `components/evilcharts/charts/echarts/area-chart.tsx`                                                                                                                                                             |
+| `src/registry/examples/echarts/ex-*-echarts-area-chart.tsx` | 20 examples, near-verbatim copies of the recharts twins (import swap + `EChartsExampleAreaChart` export)                                                                                                                                                                                                             |
 | `src/content/docs/echarts/`                         | Provider index + `area-chart/static.mdx` (per-part API reference)                                                                                                                                                                                                                                                    |
 | `src/globals/constants/providers.ts`                | Provider ids, metadata, `available` flags, `providerFromPathname`                                                                                                                                                                                                                                                    |
 | `src/components/docs/sidebar/provider-switcher.tsx` | Base UI switcher (uses `render` prop, `data-popup-open`, `w-(--anchor-width)`; `DropdownMenuLabel` must sit inside `DropdownMenuGroup` or Base UI throws at runtime)                                                                                                                                                 |

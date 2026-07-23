@@ -1,6 +1,16 @@
 "use client";
 
 import {
+  resolveTooltipPosition,
+  roundnessClass,
+  tooltipIndicatorHtml,
+  tooltipRow,
+  tooltipVariantClass,
+  type TooltipPosition,
+  type TooltipRoundness,
+  type TooltipVariant,
+} from "@/registry/ui/echarts/tooltip";
+import {
   Children,
   isValidElement,
   useCallback,
@@ -9,17 +19,29 @@ import {
   useMemo,
   useRef,
   useState,
-  type ComponentType,
   type CSSProperties,
   type FC,
   type ReactNode,
 } from "react";
+import {
+  buildChartCss,
+  getColorsCount,
+  resolveColors,
+  withAlpha,
+  type ChartConfig,
+  type ResolvedColors,
+} from "@/registry/ui/echarts/chart";
 import { TooltipComponent, type TooltipComponentOption } from "echarts/components";
+import { LegendOverlay, type LegendVariant } from "@/registry/ui/echarts/legend";
 import { PieChart, type PieSeriesOption } from "echarts/charts";
 import { motion, useReducedMotion } from "motion/react";
 import { CanvasRenderer } from "echarts/renderers";
 import type { ComposeOption } from "echarts/core";
 import * as echarts from "echarts/core";
+
+// Re-export the shared types that were previously declared inline here, so
+// existing consumers/examples keep importing them from the chart module.
+export type { ChartConfig, LegendVariant, TooltipPosition, TooltipRoundness, TooltipVariant };
 
 // Modular registration keeps the bundle lean — only the pieces this chart needs.
 // A pie has no coordinate system, so there is no GridComponent and no axes; the
@@ -111,11 +133,6 @@ const LOADING_PEAK_OPACITY = 0.5; // fill inside the sweep window, × foreground
 const LOADING_SHIMMER_BAND = 0.28; // window half-width, fraction of the ring (0..1)
 const LOADING_SHIMMER_FEATHER = 0.22; // sine-eased edge softening of the window
 
-// Theme selectors mirror the repo's <ChartStyle>: light is the bare root, dark is `.dark`.
-const THEMES = { light: "", dark: ".dark" } as const;
-type ThemeKey = keyof typeof THEMES;
-const THEME_KEYS = Object.keys(THEMES) as ThemeKey[];
-
 // ─────────────────────────────────────────────────────────────────────────────
 // Public types
 // ─────────────────────────────────────────────────────────────────────────────
@@ -127,16 +144,9 @@ export type PieVariant = "gradient";
 // "outside" moves the sector's name past the rim with a leader line, matching the
 // classic ECharts pie (echarts.apache.org/examples/en/editor.html?c=pie-simple).
 export type LabelPosition = "inside" | "outside";
-export type TooltipVariant = "default" | "frosted-glass";
-export type TooltipRoundness = "sm" | "md" | "lg" | "xl";
-export type LegendVariant =
-  | "square"
-  | "circle"
-  | "circle-outline"
-  | "rounded-square"
-  | "rounded-square-outline"
-  | "vertical-bar"
-  | "horizontal-bar";
+// TooltipVariant, TooltipRoundness, TooltipPosition, LegendVariant, and ChartConfig
+// now live in the shared @/registry/ui/echarts/* modules and are imported +
+// re-exported at the top of this file.
 export type BackgroundVariant =
   | "dots"
   | "grid"
@@ -149,20 +159,6 @@ export type BackgroundVariant =
   | "overlapping-circles"
   | "wiggle-lines"
   | "bubbles";
-
-// Require at least one theme key — identical constraint to the repo's ChartConfig.
-type AtLeastOneThemeColor =
-  | { light: string[]; dark?: string[] }
-  | { light?: string[]; dark: string[] };
-
-export type ChartConfig = Record<
-  string,
-  {
-    label?: ReactNode;
-    icon?: ComponentType;
-    colors?: AtLeastOneThemeColor;
-  }
->;
 
 export interface EChartsPieChartProps<TData extends Record<string, unknown>> {
   data: TData[]; // rows rendered by the chart — one sector each
@@ -220,6 +216,7 @@ export interface TooltipProps {
   variant?: TooltipVariant; // visual style of the tooltip surface
   roundness?: TooltipRoundness; // border-radius of the tooltip
   defaultIndex?: number; // sector index shown by default with no hover
+  position?: TooltipPosition; // "variable" follows the pointer (default); "fixed" pins the tooltip near the top and tracks the pointer's X
 }
 
 /** Presence enables the hover tooltip. Renders nothing. */
@@ -266,6 +263,7 @@ type TooltipSlot = {
   variant: TooltipVariant;
   roundness: TooltipRoundness;
   defaultIndex?: number;
+  position: TooltipPosition;
 };
 type LegendSlot = {
   present: boolean;
@@ -289,6 +287,7 @@ function collectConfig(children: ReactNode): CollectedConfig {
     present: false,
     variant: "default",
     roundness: "lg",
+    position: "variable",
   };
   // Pie legend defaults differ from the area chart's: centered along the bottom.
   let legend: LegendSlot = {
@@ -334,6 +333,7 @@ function collectConfig(children: ReactNode): CollectedConfig {
         variant: props.variant ?? "default",
         roundness: props.roundness ?? "lg",
         defaultIndex: props.defaultIndex,
+        position: props.position ?? "variable",
       };
     } else if (type === Legend) {
       const props = child.props as LegendProps;
@@ -353,142 +353,14 @@ function collectConfig(children: ReactNode): CollectedConfig {
   return { pie, tooltip, legend, background };
 }
 
+// Color plumbing (ChartConfig, getColorsCount, buildChartCss, withAlpha,
+// ResolvedColors, resolveColors) now lives in @/registry/ui/echarts/chart and is
+// imported at the top of this file. The pie keeps its own DIAGONAL sectorPaint
+// below (the shared seriesPaint is a horizontal gradient).
+
 // ─────────────────────────────────────────────────────────────────────────────
-// Color plumbing — replicated from the repo's <ChartStyle> so this file stays
-// self-contained (no @/registry/ui imports).
+// Sector fill
 // ─────────────────────────────────────────────────────────────────────────────
-
-// Max slots a key needs = longest color array across themes (min 1). Both themes
-// always emit the same number of `--color-{key}-{n}` vars.
-function getColorsCount(item: ChartConfig[string]): number {
-  if (!item.colors) return 1;
-  const counts = THEME_KEYS.map((theme) => item.colors?.[theme]?.length ?? 0);
-  return Math.max(...counts, 1);
-}
-
-// Distribute colors evenly across slots; extra slots go to the LAST color(s).
-// 2 colors / 4 slots → [c0, c0, c1, c1]; 3 colors / 4 slots → [c0, c1, c2, c2].
-function distributeColors(colors: string[], maxCount: number): string[] {
-  const available = colors.length;
-  if (available >= maxCount) return colors.slice(0, maxCount);
-
-  const result: string[] = [];
-  const baseSlots = Math.floor(maxCount / available);
-  const extraSlots = maxCount % available;
-
-  for (let i = 0; i < available; i++) {
-    const isExtra = i >= available - extraSlots;
-    const slots = baseSlots + (isExtra ? 1 : 0);
-    for (let j = 0; j < slots; j++) result.push(colors[i]);
-  }
-
-  return result;
-}
-
-// Emits the same CSS <ChartStyle> would: `--color-{key}-{n}` scoped to
-// `[data-chart={id}]` (light) and `.dark [data-chart={id}]` (dark).
-function buildChartCss(id: string, config: ChartConfig): string {
-  const colorConfig = Object.entries(config).filter(([, item]) => item.colors);
-  if (!colorConfig.length) return "";
-
-  const varsFor = (theme: ThemeKey) =>
-    colorConfig
-      .flatMap(([key, item]) => {
-        const authored = item.colors?.[theme];
-        if (!authored || authored.length === 0) return [];
-        return distributeColors(authored, getColorsCount(item)).map(
-          (color, index) => `  --color-${key}-${index}: ${color};`,
-        );
-      })
-      .join("\n");
-
-  return Object.entries(THEMES)
-    .map(([theme, prefix]) => `${prefix} [data-chart=${id}] {\n${varsFor(theme as ThemeKey)}\n}`)
-    .join("\n");
-}
-
-// A single reusable 1×1 canvas normalizes ANY CSS color (hex, named, oklch, …)
-// to a concrete rgba string by painting it and reading the pixel back.
-let normalizerCtx: CanvasRenderingContext2D | null = null;
-function normalizeColor(value: string): string {
-  const raw = value.trim();
-  if (!raw || typeof document === "undefined") return raw;
-
-  if (!normalizerCtx) {
-    const canvas = document.createElement("canvas");
-    canvas.width = 1;
-    canvas.height = 1;
-    normalizerCtx = canvas.getContext("2d", { willReadFrequently: true });
-  }
-  if (!normalizerCtx) return raw;
-
-  normalizerCtx.clearRect(0, 0, 1, 1);
-  normalizerCtx.fillStyle = "#000";
-  normalizerCtx.fillStyle = raw; // invalid values leave the sentinel in place
-  normalizerCtx.fillRect(0, 0, 1, 1);
-  const [r, g, b, a] = normalizerCtx.getImageData(0, 0, 1, 1).data;
-  return `rgba(${r}, ${g}, ${b}, ${(a / 255).toFixed(3)})`;
-}
-
-// Scales the alpha of a normalized `rgba(r, g, b, a)` string. Multiplying (not
-// replacing) keeps translucent theme tokens honest: a background that is
-// already translucent stays translucent when tinted.
-function withAlpha(color: string, alpha: number): string {
-  const match = color.match(/rgba?\(([^)]+)\)/);
-  if (!match) return color;
-  const [r, g, b, a] = match[1].split(",").map((p) => p.trim());
-  const base = a === undefined ? 1 : Number.parseFloat(a) || 0;
-  return `rgba(${r}, ${g}, ${b}, ${(base * alpha).toFixed(3)})`;
-}
-
-type ResolvedColors = {
-  series: Record<string, string[]>; // normalized `--color-{key}-{n}` slots per sector name
-  tokens: {
-    mutedForeground: string;
-    border: string;
-    foreground: string;
-    background: string;
-  };
-};
-
-// Reads the injected CSS vars + theme tokens from the live DOM. Sector slots come
-// from `getComputedStyle` on the container; tokens are read off a throwaway probe
-// carrying the matching Tailwind class (robust to the var naming a theme uses).
-function resolveColors(
-  container: HTMLElement,
-  config: ChartConfig,
-  sectorKeys: string[],
-): ResolvedColors {
-  const computed = getComputedStyle(container);
-  const series: Record<string, string[]> = {};
-
-  for (const key of sectorKeys) {
-    const count = getColorsCount(config[key] ?? {});
-    const slots: string[] = [];
-    for (let n = 0; n < count; n++) {
-      const raw = computed.getPropertyValue(`--color-${key}-${n}`).trim();
-      slots.push(raw ? normalizeColor(raw) : FALLBACK_COLOR);
-    }
-    series[key] = slots;
-  }
-
-  const probe = document.createElement("span");
-  probe.style.cssText = "position:absolute;width:0;height:0;visibility:hidden;pointer-events:none;";
-  container.appendChild(probe);
-  const readToken = (className: string) => {
-    probe.className = className;
-    return normalizeColor(getComputedStyle(probe).color);
-  };
-  const tokens = {
-    mutedForeground: readToken("text-muted-foreground"),
-    border: readToken("text-border"),
-    foreground: readToken("text-foreground"),
-    background: readToken("text-background"),
-  };
-  container.removeChild(probe);
-
-  return { series, tokens };
-}
 
 // Per-sector fill: a solid color for a single-color config, else a diagonal
 // top-left → bottom-right gradient across the sector's own bounding box. This
@@ -524,84 +396,10 @@ function loadingSectorAlpha(pos: number, center: number): number {
   return LOADING_BASE_OPACITY + (LOADING_PEAK_OPACITY - LOADING_BASE_OPACITY) * eased;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Tooltip / legend HTML — the tooltip DOM lives inside `[data-chart={id}]`, so the
-// injected `--color-*` vars and Tailwind classes resolve directly (no color read).
-// ─────────────────────────────────────────────────────────────────────────────
-
-const roundnessClass: Record<TooltipRoundness, string> = {
-  sm: "rounded-sm",
-  md: "rounded-md",
-  lg: "rounded-lg",
-  xl: "rounded-xl",
-};
-
-const tooltipVariantClass: Record<TooltipVariant, string> = {
-  default: "bg-background",
-  "frosted-glass": "bg-background/70 backdrop-blur-sm",
-};
-
-// Solid var / gradient of vars for a sector indicator — mirrors getIndicatorColorStyle.
-function indicatorBackground(key: string, colorsCount: number): string {
-  if (colorsCount <= 1) return `var(--color-${key}-0)`;
-  const stops = Array.from({ length: colorsCount }, (_, i) => {
-    const offset = (i / (colorsCount - 1)) * 100;
-    return `var(--color-${key}-${i}) ${offset}%`;
-  }).join(", ");
-  return `linear-gradient(to right, ${stops})`;
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Legend overlay (React) — replicates ChartLegendContent + its 7 indicators.
-// ─────────────────────────────────────────────────────────────────────────────
-
-function legendFillStyle(key: string, colorsCount: number): CSSProperties {
-  if (colorsCount <= 1) return { backgroundColor: `var(--color-${key}-0)` };
-  return { background: indicatorBackground(key, colorsCount) };
-}
-
-// Punches out the centre with a mask-composite so only the "border" shows —
-// works with gradients and border-radius, unlike plain border-color.
-function legendOutlineStyle(key: string, colorsCount: number): CSSProperties {
-  const mask: CSSProperties = {
-    WebkitMask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-    WebkitMaskComposite: "xor",
-    mask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-    maskComposite: "exclude",
-  };
-  return { ...legendFillStyle(key, colorsCount), ...mask };
-}
-
-function LegendIndicator({
-  variant,
-  dataKey,
-  colorsCount,
-}: {
-  variant: LegendVariant;
-  dataKey: string;
-  colorsCount: number;
-}) {
-  const fill = legendFillStyle(dataKey, colorsCount);
-  const outline = legendOutlineStyle(dataKey, colorsCount);
-
-  switch (variant) {
-    case "square":
-      return <div className="h-2 w-2 shrink-0" style={fill} />;
-    case "circle":
-      return <div className="h-2 w-2 shrink-0 rounded-full" style={fill} />;
-    case "circle-outline":
-      return <div className="h-2.5 w-2.5 shrink-0 rounded-full p-[1.5px]" style={outline} />;
-    case "vertical-bar":
-      return <div className="h-3 w-1 shrink-0 rounded-[2px]" style={fill} />;
-    case "horizontal-bar":
-      return <div className="h-1 w-3 shrink-0 rounded-[2px]" style={fill} />;
-    case "rounded-square-outline":
-      return <div className="h-2.5 w-2.5 shrink-0 rounded-[3px] p-[1.5px]" style={outline} />;
-    case "rounded-square":
-    default:
-      return <div className="h-2 w-2 shrink-0 rounded-[2px]" style={fill} />;
-  }
-}
+// Tooltip styling (roundnessClass, tooltipVariantClass, tooltipRow,
+// tooltipIndicatorHtml) and the legend overlay (LegendOverlay + its indicators)
+// now live in @/registry/ui/echarts/{tooltip,legend} and are imported at the top
+// of this file.
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Background overlay (SVG) — the Recharts twin renders its decorative pattern in
@@ -837,13 +635,17 @@ function createTooltipFormatter(ctx: OptionBuildContext) {
     const value = typeof p.value === "number" ? p.value.toLocaleString() : String(p.value ?? "");
     const dimmed = selectedSector != null && selectedSector !== name ? " opacity-30" : "";
 
-    const row = `<div class="flex w-full flex-wrap items-center gap-2${dimmed}">
-        <div class="h-2.5 w-2.5 shrink-0 rounded-[2px]" style="background:${indicatorBackground(name, colorsCount)}"></div>
-        <div class="flex flex-1 items-center justify-between gap-4 leading-none">
-          <span class="text-muted-foreground">${labelText}</span>
-          <span class="text-foreground font-mono font-medium tabular-nums">${value}</span>
-        </div>
-      </div>`;
+    // The row shape matches the area chart's indicator + label + value, so it
+    // reuses the shared tooltipRow/tooltipIndicatorHtml. The pie tooltip is
+    // item-triggered with NO header (hideLabel), so it keeps its own no-header
+    // shell — built from the shared roundnessClass/tooltipVariantClass — rather
+    // than the header-carrying tooltipShell.
+    const row = tooltipRow({
+      indicatorHtml: tooltipIndicatorHtml(name, colorsCount),
+      labelText,
+      valueText: value,
+      dimmed,
+    });
 
     return `<div class="grid min-w-32 items-start gap-1.5 border border-border/50 px-2.5 py-1.5 text-xs shadow-xl ${roundnessClass[tooltipSlot.roundness]} ${tooltipVariantClass[tooltipSlot.variant]}">
       <div class="grid gap-1.5">${row}</div>
@@ -853,6 +655,11 @@ function createTooltipFormatter(ctx: OptionBuildContext) {
 
 function buildTooltipOption(ctx: OptionBuildContext): TooltipComponentOption {
   const { tooltipSlot, isLoading } = ctx;
+  // The pie tooltip is item-triggered (no axis, no cursor line), so it can't use
+  // the shared tooltipBaseOption (which is trigger:"axis" with an axisPointer).
+  // It keeps its own item-tooltip fields and wires the position prop directly
+  // through the shared resolveTooltipPosition — "variable" → undefined (default
+  // follow-the-pointer behavior), "fixed" → pinned near the top, tracking X.
   return {
     show: tooltipSlot.present && !isLoading,
     trigger: "item",
@@ -861,6 +668,7 @@ function buildTooltipOption(ctx: OptionBuildContext): TooltipComponentOption {
     borderWidth: 0,
     padding: 0,
     extraCssText: "box-shadow:none;",
+    position: resolveTooltipPosition(tooltipSlot.position),
     formatter: createTooltipFormatter(ctx),
   };
 }
@@ -1350,13 +1158,6 @@ export function EChartsPieChart<TData extends Record<string, unknown>>({
         : { top: "50%", transform: "translateY(-50%)" }),
   };
 
-  const legendJustify =
-    legendSlot.align === "left"
-      ? "justify-start"
-      : legendSlot.align === "center"
-        ? "justify-center"
-        : "justify-end";
-
   return (
     <div
       ref={containerRef}
@@ -1373,33 +1174,18 @@ export function EChartsPieChart<TData extends Record<string, unknown>>({
       </div>
 
       {legendSlot.present && !isLoading && (
-        <div style={legendStyle} className={`flex items-center gap-4 select-none ${legendJustify}`}>
-          {sectorKeys.map((key) => {
-            const item = config[key];
-            const colorsCount = item ? getColorsCount(item) : 1;
-            const isSelected = selectedSector === null || selectedSector === key;
-            return (
-              // No entrance here — the Recharts legend appears instantly, and a
-              // fade-in reads as disconnected from the canvas draw-in.
-              <div
-                key={key}
-                className={`flex items-center gap-1.5 transition-opacity ${
-                  !isSelected ? "opacity-30" : ""
-                } ${legendSlot.isClickable ? "cursor-pointer" : ""}`}
-                onClick={() => {
-                  if (legendSlot.isClickable) selectSector(selectedSector === key ? null : key);
-                }}
-              >
-                <LegendIndicator
-                  variant={legendSlot.variant}
-                  dataKey={key}
-                  colorsCount={colorsCount}
-                />
-                {item?.label}
-              </div>
-            );
-          })}
-        </div>
+        <LegendOverlay
+          seriesKeys={sectorKeys}
+          config={config}
+          variant={legendSlot.variant}
+          align={legendSlot.align}
+          verticalAlign={legendSlot.verticalAlign}
+          selectedKey={selectedSector}
+          hoveredKey={null}
+          isClickable={legendSlot.isClickable}
+          onToggle={(key) => selectSector(selectedSector === key ? null : key)}
+          style={legendStyle}
+        />
       )}
 
       {isLoading && (

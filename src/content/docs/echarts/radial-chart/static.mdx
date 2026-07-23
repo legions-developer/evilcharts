@@ -245,6 +245,9 @@ The hover tooltip, labeling each bar by name. Its presence enables the tooltip; 
   <ApiRow name="defaultIndex" type="number">
     Shows the tooltip by default at this data point index.
   </ApiRow>
+  <ApiRow name="position" type='"fixed" | "variable"' default='"variable"'>
+    How the tooltip is anchored. `"variable"` lets it follow the pointer (the default). `"fixed"` pins the tooltip near the top of the chart and only tracks the pointer's X.
+  </ApiRow>
 </ApiTable>
 
 <ApiHeading>Legend</ApiHeading>

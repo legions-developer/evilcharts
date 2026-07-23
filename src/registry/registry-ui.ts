@@ -4,75 +4,140 @@ const TARGET_BASE_PATH = "components/evilcharts/ui";
 
 export const ui: Registry["items"] = [
   {
-    name: "chart",
+    name: "recharts-chart",
     type: "registry:component",
     dependencies: ["recharts"],
     files: [
       {
-        path: "ui/chart.tsx",
+        path: "ui/recharts/chart.tsx",
         type: "registry:component",
-        target: TARGET_BASE_PATH + "/chart.tsx",
+        target: TARGET_BASE_PATH + "/recharts/chart.tsx",
       },
     ],
   },
   {
-    name: "tooltip",
+    name: "recharts-tooltip",
     type: "registry:component",
     dependencies: ["recharts"],
     files: [
       {
-        path: "ui/tooltip.tsx",
+        path: "ui/recharts/tooltip.tsx",
         type: "registry:component",
-        target: TARGET_BASE_PATH + "/tooltip.tsx",
+        target: TARGET_BASE_PATH + "/recharts/tooltip.tsx",
       },
     ],
   },
   {
-    name: "legend",
+    name: "recharts-legend",
     type: "registry:component",
     dependencies: ["recharts"],
     files: [
       {
-        path: "ui/legend.tsx",
+        path: "ui/recharts/legend.tsx",
         type: "registry:component",
-        target: TARGET_BASE_PATH + "/legend.tsx",
+        target: TARGET_BASE_PATH + "/recharts/legend.tsx",
       },
     ],
   },
   {
-    name: "dot",
+    name: "recharts-dot",
     type: "registry:component",
     dependencies: ["recharts"],
     files: [
       {
-        path: "ui/dot.tsx",
+        path: "ui/recharts/dot.tsx",
         type: "registry:component",
-        target: TARGET_BASE_PATH + "/dot.tsx",
+        target: TARGET_BASE_PATH + "/recharts/dot.tsx",
       },
     ],
   },
   {
-    name: "evil-brush",
+    name: "recharts-brush",
     type: "registry:component",
-    registryDependencies: ["@evilcharts/chart"],
+    registryDependencies: ["@evilcharts/recharts-chart"],
     dependencies: ["recharts"],
     files: [
       {
-        path: "ui/evil-brush.tsx",
+        path: "ui/recharts/evil-brush.tsx",
         type: "registry:component",
-        target: TARGET_BASE_PATH + "/evil-brush.tsx",
+        target: TARGET_BASE_PATH + "/recharts/evil-brush.tsx",
       },
     ],
   },
   {
-    name: "background",
+    name: "recharts-background",
     type: "registry:component",
     dependencies: ["recharts"],
     files: [
       {
-        path: "ui/background.tsx",
+        path: "ui/recharts/background.tsx",
         type: "registry:component",
-        target: TARGET_BASE_PATH + "/background.tsx",
+        target: TARGET_BASE_PATH + "/recharts/background.tsx",
+      },
+    ],
+  },
+
+  // ── ECharts shared UI — the canvas counterparts of the recharts primitives.
+  // Each ECharts chart pulls the modules it uses; nothing here touches recharts.
+  {
+    name: "echarts-chart",
+    type: "registry:component",
+    dependencies: ["echarts"],
+    files: [
+      {
+        path: "ui/echarts/chart.tsx",
+        type: "registry:component",
+        target: TARGET_BASE_PATH + "/echarts/chart.tsx",
+      },
+    ],
+  },
+  {
+    name: "echarts-tooltip",
+    type: "registry:component",
+    dependencies: ["echarts"],
+    registryDependencies: ["@evilcharts/echarts-chart"],
+    files: [
+      {
+        path: "ui/echarts/tooltip.tsx",
+        type: "registry:component",
+        target: TARGET_BASE_PATH + "/echarts/tooltip.tsx",
+      },
+    ],
+  },
+  {
+    name: "echarts-legend",
+    type: "registry:component",
+    registryDependencies: ["@evilcharts/echarts-chart"],
+    files: [
+      {
+        path: "ui/echarts/legend.tsx",
+        type: "registry:component",
+        target: TARGET_BASE_PATH + "/echarts/legend.tsx",
+      },
+    ],
+  },
+  {
+    name: "echarts-dot",
+    type: "registry:component",
+    dependencies: ["echarts"],
+    files: [
+      {
+        path: "ui/echarts/dot.tsx",
+        type: "registry:component",
+        target: TARGET_BASE_PATH + "/echarts/dot.tsx",
+      },
+    ],
+  },
+  {
+    name: "echarts-brush",
+    type: "registry:component",
+    dependencies: ["echarts"],
+    registryDependencies: ["@evilcharts/echarts-chart"],
+    files: [
+      {
+        path: "ui/echarts/evil-brush.tsx",
+        type: "registry:component",
+        target: TARGET_BASE_PATH + "/echarts/evil-brush.tsx",
       },
     ],
   },
