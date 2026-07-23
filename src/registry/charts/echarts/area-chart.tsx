@@ -55,7 +55,6 @@ const LOADING_STROKE_OPACITY = 0.28; // skeleton outline, × foreground alpha
 const LOADING_FILL_OPACITY = 0.06; // skeleton resting fill, × foreground alpha
 const LOADING_SHIMMER_MAX_OPACITY = 0.16; // shimmer sheen peak, × foreground alpha
 const LOADING_SHIMMER_BAND = 0.3; // sheen half-width, fraction of chart width
-const LOADING_BAND_SCALE = 0.45; // upper ghost bands hug the base wave at this ratio
 const BRUSH_STROKE_OPACITY = 0.5; // mini-chart series stroke
 const BRUSH_FILL_OPACITY = 0.15; // mini-chart series fade, at the top stop
 const BRUSH_BORDER_OPACITY = 1; // brush frame, × border alpha (evil-brush uses the full token)
@@ -909,14 +908,6 @@ function getLoadingData(points: number): number[] {
   return rows;
 }
 
-// The stacked skeleton: a full base wave, with every further ghost a thin band
-// hugging it — the silhouette of a stacked chart, not floating wires.
-function buildLoadingWaves(count: number, points: number): number[][] {
-  return Array.from({ length: count }, (_, i) =>
-    getLoadingData(points).map((v) => (i === 0 ? v : Math.round(v * LOADING_BAND_SCALE))),
-  );
-}
-
 // A wide, soft bell of alpha stops (sin² eased, 17 slots) that sweeps a sheen
 // through the skeleton fill. `center` may run outside [0, 1] so the sheen fully
 // enters and exits the frame instead of piling up at the edges.
@@ -1065,14 +1056,9 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
   // One ghost wave per declared <Area>, so the skeleton previews the shape of
   // the chart it becomes. Created lazily — an impure initializer would re-roll
   // Math.random() on every render.
-  const loadingDataRef = useRef<number[][] | null>(null);
-  const loadingWaves = useCallback(
-    (count: number) => {
-      if (!loadingDataRef.current || loadingDataRef.current.length !== count) {
-        loadingDataRef.current = buildLoadingWaves(count, loadingPoints);
-      }
-      return loadingDataRef.current;
-    },
+  const loadingDataRef = useRef<number[] | null>(null);
+  const loadingData = useCallback(
+    () => (loadingDataRef.current ??= getLoadingData(loadingPoints)),
     [loadingPoints],
   );
   const shouldReduceMotion = useReducedMotion();
@@ -1256,7 +1242,7 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
       type: "category",
       boundaryGap: false,
       show: true,
-      data: isLoading ? loadingWaves(Math.max(areas.length, 1))[0].map((_, i) => i) : categories,
+      data: isLoading ? loadingData().map((_, i) => i) : categories,
       axisLine: { show: false },
       axisTick: { show: false },
       splitLine: { show: false },
@@ -1423,11 +1409,10 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
         ]
       : undefined;
 
-    // Loading skeleton — stacked gray ghost waves (one per <Area>), swept by the
-    // shimmer rAF.
+    // Loading skeleton — ONE gray wave regardless of declared areas (Recharts
+    // parity: its skeleton is a single LoadingArea), swept by the shimmer rAF.
     if (isLoading) {
       const curve = curveConfig(curveType);
-      const waves = loadingWaves(Math.max(areas.length, 1));
 
       return {
         animation: false,
@@ -1435,19 +1420,20 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
         xAxis,
         yAxis,
         tooltip: { show: false },
-        series: waves.map((wave, index) => ({
-          id: `__loading-${index}`,
-          type: "line",
-          data: wave,
-          stack: "__loading",
-          smooth: curve.smooth,
-          step: curve.step,
-          showSymbol: false,
-          silent: true,
-          lineStyle: { color: tokens.foreground, width: 1, opacity: LOADING_STROKE_OPACITY },
-          areaStyle: { color: withAlpha(tokens.foreground, LOADING_FILL_OPACITY) },
-          z: 1,
-        })),
+        series: [
+          {
+            id: "__loading",
+            type: "line",
+            data: loadingData(),
+            smooth: curve.smooth,
+            step: curve.step,
+            showSymbol: false,
+            silent: true,
+            lineStyle: { color: tokens.foreground, width: 1, opacity: LOADING_STROKE_OPACITY },
+            areaStyle: { color: withAlpha(tokens.foreground, LOADING_FILL_OPACITY) },
+            z: 1,
+          },
+        ],
       } as unknown as EChartsOption;
     }
 
@@ -1634,7 +1620,7 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
     tooltipSlot,
     legendSlot,
     isLoading,
-    loadingWaves,
+    loadingData,
     showBrush,
     brushHeight,
     enableHoverHighlight,
@@ -1873,10 +1859,7 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
     const tick = (now: number) => {
       const phase = ((((now - start) / LOADING_ANIMATION_DURATION) % 1) + 1) % 1;
       // Wrapped past 1 → the band is off-screen; swap in fresh random data.
-      if (phase < lastPhase) {
-        loadingDataRef.current =
-          buildLoadingWaves(loadingDataRef.current?.length ?? 1, loadingPoints);
-      }
+      if (phase < lastPhase) loadingDataRef.current = getLoadingData(loadingPoints);
       lastPhase = phase;
 
       // Read tokens per frame, so a theme flip mid-loading retints the shimmer.
@@ -1892,20 +1875,14 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
         shimmerStops(center, foreground),
       );
       chart.setOption(
-        {
-          series: (loadingDataRef.current ?? []).map((wave, index) => ({
-            id: `__loading-${index}`,
-            data: wave,
-            areaStyle: { color: gradient },
-          })),
-        },
+        { series: [{ id: "__loading", data: loadingData(), areaStyle: { color: gradient } }] },
         { silent: true, lazyUpdate: true },
       );
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [isLoading, loadingPoints]);
+  }, [isLoading, loadingPoints, loadingData]);
 
   // ── Legend overlay position ──────────────────────────────────────────────────
   // Insets match the Recharts legend's breathing room inside the plot frame.

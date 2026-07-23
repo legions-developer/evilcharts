@@ -184,13 +184,14 @@ seriesIndex fallback as clicks; `__`-prefixed internal series are ignored.
 
 ## 9. Loading state
 
-- One stacked gray ghost wave **per declared `<Area>`** (`__loading-{i}`), so
-  the skeleton previews the shape of the chart it becomes. Data is a smooth
-  random walk (16–58 band), not raw noise. Lazy-created (`loadingWaves(count)`) —
-  an impure `useRef` initializer would re-roll `Math.random()` every render.
-- Shimmer: a tight sin²-eased bell (width ±0.12) swept through the area fill by
-  a rAF loop (2s linear); data regenerates only when the band is off-screen.
-  The loop reads theme tokens per frame, so theme flips retint mid-loading.
+- **ONE gray wave regardless of declared areas** (`__loading`) — Recharts
+  parity: its skeleton is a single `LoadingArea`. Data is a smooth random walk
+  (16–58 band), not raw noise. Lazy-created (`loadingData()`) — an impure
+  `useRef` initializer would re-roll `Math.random()` every render.
+- Shimmer: a wide, soft sin²-eased bell (`LOADING_SHIMMER_BAND` ±0.3, low peak)
+  leaned diagonally, swept fully off-screen on both sides by a rAF loop
+  (2s linear); data regenerates only while the band is off-screen. The loop
+  reads theme tokens per frame, so theme flips retint mid-loading.
 - While loading: y-axis labels hidden, x labels hidden, legend hidden, tooltip
   off. The centered "Loading" pill scales in with motion.
 
