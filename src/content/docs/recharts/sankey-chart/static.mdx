@@ -1,6 +1,6 @@
 ---
 title: Sankey Chart
-description: Sankey charts for visualizing flow data with nodes and links, featuring gradient colors and glow effects
+description: Sankey charts for flow data with nodes and links, plus gradient colors and glow effects
 image: /og/sankey-chart.png
 links:
   github: https://github.com/legions-developer/evilcharts/blob/main/src/registry/charts/sankey-chart.tsx
@@ -29,10 +29,9 @@ links:
         </StepContent>
       </Step>
       <Step>
-        <StepTitle>Copy and paste the following code snippets into your project.</StepTitle>
+        <StepTitle>Copy the code below into your project.</StepTitle>
          <StepDescription>
-          To use the chart, first create the folder `evilcharts` and a subfolder called `charts` inside your `components` directory.
-          Then, copy the following base sankey-chart code into a new file in that folder.
+          Create an `evilcharts` folder with a `charts` subfolder inside your `components` directory, then copy the base sankey-chart code into a new file there.
         </StepDescription>
         <StepContent>
           <ComponentSource
@@ -42,11 +41,9 @@ links:
         </StepContent>
       </Step>
        <Step>
-        <StepTitle>Now, Let's add the chart component to your project.</StepTitle>
+        <StepTitle>Add the chart component to your project.</StepTitle>
         <StepDescription>
-          These Components are required by the chart component to render the chart. Make a folder called `ui` inside the `evilcharts` folder and paste the code there.
-
-          Below is main chart component.
+          The chart needs these components to render. Make a `ui` folder inside `evilcharts` and paste the main chart component below.
         </StepDescription>
         <StepContent>
           <ComponentSource
@@ -61,9 +58,8 @@ links:
 
 ## Usage
 
-The sankey chart is a composible compound component: `<EvilSankeyChart />` is the
-container, and `<Node />`, `<Link />`, and `<Tooltip />` are composed as children.
-Render only the parts you need.
+A compound component: `<EvilSankeyChart />` is the container; `<Node />`,
+`<Link />`, and `<Tooltip />` compose as children. Render only the parts you need.
 
 ```tsx
 import {
@@ -116,8 +112,8 @@ const chartConfig = {
 
 ### Interactive Selection
 
-Set `isClickable` on `<Node />` to let nodes be selected by clicking. Use the
-`onSelectionChange` callback on the root to handle selection events:
+Set `isClickable` on `<Node />` to select nodes on click. Handle events with the
+root's `onSelectionChange` callback:
 
 ```tsx
 <EvilSankeyChart
@@ -142,13 +138,13 @@ Set `isClickable` on `<Node />` to let nodes be selected by clicking. Use the
 <ComponentPreview className="mb-0" title="isLoading='true'" name="ex-loading-state-sankey-chart"  />
 <Alert > 
   <AlertContent >
-    The sankey chart supports loading state with a placeholder animation showing nodes and links. You can pass the `isLoading` prop to `<EvilSankeyChart />` to show the loading state while your data is being fetched.
+    Pass `isLoading` to `<EvilSankeyChart />` to show a placeholder animation of nodes and links while data loads.
   </AlertContent>
 </Alert>
 
 ## Examples
 
-Below are some examples of the sankey chart with different configurations. You can customize the `<Link />` `variant`, the root `nodeWidth`, `nodePadding`, and other properties.
+Customize the `<Link />` `variant`, the root `nodeWidth`, `nodePadding`, and more.
 
 ### Gradient Colors
 
@@ -169,7 +165,7 @@ Below are some examples of the sankey chart with different configurations. You c
 <ComponentPreview className="mb-0" title="showNodeLabels='inside' - solid colors" name="ex-solid-labeled-nodes-sankey-chart"  />
 <Alert> 
   <AlertContent>
-    Use a larger `nodeWidth` (e.g., 80) on the root to accommodate the text. You can also use `verticalPadding` on `<Link />` to add padding where links connect to nodes.
+    Use a larger `nodeWidth` (e.g., 80) on the root to fit the text. Add `verticalPadding` on `<Link />` for space where links meet nodes.
   </AlertContent>
 </Alert>  
 
@@ -181,7 +177,7 @@ Below are some examples of the sankey chart with different configurations. You c
 
 <Alert>
   <AlertContent>
-    The sankey chart supports different link coloring strategies through the `variant` prop on `<Link />`.
+    The `variant` prop on `<Link />` sets the link coloring strategy.
   </AlertContent>
 </Alert>
 
@@ -190,7 +186,7 @@ Below are some examples of the sankey chart with different configurations. You c
 <ComponentPreview className="mb-0" title="<Link variant='solid' />" name="ex-solid-link-variant-sankey-chart"  />
 <Alert> 
   <AlertContent>
-    Set `<Link />` `variant` to `"solid"` to use a single color for all links. This creates a clean, minimal look.
+    Set `<Link />` `variant` to `"solid"` for a single color across all links — clean and minimal.
   </AlertContent>
 </Alert>
 
@@ -199,7 +195,7 @@ Below are some examples of the sankey chart with different configurations. You c
 <ComponentPreview className="mb-0" title="<Link variant='source' />" name="ex-source-link-variant-sankey-chart"  />
 <Alert> 
   <AlertContent>
-    Set `<Link />` `variant` to `"source"` to color links based on their source node. This helps trace where flows originate.
+    Set `<Link />` `variant` to `"source"` to color links by their source node, tracing where flows originate.
   </AlertContent>
 </Alert>
 
@@ -208,33 +204,33 @@ Below are some examples of the sankey chart with different configurations. You c
 <ComponentPreview className="mb-0" title="<Node glow={['Solar', 'Wind']} />" name="ex-glowing-sankey-chart"  />
 <Alert> 
   <AlertContent>
-    Add a subtle glow effect to specific nodes using the `glow` prop on `<Node />`. Pass an array of node names to specify which nodes should glow.
+    Pass an array of node names to the `glow` prop on `<Node />` to add a subtle glow to those nodes.
   </AlertContent>
 </Alert>
 
 
 ## API Reference
 
-The sankey chart is composed of a root container and a small set of composible
-parts. Render the root, then compose the parts you need as children.
+A root container plus a few composible parts. Render the root, then compose the
+parts you need.
 
 <ApiHeading>EvilSankeyChart</ApiHeading>
 
-The root container. Owns the flow data, the layout configuration, the shared
-context, and the loading skeleton.
+The root container. Owns the flow data, layout config, shared context, and the
+loading skeleton.
 
 <ApiTable>
   <ApiRow name="data" type="SankeyData" required>
-    Sankey diagram data containing nodes and links. Nodes represent entities, and links represent flows between them. `SankeyData` is `{ nodes: SankeyNode[]; links: SankeyLink[] }`, where `SankeyNode = { name: string; icon?: ReactNode }` and `SankeyLink = { source: number; target: number; value: number }`.
+    Nodes and links for the diagram — nodes are entities, links are flows between them. `SankeyData` is `{ nodes: SankeyNode[]; links: SankeyLink[] }`, where `SankeyNode = { name: string; icon?: ReactNode }` and `SankeyLink = { source: number; target: number; value: number }`.
   </ApiRow>
   <ApiRow name="config" type="ChartConfig" required>
-    Configuration object that defines the chart's nodes. Each key should match a node name from your data, with corresponding colors.
+    Defines the chart's nodes. Each key matches a node name from your data and sets its colors.
   </ApiRow>
   <ApiRow name="children" type="ReactNode" required>
     The composed parts — `<Node />`, `<Link />`, and `<Tooltip />`.
   </ApiRow>
   <ApiRow name="className" type="string">
-    Additional CSS classes to apply to the chart container.
+    Extra CSS classes for the chart container.
   </ApiRow>
   <ApiRow name="nodeWidth" type="number" default="10">
     The width of each node in pixels.
@@ -246,16 +242,16 @@ context, and the loading skeleton.
     The curvature of links between nodes. Value between 0 (straight) and 1 (maximum curve).
   </ApiRow>
   <ApiRow name="iterations" type="number" default="32">
-    Number of iterations for the Sankey layout algorithm. Higher values produce better layouts but take more time.
+    Iterations for the Sankey layout algorithm. Higher values improve the layout but take more time.
   </ApiRow>
   <ApiRow name="sort" type="boolean" default="true">
     Whether to sort nodes automatically for optimal layout.
   </ApiRow>
   <ApiRow name="align" type='"left" | "justify"' default='"justify"'>
-    Horizontal alignment strategy for nodes. `"left"` aligns nodes to the left, `"justify"` spreads them across the width.
+    Horizontal alignment for nodes. `"left"` aligns left; `"justify"` spreads them across the width.
   </ApiRow>
   <ApiRow name="verticalAlign" type='"justify" | "top"' default='"justify"'>
-    Vertical alignment strategy for nodes. `"top"` aligns to top, `"justify"` distributes vertically.
+    Vertical alignment for nodes. `"top"` aligns to top; `"justify"` distributes vertically.
   </ApiRow>
   <ApiRow name="backgroundVariant" type="BackgroundVariant">
     Background pattern variant to display behind the chart.
@@ -264,30 +260,30 @@ context, and the loading skeleton.
     The node name selected on first render.
   </ApiRow>
   <ApiRow name="onSelectionChange" type="(selection: { dataKey: string; value: number } | null) => void">
-    Callback function that is called when a node is selected or deselected. Receives an object with `dataKey` (node name) and `value` (node value calculated from links), or `null` when deselected. Fires when a node is clicked while `<Node />` has `isClickable` set.
+    Called when a node is selected or deselected. Receives an object with `dataKey` (node name) and `value` (calculated from links), or `null` when deselected. Fires on node click when `<Node />` has `isClickable` set.
   </ApiRow>
   <ApiRow name="isLoading" type="boolean" default="false">
     Shows a loading placeholder animation when data is being fetched.
   </ApiRow>
   <ApiRow name="sankeyProps" type='Omit<SankeyProps, "data">'>
-    Additional props to pass to the underlying Recharts Sankey component. Read the <Link href="https://recharts.github.io/en-US/api/Sankey/" _blank>Recharts Sankey documentation</Link> for available props.
+    Extra props for the underlying Recharts Sankey component. See the <Link href="https://recharts.github.io/en-US/api/Sankey/" _blank>Recharts Sankey documentation</Link> for available props.
   </ApiRow>
 </ApiTable>
 
 <ApiHeading>Node</ApiHeading>
 
-Configures how the sankey nodes render. Compose a `<NodeLabel />` inside it to
-show labels and values.
+Configures how nodes render. Compose a `<NodeLabel />` inside to show labels and
+values.
 
 <ApiTable>
   <ApiRow name="radius" type="number" default="0">
     The corner radius of node rectangles in pixels. Set to 0 for square nodes.
   </ApiRow>
   <ApiRow name="isClickable" type="boolean" default="false">
-    Enables interactive clicking on nodes to select/deselect them. Selected nodes become highlighted while unselected nodes and their links dim.
+    Lets nodes be clicked to select or deselect them. Selected nodes highlight while the rest, and their links, dim.
   </ApiRow>
   <ApiRow name="glow" type="string[]" default="[]">
-    Array of node names that should have a glowing effect applied. Creates a smooth outer glow around the specified nodes.
+    Node names to apply a glow effect to. Renders a smooth outer glow around them.
   </ApiRow>
   <ApiRow name="children" type="ReactNode">
     Optional `<NodeLabel />` composition.
@@ -300,7 +296,7 @@ Declares labels for the `<Node />` it is composed inside.
 
 <ApiTable>
   <ApiRow name="position" type='"inside" | "outside"'>
-    Position of node labels. `"inside"` shows labels inside nodes, `"outside"` shows labels beside nodes. When `<NodeLabel />` is not composed, no labels are shown.
+    Label position. `"inside"` shows labels inside nodes; `"outside"` shows them beside nodes. Without `<NodeLabel />`, no labels render.
   </ApiRow>
   <ApiRow name="showValues" type="boolean" default="false">
     Whether to display the total flow value alongside each node label.
@@ -312,17 +308,17 @@ Declares labels for the `<Node />` it is composed inside.
 
 <ApiHeading>Link</ApiHeading>
 
-Configures how the sankey links render.
+Configures how links render.
 
 <ApiTable>
   <ApiRow name="variant" type='"gradient" | "solid" | "source" | "target"' default='"gradient"'>
-    The coloring strategy for links. `"gradient"` fades from source to target color, `"solid"` uses a single color, `"source"` uses the source node color, `"target"` uses the target node color.
+    Coloring strategy for links. `"gradient"` fades source to target; `"solid"` uses one color; `"source"` uses the source node color; `"target"` uses the target node color.
   </ApiRow>
   <ApiRow name="verticalPadding" type="number" default="0">
     Vertical padding where links connect to nodes in pixels. Useful when using node labels.
   </ApiRow>
   <ApiRow name="glow" type="number[]" default="[]">
-    Array of link indices that should have a glowing effect applied. Creates a smooth outer glow around the specified links.
+    Link indices to apply a glow effect to. Renders a smooth outer glow around them.
   </ApiRow>
 </ApiTable>
 
@@ -338,6 +334,6 @@ The hover tooltip. Hidden automatically while the chart is loading.
     Controls the border-radius of the tooltip.
   </ApiRow>
   <ApiRow name="defaultIndex" type="number">
-    When set, the tooltip will be visible by default at the specified data point index.
+    When set, shows the tooltip by default at this data point index.
   </ApiRow>
 </ApiTable>

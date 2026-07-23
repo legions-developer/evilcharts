@@ -1,6 +1,6 @@
 ---
 title: Area Chart
-description: Simple static & beautifully designed area charts
+description: Static, beautifully designed area charts
 image: /og/area-chart.png
 links:
   github: https://github.com/legions-developer/evilcharts/blob/main/src/registry/charts/area-chart.tsx
@@ -29,10 +29,9 @@ links:
         </StepContent>
       </Step>
       <Step>
-        <StepTitle>Copy and paste the following code snippets into your project.</StepTitle>
+        <StepTitle>Copy the code snippets into your project.</StepTitle>
          <StepDescription>
-          To use the chart, first create the folder `evilcharts` and a subfolder called `charts` inside your `components` directory.
-          Then, copy the following base area-chart code into a new file in that folder.
+          Inside `components`, create an `evilcharts` folder with a `charts` subfolder, then paste the base chart code into a new file there.
         </StepDescription>
         <StepContent>
           <ComponentSource
@@ -42,11 +41,11 @@ links:
         </StepContent>
       </Step>
        <Step>
-        <StepTitle>Now, Let's add the chart component to your project.</StepTitle>
+        <StepTitle>Add the main chart component.</StepTitle>
         <StepDescription>
-          These Components are required by the chart component to render the chart. Make a folder called `ui` inside the `evilcharts` folder and paste the code there.
+          The chart needs these components to render. Create a `ui` folder inside `evilcharts` and paste the code there.
 
-          Below is main chart component.
+          Below is the main chart component.
         </StepDescription>
         <StepContent>
           <ComponentSource
@@ -56,9 +55,9 @@ links:
         </StepContent>
       </Step>
        <Step>
-        <StepTitle>Now, We need to add sub components.</StepTitle>
+        <StepTitle>Add the sub-components.</StepTitle>
         <StepDescription>
-          Create a file called `tooltip.tsx` inside the `evilcharts/ui` folder and paste the code there.
+          Create `tooltip.tsx` inside `evilcharts/ui` and paste the code there.
         </StepDescription>
         <StepContent>
           <ComponentSource
@@ -67,7 +66,7 @@ links:
           />
         </StepContent>
         <StepDescription>
-          Now, create another file called `legend.tsx` inside the `evilcharts/ui` folder and paste the code there.
+          Next, create `legend.tsx` in the same folder and paste the code there.
         </StepDescription>
         <StepContent>
           <ComponentSource
@@ -76,7 +75,7 @@ links:
           />
         </StepContent>
         <StepDescription>
-          Finally, create last file called `dot.tsx` inside the `evilcharts/ui` folder and paste the code there.
+          Finally, create `dot.tsx` in the same folder and paste the code there.
         </StepDescription>
         <StepContent>
           <ComponentSource
@@ -91,7 +90,7 @@ links:
 
 ## Usage
 
-The area chart is composible. `<EvilAreaChart>` is the container, and you compose only the parts you need — `<Grid>`, `<XAxis>`, `<YAxis>`, `<Legend>`, `<Tooltip>`, and one or more `<Area>` — as its children. Each `<Area>` carries its own `variant`, `strokeVariant`, and `isClickable`, so a single chart can mix fill styles, stroke styles, and make only some series interactive.
+The area chart is composable. `<EvilAreaChart>` is the container; drop in only the parts you need — `<Grid>`, `<XAxis>`, `<YAxis>`, `<Legend>`, `<Tooltip>`, and one or more `<Area>` — as children. Each `<Area>` owns its `variant`, `strokeVariant`, and `isClickable`, so one chart can mix fills, strokes, and per-series interactivity.
 
 ```tsx
 import {
@@ -126,7 +125,7 @@ import {
 
 ### Interactive Selection
 
-Add `isClickable` to any `<Area>` (and to `<Legend>`) to make those series selectable. Use the `onSelectionChange` callback on `<EvilAreaChart>` to handle selection events:
+Add `isClickable` to any `<Area>` (and to `<Legend>`) to make series selectable, then handle events with the `onSelectionChange` callback on `<EvilAreaChart>`:
 
 ```tsx
 <EvilAreaChart
@@ -153,13 +152,13 @@ Add `isClickable` to any `<Area>` (and to `<Legend>`) to make those series selec
 <ComponentPreview className="mb-0" title="isLoading='true'" name="ex-loading-state-area-chart"  />
 <Alert > 
   <AlertContent >
-    The area chart supports loading state. You can pass the `isLoading` prop to the chart to show the loading state. You can also pass `curveType` to customize the curve type of the loading state. Here, im using `curveType='bump'` to make the loading state more realistic.
+    Pass `isLoading` to show the loading skeleton, and `curveType` to shape it. This example uses `curveType='bump'` for a more realistic look.
   </AlertContent>
 </Alert>
 
 ## Examples
 
-Below are some examples of the area chart with different `variants`. where you can change the `stackType`, `curveType`, `strokeVariant` & `areaVariant`. 
+Examples across different `variants` — mix `stackType`, `curveType`, `strokeVariant`, and `areaVariant`.
 
 ### Gradient Colors
 
@@ -195,18 +194,18 @@ Below are some examples of the area chart with different `variants`. where you c
 
 ## API Reference
 
-The chart is composed of several parts. The props below are grouped by the component they belong to.
+The chart has several parts. Props below are grouped by component.
 
 <ApiHeading>EvilAreaChart</ApiHeading>
 
-The root container. It owns the data, the shared selection state, the loading skeleton, and the optional brush. Everything visual is composed as its children.
+The root container. Owns the data, shared selection state, loading skeleton, and optional brush; everything visual is composed as children.
 
 <ApiTable>
   <ApiRow name="data" type="TData[]" required>
-    Data used to display the chart — an array of objects where each object is a data point (`TData extends Record<string, unknown>`).
+    The chart data — an array of objects, one per data point (`TData extends Record<string, unknown>`).
   </ApiRow>
   <ApiRow name="config" type="Record<string, ChartConfig[string]>" required>
-    Defines the chart's series. Each key matches a data key, with a color or color array.
+    Defines the series — each key matches a data key with a color or color array.
   </ApiRow>
   <ApiRow name="children" type="ReactNode" required>
     The composed chart parts — `<Grid />`, `<XAxis />`, `<YAxis />`, `<Legend />`, `<Tooltip />`, and one or more `<Area />`.
@@ -218,7 +217,7 @@ The root container. It owns the data, the shared selection state, the loading sk
     Default curve interpolation inherited by every `<Area />`.
   </ApiRow>
   <ApiRow name="animationType" type='"none" | "left-to-right" | "right-to-left" | "center-out" | "edges-in"' default='"left-to-right"'>
-    Direction of the custom intro reveal inherited by every `<Area />`. `"none"` disables it — devices with the OS reduce-motion preference fall back to `"none"` automatically.
+    Direction of the intro reveal inherited by every `<Area />`. `"none"` disables it; the OS reduce-motion preference forces `"none"` automatically.
   </ApiRow>
   <ApiRow name="stackType" type='"default" | "expanded" | "stacked"' default='"default"'>
     How multiple areas combine — independent, stacked, or normalized to 100%.
@@ -257,14 +256,14 @@ The root container. It owns the data, the shared selection state, the loading sk
 
 <ApiHeading>Area</ApiHeading>
 
-A single area series. Each `<Area />` is self-contained and generates its own gradient/pattern definitions, so a chart can hold any number of areas — each with its own variant, stroke, and clickability.
+A single area series. Each `<Area />` is self-contained, generating its own gradient/pattern definitions, so a chart can hold any number — each with its own variant, stroke, and clickability.
 
 <ApiTable>
   <ApiRow name="dataKey" type="string" required>
     The series key. Must exist on both the data rows and the chart `config`.
   </ApiRow>
   <ApiRow name="variant" type='"gradient" | "gradient-reverse" | "solid" | "dotted" | "lines" | "hatched"' default='"gradient"'>
-    The visual style of the area fill. Applies to this area only.
+    The fill style for this area.
   </ApiRow>
   <ApiRow name="strokeVariant" type='"solid" | "dashed" | "animated-dashed"' default='"dashed"'>
     The stroke style for this area.
@@ -279,7 +278,7 @@ A single area series. Each `<Area />` is self-contained and generates its own gr
     Whether to connect line segments across null or missing values.
   </ApiRow>
   <ApiRow name="isClickable" type="boolean" default="false">
-    Lets this area be selected by clicking it. When any area is selected, unselected areas become semi-transparent.
+    Lets this area be selected on click. When any area is selected, the rest dim to semi-transparent.
   </ApiRow>
   <ApiRow name="children" type="ReactNode">
     Optional `<Dot />` and `<ActiveDot />` composition that adds point markers to this area.
@@ -301,7 +300,7 @@ Point markers composed inside an `<Area />`. `<Dot />` is the resting marker; `<
 
 <ApiHeading>XAxis and YAxis</ApiHeading>
 
-The category and value axes. Both ship with the chart's flat default styling and forward every Recharts axis prop, so `dataKey`, `tickFormatter`, `tickMargin`, etc. pass straight through. They are hidden automatically while the chart is loading, and `<YAxis />` formats ticks as percentages when `stackType="expanded"`.
+The category and value axes. Both use the chart's flat default styling and forward every Recharts axis prop — `dataKey`, `tickFormatter`, `tickMargin`, and the rest pass straight through. Both hide while the chart loads, and `<YAxis />` formats ticks as percentages when `stackType="expanded"`.
 
 <ApiTable>
   <ApiRow name="dataKey" type="string">

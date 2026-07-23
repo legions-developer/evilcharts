@@ -1,6 +1,6 @@
 ---
 title: Radar Chart
-description: Beautiful radar charts with filled and lines variants and gradient colors, powered by Apache ECharts
+description: Radar charts with filled and lines variants and gradient colors, powered by Apache ECharts
 image: /og/radar-chart.png
 links:
   github: https://github.com/legions-developer/evilcharts/blob/main/src/registry/charts/echarts/radar-chart.tsx
@@ -31,8 +31,7 @@ links:
       <Step>
         <StepTitle>Copy and paste the following code snippets into your project.</StepTitle>
         <StepDescription>
-          To use the chart, first create the folder `evilcharts` and a subfolder called `charts` (with an `echarts` folder inside) in your `components` directory.
-          Then, copy the following radar-chart code into a new file in that folder. Unlike the Recharts twin, this component is fully self-contained — it ships everything ECharts needs in a single file, so there are no extra `ui` sub-components to add.
+          Create the folder `evilcharts` with a `charts` subfolder (and an `echarts` folder inside) in your `components` directory, then paste the radar-chart code into a new file there. Unlike the Recharts twin, this component is self-contained — everything ECharts needs ships in one file, with no extra `ui` sub-components to add.
         </StepDescription>
         <StepContent>
           <ComponentSource
@@ -47,7 +46,7 @@ links:
 
 ## Usage
 
-The ECharts radar chart is composible, with the same API shape as the Recharts twin. `<EChartsRadarChart>` is the container, and you compose only the parts you need — `<PolarGrid>`, `<PolarAngleAxis>`, `<PolarRadiusAxis>`, `<Legend>`, `<Tooltip>`, and one or more `<Radar>` — as its children. Each `<Radar>` carries its own `variant` and `isClickable`, so a single chart can mix fill styles and make only some series interactive.
+The ECharts radar chart is composible, sharing the Recharts twin's API shape. `<EChartsRadarChart>` is the container; compose the parts you need — `<PolarGrid>`, `<PolarAngleAxis>`, `<PolarRadiusAxis>`, `<Legend>`, `<Tooltip>`, and one or more `<Radar>` — as children. Each `<Radar>` carries its own `variant` and `isClickable`, so one chart can mix fill styles and make only some series interactive.
 
 ```tsx
 import {
@@ -95,19 +94,19 @@ const chartConfig = {
 </EChartsRadarChart>
 ```
 
-The one honest difference from the Recharts twin is under the hood: ECharts renders to a `<canvas>`, so these children never mount as DOM. The root walks them, reads their props, and compiles them into the ECharts option object — same JSX, same presence semantics (omit a part and it doesn't render), same behavior, but the children are declarative config rather than live DOM nodes.
+The one difference from the Recharts twin is under the hood: ECharts renders to a `<canvas>`, so these children never mount as DOM. The root reads their props and compiles them into the ECharts option — same JSX, same presence semantics (omit a part and it doesn't render), same behavior, only the children are declarative config rather than live DOM nodes.
 
-The `config` is the same contract as every EvilCharts chart — each key maps a data key to a `label` and a per-theme `colors` array. See <Link href="/docs/chart-config">Chart Config</Link> for the full shape. Colors resolve from your CSS variables at runtime, so dark mode just works with no extra wiring.
+The `config` is the same contract as every EvilCharts chart — each key maps a data key to a `label` and a per-theme `colors` array. See <Link href="/docs/chart-config">Chart Config</Link> for the full shape. Colors resolve from your CSS variables at runtime, so dark mode just works.
 
 <Alert>
   <AlertContent>
-    Rendering to canvas means two small departures from the Recharts twin: a radar series is a single polygon, so multi-color configs paint the stroke and fill as gradients while the vertex dots take one representative color, and the tooltip is item-triggered (it shows the hovered series and its per-category values rather than anchoring on a category).
+    Canvas rendering brings two small departures from the Recharts twin: a radar series is a single polygon, so multi-color configs paint the stroke and fill as gradients while the vertex dots take one representative color; and the tooltip is item-triggered, showing the hovered series and its per-category values rather than anchoring on a category.
   </AlertContent>
 </Alert>
 
 ### Interactive Selection
 
-Set `isClickable` on a `<Radar>` to let it be selected by clicking, and on `<Legend>` to let legend entries toggle selection. Use the root's `onSelectionChange` callback to react to selection events:
+Set `isClickable` on a `<Radar>` to make it selectable by click, and on `<Legend>` to let entries toggle selection. React to changes with the root's `onSelectionChange` callback:
 
 ```tsx
 <EChartsRadarChart
@@ -135,7 +134,7 @@ Set `isClickable` on a `<Radar>` to let it be selected by clicking, and on `<Leg
 <ComponentPreview className="mb-0" title="isLoading='true'" name="ex-loading-state-echarts-radar-chart"  />
 <Alert>
   <AlertContent>
-    The radar chart supports a loading state. Pass the `isLoading` prop to show an animated skeleton polygon, and use `loadingPoints` to control how many points the skeleton draws.
+    Pass `isLoading` to show an animated skeleton polygon, and `loadingPoints` to set how many points it draws.
   </AlertContent>
 </Alert>
 
@@ -152,14 +151,14 @@ Set `isClickable` on a `<Radar>` to let it be selected by clicking, and on `<Leg
 
 ## Examples
 
-Below are some examples of the radar chart with different configurations.
+Radar charts with different configurations.
 
 ### Lines Variant
 
 <ComponentPreview className="mb-0" title="variant='lines'" name="ex-lines-variant-echarts-radar-chart"  />
 <Alert>
   <AlertContent>
-    Set `variant="lines"` to show only the outline without fill. This is useful for comparing multiple datasets more clearly.
+    Set `variant="lines"` to show the outline without fill — cleaner for comparing multiple datasets.
   </AlertContent>
 </Alert>
 
@@ -168,7 +167,7 @@ Below are some examples of the radar chart with different configurations.
 <ComponentPreview className="mb-0" title="gridType='circle'" name="ex-circle-grid-echarts-radar-chart"  />
 <Alert>
   <AlertContent>
-    Set `gridType="circle"` on `<PolarGrid>` to use circular grid lines instead of the default polygon grid.
+    Set `gridType="circle"` on `<PolarGrid>` for circular grid lines instead of the default polygon grid.
   </AlertContent>
 </Alert>
 
@@ -178,18 +177,18 @@ Below are some examples of the radar chart with different configurations.
 
 ## API Reference
 
-The radar chart is composed of a root container and a set of composible parts. On canvas each part is declarative config the root compiles, but the API mirrors the Recharts twin. Each part is documented in its own section below.
+The radar chart is a root container plus composible parts. On canvas each part is declarative config the root compiles, but the API mirrors the Recharts twin. Each is documented below.
 
 <ApiHeading>EChartsRadarChart</ApiHeading>
 
-The root container. It owns the data, the shared selection state, the loading skeleton, and the intro reveal. Everything visual is composed as its children and compiled into the ECharts option.
+The root container. It owns the data, shared selection state, loading skeleton, and intro reveal. Everything visual is composed as children and compiled into the ECharts option.
 
 <ApiTable>
   <ApiRow name="data" type="TData[]" required>
-    Data used to display the chart — an array of objects where each object is one angle-axis category (`TData extends Record<string, unknown>`).
+    The chart data — an array of objects, one per angle-axis category (`TData extends Record<string, unknown>`).
   </ApiRow>
   <ApiRow name="config" type="ChartConfig" required>
-    Defines the chart's radar series. Each key matches a numeric data key, with a `label` and a per-theme `colors` array. Same contract as every EvilCharts chart — see <Link href="/docs/chart-config">Chart Config</Link>.
+    Defines the radar series. Each key matches a numeric data key, with a `label` and a per-theme `colors` array. Same contract as every EvilCharts chart — see <Link href="/docs/chart-config">Chart Config</Link>.
   </ApiRow>
   <ApiRow name="children" type="ReactNode" required>
     The composed chart parts — `<PolarGrid />`, `<PolarAngleAxis />`, `<PolarRadiusAxis />`, `<Legend />`, `<Tooltip />`, and one or more `<Radar />`.
@@ -198,7 +197,7 @@ The root container. It owns the data, the shared selection state, the loading sk
     Additional CSS classes for the chart container.
   </ApiRow>
   <ApiRow name="animation" type="boolean" default="true">
-    Master switch for the intro draw-in — the radar polygon grows out from the center on the first render. Pass `false` to render instantly. Devices with the OS reduce-motion preference disable it automatically.
+    Master switch for the intro draw-in — the radar polygon grows from the center on first render. Pass `false` to render instantly. The OS reduce-motion preference disables it automatically.
   </ApiRow>
   <ApiRow name="defaultSelectedDataKey" type="string | null" default="null">
     The radar series selected on first render.
@@ -207,7 +206,7 @@ The root container. It owns the data, the shared selection state, the loading sk
     Fires when a series is selected or deselected via a clickable `<Radar />` or `<Legend />`. Receives the selected data key, or `null` when deselected.
   </ApiRow>
   <ApiRow name="isLoading" type="boolean" default="false">
-    Shows the animated loading skeleton while data is being fetched.
+    Shows the animated loading skeleton while data loads.
   </ApiRow>
   <ApiRow name="loadingPoints" type="number" default="6">
     Number of points rendered in the loading skeleton polygon.
@@ -219,7 +218,7 @@ The root container. It owns the data, the shared selection state, the loading sk
 
 <ApiHeading>Radar</ApiHeading>
 
-A single radar series — one polygon drawn over every angle-axis category. Each `<Radar />` carries its own fill and clickability, so a chart can hold any number of radars each styled independently. Compose `<Dot />` and `<ActiveDot />` inside it to add vertex markers.
+A single radar series — one polygon across every angle-axis category. Each `<Radar />` carries its own fill and clickability, so a chart can hold many radars styled independently. Compose `<Dot />` and `<ActiveDot />` inside for vertex markers.
 
 <ApiTable>
   <ApiRow name="dataKey" type="string" required>
@@ -232,7 +231,7 @@ A single radar series — one polygon drawn over every angle-axis category. Each
     The opacity of the filled area when using `variant="filled"`.
   </ApiRow>
   <ApiRow name="isClickable" type="boolean" default="false">
-    Enables interactive clicking on this radar to select/deselect it. When a radar is selected, unselected clickable radars become semi-transparent.
+    Lets this radar be clicked to select/deselect it. When one is selected, unselected clickable radars turn semi-transparent.
   </ApiRow>
   <ApiRow name="children" type="ReactNode">
     Optional `<Dot />` and `<ActiveDot />` composition for vertex markers on this radar.
@@ -265,7 +264,7 @@ The angular category axis — the labels around the chart's perimeter. Its prese
 
 <ApiTable>
   <ApiRow name="dataKey" type="string">
-    The key from your data objects to use for the angle-axis labels (e.g., categories, skills, months). When omitted, the first data column not claimed by a `<Radar />` is used.
+    The data key for the angle-axis labels (e.g. categories, skills, months). When omitted, the first data column not claimed by a `<Radar />` is used.
   </ApiRow>
 </ApiTable>
 
@@ -285,7 +284,7 @@ The hover tooltip. Its presence enables the tooltip; omit it and none shows. On 
     Controls the border-radius of the tooltip.
   </ApiRow>
   <ApiRow name="defaultIndex" type="number">
-    When set, a tooltip shows by default with no hover. Because the radar tooltip is item-triggered, this selects the default series (by index) whose tooltip is revealed.
+    Shows a tooltip by default with no hover. Because the radar tooltip is item-triggered, this selects the series (by index) whose tooltip is revealed.
   </ApiRow>
 </ApiTable>
 

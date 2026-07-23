@@ -1,6 +1,6 @@
 ---
 title: Tooltip
-description: Display interactive tooltips when hovering over chart data points
+description: Interactive tooltips on chart data-point hover
 image: /og/tooltip.png
 ---
 
@@ -18,17 +18,17 @@ image: /og/tooltip.png
 
 ## Variants
 
-Control the visual style of the tooltip with the `tooltipVariant` prop. Accepts `"default"` or `"frosted-glass"`.
+Set the tooltip style with the `tooltipVariant` prop: `"default"` or `"frosted-glass"`.
 
 ### Default
 
-The default variant uses a solid background.
+A solid background.
 
 <ComponentPreview title="tooltipVariant='default'" name="ex-tooltip-default-bar-chart" />
 
 ### Frosted Glass
 
-The frosted-glass variant applies a semi-transparent background with a backdrop blur effect for a frosted-glass look.
+A semi-transparent background with a backdrop blur.
 
 <ComponentPreview title="tooltipVariant='frosted-glass'" name="ex-tooltip-frosted-glass-bar-chart" />
 
@@ -36,24 +36,24 @@ The frosted-glass variant applies a semi-transparent background with a backdrop 
 
 <ApiTable>
   <ApiRow name="tooltipVariant" type='"default" | "frosted-glass"' default='"default"'>
-    Controls the visual style of the tooltip.
+    The tooltip's visual style.
   </ApiRow>
   <ApiRow name="tooltipRoundness" type='"sm" | "md" | "lg" | "xl"' default='"lg"'>
-    Controls the border-radius of the tooltip.
+    The tooltip's border-radius.
   </ApiRow>
   <ApiRow name="tooltipDefaultIndex" type="number">
-    When set, the tooltip will be visible by default at the specified data point index.
+    Shows the tooltip by default at this data-point index.
   </ApiRow>
   <ApiRow name="hideTooltip" type="boolean" default="false">
-    When `true`, hides the tooltip entirely.
+    When `true`, hides the tooltip.
   </ApiRow>
   <ApiRow name="indicator" type='"line" | "dot" | "dashed"' default='"dot"'>
-    The style of the color indicator shown next to each tooltip item.
+    Style of the color indicator beside each item.
   </ApiRow>
   <ApiRow name="hideLabel" type="boolean" default="false">
-    When `true`, hides the label (e.g. month name) at the top of the tooltip.
+    When `true`, hides the top label (e.g. month name).
   </ApiRow>
   <ApiRow name="hideIndicator" type="boolean" default="false">
-    When `true`, hides the color indicator dot/line next to each tooltip item.
+    When `true`, hides the color indicator beside each item.
   </ApiRow>
 </ApiTable>

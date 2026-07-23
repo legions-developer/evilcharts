@@ -1,6 +1,6 @@
 ---
 title: Radial Chart
-description: Beautiful radial bar charts with full and semi-circle variants, gradient colors, and glow effects, powered by Apache ECharts
+description: Radial bar charts with full and semi-circle variants, gradient colors, and glow, powered by Apache ECharts
 image: /og/radial-chart.png
 links:
   github: https://github.com/legions-developer/evilcharts/blob/main/src/registry/charts/echarts/radial-chart.tsx
@@ -31,8 +31,7 @@ links:
       <Step>
         <StepTitle>Copy and paste the following code snippets into your project.</StepTitle>
         <StepDescription>
-          To use the chart, first create the folder `evilcharts` and a subfolder called `charts` (with an `echarts` folder inside) in your `components` directory.
-          Then, copy the following radial-chart code into a new file in that folder. Unlike the Recharts twin, this component is fully self-contained — it ships everything ECharts needs in a single file, so there are no extra `ui` sub-components to add.
+          In your `components` directory, create `evilcharts` → `charts` → `echarts`, then paste the radial-chart code into a new file there. Unlike the Recharts twin, this component is self-contained — it ships everything ECharts needs in one file, so there are no extra `ui` sub-components to add.
         </StepDescription>
         <StepContent>
           <ComponentSource
@@ -47,7 +46,7 @@ links:
 
 ## Usage
 
-The ECharts radial chart is composible, with the same API shape as the Recharts twin. `<EChartsRadialChart>` is the container, and you compose only the parts you need — `<Legend>`, `<Tooltip>`, and a `<RadialBar>` — as its children. The `<RadialBar>` carries its own `glowingBars` and `isClickable`, so styling and interactivity live with the series itself.
+The ECharts radial chart is composible, sharing the Recharts twin's API shape. `<EChartsRadialChart>` is the container; compose the parts you need — `<Legend>`, `<Tooltip>`, and a `<RadialBar>` — as children. `<RadialBar>` carries its own `glowingBars` and `isClickable`, so styling and interactivity live with the series.
 
 ```tsx
 import {
@@ -89,19 +88,19 @@ const chartConfig = {
 </EChartsRadialChart>
 ```
 
-The one honest difference from the Recharts twin is under the hood: ECharts renders each ring as a polar `bar` series on a `<canvas>`, so these children never mount as DOM. The root walks them, reads their props, and compiles them into the ECharts option object — same JSX, same presence semantics (omit a part and it doesn't render), same behavior, but the children are declarative config rather than live DOM nodes.
+The one real difference is under the hood: ECharts renders each ring as a polar `bar` series on a `<canvas>`, so these children never mount as DOM. The root reads their props and compiles them into the ECharts option — same JSX, same presence semantics (omit a part and it doesn't render), same behavior, just declarative config instead of live DOM nodes.
 
-The `config` is the same contract as every EvilCharts chart — each key matches a value from your `nameKey` field and maps it to a `label` and a per-theme `colors` array. See <Link href="/docs/chart-config">Chart Config</Link> for the full shape. Colors resolve from your CSS variables at runtime, so dark mode just works with no extra wiring.
+The `config` is the same contract as every EvilCharts chart — each key matches a `nameKey` value and maps it to a `label` and a per-theme `colors` array. See <Link href="/docs/chart-config">Chart Config</Link> for the full shape. Colors resolve from your CSS variables at runtime, so dark mode just works.
 
 <Alert>
   <AlertContent>
-    Rendering to canvas means a couple of small departures from the Recharts twin: multi-color bars use a diagonal canvas gradient (visually equivalent), the glow is a soft layered canvas glow rather than an SVG blur filter, and the corner rounding is a rounded cap on each ring's ends.
+    Canvas rendering brings a few small departures from the Recharts twin: multi-color bars use a diagonal canvas gradient (visually equivalent), the glow is a layered canvas glow rather than an SVG blur filter, and corner rounding becomes a rounded cap on each ring's ends.
   </AlertContent>
 </Alert>
 
 ### Interactive Selection
 
-Add `isClickable` to `<RadialBar>` (and to `<Legend>`) to make bars selectable. Use the `onSelectionChange` callback on `<EChartsRadialChart>` to handle selection events:
+Add `isClickable` to `<RadialBar>` (and `<Legend>`) to make bars selectable. Handle selection with the `onSelectionChange` callback on `<EChartsRadialChart>`:
 
 ```tsx
 <EChartsRadialChart
@@ -127,20 +126,20 @@ Add `isClickable` to `<RadialBar>` (and to `<Legend>`) to make bars selectable. 
 <ComponentPreview className="mb-0" title="isLoading='true'" name="ex-loading-state-echarts-radial-chart"  />
 <Alert>
   <AlertContent>
-    The radial chart supports a loading state with a placeholder animation. Pass the `isLoading` prop to show an animated skeleton of shimmering rings while your data is being fetched.
+    Pass the `isLoading` prop to show an animated skeleton of shimmering rings while your data loads.
   </AlertContent>
 </Alert>
 
 ## Examples
 
-Below are some examples of the radial chart with different configurations. You can customize the `variant`, `innerRadius`, `outerRadius`, and other properties.
+Radial chart examples with different configurations. Customize `variant`, `innerRadius`, `outerRadius`, and more.
 
 ### Semi-Circle Variant
 
 <ComponentPreview className="mb-0" title="variant='semi'" name="ex-semi-variant-echarts-radial-chart"  />
 <Alert>
   <AlertContent>
-    Set `variant="semi"` to create a half-circle radial chart. This is useful for displaying progress or gauges in a more compact space.
+    Set `variant="semi"` for a half-circle chart — useful for progress or gauges in a compact space.
   </AlertContent>
 </Alert>
 
@@ -153,57 +152,57 @@ Below are some examples of the radial chart with different configurations. You c
 <ComponentPreview className="mb-0" title="glowingBars={['chrome', 'safari']}" name="ex-glowing-echarts-radial-chart"  />
 <Alert>
   <AlertContent>
-    Add a subtle glow effect to specific bars using the `glowingBars` prop on `<RadialBar>`. Pass an array of bar names (the values from your `nameKey` field) to specify which bars should glow.
+    Add a glow to specific bars with the `glowingBars` prop on `<RadialBar>`. Pass an array of bar names (values from your `nameKey` field) to choose which bars glow.
   </AlertContent>
 </Alert>
 
 ## API Reference
 
-The chart is composed of several parts. The props below are grouped by the part they belong to. On canvas each part is declarative config the root compiles, but the API mirrors the Recharts twin one-to-one.
+The chart is composed of several parts; the props below are grouped by part. On canvas each part is declarative config the root compiles, but the API mirrors the Recharts twin one-to-one.
 
 <ApiHeading>EChartsRadialChart</ApiHeading>
 
-The root container. It owns the data, the shared selection state, the loading skeleton, and the chart-wide arc shape. Everything visual is composed as its children and compiled into the ECharts option.
+The root container. It owns the data, shared selection state, loading skeleton, and chart-wide arc shape. Everything visual is composed as children and compiled into the ECharts option.
 
 <ApiTable>
   <ApiRow name="data" type="TData[]" required>
-    Data used to display the chart. An array of objects where each object represents a radial bar (`TData extends Record<string, unknown>`).
+    The chart data. An array of objects, each representing one radial bar (`TData extends Record<string, unknown>`).
   </ApiRow>
   <ApiRow name="config" type="ChartConfig" required>
-    Configuration object that defines the chart's bars. Each key should match a value from your `nameKey` field, with a `label` and a per-theme `colors` array. Same contract as every EvilCharts chart — see <Link href="/docs/chart-config">Chart Config</Link>.
+    Defines the chart's bars. Each key matches a `nameKey` value, with a `label` and a per-theme `colors` array. Same contract as every EvilCharts chart — see <Link href="/docs/chart-config">Chart Config</Link>.
   </ApiRow>
   <ApiRow name="nameKey" type="keyof TData & string" required>
-    The key from your data objects to use for bar names (typically string values used for labels and the legend).
+    Data key used for bar names (string values for labels and the legend).
   </ApiRow>
   <ApiRow name="children" type="ReactNode" required>
     The composed chart parts — `<Legend />`, `<Tooltip />`, and a `<RadialBar />`.
   </ApiRow>
   <ApiRow name="className" type="string">
-    Additional CSS classes to apply to the chart container.
+    Additional CSS classes for the chart container.
   </ApiRow>
   <ApiRow name="variant" type='"full" | "semi"' default='"full"'>
-    The arc shape of the radial chart. `"full"` displays a full circle (360°), `"semi"` displays a half circle (180°).
+    The chart's arc shape. `"full"` is a full circle (360°); `"semi"` is a half circle (180°).
   </ApiRow>
   <ApiRow name="innerRadius" type="number | string" default='"30%"'>
-    The inner radius of the radial bars. Can be a number (pixels) or percentage string.
+    Inner radius of the bars, as a number (pixels) or percentage string.
   </ApiRow>
   <ApiRow name="outerRadius" type="number | string" default='"100%"'>
-    The outer radius of the radial bars. Can be a number (pixels) or percentage string.
+    Outer radius of the bars, as a number (pixels) or percentage string.
   </ApiRow>
   <ApiRow name="defaultSelectedDataKey" type="string | null" default="null">
-    The bar name that should be selected by default.
+    Bar name selected by default.
   </ApiRow>
   <ApiRow name="onSelectionChange" type="(selection: { dataKey: string; value: number } | null) => void">
-    Callback fired when a bar is selected or deselected — by clicking a clickable `<RadialBar />` or `<Legend />` entry. Receives an object with `dataKey` (bar name) and `value` (bar value), or `null` when deselected.
+    Fires when a bar is selected or deselected by clicking a clickable `<RadialBar />` or `<Legend />` entry. Receives an object with `dataKey` (bar name) and `value` (bar value), or `null` when deselected.
   </ApiRow>
   <ApiRow name="isLoading" type="boolean" default="false">
-    Shows a loading placeholder animation when data is being fetched.
+    Shows a placeholder animation while data loads.
   </ApiRow>
   <ApiRow name="backgroundVariant" type="BackgroundVariant">
-    Decorative background pattern rendered behind the chart (`"dots"`, `"grid"`, `"cross-hatch"`, and more).
+    Decorative background pattern behind the chart (`"dots"`, `"grid"`, `"cross-hatch"`, and more).
   </ApiRow>
   <ApiRow name="chartOptions" type="Record<string, unknown>">
-    Escape hatch merged over the underlying ECharts option object. See the <Link href="https://echarts.apache.org/en/option.html" _blank>ECharts option documentation</Link>.
+    Escape hatch merged over the underlying ECharts option. See the <Link href="https://echarts.apache.org/en/option.html" _blank>ECharts option documentation</Link>.
   </ApiRow>
 </ApiTable>
 
@@ -213,48 +212,48 @@ The radial bar series. Each data row becomes one concentric ring. Its presence r
 
 <ApiTable>
   <ApiRow name="dataKey" type="string" required>
-    The key from your data objects to use for bar values (numeric values that determine each bar's arc length).
+    Data key used for bar values (numbers that set each bar's arc length).
   </ApiRow>
   <ApiRow name="cornerRadius" type="number" default="5">
     The corner rounding for each bar. On canvas this maps to a rounded cap on the bar's ends — pass `0` for square ends.
   </ApiRow>
   <ApiRow name="barSize" type="number" default="14">
-    The thickness of each radial bar in pixels.
+    Thickness of each bar, in pixels.
   </ApiRow>
   <ApiRow name="showBackground" type="boolean" default="true">
-    Whether to render the background track (the unfilled portion of each bar).
+    Renders the background track (the unfilled portion of each bar).
   </ApiRow>
   <ApiRow name="isClickable" type="boolean" default="false">
-    Enables interactive clicking on bars to select/deselect them. Unselected bars dim while a selection is active.
+    Lets bars be clicked to select/deselect them. Unselected bars dim while a selection is active.
   </ApiRow>
   <ApiRow name="glowingBars" type="string[]" default="[]">
-    Array of bar names (values from your `nameKey` field) that should have a glowing effect applied. Creates a soft, color-following glow around the specified bars.
+    Bar names (values from your `nameKey` field) that get a glowing effect. Creates a soft, color-following glow around those bars.
   </ApiRow>
 </ApiTable>
 
 <ApiHeading>Tooltip</ApiHeading>
 
-The hover tooltip. Labels each bar by its name. Its presence enables the tooltip; omit it and none shows. Hidden automatically while the chart is loading.
+The hover tooltip, labeling each bar by name. Its presence enables the tooltip; omit it and none shows. Hidden automatically while loading.
 
 <ApiTable>
   <ApiRow name="variant" type='"default" | "frosted-glass"' default='"default"'>
-    Controls the visual style of the tooltip surface.
+    Visual style of the tooltip surface.
   </ApiRow>
   <ApiRow name="roundness" type='"sm" | "md" | "lg" | "xl"' default='"lg"'>
-    Controls the border-radius of the tooltip.
+    Border-radius of the tooltip.
   </ApiRow>
   <ApiRow name="defaultIndex" type="number">
-    When set, the tooltip is shown by default at the specified data point index.
+    Shows the tooltip by default at this data point index.
   </ApiRow>
 </ApiTable>
 
 <ApiHeading>Legend</ApiHeading>
 
-The bar legend, rendered as HTML alongside the canvas. Its presence enables the legend; omit it and none shows. When `isClickable` is set, each entry toggles selection of its bar.
+The bar legend, rendered as HTML alongside the canvas. Its presence enables the legend; omit it and none shows. With `isClickable`, each entry toggles selection of its bar.
 
 <ApiTable>
   <ApiRow name="variant" type='"square" | "circle" | "circle-outline" | "rounded-square" | "rounded-square-outline" | "vertical-bar" | "horizontal-bar"'>
-    The visual style of the legend indicators.
+    Visual style of the legend indicators.
   </ApiRow>
   <ApiRow name="align" type='"left" | "center" | "right"' default='"center"'>
     Horizontal placement of the legend.
@@ -263,6 +262,6 @@ The bar legend, rendered as HTML alongside the canvas. Its presence enables the 
     Vertical placement of the legend.
   </ApiRow>
   <ApiRow name="isClickable" type="boolean" default="false">
-    When enabled, each legend entry toggles selection of its bar, driving the shared selection state read by `<RadialBar />`.
+    When enabled, each entry toggles selection of its bar, driving the shared selection state read by `<RadialBar />`.
   </ApiRow>
 </ApiTable>

@@ -1,6 +1,6 @@
 ---
 title: Bar Chart
-description: Simple static & beautifully designed bar charts
+description: Static, beautifully designed bar charts
 image: /og/bar-chart.png
 links:
   github: https://github.com/legions-developer/evilcharts/blob/main/src/registry/charts/bar-chart.tsx
@@ -29,10 +29,9 @@ links:
         </StepContent>
       </Step>
       <Step>
-        <StepTitle>Copy and paste the following code snippets into your project.</StepTitle>
+        <StepTitle>Copy the code into your project.</StepTitle>
          <StepDescription>
-          To use the chart, first create the folder `evilcharts` and a subfolder called `charts` inside your `components` directory.
-          Then, copy the following base bar-chart code into a new file in that folder.
+          Create an `evilcharts` folder with a `charts` subfolder inside `components`, then paste the base bar-chart code into a new file there.
         </StepDescription>
         <StepContent>
           <ComponentSource
@@ -42,11 +41,11 @@ links:
         </StepContent>
       </Step>
        <Step>
-        <StepTitle>Now, Let's add the chart component to your project.</StepTitle>
+        <StepTitle>Add the chart component.</StepTitle>
         <StepDescription>
-          These Components are required by the chart component to render the chart. Make a folder called `ui` inside the `evilcharts` folder and paste the code there.
+          The chart needs these components to render. Make a `ui` folder inside `evilcharts` and paste the code there.
 
-          Below is main chart component.
+          Below is the main chart component.
         </StepDescription>
         <StepContent>
           <ComponentSource
@@ -56,9 +55,9 @@ links:
         </StepContent>
       </Step>
        <Step>
-        <StepTitle>Now, We need to add sub components.</StepTitle>
+        <StepTitle>Add the sub-components.</StepTitle>
         <StepDescription>
-          Create a file called `tooltip.tsx` inside the `evilcharts/ui` folder and paste the code there.
+          Create `tooltip.tsx` inside `evilcharts/ui` and paste the code there.
         </StepDescription>
         <StepContent>
           <ComponentSource
@@ -67,7 +66,7 @@ links:
           />
         </StepContent>
         <StepDescription>
-          Now, create another file called `legend.tsx` inside the `evilcharts/ui` folder and paste the code there.
+          Then create `legend.tsx` in the same folder and paste the code there.
         </StepDescription>
         <StepContent>
           <ComponentSource
@@ -82,7 +81,7 @@ links:
 
 ## Usage
 
-The bar chart is composible. `<EvilBarChart>` is the container, and you compose only the parts you need — `<Grid>`, `<XAxis>`, `<YAxis>`, `<Legend>`, `<Tooltip>`, and one or more `<Bar>` — as its children. Each `<Bar>` carries its own `variant`, `radius`, `glowing`, `bufferBar`, and `isClickable`, so a single chart can mix fill styles and make only some series interactive.
+The bar chart is composible. `<EvilBarChart>` is the container; compose the parts you need — `<Grid>`, `<XAxis>`, `<YAxis>`, `<Legend>`, `<Tooltip>`, and one or more `<Bar>` — as children. Each `<Bar>` sets its own `variant`, `radius`, `glowing`, `bufferBar`, and `isClickable`, so one chart can mix fill styles and make only some series interactive.
 
 ```tsx
 import {
@@ -109,7 +108,7 @@ import {
 
 ### Interactive Selection
 
-Add `isClickable` to any `<Bar>` (and to `<Legend>`) to make those series selectable. Use the `onSelectionChange` callback on `<EvilBarChart>` to handle selection events:
+Add `isClickable` to any `<Bar>` (and `<Legend>`) to make its series selectable, then handle events with the `onSelectionChange` callback on `<EvilBarChart>`:
 
 ```tsx
 <EvilBarChart
@@ -136,7 +135,7 @@ Add `isClickable` to any `<Bar>` (and to `<Legend>`) to make those series select
 <ComponentPreview className="mb-0" title="isLoading='true'" name="ex-loading-state-bar-chart"  />
 <Alert > 
   <AlertContent >
-    The bar chart supports loading state with a shimmer animation. You can pass the `isLoading` prop to the chart to show the loading state while your data is being fetched.
+    Pass `isLoading` to show a shimmer skeleton while data loads.
   </AlertContent>
 </Alert>
 
@@ -145,20 +144,20 @@ Add `isClickable` to any `<Bar>` (and to `<Legend>`) to make those series select
 <ComponentPreview className="mb-0" title="<Bar bufferBar />" name="ex-buffer-bar-chart"  />
 <Alert > 
   <AlertContent >
-    When a `<Bar>` has `bufferBar` set, its last data point is rendered with a diagonal lines (hatched) pattern while the rest stay solid. This is useful for indicating projected, estimated, or incomplete data at the end of a series — commonly seen in financial charts and forecasting dashboards.
+    With `bufferBar` set, a `<Bar>`'s last data point renders as a hatched pattern while the rest stay solid — handy for flagging projected or incomplete data, as in financial and forecasting charts.
   </AlertContent>
 </Alert>
 
 ## Examples
 
-Below are some examples of the bar chart with different `variants`. Each `<Bar>` carries its own `variant`, and the chart-wide `stackType` and `layout` shape the rest.
+Examples across different `variants`. Each `<Bar>` sets its own `variant`; the chart-wide `stackType` and `layout` shape the rest.
 
 ### Hover Highlight
 
 <ComponentPreview className="mb-0" title="<Bar enableHoverHighlight />" name="ex-hover-highlight-bar-chart"  />
 <Alert> 
   <AlertContent>
-    The hover highlight feature dims other bars when you hover over a bar, making it easier to focus on specific data points. Set the `enableHoverHighlight` prop on each `<Bar>` to enable this feature.
+    Set `enableHoverHighlight` on a `<Bar>` to dim the other bars on hover, keeping focus on one series.
   </AlertContent>
 </Alert>
 
@@ -185,7 +184,7 @@ Below are some examples of the bar chart with different `variants`. Each `<Bar>`
 <ComponentPreview className="mb-0" title="layout='horizontal'" name="ex-horizontal-layout-bar-chart"  />
 <Alert> 
   <AlertContent>
-    Use `layout="horizontal"` on `<EvilBarChart>` to display bars horizontally. In horizontal mode, the `<YAxis>` shows categories while the `<XAxis>` shows values — pass a `tickFormatter` to `<YAxis>` for category formatting.
+    Set `layout="horizontal"` on `<EvilBarChart>` to lay bars sideways. The `<YAxis>` then shows categories and the `<XAxis>` shows values — pass a `tickFormatter` to `<YAxis>` to format categories.
   </AlertContent>
 </Alert>
 
@@ -196,148 +195,148 @@ Below are some examples of the bar chart with different `variants`. Each `<Bar>`
 
 ## API Reference
 
-The chart is composed of several parts. The props below are grouped by the component they belong to.
+The chart has several parts. Props below are grouped by component.
 
 <ApiHeading>EvilBarChart</ApiHeading>
 
-The root container. It owns the data, the shared selection state, the loading skeleton, and the optional brush. Everything visual is composed as its children.
+The root container. It owns the data, shared selection state, loading skeleton, and optional brush — everything visual is composed as its children.
 
 <ApiTable>
   <ApiRow name="data" type="TData[]" required>
-    Data used to display the chart. An array of objects where each object represents a data point (`TData extends Record<string, unknown>`).
+    The chart data — an array of objects, one per data point (`TData extends Record<string, unknown>`).
   </ApiRow>
   <ApiRow name="config" type="Record<string, ChartConfig[string]>" required>
-    Configuration object that defines the chart's series. Each key should match a data key in your data array, with a corresponding color or color array.
+    Defines the chart's series. Each key matches a data key and maps to a color or color array.
   </ApiRow>
   <ApiRow name="children" type="ReactNode" required>
     The composed chart parts — `<Grid />`, `<XAxis />`, `<YAxis />`, `<Legend />`, `<Tooltip />`, and one or more `<Bar />`.
   </ApiRow>
   <ApiRow name="className" type="string">
-    Additional CSS classes to apply to the chart container.
+    Extra CSS classes for the chart container.
   </ApiRow>
   <ApiRow name="stackType" type='"default" | "stacked" | "percent"' default='"default"'>
-    Controls how multiple bars combine. `"default"` renders bars side by side, `"stacked"` stacks them on top of each other, and `"percent"` normalizes them to show percentage distribution.
+    How multiple bars combine. `"default"` sits them side by side, `"stacked"` stacks them, and `"percent"` normalizes them to a percentage distribution.
   </ApiRow>
   <ApiRow name="layout" type='"vertical" | "horizontal"' default='"vertical"'>
-    The orientation of the bars. `"vertical"` displays bars vertically, `"horizontal"` displays bars horizontally — in which case the `<YAxis />` shows categories and the `<XAxis />` shows values.
+    Bar orientation. `"vertical"` draws upright bars; `"horizontal"` lays them sideways, so the `<YAxis />` shows categories and the `<XAxis />` shows values.
   </ApiRow>
   <ApiRow name="barRadius" type="number" default="2">
-    The default corner radius for every `<Bar />`, in pixels. Each `<Bar />` may override it locally with its own `radius` prop.
+    Default corner radius (px) for every `<Bar />`. Each `<Bar />` can override it with its own `radius` prop.
   </ApiRow>
   <ApiRow name="animationType" type='"none" | "left-to-right" | "right-to-left" | "center-out" | "edges-in"' default='"left-to-right"'>
-    Order in which bars grow into view, inherited by every `<Bar />`. Each bar grows from its baseline (bottom for vertical layout, left for horizontal). `"none"` disables it — devices with the OS reduce-motion preference fall back to `"none"` automatically.
+    Order in which bars grow into view, inherited by every `<Bar />`. Each grows from its baseline (bottom when vertical, left when horizontal). `"none"` disables it; the OS reduce-motion preference forces `"none"` automatically.
   </ApiRow>
   <ApiRow name="barGap" type="number">
-    The gap between bars in the same category (when using multiple series).
+    Gap between bars in the same category (multiple series).
   </ApiRow>
   <ApiRow name="barCategoryGap" type="number">
-    The gap between different categories of bars.
+    Gap between bar categories.
   </ApiRow>
   <ApiRow name="backgroundVariant" type="BackgroundVariant">
-    Background pattern variant to display behind the chart.
+    Background pattern shown behind the chart.
   </ApiRow>
   <ApiRow name="defaultSelectedDataKey" type="string | null" default="null">
-    The data key that should be selected by default.
+    Data key selected by default.
   </ApiRow>
   <ApiRow name="onSelectionChange" type="(selectedDataKey: string | null) => void">
-    Callback fired when a series is selected or deselected — by clicking a clickable `<Bar />` or `<Legend />` entry. Receives the selected data key, or `null` when deselected.
+    Fires when a series is selected or deselected by clicking a clickable `<Bar />` or `<Legend />` entry. Receives the data key, or `null` when deselected.
   </ApiRow>
   <ApiRow name="isLoading" type="boolean" default="false">
-    Shows a loading skeleton animation with a shimmer effect when data is being fetched.
+    Shows a shimmer skeleton while data loads.
   </ApiRow>
   <ApiRow name="loadingBars" type="number" default="12">
-    Number of bars to display in the loading skeleton.
+    Number of bars in the loading skeleton.
   </ApiRow>
   <ApiRow name="showBrush" type="boolean" default="false">
-    When enabled, displays a brush control below the chart for selecting and zooming into a range of data.
+    Shows a brush below the chart for selecting and zooming into a data range.
   </ApiRow>
   <ApiRow name="xDataKey" type="keyof TData & string">
-    The data key used for the x-axis. Only needed by the brush footer — the axis itself reads its key from `<XAxis dataKey="…" />`.
+    X-axis data key. Only the brush footer needs it — the axis reads its own key from `<XAxis dataKey="…" />`.
   </ApiRow>
   <ApiRow name="brushHeight" type="number">
-    The height of the brush preview area in pixels.
+    Height of the brush preview area (px).
   </ApiRow>
   <ApiRow name="brushFormatLabel" type="(value: unknown, index: number) => string">
-    Custom formatter for the brush axis labels.
+    Formatter for the brush axis labels.
   </ApiRow>
   <ApiRow name="onBrushChange" type="(range: EvilBrushRange) => void">
-    Callback invoked when the user changes the brush selection range.
+    Fires when the user changes the brush range.
   </ApiRow>
   <ApiRow name="chartProps" type="ComponentProps<typeof BarChart>">
-    Additional props forwarded to the underlying Recharts BarChart component. Read the <Link href="https://recharts.github.io/en-US/api/BarChart/" _blank>Recharts BarChart documentation</Link> for available props.
+    Extra props forwarded to the underlying Recharts BarChart. See the <Link href="https://recharts.github.io/en-US/api/BarChart/" _blank>Recharts BarChart docs</Link> for options.
   </ApiRow>
 </ApiTable>
 
 <ApiHeading>Bar</ApiHeading>
 
-A single bar series. Each `<Bar />` is self-contained and generates its own gradient/pattern definitions, so a chart can hold any number of bars — each with its own variant, radius, glow, and clickability.
+A single bar series. Each `<Bar />` is self-contained and generates its own gradient/pattern defs, so a chart can hold any number — each with its own variant, radius, glow, and clickability.
 
 <ApiTable>
   <ApiRow name="dataKey" type="string" required>
     The series key. Must exist on both the data rows and the chart `config`.
   </ApiRow>
   <ApiRow name="variant" type='"default" | "hatched" | "duotone" | "duotone-reverse" | "gradient" | "stripped"' default='"default"'>
-    The visual style of the bar fill. Applies to this bar only.
+    Fill style for this bar only.
   </ApiRow>
   <ApiRow name="radius" type="number">
-    The corner radius of this bar, in pixels. Falls back to the chart's `barRadius` when omitted.
+    Corner radius (px) for this bar. Falls back to the chart's `barRadius` when omitted.
   </ApiRow>
   <ApiRow name="animationType" type='"none" | "left-to-right" | "right-to-left" | "center-out" | "edges-in"'>
-    The grow-in order for this bar series. Falls back to the chart's `animationType` when omitted.
+    Grow-in order for this series. Falls back to the chart's `animationType` when omitted.
   </ApiRow>
   <ApiRow name="isClickable" type="boolean" default="false">
-    Lets this bar be selected by clicking it. When any bar is selected, unselected bars become semi-transparent.
+    Lets this bar be selected on click. While any bar is selected, unselected bars turn semi-transparent.
   </ApiRow>
   <ApiRow name="enableHoverHighlight" type="boolean" default="false">
-    When enabled, hovering over a bar dims this bar while another is hovered, making it easier to focus on specific data points.
+    Dims this bar while another is hovered, keeping focus on one series.
   </ApiRow>
   <ApiRow name="glowing" type="boolean" default="false">
-    Applies a soft outer glow to this bar series.
+    Adds a soft outer glow to this series.
   </ApiRow>
   <ApiRow name="bufferBar" type="boolean" default="false">
-    When enabled, renders this series' last data point with a diagonal lines (hatched) pattern while the rest stay solid. Useful for indicating projected or incomplete data at the end of a series.
+    Renders this series' last data point as a hatched pattern while the rest stay solid — good for projected or incomplete data.
   </ApiRow>
   <ApiRow name="barProps" type="ComponentProps<typeof Bar>">
-    Escape hatch for raw props forwarded to the underlying Recharts Bar component.
+    Escape hatch for raw props forwarded to the Recharts Bar.
   </ApiRow>
 </ApiTable>
 
 <ApiHeading>XAxis and YAxis</ApiHeading>
 
-The category and value axes. Both ship with the chart's flat default styling and forward every Recharts axis prop, so `dataKey`, `tickFormatter`, `tickMargin`, etc. pass straight through. They are hidden automatically while the chart is loading, and each resolves its axis `type` from the chart `layout` — categorical or numeric — unless you set `type` explicitly.
+The category and value axes. Both use the chart's flat default styling and forward every Recharts axis prop, so `dataKey`, `tickFormatter`, `tickMargin`, etc. pass straight through. They hide automatically while the chart loads, and each resolves its `type` from the chart `layout` — categorical or numeric — unless you set `type` explicitly.
 
 <ApiTable>
   <ApiRow name="dataKey" type="string">
     The data key for the axis values.
   </ApiRow>
   <ApiRow name="…axisProps">
-    Every other Recharts XAxis / YAxis prop is forwarded as-is. Read the <Link href="https://recharts.github.io/en-US/api/XAxis/" _blank>Recharts XAxis</Link> and <Link href="https://recharts.github.io/en-US/api/YAxis/" _blank>Recharts YAxis</Link> documentation for available props.
+    Every other Recharts XAxis / YAxis prop is forwarded as-is. See the <Link href="https://recharts.github.io/en-US/api/XAxis/" _blank>Recharts XAxis</Link> and <Link href="https://recharts.github.io/en-US/api/YAxis/" _blank>Recharts YAxis</Link> docs for options.
   </ApiRow>
 </ApiTable>
 
 <ApiHeading>Grid</ApiHeading>
 
-The background grid lines. Defaults to dashed lines aligned to the value axis based on the chart layout, and forwards every Recharts CartesianGrid prop.
+The background grid lines. Defaults to dashed lines aligned to the value axis for the current layout, and forwards every Recharts CartesianGrid prop.
 
 <ApiTable>
   <ApiRow name="…gridProps">
-    Every Recharts CartesianGrid prop is forwarded as-is. Read the <Link href="https://recharts.github.io/en-US/api/CartesianGrid/" _blank>Recharts CartesianGrid documentation</Link> for available props.
+    Every Recharts CartesianGrid prop is forwarded as-is. See the <Link href="https://recharts.github.io/en-US/api/CartesianGrid/" _blank>Recharts CartesianGrid docs</Link> for options.
   </ApiRow>
 </ApiTable>
 
 <ApiHeading>Tooltip</ApiHeading>
 
-The hover tooltip. It reads the chart's selection state so its content dims unselected series.
+The hover tooltip. It reads the chart's selection state, dimming unselected series.
 
 <ApiTable>
   <ApiRow name="variant" type='"default" | "frosted-glass"' default='"default"'>
     The visual style of the tooltip surface.
   </ApiRow>
   <ApiRow name="roundness" type='"sm" | "md" | "lg" | "xl"' default='"lg"'>
-    Controls the border-radius of the tooltip.
+    Border-radius of the tooltip.
   </ApiRow>
   <ApiRow name="defaultIndex" type="number">
-    When set, the tooltip is visible by default at the specified data point index.
+    Shows the tooltip by default at this data point index.
   </ApiRow>
 </ApiTable>
 

@@ -1,6 +1,6 @@
 ---
 title: Background
-description: Customize the background of your charts with various styles and patterns
+description: Style chart backgrounds with built-in and custom patterns.
 image: /og/backgrounds.png
 ---
 
@@ -63,7 +63,7 @@ image: /og/backgrounds.png
 
 ## Custom Variant
 
-You can add your own background style by defining an SVG `<pattern>` and registering it as a new variant.
+Add your own style: define an SVG `<pattern>` and register it as a variant.
 
 1. Add the new name to the `BackgroundVariant` union in `src/registry/ui/background.tsx`.
 2. Create a pattern component that returns a `<pattern>` with your SVG shapes.
@@ -111,7 +111,7 @@ const PATTERN_MAP: Record<BackgroundVariant, React.FC<{ id: string }>> = {
 `}
 />
 
-Then use your new variant in any chart:
+Then use it in any chart:
 
 ```tsx
 <EvilLineChart
@@ -124,8 +124,8 @@ Then use your new variant in any chart:
 
 <Alert>
   <AlertContent>
-    Tip: You can use a custom logo as a pattern. In your pattern component, swap the SVG shape for an
-    `<image>` element that points to your logo, then control size and transparency. For example:
-    `<image href="/logo.svg" width="24" height="24" opacity="0.2" />`.
+    Tip: Use your logo as a pattern. Swap the SVG shape for an `<image>` pointing to your logo, then
+    control its size and transparency: `<image href="/logo.svg" width="24" height="24" opacity="0.2"
+    />`.
   </AlertContent>
 </Alert>

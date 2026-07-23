@@ -1,6 +1,6 @@
 ---
 title: Pie Chart
-description: Simple static & beautifully designed pie charts with donut, gradient, and pop-out selection, powered by Apache ECharts
+description: Static, beautifully designed pie charts with donut, gradient, and pop-out selection, powered by Apache ECharts
 image: /og/og-image.png
 links:
   github: https://github.com/legions-developer/evilcharts/blob/main/src/registry/charts/echarts/pie-chart.tsx
@@ -31,8 +31,7 @@ links:
       <Step>
         <StepTitle>Copy and paste the following code snippets into your project.</StepTitle>
         <StepDescription>
-          To use the chart, first create the folder `evilcharts` and a subfolder called `charts` (with an `echarts` folder inside) in your `components` directory.
-          Then, copy the following pie-chart code into a new file in that folder. Unlike the Recharts twin, this component is fully self-contained — it ships everything ECharts needs in a single file, so there are no extra `ui` sub-components to add.
+          In your `components` directory, create an `evilcharts` folder with a `charts` subfolder and an `echarts` folder inside. Paste the code below into a new file there. Unlike the Recharts twin, this component is self-contained — everything ECharts needs ships in one file, so there are no extra `ui` sub-components to add.
         </StepDescription>
         <StepContent>
           <ComponentSource
@@ -47,7 +46,7 @@ links:
 
 ## Usage
 
-The ECharts pie chart is composible, with the same API shape as the Recharts twin. `<EChartsPieChart>` is the container, and you compose only the parts you need — `<Legend>`, `<Tooltip>`, `<Background>`, and one `<Pie>` — as its children. The `<Pie>` carries its own shape props (`innerRadius`, `paddingAngle`, `cornerRadius`, …) and its `isClickable` flag, so a single chart can mix any combination of those.
+The ECharts pie chart is composible, sharing the Recharts twin's API shape. `<EChartsPieChart>` is the container; compose the parts you need — `<Legend>`, `<Tooltip>`, `<Background>`, and one `<Pie>` — as its children. The `<Pie>` carries its own shape props (`innerRadius`, `paddingAngle`, `cornerRadius`, …) and an `isClickable` flag.
 
 ```tsx
 import {
@@ -93,19 +92,19 @@ const chartConfig = {
 </EChartsPieChart>
 ```
 
-The one honest difference from the Recharts twin is under the hood: ECharts renders to a `<canvas>`, so these children never mount as DOM. The root walks them, reads their props, and compiles them into the ECharts option object — same JSX, same presence semantics (omit a part and it doesn't render), same behavior, but the children are declarative config rather than live DOM nodes.
+The one real difference is under the hood: ECharts renders to a `<canvas>`, so these children never mount as DOM. The root reads their props and compiles them into the ECharts option — same JSX, same presence semantics (omit a part and it won't render), same behavior, just declarative config instead of live DOM nodes.
 
-The `config` is the same contract as every EvilCharts chart — each key maps a sector name to a `label` and a per-theme `colors` array. See <Link href="/docs/chart-config">Chart Config</Link> for the full shape. Colors resolve from your CSS variables at runtime, so dark mode just works with no extra wiring.
+The `config` is the same contract as every EvilCharts chart — each key maps a sector name to a `label` and a per-theme `colors` array. See <Link href="/docs/chart-config">Chart Config</Link> for the full shape. Colors resolve from your CSS variables at runtime, so dark mode works with no extra wiring.
 
 <Alert>
   <AlertContent>
-    Rendering to canvas means a couple of small departures from the Recharts twin: per-sector gradients paint across each sector's own bounding box, sector gaps are drawn as constant-width background borders (parallel-edged from rim to center rather than a wedge-shaped angular pad), and the `<Background>` pattern is drawn as an SVG layer behind the transparent canvas.
+    Canvas rendering brings a few small departures from the Recharts twin: per-sector gradients paint across each sector's own bounding box, sector gaps are constant-width background borders (parallel-edged from rim to center, not a wedge-shaped angular pad), and the `<Background>` pattern is an SVG layer behind the transparent canvas.
   </AlertContent>
 </Alert>
 
 ### Interactive Selection
 
-Add `isClickable` to the `<Pie>` (and to `<Legend>`) to make sectors selectable. Selecting a sector pops it radially outward from the center — the offset-slice look — while the others dim; selecting it again returns it. Use the `onSelectionChange` callback on `<EChartsPieChart>` to handle selection events:
+Add `isClickable` to the `<Pie>` (and `<Legend>`) to make sectors selectable. Selecting one pops it radially outward — the offset-slice look — while the others dim; select again to reset. Handle selection events with the `onSelectionChange` callback on `<EChartsPieChart>`:
 
 ```tsx
 <EChartsPieChart
@@ -132,13 +131,13 @@ Add `isClickable` to the `<Pie>` (and to `<Legend>`) to make sectors selectable.
 <ComponentPreview className="mb-0" title="isLoading='true'" name="ex-loading-state-echarts-pie-chart"  />
 <Alert>
   <AlertContent>
-    The pie chart supports a loading state. Pass the `isLoading` prop to show an animated skeleton ring — a shimmer sweeps around the sectors while your data is being fetched.
+    Pass the `isLoading` prop to show an animated skeleton ring — a shimmer sweeps around the sectors while your data loads.
   </AlertContent>
 </Alert>
 
 ## Examples
 
-Below are some examples of the pie chart with different configurations. You can customize the `innerRadius`, `paddingAngle`, `cornerRadius`, and other properties.
+Examples of the pie chart in different configurations. Customize `innerRadius`, `paddingAngle`, `cornerRadius`, and more.
 
 ### Gradient Colors
 
@@ -149,7 +148,7 @@ Below are some examples of the pie chart with different configurations. You can 
 <ComponentPreview className="mb-0" title="innerRadius={60}" name="ex-donut-echarts-pie-chart"  />
 <Alert>
   <AlertContent>
-    Set `innerRadius` to a value greater than 0 to create a donut chart. The inner radius creates the hole in the center of the pie.
+    Set `innerRadius` above 0 to create a donut chart — the inner radius carves the hole in the center.
   </AlertContent>
 </Alert>
 
@@ -158,14 +157,14 @@ Below are some examples of the pie chart with different configurations. You can 
 <ComponentPreview className="mb-0" title="paddingAngle={4} cornerRadius={8}" name="ex-padded-echarts-pie-chart"  />
 <Alert>
   <AlertContent>
-    Use `paddingAngle` to add space between sectors and `cornerRadius` to round the corners of each sector. Combine with `innerRadius` for a modern donut look.
+    Use `paddingAngle` to space sectors apart and `cornerRadius` to round their corners. Combine with `innerRadius` for a modern donut look.
   </AlertContent>
 </Alert>
 
 <ComponentPreview className="mb-0" title="innerRadius={60} paddingAngle={-25} cornerRadius={99}" name="ex-overlapping-padded-echarts-pie-chart"  />
 <Alert>
   <AlertContent>
-    Use a negative `paddingAngle` to create overlapping sectors with a high `cornerRadius` for a petal-like effect. A background-colored border separates the overlapping petals, giving a flower-shaped donut chart.
+    Pair a negative `paddingAngle` with a high `cornerRadius` for overlapping, petal-like sectors. A background-colored border separates the petals into a flower-shaped donut.
   </AlertContent>
 </Alert>
 
@@ -174,7 +173,7 @@ Below are some examples of the pie chart with different configurations. You can 
 <ComponentPreview className="mb-0" title="<Label />" name="ex-labels-echarts-pie-chart"  />
 <Alert>
   <AlertContent>
-    Compose a `<Label />` inside the `<Pie />` to draw labels on each sector. By default the label shows the sector's value; set the `<Label />`'s `dataKey` to show a different field.
+    Compose a `<Label />` inside the `<Pie />` to draw labels on each sector. It shows the sector's value by default; set the `<Label />`'s `dataKey` for a different field.
   </AlertContent>
 </Alert>
 
@@ -183,27 +182,27 @@ Below are some examples of the pie chart with different configurations. You can 
 <ComponentPreview className="mb-0" title='<Label position="outside" />' name="ex-outside-labels-echarts-pie-chart"  />
 <Alert>
   <AlertContent>
-    Set the `<Label />`'s `position` to `"outside"` to move each sector's name past the rim with a leader line — the classic ECharts pie layout ([pie-simple](https://echarts.apache.org/examples/en/editor.html?c=pie-simple)). Outside labels show the sector's name (from `config`) by default, while inside labels show its value. Give the `<Pie />` a smaller `outerRadius` so the labels have room to breathe.
+    Set the `<Label />`'s `position` to `"outside"` to move each sector's name past the rim with a leader line — the classic ECharts pie layout ([pie-simple](https://echarts.apache.org/examples/en/editor.html?c=pie-simple)). Outside labels show the sector's name (from `config`) by default; inside labels show its value. Give the `<Pie />` a smaller `outerRadius` so the labels have room.
   </AlertContent>
 </Alert>
 
 ## API Reference
 
-The chart is composed of several parts. The props below are grouped by the part they belong to. On canvas each part is declarative config the root compiles, but the API mirrors the Recharts twin one-to-one.
+The chart has several parts; the props below are grouped by part. On canvas each part is declarative config the root compiles, but the API mirrors the Recharts twin one-to-one.
 
 <ApiHeading>EChartsPieChart</ApiHeading>
 
-The root container. It owns the data, the shared selection state, the loading skeleton, and the intro reveal. Everything visual is composed as its children and compiled into the ECharts option.
+The root container. It owns the data, shared selection state, loading skeleton, and intro reveal. Everything visual is composed as its children and compiled into the ECharts option.
 
 <ApiTable>
   <ApiRow name="data" type="TData[]" required>
-    Data used to display the chart. An array of objects where each object represents a sector (`TData extends Record<string, unknown>`).
+    The chart data — an array of objects, one per sector (`TData extends Record<string, unknown>`).
   </ApiRow>
   <ApiRow name="dataKey" type="keyof TData & string" required>
-    The key from your data objects to use for sector values (typically numeric values that determine sector size).
+    The data key for sector values — typically the numbers that size each sector.
   </ApiRow>
   <ApiRow name="nameKey" type="keyof TData & string" required>
-    The key from your data objects to use for sector names (typically string values used for labels and legend). Each name must match a key in `config`.
+    The data key for sector names, used in labels and legend. Each name must match a key in `config`.
   </ApiRow>
   <ApiRow name="config" type="ChartConfig" required>
     Defines the chart's sectors. Each key matches a value from your `nameKey` field, with a `label` and a per-theme `colors` array. Same contract as every EvilCharts chart — see <Link href="/docs/chart-config">Chart Config</Link>.
@@ -212,19 +211,19 @@ The root container. It owns the data, the shared selection state, the loading sk
     The composed chart parts — `<Legend />`, `<Tooltip />`, `<Background />`, and one `<Pie />`.
   </ApiRow>
   <ApiRow name="className" type="string">
-    Additional CSS classes to apply to the chart container.
+    Extra CSS classes for the chart container.
   </ApiRow>
   <ApiRow name="animation" type="boolean" default="true">
-    Master switch for the intro draw-in. Pass `false` to render the chart instantly. Not present on the Recharts twin — added here as the canvas off-switch. Devices with the OS reduce-motion preference disable the entrance automatically.
+    Master switch for the intro draw-in. Pass `false` to render instantly. Not on the Recharts twin — it's the canvas off-switch. The OS reduce-motion preference disables the entrance automatically.
   </ApiRow>
   <ApiRow name="defaultSelectedSector" type="string | null" default="null">
-    The sector name that should be selected on first render.
+    The sector selected on first render.
   </ApiRow>
   <ApiRow name="onSelectionChange" type="(selection: { dataKey: string; value: number } | null) => void">
-    Callback fired when a sector is selected or deselected — by clicking a clickable `<Pie />` sector or `<Legend />` entry. Receives an object with `dataKey` (sector name) and `value` (sector value), or `null` when deselected.
+    Fires when a sector is selected or deselected via a clickable `<Pie />` sector or `<Legend />` entry. Receives an object with `dataKey` (sector name) and `value` (sector value), or `null` when deselected.
   </ApiRow>
   <ApiRow name="isLoading" type="boolean" default="false">
-    Shows the animated loading skeleton while data is being fetched.
+    Shows the animated loading skeleton while data loads.
   </ApiRow>
   <ApiRow name="chartOptions" type="Record<string, unknown>">
     Escape hatch merged over the underlying ECharts option object. See the <Link href="https://echarts.apache.org/en/option.html" _blank>ECharts option documentation</Link>.
@@ -237,19 +236,19 @@ The pie series. Carries its own shape and clickability. When clickable, the sele
 
 <ApiTable>
   <ApiRow name="variant" type='"gradient"' default='"gradient"'>
-    The fill style for the pie's sectors. Each sector paints from a diagonal gradient built from its `config` colors — a solid color when the config has a single color, or a multi-stop gradient across the sector.
+    The fill style for the sectors. Each paints a diagonal gradient from its `config` colors — solid for a single color, or a multi-stop gradient across the sector.
   </ApiRow>
   <ApiRow name="innerRadius" type="number | string" default="0">
-    The inner radius of the pie. Set to a value greater than 0 to create a donut chart. Can be a number (pixels) or percentage string.
+    The pie's inner radius. Set above 0 for a donut. Accepts a number (pixels) or percentage string.
   </ApiRow>
   <ApiRow name="outerRadius" type="number | string" default='"80%"'>
-    The outer radius of the pie. Can be a number (pixels) or percentage string.
+    The pie's outer radius. Accepts a number (pixels) or percentage string.
   </ApiRow>
   <ApiRow name="cornerRadius" type="number" default="0">
     The border radius for the corners of each sector in pixels.
   </ApiRow>
   <ApiRow name="paddingAngle" type="number" default="0">
-    The space between sectors. Positive values are drawn as a constant-width, background-colored gap (parallel-edged all the way from the rim to the center — not a wedge-shaped angular pad). Use a negative value to overlap sectors into petals, where a background-colored border keeps them distinct.
+    The space between sectors. Positive values draw a constant-width, background-colored gap (parallel-edged from rim to center, not a wedge-shaped angular pad). Negative values overlap sectors into petals, kept distinct by a background-colored border.
   </ApiRow>
   <ApiRow name="startAngle" type="number" default="0">
     The starting angle of the pie in degrees (0 is 3 o'clock, 90 is 12 o'clock). Sectors sweep counterclockwise from here.
@@ -274,7 +273,7 @@ Per-sector labels composed inside a `<Pie />`. It renders nothing on its own —
     Where the labels sit. `"inside"` draws the value on each sector; `"outside"` moves the sector's name past the rim with a leader line (the classic ECharts pie layout). When `"outside"` and no `dataKey` is set, the label shows the sector's name from `config` instead of its value.
   </ApiRow>
   <ApiRow name="dataKey" type="string">
-    The key from your data objects to use for label text. When omitted, an inside label falls back to the chart's `dataKey` (the sector value) and an outside label falls back to the sector's name.
+    The data key for label text. When omitted, inside labels fall back to the chart's `dataKey` (the sector value), outside labels to the sector's name.
   </ApiRow>
 </ApiTable>
 

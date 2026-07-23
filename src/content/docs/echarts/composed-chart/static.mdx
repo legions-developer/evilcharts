@@ -1,6 +1,6 @@
 ---
 title: Composed Chart
-description: Simple static & beautifully designed composed charts combining bars and lines, powered by Apache ECharts
+description: Beautifully designed composed charts combining bars and lines, powered by Apache ECharts
 image: /og/og-image.png
 links:
   github: https://github.com/legions-developer/evilcharts/blob/main/src/registry/charts/echarts/composed-chart.tsx
@@ -31,8 +31,7 @@ links:
       <Step>
         <StepTitle>Copy and paste the following code snippets into your project.</StepTitle>
         <StepDescription>
-          To use the chart, first create the folder `evilcharts` and a subfolder called `charts` (with an `echarts` folder inside) in your `components` directory.
-          Then, copy the following composed-chart code into a new file in that folder. Unlike the Recharts twin, this component is fully self-contained — it ships everything ECharts needs in a single file, so there are no extra `ui` sub-components to add.
+          Create the folder `evilcharts` with a `charts` subfolder (and an `echarts` folder inside) in your `components` directory, then copy the code below into a new file there. Unlike the Recharts twin, this component is self-contained — it ships everything ECharts needs in one file, so there are no extra `ui` sub-components to add.
         </StepDescription>
         <StepContent>
           <ComponentSource
@@ -47,7 +46,7 @@ links:
 
 ## Usage
 
-The ECharts composed chart is composible, with the same API shape as the Recharts twin. `<EChartsComposedChart>` is the container, and you compose only the parts you need — `<Grid>`, `<XAxis>`, `<YAxis>`, `<Legend>`, `<Tooltip>`, and one or more `<Bar>` and `<Line>` — as its children. Each `<Bar>` carries its own `variant`, `glow`, and `isClickable`, and each `<Line>` its own `strokeVariant`, `curveType`, `glow`, and `isClickable`, so a single chart can freely mix bar and line styles.
+The ECharts composed chart is composible, sharing the Recharts twin's API shape. `<EChartsComposedChart>` is the container; compose only the parts you need as children — `<Grid>`, `<XAxis>`, `<YAxis>`, `<Legend>`, `<Tooltip>`, and one or more `<Bar>` and `<Line>`. Each `<Bar>` carries its own `variant`, `glow`, and `isClickable`, and each `<Line>` its own `strokeVariant`, `curveType`, `glow`, and `isClickable`, so one chart can freely mix bar and line styles.
 
 ```tsx
 import {
@@ -90,19 +89,19 @@ const chartConfig = {
 </EChartsComposedChart>
 ```
 
-The one honest difference from the Recharts twin is under the hood: ECharts renders to a `<canvas>`, so these children never mount as DOM. The root walks them, reads their props, and compiles them into the ECharts option object — same JSX, same presence semantics (omit a part and it doesn't render), same behavior, but the children are declarative config rather than live DOM nodes.
+The only real difference from the Recharts twin is under the hood. ECharts renders to a `<canvas>`, so these children never mount as DOM — the root reads their props and compiles them into the ECharts option object. Same JSX, same presence semantics (omit a part and it doesn't render), same behavior; the children are just config, not live DOM nodes.
 
-The `config` is the same contract as every EvilCharts chart — each key maps a data key to a `label` and a per-theme `colors` array. See <Link href="/docs/chart-config">Chart Config</Link> for the full shape. Colors resolve from your CSS variables at runtime, so dark mode just works with no extra wiring.
+The `config` is the same contract as every EvilCharts chart — each key maps a data key to a `label` and a per-theme `colors` array. See <Link href="/docs/chart-config">Chart Config</Link> for the full shape. Colors resolve from your CSS variables at runtime, so dark mode just works.
 
 <Alert>
   <AlertContent>
-    Rendering to canvas means a few small departures from the Recharts twin: multi-color bars run a vertical gradient through their color slots (the horizontal-split and textured variants are authored single-color), the glow is rebuilt for canvas as a soft colored blur that follows each series' own color rather than an SVG blur filter, and the zoom brush is a themed mini chart driven by ECharts' native `dataZoom` rather than the custom `EvilBrush`.
+    Canvas rendering brings a few small departures from the Recharts twin: multi-color bars run a vertical gradient through their color slots (horizontal-split and textured variants are single-color); the glow becomes a soft colored blur that follows each series' own color rather than an SVG filter; and the zoom brush is a themed mini chart driven by ECharts' native `dataZoom` rather than the custom `EvilBrush`.
   </AlertContent>
 </Alert>
 
 ### Interactive Selection
 
-Add `isClickable` to any `<Bar>` or `<Line>` (and to `<Legend>`) to make those series selectable. Use the `onSelectionChange` callback on `<EChartsComposedChart>` to handle selection events:
+Add `isClickable` to any `<Bar>`, `<Line>`, or `<Legend>` to make its series selectable, and handle events with the `onSelectionChange` callback on `<EChartsComposedChart>`:
 
 ```tsx
 <EChartsComposedChart
@@ -129,13 +128,13 @@ Add `isClickable` to any `<Bar>` or `<Line>` (and to `<Legend>`) to make those s
 <ComponentPreview className="mb-0" title="isLoading='true'" name="ex-loading-state-echarts-composed-chart"  />
 <Alert>
   <AlertContent>
-    The composed chart supports a loading state. Pass the `isLoading` prop to show an animated skeleton of shimmering bars and a line — both revealed by the same diagonal shimmer sweep, since the chart itself is bars plus lines — and use `loadingBars` to control how many bars the skeleton draws.
+    Pass `isLoading` to show an animated skeleton of shimmering bars and a line, both revealed by one diagonal shimmer sweep. Use `loadingBars` to set how many bars it draws.
   </AlertContent>
 </Alert>
 
 ## Examples
 
-Below are some examples of the composed chart with different `variants`. You can customize each `<Bar>` with a `variant`, and each `<Line>` with a `strokeVariant`, `curveType`, and other properties.
+Examples of the composed chart with different `variants`. Customize each `<Bar>` with a `variant`, and each `<Line>` with a `strokeVariant`, `curveType`, and more.
 
 ### Gradient Colors
 
@@ -162,7 +161,7 @@ Below are some examples of the composed chart with different `variants`. You can
 <ComponentPreview className="mb-0" title="<Dot /> and <ActiveDot />" name="ex-dots-echarts-composed-chart"  />
 <Alert>
   <AlertContent>
-    The composed chart supports dots on lines. Compose a `<Dot>` for the resting marker and an `<ActiveDot>` for the marker that appears on hover, inside a `<Line>`. Available variants: `default`, `border`, `colored-border`.
+    Inside a `<Line>`, compose a `<Dot>` for the resting marker and an `<ActiveDot>` for the one shown on hover. Available variants: `default`, `border`, `colored-border`.
   </AlertContent>
 </Alert>
 
@@ -171,7 +170,7 @@ Below are some examples of the composed chart with different `variants`. You can
 <ComponentPreview className="mb-0" title="<Bar enableHoverHighlight />" name="ex-hover-highlight-echarts-composed-chart"  />
 <Alert>
   <AlertContent>
-    The hover highlight feature dims the other columns of a bar when you hover over one of them, making it easier to focus on a single data point. Set the `enableHoverHighlight` prop on a `<Bar>` to enable it — on canvas it is driven by ECharts' native emphasis, so nothing is re-rendered mid-hover.
+    Set `enableHoverHighlight` on a `<Bar>` to dim its other columns when you hover one, making a single data point easier to focus on. On canvas it uses ECharts' native emphasis, so nothing re-renders mid-hover.
   </AlertContent>
 </Alert>
 
@@ -180,21 +179,21 @@ Below are some examples of the composed chart with different `variants`. You can
 <ComponentPreview className="mb-0" title="<Bar glow /> and <Line glow />" name="ex-glowing-echarts-composed-chart"  />
 <Alert>
   <AlertContent>
-    Add a subtle glow to a series with the `glow` prop on a `<Bar>` or `<Line>`. On canvas the glow is a soft colored blur that follows the series' own color along its whole length — so it stays faithful even on multi-stop gradient series.
+    Add the `glow` prop to a `<Bar>` or `<Line>` for a subtle glow. On canvas it's a soft colored blur that follows the series' own color along its length, staying faithful even on multi-stop gradients.
   </AlertContent>
 </Alert>
 
 ## API Reference
 
-The chart is composed of several parts. The props below are grouped by the part they belong to. On canvas each part is declarative config the root compiles, but the API mirrors the Recharts twin one-to-one.
+The chart is composed of several parts; the props below are grouped by part. On canvas each part is config the root compiles, but the API mirrors the Recharts twin one-to-one.
 
 <ApiHeading>EChartsComposedChart</ApiHeading>
 
-The root container. It owns the data, the shared selection state, the loading skeleton, and the optional native `dataZoom` brush. Everything visual is composed as its children and compiled into the ECharts option.
+The root container. It owns the data, shared selection state, loading skeleton, and optional native `dataZoom` brush. Everything visual is composed as its children and compiled into the ECharts option.
 
 <ApiTable>
   <ApiRow name="data" type="TData[]" required>
-    Data used to display the chart — an array of objects where each object is a data point (`TData extends Record<string, unknown>`).
+    The chart data — an array of objects, one per data point (`TData extends Record<string, unknown>`).
   </ApiRow>
   <ApiRow name="config" type="ChartConfig" required>
     Defines every bar and line series. Each key matches a data key, with a `label` and a per-theme `colors` array. Same contract as every EvilCharts chart — see <Link href="/docs/chart-config">Chart Config</Link>.
@@ -206,22 +205,22 @@ The root container. It owns the data, the shared selection state, the loading sk
     Additional CSS classes for the chart container.
   </ApiRow>
   <ApiRow name="xDataKey" type="keyof TData & string">
-    The data key used for the x-axis categories. Falls back to the `<XAxis dataKey="…" />` value, then to the first data column no series claims.
+    The data key for the x-axis categories. Falls back to the `<XAxis dataKey="…" />` value, then to the first data column no series claims.
   </ApiRow>
   <ApiRow name="curveType" type='"linear" | "smooth" | "bump" | "monotone" | "monotoneX" | "monotoneY" | "natural" | "step"' default='"linear"'>
-    Default curve interpolation inherited by every `<Line />`. Each `<Line />` may override it locally.
+    Default curve interpolation inherited by every `<Line />`; each may override it locally.
   </ApiRow>
   <ApiRow name="animation" type="boolean" default="true">
     Master switch for the intro draw-in. Pass `false` to render the chart instantly, regardless of `animationType`.
   </ApiRow>
   <ApiRow name="animationType" type='"none" | "left-to-right" | "right-to-left" | "center-out" | "edges-in"' default='"left-to-right"'>
-    The intro animation inherited by every `<Bar />` and `<Line />` — any value other than `"none"` plays the draw-in: lines trace in left-to-right while bars grow up from their baseline, staggered per-column in the chosen direction (`left-to-right`, `right-to-left`, `center-out`, `edges-in`). `"none"` disables it — devices with the OS reduce-motion preference fall back to `"none"` automatically.
+    The intro animation inherited by every `<Bar />` and `<Line />`. Any value but `"none"` plays the draw-in: lines trace in left-to-right while bars grow from their baseline, staggered per-column in the chosen direction (`left-to-right`, `right-to-left`, `center-out`, `edges-in`). `"none"` disables it; the OS reduce-motion preference falls back to `"none"` automatically.
   </ApiRow>
   <ApiRow name="barGap" type="number | string">
-    The gap between bars sharing the same category (ECharts accepts a percentage like `"30%"` or a pixel number).
+    The gap between bars in the same category (ECharts accepts a percentage like `"30%"` or a pixel number).
   </ApiRow>
   <ApiRow name="barCategoryGap" type="number | string">
-    The gap between different categories of bars.
+    The gap between bar categories.
   </ApiRow>
   <ApiRow name="defaultSelectedDataKey" type="string | null" default="null">
     The series selected on first render.
@@ -261,7 +260,7 @@ A single bar series. Each `<Bar />` carries its own fill variant, radius, glow, 
     The series key. Must exist on both the data rows and the chart `config`.
   </ApiRow>
   <ApiRow name="variant" type='"default" | "hatched" | "duotone" | "duotone-reverse" | "gradient" | "stripped"' default='"default"'>
-    The visual style of the bar fill. Applies to this bar only.
+    The bar fill style, for this bar only.
   </ApiRow>
   <ApiRow name="radius" type="number" default="4">
     The corner radius of the bar in pixels.
@@ -276,7 +275,7 @@ A single bar series. Each `<Bar />` carries its own fill variant, radius, glow, 
     Lets this bar be selected by clicking it. When any series is selected, unselected series become semi-transparent.
   </ApiRow>
   <ApiRow name="enableHoverHighlight" type="boolean" default="false">
-    When enabled, hovering over a column dims the other columns of this bar, making it easier to focus on a single data point.
+    Hovering a column dims this bar's other columns, easing focus on a single data point.
   </ApiRow>
   <ApiRow name="barProps" type="Partial<BarSeriesOption>">
     Escape hatch merged into the raw ECharts bar series.
@@ -304,13 +303,13 @@ A single line series. Each `<Line />` carries its own stroke, curve, glow, and c
     Whether to connect line segments across null or missing values.
   </ApiRow>
   <ApiRow name="glow" type="boolean" default="false">
-    Applies a soft neon glow to this line — a colored blur that follows the line's own color along its length.
+    A soft neon glow for this line — a colored blur that follows its color along its length.
   </ApiRow>
   <ApiRow name="isClickable" type="boolean" default="false">
     Lets this line be selected by clicking it. When any series is selected, unselected series become semi-transparent.
   </ApiRow>
   <ApiRow name="children" type="ReactNode">
-    Optional `<Dot />` and `<ActiveDot />` composition that adds point markers to this line.
+    Optional `<Dot />` and `<ActiveDot />` that add point markers to this line.
   </ApiRow>
   <ApiRow name="lineProps" type="Partial<LineSeriesOption>">
     Escape hatch merged into the raw ECharts line series.
@@ -329,7 +328,7 @@ Point markers composed inside a `<Line />`. `<Dot />` is the resting marker; `<A
 
 <ApiHeading>XAxis and YAxis</ApiHeading>
 
-The category and value axes. Include `<XAxis />` to show the x-axis labels and `<YAxis />` to show the y-axis; omit either to hide it. Both are hidden automatically while the chart is loading.
+The category and value axes. Include `<XAxis />` for the x-axis labels and `<YAxis />` for the y-axis; omit either to hide it. Both hide automatically while loading.
 
 <ApiTable>
   <ApiRow name="dataKey" type="string">
@@ -342,11 +341,11 @@ The category and value axes. Include `<XAxis />` to show the x-axis labels and `
 
 <ApiHeading>Grid</ApiHeading>
 
-The background grid lines. Its presence renders the dashed horizontal split lines; omit it and they don't draw. It takes no props.
+The background grid lines. Include it to render the dashed horizontal split lines; omit it and they don't draw. Takes no props.
 
 <ApiHeading>Tooltip</ApiHeading>
 
-The hover tooltip. Its presence enables the tooltip; omit it and none shows. It reads the chart's selection state so its content dims unselected series.
+The hover tooltip. Include it to enable the tooltip; omit it and none shows. It reads the selection state and dims unselected series.
 
 <ApiTable>
   <ApiRow name="variant" type='"default" | "frosted-glass"' default='"default"'>
@@ -356,7 +355,7 @@ The hover tooltip. Its presence enables the tooltip; omit it and none shows. It 
     Controls the border-radius of the tooltip.
   </ApiRow>
   <ApiRow name="defaultIndex" type="number">
-    When set, the tooltip is shown by default at the specified data point index.
+    Shows the tooltip by default at this data point index.
   </ApiRow>
   <ApiRow name="cursor" type="boolean" default="true">
     Whether the vertical cursor line follows the pointer on hover.
@@ -365,7 +364,7 @@ The hover tooltip. Its presence enables the tooltip; omit it and none shows. It 
 
 <ApiHeading>Legend</ApiHeading>
 
-The series legend, rendered as HTML above the canvas. Its presence enables the legend; omit it and none shows. When `isClickable` is set, each entry toggles selection of its series.
+The series legend, rendered as HTML above the canvas. Include it to show the legend; omit it and none shows. With `isClickable`, each entry toggles selection of its series.
 
 <ApiTable>
   <ApiRow name="variant" type='"square" | "circle" | "circle-outline" | "rounded-square" | "rounded-square-outline" | "vertical-bar" | "horizontal-bar"'>

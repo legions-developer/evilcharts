@@ -1,10 +1,10 @@
 ---
 title: Installation
-description: how to install evilcharts & use it in your project
+description: Install EvilCharts and add charts to your project
 image: /og/og-image.png
 ---
 
-EvilCharts is designed to be a plug-and-play solution for beautiful, interactive charts in your Next.js projects. You don't need any complex setup or high-end configuration—just follow these simple steps to get started with stunning data visualizations in minutes.
+EvilCharts is plug-and-play. Skip the heavy setup—follow these steps to add beautiful, interactive charts to your Next.js project.
 
 ## Steps
 <Steps>
@@ -12,9 +12,9 @@ EvilCharts is designed to be a plug-and-play solution for beautiful, interactive
     <StepTitle>Install Recharts</StepTitle>
     <StepContent>
       <StepDescription>
-        Install Recharts, the charting library that powers EvilCharts. This is a required dependency for all chart components.
+        Recharts powers every EvilCharts component and is a required dependency.
         
-        Learn more at the <Link href="https://recharts.github.io/en-US/guide/installation" _blank>Recharts installation guide</Link>.
+        See the <Link href="https://recharts.github.io/en-US/guide/installation" _blank>Recharts installation guide</Link>.
       </StepDescription>
       <CommandBlock commands={["recharts"]} />
     </StepContent>
@@ -24,9 +24,9 @@ EvilCharts is designed to be a plug-and-play solution for beautiful, interactive
     <StepTitle>Setup shadcn/ui</StepTitle>
     <StepContent>
       <StepDescription>
-        Initialize shadcn/ui in your project. This sets up Tailwind CSS, theme configuration, and component structure. Skip this step if you already have shadcn/ui installed.
+        Initialize shadcn/ui to set up Tailwind CSS, themes, and component structure. Skip this if it's already installed.
         
-        Check out the <Link href="https://ui.shadcn.com/docs/installation/next" _blank>shadcn/ui Next.js installation docs</Link> for more details.
+        See the <Link href="https://ui.shadcn.com/docs/installation/next" _blank>shadcn/ui Next.js installation docs</Link>.
       </StepDescription>
       <CliBlock commands={["init"]} />
     </StepContent>
@@ -36,7 +36,7 @@ EvilCharts is designed to be a plug-and-play solution for beautiful, interactive
     <StepTitle>Add EvilCharts Components</StepTitle>
     <StepContent>
       <StepDescription>
-        Add chart components to your project using the CLI. Replace `{chart-name}` with your desired chart type (e.g., `area-chart`, `bar-chart`, `line-chart`, `pie-chart`). The CLI will install all necessary files and dependencies.
+        Add chart components with the CLI. Replace `{chart-name}` with the chart you want (e.g., `area-chart`, `bar-chart`, `line-chart`, `pie-chart`); it installs all files and dependencies.
       </StepDescription>
       <CliBlock commands={["@evilcharts/{chart-name}"]} />
     </StepContent>
