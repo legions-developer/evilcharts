@@ -52,9 +52,12 @@ const LOADING_DEFAULT_POINTS = 14;
 const GRID_LINE_OPACITY = 1; // dashed y-axis split lines, × border alpha
 const AXIS_POINTER_OPACITY = 1; // tooltip cursor line, × border alpha
 const LOADING_STROKE_OPACITY = 0.28; // skeleton outline, × foreground alpha
-const LOADING_FILL_OPACITY = 0.06; // skeleton resting fill, × foreground alpha
-const LOADING_SHIMMER_MAX_OPACITY = 0.16; // shimmer sheen peak, × foreground alpha
-const LOADING_SHIMMER_BAND = 0.3; // sheen half-width, fraction of chart width
+// Outside the sheen the fill is near-invisible — the band reads as a contained,
+// clipped glint passing through (Recharts masks its fill the same way), not a
+// permanent glow flooding the plot.
+const LOADING_FILL_OPACITY = 0.035; // skeleton resting fill, × foreground alpha
+const LOADING_SHIMMER_MAX_OPACITY = 0.3; // shimmer sheen peak, × foreground alpha
+const LOADING_SHIMMER_BAND = 0.18; // sheen half-width, fraction of chart width
 const BRUSH_STROKE_OPACITY = 0.5; // mini-chart series stroke
 const BRUSH_FILL_OPACITY = 0.15; // mini-chart series fade, at the top stop
 const BRUSH_BORDER_OPACITY = 1; // brush frame, × border alpha (evil-brush uses the full token)
