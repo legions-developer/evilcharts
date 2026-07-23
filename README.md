@@ -1,5 +1,12 @@
 <img width="4800" height="2532" alt="banner" src="https://evilcharts.com/og/og-image.png" />
 
+# Sponsers 
+
+<a href="https://vercel.com/oss">
+  <img alt="Vercel OSS Program" src="https://vercel.com/oss/program-badge.svg" />
+</a>
+
+
 # 📊 EvilCharts
 
 Website: [evilcharts.com](https://evilcharts.com)
