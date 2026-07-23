@@ -1,22 +1,6 @@
 "use client";
 
 import {
-  type ChartConfig,
-  ChartContainer,
-  getColorsCount,
-  getLoadingData,
-  LoadingIndicator,
-} from "@/registry/ui/chart";
-import { EvilBrush, useEvilBrush, type EvilBrushRange } from "@/registry/ui/evil-brush";
-import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/legend";
-import {
-  ChartTooltip,
-  ChartTooltipContent,
-  type TooltipRoundness,
-  type TooltipVariant,
-} from "@/registry/ui/tooltip";
-import { ChartDot, type DotVariant } from "@/registry/ui/dot";
-import {
   Children,
   createContext,
   isValidElement,
@@ -39,6 +23,22 @@ import {
   XAxis as RechartsXAxis,
   YAxis as RechartsYAxis,
 } from "recharts";
+import {
+  type ChartConfig,
+  ChartContainer,
+  getColorsCount,
+  getLoadingData,
+  LoadingIndicator,
+} from "@/registry/ui/chart";
+import {
+  ChartTooltip,
+  ChartTooltipContent,
+  type TooltipRoundness,
+  type TooltipVariant,
+} from "@/registry/ui/tooltip";
+import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/legend";
+import { EvilBrush, useEvilBrush, type EvilBrushRange } from "@/registry/ui/evil-brush";
+import { ChartDot, type DotVariant } from "@/registry/ui/dot";
 import { motion, useReducedMotion } from "motion/react";
 
 // Constants
@@ -65,12 +65,7 @@ type BarVariant = "default" | "hatched" | "duotone" | "duotone-reverse" | "gradi
  * NOTE: the intro is a per-frame animation, heavier than a static chart.
  * `"none"` opts out — as does a device with the OS "reduce motion" preference.
  */
-type ComposedAnimationType =
-  | "none"
-  | "left-to-right"
-  | "right-to-left"
-  | "center-out"
-  | "edges-in";
+type ComposedAnimationType = "none" | "left-to-right" | "right-to-left" | "center-out" | "edges-in";
 type RevealAnimationType = Exclude<ComposedAnimationType, "none">;
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -261,7 +256,11 @@ export function EvilComposedChart<
         >
           {children}
           {isLoading && (
-            <LoadingBar chartId={chartId} barRadius={DEFAULT_BAR_RADIUS} onShimmerExit={onShimmerExit} />
+            <LoadingBar
+              chartId={chartId}
+              barRadius={DEFAULT_BAR_RADIUS}
+              onShimmerExit={onShimmerExit}
+            />
           )}
         </RechartsComposedChart>
       </ChartContainer>
@@ -678,7 +677,7 @@ const getBarOpacity = ({
   hoveredIndex: number | null;
   index: number;
 }) => {
-  const clickOpacity = isClickable && selectedDataKey !== null ? (isSelected ? 1 : 0.3) : 1;
+  const clickOpacity = isClickable && selectedDataKey !== null ? (isSelected ? 1 : 0.15) : 1;
 
   if (enableHoverHighlight && hoveredIndex !== null) {
     return hoveredIndex === index ? clickOpacity : clickOpacity * 0.3;
@@ -720,7 +719,12 @@ const resolveDots = (
     if (child.type === ActiveDot) {
       const { variant } = (child as ReactElement<DotProps>).props;
       activeDot = (
-        <ChartDot type={variant} dataKey={dataKey} chartId={`${id}-line`} fillOpacity={dotOpacity} />
+        <ChartDot
+          type={variant}
+          dataKey={dataKey}
+          chartId={`${id}-line`}
+          fillOpacity={dotOpacity}
+        />
       );
     }
   });
@@ -812,7 +816,13 @@ const CustomBar = ({
 
   // Full-height invisible rect — keeps the column hoverable even mid grow-in
   const hitArea = enableHoverHighlight ? (
-    <rect x={hitAreaX} y={hitAreaY} width={hitAreaWidth} height={hitAreaHeight} fill="transparent" />
+    <rect
+      x={hitAreaX}
+      y={hitAreaY}
+      width={hitAreaWidth}
+      height={hitAreaHeight}
+      fill="transparent"
+    />
   ) : null;
 
   if (variant === "stripped") {
@@ -1013,11 +1023,7 @@ const AnimatedDashedStroke = () => {
 };
 
 /** Vertical top-to-bottom color gradient — the fill source for every bar variant. */
-const VerticalColorGradient = ({
-  id,
-  dataKey,
-  config,
-}: StyleProps & { config: ChartConfig }) => {
+const VerticalColorGradient = ({ id, dataKey, config }: StyleProps & { config: ChartConfig }) => {
   const colorsCount = getColorsCount(config[dataKey] ?? {});
 
   return (
@@ -1044,11 +1050,7 @@ const VerticalColorGradient = ({
 };
 
 /** Horizontal left-to-right color gradient — the stroke source for a line series. */
-const HorizontalColorGradient = ({
-  id,
-  dataKey,
-  config,
-}: StyleProps & { config: ChartConfig }) => {
+const HorizontalColorGradient = ({ id, dataKey, config }: StyleProps & { config: ChartConfig }) => {
   const colorsCount = getColorsCount(config[dataKey] ?? {});
 
   return (
@@ -1215,13 +1217,7 @@ const DuotoneReversePattern = ({ id, dataKey, config }: StyleProps & { config: C
         )}
       </linearGradient>
       <mask id={`${id}-duotone-reverse-mask`} maskContentUnits="objectBoundingBox">
-        <rect
-          x="0"
-          y="0"
-          width="1"
-          height="1"
-          fill={`url(#${id}-duotone-reverse-mask-gradient)`}
-        />
+        <rect x="0" y="0" width="1" height="1" fill={`url(#${id}-duotone-reverse-mask-gradient)`} />
       </mask>
       <pattern
         id={`${id}-duotone-reverse`}

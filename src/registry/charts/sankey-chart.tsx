@@ -1,18 +1,14 @@
 "use client";
 
 import {
-  type ChartConfig,
-  ChartContainer,
-  getColorsCount,
-  LoadingIndicator,
-} from "@/registry/ui/chart";
-import {
-  ChartTooltip,
-  ChartTooltipContent,
-  type TooltipRoundness,
-  type TooltipVariant,
-} from "@/registry/ui/tooltip";
-import { ChartBackground, type BackgroundVariant } from "@/registry/ui/background";
+  Sankey as RechartsSankey,
+  Layer,
+  type SankeyProps,
+  type SankeyNodeProps,
+  type SankeyLinkProps,
+  type SankeyData,
+  type SankeyNode as RechartsSankeyNode,
+} from "recharts";
 import {
   Children,
   createContext,
@@ -27,14 +23,18 @@ import {
   type ReactNode,
 } from "react";
 import {
-  Sankey as RechartsSankey,
-  Layer,
-  type SankeyProps,
-  type SankeyNodeProps,
-  type SankeyLinkProps,
-  type SankeyData,
-  type SankeyNode as RechartsSankeyNode,
-} from "recharts";
+  ChartTooltip,
+  ChartTooltipContent,
+  type TooltipRoundness,
+  type TooltipVariant,
+} from "@/registry/ui/tooltip";
+import {
+  type ChartConfig,
+  ChartContainer,
+  getColorsCount,
+  LoadingIndicator,
+} from "@/registry/ui/chart";
+import { ChartBackground, type BackgroundVariant } from "@/registry/ui/background";
 import { motion } from "motion/react";
 
 // Constants
@@ -284,9 +284,7 @@ const getNodeValue = (data: SankeyData, nodeName: string): number => {
 };
 
 // Reads composed <Node /> and <Link /> children into the Sankey `node`/`link` render props
-const resolveSankeyRenderers = (
-  children: ReactNode,
-): Pick<SankeyProps, "node" | "link"> => {
+const resolveSankeyRenderers = (children: ReactNode): Pick<SankeyProps, "node" | "link"> => {
   let nodeProps: NodeProps | null = null;
   let linkProps: LinkProps | null = null;
 
@@ -370,7 +368,7 @@ const SankeyNode = ({ x, y, width, height, payload, nodeConfig }: SankeyNodeRend
         rx={radius}
         ry={radius}
         fill={hasConfigColor ? `url(#${chartId}-sankey-colors-${nodeName})` : "currentColor"}
-        fillOpacity={dimmed ? 0.3 : 0.9}
+        fillOpacity={dimmed ? 0.15 : 0.9}
         filter={isGlowing ? `url(#${chartId}-node-glow-${nodeName})` : undefined}
         className="transition-opacity duration-200"
         style={isClickable ? { cursor: "pointer" } : undefined}
@@ -538,7 +536,7 @@ const SankeyLink = ({
           selectedNode !== null && isConnected ? `url(#${chartId}-link-stroke-${index})` : "none"
         }
         strokeWidth={1}
-        strokeOpacity={0.3}
+        strokeOpacity={1}
         filter={isGlowing ? `url(#${chartId}-link-glow-${index})` : undefined}
         className="transition-opacity duration-200"
       />
@@ -591,13 +589,7 @@ const getLinkFill = (
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** Vertical color gradient for every configured node, painted by name. */
-const NodeColorGradients = ({
-  config,
-  chartId,
-}: {
-  config: ChartConfig;
-  chartId: string;
-}) => {
+const NodeColorGradients = ({ config, chartId }: { config: ChartConfig; chartId: string }) => {
   return (
     <>
       {Object.entries(config).map(([dataKey, nodeConfig]) => {
@@ -686,13 +678,7 @@ const GlowFilter = ({
   type: "node" | "link";
 }) => {
   return (
-    <filter
-      id={`${chartId}-${type}-glow-${name}`}
-      x="-200%"
-      y="-200%"
-      width="400%"
-      height="400%"
-    >
+    <filter id={`${chartId}-${type}-glow-${name}`} x="-200%" y="-200%" width="400%" height="400%">
       <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur" />
       <feColorMatrix
         in="blur"

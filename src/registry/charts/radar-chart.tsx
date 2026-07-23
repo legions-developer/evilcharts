@@ -1,20 +1,12 @@
 "use client";
 
 import {
-  type ChartConfig,
-  ChartContainer,
-  getColorsCount,
-  LoadingIndicator,
-} from "@/registry/ui/chart";
-import {
-  ChartTooltip,
-  ChartTooltipContent,
-  type TooltipRoundness,
-  type TooltipVariant,
-} from "@/registry/ui/tooltip";
-import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/legend";
-import { ChartBackground, type BackgroundVariant } from "@/registry/ui/background";
-import { ChartDot, type DotVariant } from "@/registry/ui/dot";
+  PolarAngleAxis as RechartsPolarAngleAxis,
+  PolarGrid as RechartsPolarGrid,
+  PolarRadiusAxis as RechartsPolarRadiusAxis,
+  Radar as RechartsRadar,
+  RadarChart as RechartsRadarChart,
+} from "recharts";
 import {
   Children,
   createContext,
@@ -31,12 +23,20 @@ import {
   type ReactNode,
 } from "react";
 import {
-  PolarAngleAxis as RechartsPolarAngleAxis,
-  PolarGrid as RechartsPolarGrid,
-  PolarRadiusAxis as RechartsPolarRadiusAxis,
-  Radar as RechartsRadar,
-  RadarChart as RechartsRadarChart,
-} from "recharts";
+  ChartTooltip,
+  ChartTooltipContent,
+  type TooltipRoundness,
+  type TooltipVariant,
+} from "@/registry/ui/tooltip";
+import {
+  type ChartConfig,
+  ChartContainer,
+  getColorsCount,
+  LoadingIndicator,
+} from "@/registry/ui/chart";
+import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/legend";
+import { ChartBackground, type BackgroundVariant } from "@/registry/ui/background";
+import { ChartDot, type DotVariant } from "@/registry/ui/dot";
 
 // Constants
 const STROKE_WIDTH = 1;
@@ -204,20 +204,29 @@ export function Radar({
   if (isLoading) return null;
 
   const isSelected = selectedDataKey === null || selectedDataKey === dataKey;
-  const opacity = isClickable && !isSelected ? 0.2 : 1;
+  const isDimmed = isClickable && !isSelected;
+  // Opacity when another radar is selected. The stroke stays full (1) on the
+  // selected/normal radar; when dimmed the fill recedes twice as far as the
+  // stroke and dots (fill 0.1 vs 0.2) so the picked radar reads clearly. The
+  // fill value multiplies the `fillOpacity` prop; stroke/dot are absolute.
+  const opacity = {
+    stroke: isDimmed ? 0.2 : 1,
+    fill: isDimmed ? 0.1 : 1,
+    dot: isDimmed ? 0.2 : 1,
+  };
   const isFilled = variant === "filled";
 
-  const { dot, activeDot } = resolveDots(children, id, dataKey, opacity);
+  const { dot, activeDot } = resolveDots(children, id, dataKey, opacity.dot);
 
   return (
     <>
       <RechartsRadar
         dataKey={dataKey}
         stroke={`url(#${id}-radar-stroke-${dataKey})`}
-        strokeOpacity={opacity}
+        strokeOpacity={opacity.stroke}
         strokeWidth={STROKE_WIDTH}
         fill={isFilled ? `url(#${id}-radar-fill-${dataKey})` : "none"}
-        fillOpacity={isFilled ? fillOpacity * opacity : 0}
+        fillOpacity={isFilled ? fillOpacity * opacity.fill : 0}
         dot={dot}
         activeDot={activeDot}
         filter={isGlowing ? `url(#${id}-radar-glow-${dataKey})` : undefined}
@@ -317,9 +326,7 @@ export function PolarRadiusAxis({
 
   if (isLoading) return null;
 
-  return (
-    <RechartsPolarRadiusAxis tick={tick} tickLine={tickLine} axisLine={axisLine} {...props} />
-  );
+  return <RechartsPolarRadiusAxis tick={tick} tickLine={tickLine} axisLine={axisLine} {...props} />;
 }
 
 type TooltipProps = {
@@ -499,7 +506,9 @@ const StrokeGradient = ({ id, dataKey, config }: StyleProps) => {
 const FillGradient = ({ id, dataKey, config }: StyleProps) => {
   const colorsCount = getColorsCount(config[dataKey] ?? {});
   const opacities =
-    colorsCount === 1 ? [0.8, 0.3] : Array.from({ length: colorsCount }, (_, i) => (i === 0 ? 0.8 : 0.3));
+    colorsCount === 1
+      ? [0.8, 0.3]
+      : Array.from({ length: colorsCount }, (_, i) => (i === 0 ? 0.8 : 0.3));
 
   return (
     <radialGradient id={`${id}-radar-fill-${dataKey}`} cx="50%" cy="50%" r="50%">

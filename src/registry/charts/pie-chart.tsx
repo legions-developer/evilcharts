@@ -1,20 +1,6 @@
 "use client";
 
 import {
-  type ChartConfig,
-  ChartContainer,
-  getColorsCount,
-  LoadingIndicator,
-} from "@/registry/ui/chart";
-import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/legend";
-import {
-  ChartTooltip,
-  ChartTooltipContent,
-  type TooltipRoundness,
-  type TooltipVariant,
-} from "@/registry/ui/tooltip";
-import { ChartBackground, type BackgroundVariant } from "@/registry/ui/background";
-import {
   Children,
   createContext,
   isValidElement,
@@ -35,6 +21,20 @@ import {
   Sector,
   type PieSectorShapeProps,
 } from "recharts";
+import {
+  ChartTooltip,
+  ChartTooltipContent,
+  type TooltipRoundness,
+  type TooltipVariant,
+} from "@/registry/ui/tooltip";
+import {
+  type ChartConfig,
+  ChartContainer,
+  getColorsCount,
+  LoadingIndicator,
+} from "@/registry/ui/chart";
+import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/legend";
+import { ChartBackground, type BackgroundVariant } from "@/registry/ui/background";
 import { motion } from "motion/react";
 
 // Constants
@@ -257,8 +257,7 @@ export function Pie({
         shape={(props: PieSectorShapeProps) => {
           const sectorName = data[props.index ?? 0]?.[nameKey] as string;
           const isGlowing = glowingSectors.includes(sectorName);
-          const isDimmed =
-            isClickable && selectedSector !== null && selectedSector !== sectorName;
+          const isDimmed = isClickable && selectedSector !== null && selectedSector !== sectorName;
 
           return (
             <Sector
@@ -267,7 +266,7 @@ export function Pie({
               filter={isGlowing ? `url(#${id}-glow-${sectorName})` : undefined}
               stroke={paddingAngle < 0 ? "var(--background)" : "none"}
               strokeWidth={paddingAngle < 0 ? 5 : 0}
-              opacity={isDimmed ? 0.3 : 1}
+              opacity={isDimmed ? 0.15 : 1}
               className="transition-opacity duration-200"
             />
           );
@@ -278,9 +277,7 @@ export function Pie({
       </RechartsPie>
       <defs>
         <RadialColorGradient id={id} config={config} variant={variant} />
-        {glowingSectors.length > 0 && (
-          <GlowFilter id={id} glowingSectors={glowingSectors} />
-        )}
+        {glowingSectors.length > 0 && <GlowFilter id={id} glowingSectors={glowingSectors} />}
       </defs>
     </>
   );
@@ -316,12 +313,7 @@ export function Tooltip({ variant, roundness, defaultIndex }: TooltipProps) {
     <ChartTooltip
       defaultIndex={defaultIndex}
       content={
-        <ChartTooltipContent
-          nameKey={nameKey}
-          hideLabel
-          roundness={roundness}
-          variant={variant}
-        />
+        <ChartTooltipContent nameKey={nameKey} hideLabel roundness={roundness} variant={variant} />
       }
     />
   );

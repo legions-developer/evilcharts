@@ -1,20 +1,6 @@
 "use client";
 
 import {
-  type ChartConfig,
-  ChartContainer,
-  getColorsCount,
-  LoadingIndicator,
-} from "@/registry/ui/chart";
-import {
-  ChartTooltip,
-  ChartTooltipContent,
-  type TooltipRoundness,
-  type TooltipVariant,
-} from "@/registry/ui/tooltip";
-import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/legend";
-import { ChartBackground, type BackgroundVariant } from "@/registry/ui/background";
-import {
   createContext,
   use,
   useCallback,
@@ -31,6 +17,20 @@ import {
   Sector,
   type SectorProps,
 } from "recharts";
+import {
+  ChartTooltip,
+  ChartTooltipContent,
+  type TooltipRoundness,
+  type TooltipVariant,
+} from "@/registry/ui/tooltip";
+import {
+  type ChartConfig,
+  ChartContainer,
+  getColorsCount,
+  LoadingIndicator,
+} from "@/registry/ui/chart";
+import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/legend";
+import { ChartBackground, type BackgroundVariant } from "@/registry/ui/background";
 import { TypedDataKey } from "recharts/types/util/typedDataKey";
 
 // Constants
@@ -102,8 +102,7 @@ type EvilRadialChartBaseProps<TData extends Record<string, unknown>> = {
   backgroundVariant?: BackgroundVariant; // background pattern behind the chart
 };
 
-type EvilRadialChartProps<TData extends Record<string, unknown>> =
-  EvilRadialChartBaseProps<TData>;
+type EvilRadialChartProps<TData extends Record<string, unknown>> = EvilRadialChartBaseProps<TData>;
 
 /**
  * Root of the composible radial chart. Owns the data, the shared context, the
@@ -250,7 +249,7 @@ export function RadialBar({
             <Sector
               {...props}
               filter={isGlowing ? `url(#${chartId}-radial-glow-${barName})` : undefined}
-              opacity={isClickable && !isSelected ? 0.3 : 1}
+              opacity={isClickable && !isSelected ? 0.15 : 1}
               className="transition-opacity duration-200"
             />
           );
@@ -284,12 +283,7 @@ export function Tooltip({ variant, roundness, defaultIndex }: TooltipProps) {
       defaultIndex={defaultIndex}
       cursor={false}
       content={
-        <ChartTooltipContent
-          nameKey={nameKey}
-          hideLabel
-          roundness={roundness}
-          variant={variant}
-        />
+        <ChartTooltipContent nameKey={nameKey} hideLabel roundness={roundness} variant={variant} />
       }
     />
   );
@@ -354,13 +348,7 @@ function getVariantConfig(variant: RadialVariant) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** Diagonal color gradient applied to every radial bar, one per config key. */
-const ColorGradientStyle = ({
-  config,
-  chartId,
-}: {
-  config: ChartConfig;
-  chartId: string;
-}) => {
+const ColorGradientStyle = ({ config, chartId }: { config: ChartConfig; chartId: string }) => {
   return (
     <>
       {Object.entries(config).map(([dataKey, colorConfig]) => {
@@ -400,13 +388,7 @@ const ColorGradientStyle = ({
 };
 
 /** Soft outer-glow SVG filter, one per glowing bar. */
-const GlowFilterStyle = ({
-  chartId,
-  glowingBars,
-}: {
-  chartId: string;
-  glowingBars: string[];
-}) => {
+const GlowFilterStyle = ({ chartId, glowingBars }: { chartId: string; glowingBars: string[] }) => {
   return (
     <>
       {glowingBars.map((barName) => (

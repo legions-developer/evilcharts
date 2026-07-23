@@ -1,21 +1,14 @@
 "use client";
 
 import {
-  type ChartConfig,
-  ChartContainer,
-  getColorsCount,
-  getLoadingData,
-  LoadingIndicator,
-} from "@/registry/ui/chart";
-import { EvilBrush, useEvilBrush, type EvilBrushRange } from "@/registry/ui/evil-brush";
-import {
-  ChartTooltip,
-  ChartTooltipContent,
-  type TooltipRoundness,
-  type TooltipVariant,
-} from "@/registry/ui/tooltip";
-import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/legend";
-import { ChartBackground, type BackgroundVariant } from "@/registry/ui/background";
+  Bar as RechartsBar,
+  BarChart as RechartsBarChart,
+  CartesianGrid,
+  Rectangle,
+  ReferenceLine,
+  XAxis as RechartsXAxis,
+  YAxis as RechartsYAxis,
+} from "recharts";
 import {
   createContext,
   use,
@@ -28,14 +21,21 @@ import {
   type ReactNode,
 } from "react";
 import {
-  Bar as RechartsBar,
-  BarChart as RechartsBarChart,
-  CartesianGrid,
-  Rectangle,
-  ReferenceLine,
-  XAxis as RechartsXAxis,
-  YAxis as RechartsYAxis,
-} from "recharts";
+  type ChartConfig,
+  ChartContainer,
+  getColorsCount,
+  getLoadingData,
+  LoadingIndicator,
+} from "@/registry/ui/chart";
+import {
+  ChartTooltip,
+  ChartTooltipContent,
+  type TooltipRoundness,
+  type TooltipVariant,
+} from "@/registry/ui/tooltip";
+import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/legend";
+import { EvilBrush, useEvilBrush, type EvilBrushRange } from "@/registry/ui/evil-brush";
+import { ChartBackground, type BackgroundVariant } from "@/registry/ui/background";
 import { RectRadius } from "recharts/types/shape/Rectangle";
 import { motion, useReducedMotion } from "motion/react";
 
@@ -93,9 +93,7 @@ function useBarChart() {
   const context = use(BarChartContext);
 
   if (!context) {
-    throw new Error(
-      "Bar chart parts (<Bar />, <XAxis />, …) must be used within <EvilBarChart />",
-    );
+    throw new Error("Bar chart parts (<Bar />, <XAxis />, …) must be used within <EvilBarChart />");
   }
 
   return context;
@@ -787,7 +785,7 @@ const getBarOpacity = ({
   isActive?: boolean;
 }) => {
   const isSelectedDataKey = selectedDataKey === null || selectedDataKey === dataKey;
-  const clickOpacity = isClickable && selectedDataKey !== null ? (isSelectedDataKey ? 1 : 0.3) : 1;
+  const clickOpacity = isClickable && selectedDataKey !== null ? (isSelectedDataKey ? 1 : 0.15) : 1;
 
   // While hovering, the hovered bar keeps its click opacity and the rest dim further
   if (enableHoverHighlight && isMouseInChart) {
@@ -810,11 +808,7 @@ type StyleProps = {
  * Vertical top-to-bottom color gradient for a series. Always rendered — every
  * fill variant and the buffer-bar stroke paint from this single gradient.
  */
-const ColorGradient = ({
-  id,
-  dataKey,
-  config,
-}: StyleProps & { config: ChartConfig }) => {
+const ColorGradient = ({ id, dataKey, config }: StyleProps & { config: ChartConfig }) => {
   const colorsCount = getColorsCount(config[dataKey] ?? {});
 
   return (
@@ -1184,13 +1178,7 @@ export function useLoadingData(isLoading: boolean, loadingBars: number = 12) {
  * The skeleton bar shown while the chart is loading. Rendered by the root in
  * place of the real bars, paired with its own masked shimmer pattern.
  */
-const LoadingBar = ({
-  chartId,
-  onShimmerExit,
-}: {
-  chartId: string;
-  onShimmerExit: () => void;
-}) => {
+const LoadingBar = ({ chartId, onShimmerExit }: { chartId: string; onShimmerExit: () => void }) => {
   return (
     <>
       <RechartsBar
