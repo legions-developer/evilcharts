@@ -75,8 +75,11 @@ const OVERLAP_BORDER_WIDTH = 5;
 // the chosen sector translates along its own bisector; deselecting returns it.
 const SELECTED_OFFSET = 12;
 
-// The selected sector stays full; the others recede to this opacity (Recharts parity).
-const DIMMED_OPACITY = 0.3;
+// The selected sector stays fully opaque; the others recede to this dimmed
+// opacity. Tuned to ~half the former 0.3 so the selected sector reads with more
+// contrast against the dimmed ones — the analogue of the area chart's dim-fill
+// halving (its dimmed fill went 0.2 → 0.1 while the selected state stays full).
+const DIMMED_OPACITY = 0.15;
 
 // Positive gaps between sectors are drawn as a CONSTANT-WIDTH background-colored
 // border (px), NOT an angular padAngle. An angular pad tapers to a wedge toward

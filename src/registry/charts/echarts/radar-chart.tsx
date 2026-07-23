@@ -571,11 +571,19 @@ function dotStyle(variant: DotVariant, paint: string, background: string): DotSt
 // ─────────────────────────────────────────────────────────────────────────────
 // Selection opacity — the twin only dims a CLICKABLE radar that isn't selected;
 // a non-clickable radar keeps full opacity even when a sibling is selected.
+// Split into stroke/fill/dot factors (mirroring the area chart's getOpacity): the
+// base state keeps stroke and dots at full, and a dimmed radar's fill drops twice
+// as far as its stroke/dots so the receding outline still reads.
 // ─────────────────────────────────────────────────────────────────────────────
 
-function selectionOpacity(selected: string | null, key: string, isClickable: boolean): number {
+function selectionOpacity(
+  selected: string | null,
+  key: string,
+  isClickable: boolean,
+): { fill: number; stroke: number; dot: number } {
   const isSelected = selected === null || selected === key;
-  return isClickable && !isSelected ? 0.2 : 1;
+  if (!isClickable || isSelected) return { fill: 1, stroke: 1, dot: 1 };
+  return { fill: 0.1, stroke: 0.2, dot: 0.2 };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -768,7 +776,7 @@ function buildRadarComponent(ctx: OptionBuildContext): RadarOption {
     axisName: {
       show: angleAxisSlot.present && !isLoading,
       color: tokens.mutedForeground,
-      fontSize: 12,
+      fontSize: 10,
     },
     // Radial spokes from the center — part of the twin's <PolarGrid>.
     axisLine: {
@@ -898,23 +906,35 @@ function buildRadarSeries(ctx: OptionBuildContext): RadarSeriesOption[] {
       cursor: radar.isClickable ? "pointer" : "default",
       // The selected radar rides on top; while a selection is active the rest sink.
       z: isSelected ? 3 : hasSelection ? 1 : 2,
-      lineStyle: { color: strokePaint, width: STROKE_WIDTH, opacity },
+      lineStyle: { color: strokePaint, width: STROKE_WIDTH, opacity: opacity.stroke },
       areaStyle: isFilled
-        ? { color: radarFillPaint(slots), opacity: radar.fillOpacity * opacity }
+        ? { color: radarFillPaint(slots), opacity: radar.fillOpacity * opacity.fill }
         : undefined,
       // Resting dots invisible when only an <ActiveDot> is declared.
       itemStyle: restingVisible
-        ? { ...restingDot.itemStyle, opacity }
+        ? { ...restingDot.itemStyle, opacity: opacity.dot }
         : { ...activeDot.itemStyle, opacity: 0 },
-      emphasis: {
-        // Promote the resting marker to the active variant on hover; keep the line
-        // and fill exactly as they rest so only the dot changes (twin parity).
-        itemStyle: { ...activeDot.itemStyle, opacity: 1 },
-        lineStyle: { color: strokePaint, width: STROKE_WIDTH, opacity },
-        ...(isFilled
-          ? { areaStyle: { color: radarFillPaint(slots), opacity: radar.fillOpacity * opacity } }
-          : {}),
-      },
+      // While a click selection is active it owns the canvas: native hover
+      // emphasis (the dot promotion) forces a dimmed radar's dot back to full
+      // opacity, fighting the selection dim — so hover highlighting stops entirely
+      // until the selection clears. The option rebuilds on every selection change,
+      // so this is a build-time switch.
+      emphasis: hasSelection
+        ? { disabled: true }
+        : {
+            // Promote the resting marker to the active variant on hover; keep the
+            // line and fill exactly as they rest so only the dot changes (twin parity).
+            itemStyle: { ...activeDot.itemStyle, opacity: 1 },
+            lineStyle: { color: strokePaint, width: STROKE_WIDTH, opacity: opacity.stroke },
+            ...(isFilled
+              ? {
+                  areaStyle: {
+                    color: radarFillPaint(slots),
+                    opacity: radar.fillOpacity * opacity.fill,
+                  },
+                }
+              : {}),
+          },
     };
   });
 }

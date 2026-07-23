@@ -209,6 +209,7 @@ export interface XAxisProps {
   // Category values are stringified, so the formatter always sees a string —
   // letting examples share `(value) => value.substring(0, 3)` with the Recharts twin.
   tickFormatter?: (value: string, index: number) => string; // formats x tick labels
+  label?: string; // axis title, centered below the x-position tick labels
 }
 
 /**
@@ -220,6 +221,7 @@ export const XAxis: FC<XAxisProps> = () => null;
 export interface YAxisProps {
   dataKey?: string; // category key — overrides the root xDataKey (horizontal layout)
   tickFormatter?: (value: string, index: number) => string; // formats y tick labels
+  label?: string; // axis title, rotated alongside the y-position tick labels
 }
 
 /**
@@ -270,6 +272,7 @@ type AxisSlot = {
   present: boolean;
   dataKey?: string;
   tickFormatter?: (value: string, index: number) => string;
+  label?: string;
 };
 type TooltipSlot = {
   present: boolean;
@@ -330,10 +333,20 @@ function collectConfig(children: ReactNode): CollectedConfig {
       });
     } else if (type === XAxis) {
       const props = child.props as XAxisProps;
-      xAxis = { present: true, dataKey: props.dataKey, tickFormatter: props.tickFormatter };
+      xAxis = {
+        present: true,
+        dataKey: props.dataKey,
+        tickFormatter: props.tickFormatter,
+        label: props.label,
+      };
     } else if (type === YAxis) {
       const props = child.props as YAxisProps;
-      yAxis = { present: true, dataKey: props.dataKey, tickFormatter: props.tickFormatter };
+      yAxis = {
+        present: true,
+        dataKey: props.dataKey,
+        tickFormatter: props.tickFormatter,
+        label: props.label,
+      };
     } else if (type === Grid) {
       showGrid = true;
     } else if (type === Tooltip) {
@@ -1035,15 +1048,25 @@ type OptionBuildContext = {
 // Grid insets plus the footer band reserved for the brush. ECharts 6 contains
 // axis labels automatically (the legacy `containLabel` flag now only triggers a
 // deprecation warning).
-function buildChartLayout({ legendSlot, showBrush, brushHeight }: OptionBuildContext): {
+function buildChartLayout({
+  legendSlot,
+  showBrush,
+  brushHeight,
+  isHorizontal,
+  categorySlot,
+  valueSlot,
+}: OptionBuildContext): {
   grid: GridComponentOption;
   brushBottom: number;
 } {
   const legendTop = legendSlot.present && legendSlot.verticalAlign === "top";
   const legendBottom = legendSlot.present && legendSlot.verticalAlign === "bottom";
   // Clearance covers the axis labels plus the same breathing room the Recharts
-  // twin leaves between them and the brush.
-  const brushGap = showBrush ? brushHeight + 30 : 0;
+  // twin leaves between them and the brush. A bottom-axis TITLE renders below the
+  // labels (nameGap), so it needs its own band above the brush frame. The brush
+  // is vertical-layout only, where the bottom (x-position) axis is the category axis.
+  const bottomAxisLabel = isHorizontal ? valueSlot.label : categorySlot.label;
+  const brushGap = showBrush ? brushHeight + 30 + (bottomAxisLabel ? 22 : 0) : 0;
 
   return {
     grid: {
@@ -1054,6 +1077,22 @@ function buildChartLayout({ legendSlot, showBrush, brushHeight }: OptionBuildCon
     },
     brushBottom: legendBottom ? 34 : 6,
   };
+}
+
+// Composites a translucent color over an opaque base into a FLAT color. The
+// tick dots need this: a translucent stroke double-paints where its round caps
+// overlap the line body, which reads as two stacked colors.
+function flattenColor(color: string, base: string): string {
+  const parse = (value: string) =>
+    value
+      .match(/rgba?\(([^)]+)\)/)?.[1]
+      .split(",")
+      .map((part) => Number.parseFloat(part)) ?? [0, 0, 0, 1];
+  const [r, g, b, a = 1] = parse(color);
+  const [baseR, baseG, baseB] = parse(base);
+  const mix = (channel: number, baseChannel: number) =>
+    Math.round(channel * a + baseChannel * (1 - a));
+  return `rgb(${mix(r, baseR)}, ${mix(g, baseG)}, ${mix(b, baseB)})`;
 }
 
 // The category + value axes, laid onto x/y per layout. Vertical bars → x is
@@ -1073,9 +1112,19 @@ function buildMainAxes(ctx: OptionBuildContext): { xAxis: XAxisOption; yAxis: YA
 
   const axisLabelColor = tokens.mutedForeground;
   const splitLineColor = withAlpha(tokens.border, GRID_LINE_OPACITY);
+  // Gridline gray as an opaque color — see flattenColor.
+  const tickDotColor = flattenColor(splitLineColor, tokens.background);
   const catData = isLoading ? loadingData().map((_, i) => i) : categories;
   const catFormatter = categorySlot.tickFormatter;
   const valFormatter = valueSlot.tickFormatter;
+
+  // The axis title (name) follows the axis PART, not its category/value role: the
+  // category axis wears whichever <XAxis>/<YAxis> child renders it per layout, and
+  // its label sits at that child's physical position. nameGap is 30 for the bottom
+  // (x-position) axis and 38 for the side (y-position) one, so it swaps with the
+  // layout alongside the axisLabel styling.
+  const categoryNameGap = isHorizontal ? 38 : 30;
+  const valueNameGap = isHorizontal ? 30 : 38;
 
   // NOTE: these are left un-annotated so their inferred literal type stays free
   // of an axis-specific `position` — the layout swap below assigns the category
@@ -1091,12 +1140,25 @@ function buildMainAxes(ctx: OptionBuildContext): { xAxis: XAxisOption; yAxis: YA
     // axis defaults to bottom-up, so flip it when the category axis is on y.
     inverse: isHorizontal,
     data: catData,
+    // Axis title — same size/color as the tick labels, pushed clear of them. The
+    // category axis carries the label of whichever <XAxis>/<YAxis> child renders it.
+    name: isLoading ? undefined : categorySlot.label,
+    nameLocation: "middle" as const,
+    nameGap: categoryNameGap,
+    nameTextStyle: { color: axisLabelColor, fontSize: 10 },
     axisLine: { show: false },
-    axisTick: { show: false },
+    // Tick DOTS: a near-zero-length tick whose round caps form a true circle, in
+    // the gridline gray (flattened opaque so the caps don't stack).
+    axisTick: {
+      show: !isLoading && categorySlot.present,
+      length: 0.5,
+      lineStyle: { color: tickDotColor, width: 3, cap: "round" as const },
+    },
     splitLine: { show: false },
     axisLabel: {
       show: !isLoading && categorySlot.present,
       color: axisLabelColor,
+      fontSize: 10,
       margin: 8,
       formatter: catFormatter
         ? (value: string, index: number) => catFormatter(value, index)
@@ -1111,8 +1173,19 @@ function buildMainAxes(ctx: OptionBuildContext): { xAxis: XAxisOption; yAxis: YA
     type: "value" as const,
     show: valueSlot.present || showGrid,
     max: isPercent ? 1 : undefined,
+    // Axis title — same styling as the category axis; the value axis carries the
+    // label of the other of the two <XAxis>/<YAxis> children.
+    name: isLoading ? undefined : valueSlot.label,
+    nameLocation: "middle" as const,
+    nameGap: valueNameGap,
+    nameTextStyle: { color: axisLabelColor, fontSize: 10 },
     axisLine: { show: false },
-    axisTick: { show: false },
+    // Same tick dots as the category axis, beside each value label.
+    axisTick: {
+      show: valueSlot.present && !isLoading,
+      length: 0.5,
+      lineStyle: { color: tickDotColor, width: 3, cap: "round" as const },
+    },
     splitLine: {
       // Hidden while loading — the skeleton floats on a clean canvas.
       show: showGrid && !isLoading,
@@ -1123,6 +1196,7 @@ function buildMainAxes(ctx: OptionBuildContext): { xAxis: XAxisOption; yAxis: YA
       // axes unmount during loading too.
       show: valueSlot.present && !isLoading,
       color: axisLabelColor,
+      fontSize: 10,
       margin: 8,
       formatter: isPercent
         ? (value: number) => `${Math.round(value * 100)}%`
@@ -1457,11 +1531,19 @@ function buildBarSeries(ctx: OptionBuildContext): BarSeriesOption[] {
       },
       // Hover-highlight uses ECharts-native focus/blur: `self` keeps only the
       // hovered bar lit and dims every other, matching the twin's per-bar dim.
-      // Without it, emphasis is disabled so hovering leaves the bar untouched.
-      emphasis: bar.enableHoverHighlight
-        ? { focus: "self", blurScope: "coordinateSystem" }
-        : { disabled: true },
-      blur: bar.enableHoverHighlight ? { itemStyle: { opacity: HOVER_BLUR } } : undefined,
+      // A click-selection OWNS the dim while it is active, so hover highlighting
+      // switches off entirely whenever a selection exists (this option rebuilds on
+      // every selection change, and the notMerge push clears any live blur) and
+      // resumes once the selection clears. Otherwise emphasis is disabled so
+      // hovering leaves the bar untouched.
+      emphasis:
+        bar.enableHoverHighlight && !hasSelection
+          ? { focus: "self", blurScope: "coordinateSystem" }
+          : { disabled: true },
+      blur:
+        bar.enableHoverHighlight && !hasSelection
+          ? { itemStyle: { opacity: HOVER_BLUR } }
+          : undefined,
       // The grow-in envelope. Only takes effect on the reveal push (top-level
       // `animation: true`); every later push sends `animation: false`, so the
       // per-datum stagger is dormant then.

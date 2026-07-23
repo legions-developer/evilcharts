@@ -73,5 +73,6 @@ Axiom (`src/lib/axiom.ts`) tracks docs markdown fetches and registry installs; i
 - Conventional commits (`feat:`, `fix:`, `docs:`, `chore:`, …)
 - Kebab-case chart/example file names; examples prefixed `ex-`, blocks `b-`
 - Charts use `recharts` for rendering and `motion` for animation — avoid new dependencies without discussion
+- Blocks and examples inline any SVG/icon markup directly in the component code — never import icons or assets. These files are installed into consumer projects, so they must be dependency-free beyond the chart itself.
 - Chart colors come from `ChartConfig` CSS variables (`var(--color-<key>-<n>)`), supporting multi-stop gradients per series
 - Prettier with import sorting and Tailwind class sorting (`prettier-plugin-sort-imports`, `prettier-plugin-tailwindcss`)

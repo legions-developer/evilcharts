@@ -142,9 +142,12 @@ const LINE_GLOW_LAYERS: { width: number; opacity: number }[] = [
   { width: 12, opacity: 0.15 },
   { width: 20, opacity: 0.07 },
 ];
-// The dim applied to unselected series once one series is selected — matches the
-// Recharts twin (bar fill / line stroke / dot all drop to 0.3).
+// The dim applied to unselected series once one series is selected. Line strokes
+// and dots drop to SELECTION_DIM (0.3, matching the Recharts twin); bar FILLS
+// recede further to SELECTION_DIM_FILL so a dimmed column fades back like the area
+// chart's dimmed fill while thin strokes and dots stay legible.
 const SELECTION_DIM = 0.3;
+const SELECTION_DIM_FILL = 0.15;
 
 // Theme selectors mirror the repo's <ChartStyle>: light is the bare root, dark is `.dark`.
 const THEMES = { light: "", dark: ".dark" } as const;
@@ -285,6 +288,7 @@ export interface XAxisProps {
   // Category-axis values are always stringified, so the formatter sees a string —
   // letting examples share `(value) => value.substring(0, 3)` with the Recharts twin.
   tickFormatter?: (value: string, index: number) => string; // formats x tick labels
+  label?: string; // axis title, centered below the tick labels
 }
 
 /** Presence shows the x-axis category labels. Renders nothing. */
@@ -293,6 +297,7 @@ export const XAxis: FC<XAxisProps> = () => null;
 export interface YAxisProps {
   dataKey?: string; // reserved for parity with the Recharts twin
   tickFormatter?: (value: number, index: number) => string; // formats y tick labels
+  label?: string; // axis title, rotated alongside the tick labels
 }
 
 /** Presence shows the y value axis. Renders nothing. */
@@ -357,11 +362,13 @@ type XAxisSlot = {
   present: boolean;
   dataKey?: string;
   tickFormatter?: (value: string, index: number) => string;
+  label?: string;
 };
 type YAxisSlot = {
   present: boolean;
   dataKey?: string;
   tickFormatter?: (value: number, index: number) => string;
+  label?: string;
 };
 type TooltipSlot = {
   present: boolean;
@@ -450,10 +457,20 @@ function collectConfig(children: ReactNode): CollectedConfig {
       });
     } else if (type === XAxis) {
       const props = child.props as XAxisProps;
-      xAxis = { present: true, dataKey: props.dataKey, tickFormatter: props.tickFormatter };
+      xAxis = {
+        present: true,
+        dataKey: props.dataKey,
+        tickFormatter: props.tickFormatter,
+        label: props.label,
+      };
     } else if (type === YAxis) {
       const props = child.props as YAxisProps;
-      yAxis = { present: true, dataKey: props.dataKey, tickFormatter: props.tickFormatter };
+      yAxis = {
+        present: true,
+        dataKey: props.dataKey,
+        tickFormatter: props.tickFormatter,
+        label: props.label,
+      };
     } else if (type === Grid) {
       showGrid = true;
     } else if (type === Tooltip) {
@@ -981,13 +998,19 @@ function curveConfig(curveType: CurveType): { smooth: boolean; step: "middle" | 
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Selection dim (§ recharts getOpacity / getBarOpacity) — a series dims to 0.3
-// only when ANOTHER series is selected; the selected (or unselected-state) series
-// stays at full strength. Bars, line strokes, and dots all use the same ratio.
+// Selection dim (§ recharts getOpacity / getBarOpacity) — a series dims only when
+// ANOTHER series is selected; the selected (or no-selection) series stays at full
+// strength. Line strokes and dots use seriesDim (0.3); bar FILLS use seriesFillDim
+// (0.15) so the dimmed columns recede further than the lines, like the area
+// chart's dimmed fill.
 // ─────────────────────────────────────────────────────────────────────────────
 
 function seriesDim(selected: string | null, key: string): number {
   return selected === null || selected === key ? 1 : SELECTION_DIM;
+}
+
+function seriesFillDim(selected: string | null, key: string): number {
+  return selected === null || selected === key ? 1 : SELECTION_DIM_FILL;
 }
 
 function seriesLabel(config: ChartConfig, key: string): string {
@@ -1187,15 +1210,16 @@ type OptionBuildContext = {
 // Grid insets plus the footer band reserved for the brush. ECharts 6 contains
 // axis labels automatically (the legacy `containLabel` flag now only triggers a
 // deprecation warning).
-function buildChartLayout({ legendSlot, showBrush, brushHeight }: OptionBuildContext): {
+function buildChartLayout({ legendSlot, xAxisSlot, showBrush, brushHeight }: OptionBuildContext): {
   grid: GridComponentOption;
   brushBottom: number;
 } {
   const legendTop = legendSlot.present && legendSlot.verticalAlign === "top";
   const legendBottom = legendSlot.present && legendSlot.verticalAlign === "bottom";
   // Clearance covers the x-axis labels plus the same breathing room the
-  // Recharts twin leaves between them and the brush.
-  const brushGap = showBrush ? brushHeight + 30 : 0;
+  // Recharts twin leaves between them and the brush. An x-axis TITLE renders
+  // below the labels (nameGap), so it needs its own band above the brush frame.
+  const brushGap = showBrush ? brushHeight + 30 + (xAxisSlot.label ? 22 : 0) : 0;
 
   return {
     grid: {
@@ -1208,12 +1232,30 @@ function buildChartLayout({ legendSlot, showBrush, brushHeight }: OptionBuildCon
   };
 }
 
+// Composites a translucent color over an opaque base into a FLAT color. The
+// tick dots need this: a translucent stroke double-paints where its round caps
+// overlap the line body, which reads as two stacked colors.
+function flattenColor(color: string, base: string): string {
+  const parse = (value: string) =>
+    value
+      .match(/rgba?\(([^)]+)\)/)?.[1]
+      .split(",")
+      .map((part) => Number.parseFloat(part)) ?? [0, 0, 0, 1];
+  const [r, g, b, a = 1] = parse(color);
+  const [baseR, baseG, baseB] = parse(base);
+  const mix = (channel: number, baseChannel: number) =>
+    Math.round(channel * a + baseChannel * (1 - a));
+  return `rgb(${mix(r, baseR)}, ${mix(g, baseG)}, ${mix(b, baseB)})`;
+}
+
 function buildMainAxes(ctx: OptionBuildContext): { xAxis: XAxisOption; yAxis: YAxisOption } {
   const { xAxisSlot, yAxisSlot, showGrid, isLoading, bars, categories, loadingData } = ctx;
   const { tokens } = ctx.resolved;
 
   const axisLabelColor = tokens.mutedForeground;
   const splitLineColor = withAlpha(tokens.border, GRID_LINE_OPACITY);
+  // Gridline gray as an opaque color — see flattenColor.
+  const tickDotColor = flattenColor(splitLineColor, tokens.background);
   // Bars need band spacing (points centered in categories); a line-only chart
   // spans edge to edge. The loading skeleton is bars, so it always bands.
   const hasBars = bars.length > 0 || isLoading;
@@ -1226,12 +1268,24 @@ function buildMainAxes(ctx: OptionBuildContext): { xAxis: XAxisOption; yAxis: YA
     boundaryGap: hasBars,
     show: true,
     data: isLoading ? loadingData().map((_, i) => i) : categories,
+    // Axis title — same size/color as the tick labels, pushed clear of them.
+    name: isLoading ? undefined : xAxisSlot.label,
+    nameLocation: "middle",
+    nameGap: 30,
+    nameTextStyle: { color: axisLabelColor, fontSize: 10 },
     axisLine: { show: false },
-    axisTick: { show: false },
+    // Tick DOTS: a near-zero-length tick whose round caps form a true circle,
+    // in the gridline gray (flattened opaque so the caps don't stack).
+    axisTick: {
+      show: !isLoading && xAxisSlot.present,
+      length: 0.5,
+      lineStyle: { color: tickDotColor, width: 3, cap: "round" },
+    },
     splitLine: { show: false },
     axisLabel: {
       show: !isLoading && xAxisSlot.present,
       color: axisLabelColor,
+      fontSize: 10,
       margin: 8,
       formatter: xTickFormatter
         ? (value: string, index: number) => xTickFormatter(value, index)
@@ -1247,8 +1301,18 @@ function buildMainAxes(ctx: OptionBuildContext): { xAxis: XAxisOption; yAxis: YA
     type: "value",
     show: yAxisSlot.present || showGrid,
     min: bars.length > 0 ? 0 : undefined,
+    // Axis title — rendered rotated alongside the tick labels, same styling.
+    name: isLoading ? undefined : yAxisSlot.label,
+    nameLocation: "middle",
+    nameGap: 38,
+    nameTextStyle: { color: axisLabelColor, fontSize: 10 },
     axisLine: { show: false },
-    axisTick: { show: false },
+    // Same tick dots as the x-axis, beside each value label.
+    axisTick: {
+      show: yAxisSlot.present && !isLoading,
+      length: 0.5,
+      lineStyle: { color: tickDotColor, width: 3, cap: "round" },
+    },
     splitLine: {
       // Hidden while loading — the skeleton floats on a clean canvas.
       show: showGrid && !isLoading,
@@ -1259,6 +1323,7 @@ function buildMainAxes(ctx: OptionBuildContext): { xAxis: XAxisOption; yAxis: YA
       // Recharts YAxis unmounts during loading too.
       show: yAxisSlot.present && !isLoading,
       color: axisLabelColor,
+      fontSize: 10,
       margin: 8,
       formatter: yTickFormatter
         ? (value: number, index: number) => yTickFormatter(value, index)
@@ -1398,9 +1463,10 @@ function buildBrushOption(
     const base = (ctx.resolved.series[key] ?? [])[0] ?? "rgba(120, 120, 120, 1)";
     const curve = curveConfig(input.curveType ?? curveType);
 
-    // The mini chart mirrors the click selection: unselected series recede by
-    // the same ratio as the main plot.
+    // The mini chart mirrors the click selection: unselected series recede like
+    // the main plot — the stroke by seriesDim, the fill by the deeper fill dim.
     const dim = seriesDim(selectedDataKey, key);
+    const fillDim = seriesFillDim(selectedDataKey, key);
 
     return {
       id: `__mini-${key}`,
@@ -1418,7 +1484,7 @@ function buildBrushOption(
       lineStyle: { color: base, width: 1, opacity: BRUSH_STROKE_OPACITY * dim },
       areaStyle: {
         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-          { offset: 0, color: withAlpha(base, BRUSH_FILL_OPACITY * dim) },
+          { offset: 0, color: withAlpha(base, BRUSH_FILL_OPACITY * fillDim) },
           { offset: 1, color: withAlpha(base, 0) },
         ]),
       },
@@ -1515,13 +1581,16 @@ function buildLoadingOption(
 function buildBarSeries(ctx: OptionBuildContext): BarSeriesOption[] {
   const { data, config, bars, animationType, selectedDataKey, resolved, barGap, barCategoryGap } =
     ctx;
+  // While a series is click-selected the selection dim owns the canvas — hover
+  // highlighting is suspended until it clears (see the emphasis/blur switch below).
+  const hasSelection = selectedDataKey !== null;
 
   return bars.map((bar) => {
     const key = bar.dataKey;
     const slots = resolved.series[key] ?? ["rgba(120, 120, 120, 1)"];
     const base = slots[0];
     const multiColor = slots.length > 1;
-    const dim = seriesDim(selectedDataKey, key);
+    const fillDim = seriesFillDim(selectedDataKey, key);
     const values = data.map((row) => Number(row[key]) || 0);
     const barAnim = bar.animationType ?? animationType;
 
@@ -1560,7 +1629,7 @@ function buildBarSeries(ctx: OptionBuildContext): BarSeriesOption[] {
       z: 2,
       itemStyle: {
         color: barFillPaint(bar.variant, slots),
-        opacity: dim,
+        opacity: fillDim,
         // Stripped bars are square (their solid top strip lives in the fill);
         // every other variant rounds all four corners like the Recharts twin.
         borderRadius: bar.variant === "stripped" ? 0 : bar.radius,
@@ -1576,11 +1645,18 @@ function buildBarSeries(ctx: OptionBuildContext): BarSeriesOption[] {
       // emphasis — `focus: "self"` blurs siblings, `blurScope: "series"` keeps
       // the blur inside this bar (so lines and other bars are untouched). This is
       // the canvas equivalent of the twin's per-column dim, driven natively so no
-      // option is pushed mid-hover.
-      emphasis: bar.enableHoverHighlight
-        ? { focus: "self", blurScope: "series" }
-        : { focus: "none" },
-      blur: bar.enableHoverHighlight ? { itemStyle: { opacity: SELECTION_DIM } } : undefined,
+      // option is pushed mid-hover. Once a series is click-SELECTED, hover
+      // highlighting is suspended: focus drops to "none" and the blur is removed so
+      // hovering no longer re-dims anything (the option rebuilds on selection
+      // change, so this build-time switch flips automatically and resumes on clear).
+      emphasis:
+        bar.enableHoverHighlight && !hasSelection
+          ? { focus: "self", blurScope: "series" }
+          : { focus: "none" },
+      blur:
+        bar.enableHoverHighlight && !hasSelection
+          ? { itemStyle: { opacity: SELECTION_DIM_FILL } }
+          : undefined,
     };
 
     return bar.barProps ? { ...series, ...bar.barProps } : series;

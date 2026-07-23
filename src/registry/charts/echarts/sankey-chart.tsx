@@ -57,10 +57,10 @@ const GRAY = "rgba(120, 120, 120, 1)"; // fallback when a node has no resolved c
 // opacity factors live here. `withAlpha` MULTIPLIES a token's own alpha, so a
 // translucent background/border token stays honest. Tune here, not inline.
 // ─────────────────────────────────────────────────────────────────────────────
-const NODE_FILL_OPACITY = 0.9; // resting node rectangle (Recharts fillOpacity 0.9)
-const NODE_DIM_OPACITY = 0.3; // node not connected to the current selection
-const LINK_FILL_OPACITY = 0.4; // resting link band (Recharts fillOpacity 0.4)
-const LINK_DIM_OPACITY = 0.1; // link not touching the current selection
+const NODE_FILL_OPACITY = 1; // resting/selected node rectangle — the bold, opaque element (stroke analogue) reads solid at full opacity (bumped from Recharts fillOpacity 0.9)
+const NODE_DIM_OPACITY = 0.3; // node not connected to the current selection (stroke-dim analogue — kept)
+const LINK_FILL_OPACITY = 0.4; // resting link band (Recharts fillOpacity 0.4 — the translucent fill base, kept)
+const LINK_DIM_OPACITY = 0.05; // link not touching the current selection — the translucent band (fill analogue) recedes further (halved from 0.1)
 const LABEL_DIM_OPACITY = 0.3; // node label faded when its node is dimmed
 // Glow is a canvas shadow — the analogue of the Recharts twin's feGaussianBlur
 // filter. Two stacked passes build a smooth Gaussian-like falloff instead of one
@@ -963,8 +963,9 @@ function buildGlowSeries(ctx: OptionBuildContext): SankeySeriesOption | null {
       name: node.name,
       itemStyle: {
         color: nodeGradient(slots),
-        // The real node (0.9) sits exactly on top, so this fill is hidden and only
-        // its shadow shows; 0 fully removes the pass for inactive nodes.
+        // The real node (opacity NODE_FILL_OPACITY) sits exactly on top, so this
+        // fill is hidden and only its shadow shows; 0 fully removes the pass for
+        // inactive nodes.
         opacity: active ? NODE_FILL_OPACITY : 0,
         borderWidth: 0,
         borderRadius: nodeConfig.radius,

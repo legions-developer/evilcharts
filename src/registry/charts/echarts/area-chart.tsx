@@ -166,6 +166,7 @@ export interface EChartsAreaChartProps<TData extends Record<string, unknown>> {
   animationType?: AreaAnimationType; // default intro reveal (first <Area> overrides)
   enableHoverHighlight?: boolean; // hovering a series dims the others, like a temporary selection
   defaultSelectedDataKey?: string | null; // series selected on first render
+  selectedDataKey?: string | null; // controlled selection — overrides internal state when set
   onSelectionChange?: (key: string | null) => void; // fires when the selected series changes
   isLoading?: boolean; // shows the animated loading skeleton
   loadingPoints?: number; // number of points in the loading skeleton
@@ -217,6 +218,7 @@ export interface XAxisProps {
   // Category-axis values are always stringified, so the formatter sees a string —
   // letting examples share `(value) => value.substring(0, 3)` with the Recharts twin.
   tickFormatter?: (value: string, index: number) => string; // formats x tick labels
+  label?: string; // axis title, centered below the tick labels
 }
 
 /** Presence shows the x-axis category labels. Renders nothing. */
@@ -225,6 +227,7 @@ export const XAxis: FC<XAxisProps> = () => null;
 export interface YAxisProps {
   dataKey?: string; // reserved for parity with the Recharts twin
   tickFormatter?: (value: number, index: number) => string; // formats y tick labels
+  label?: string; // axis title, rotated alongside the tick labels
 }
 
 /** Presence shows the y value axis. Renders nothing. */
@@ -274,11 +277,13 @@ type XAxisSlot = {
   present: boolean;
   dataKey?: string;
   tickFormatter?: (value: string, index: number) => string;
+  label?: string;
 };
 type YAxisSlot = {
   present: boolean;
   dataKey?: string;
   tickFormatter?: (value: number, index: number) => string;
+  label?: string;
 };
 type TooltipSlot = {
   present: boolean;
@@ -351,10 +356,20 @@ function collectConfig(children: ReactNode): CollectedConfig {
       });
     } else if (type === XAxis) {
       const props = child.props as XAxisProps;
-      xAxis = { present: true, dataKey: props.dataKey, tickFormatter: props.tickFormatter };
+      xAxis = {
+        present: true,
+        dataKey: props.dataKey,
+        tickFormatter: props.tickFormatter,
+        label: props.label,
+      };
     } else if (type === YAxis) {
       const props = child.props as YAxisProps;
-      yAxis = { present: true, dataKey: props.dataKey, tickFormatter: props.tickFormatter };
+      yAxis = {
+        present: true,
+        dataKey: props.dataKey,
+        tickFormatter: props.tickFormatter,
+        label: props.label,
+      };
     } else if (type === Grid) {
       showGrid = true;
     } else if (type === Tooltip) {
@@ -916,8 +931,8 @@ function curveConfig(curveType: CurveType): { smooth: boolean; step: "middle" | 
 // ─────────────────────────────────────────────────────────────────────────────
 
 function getOpacity(selected: string | null, key: string) {
-  if (selected === null || selected === key) return { fill: 0.8, stroke: 0.8, dot: 1 };
-  return { fill: 0.2, stroke: 0.3, dot: 0.3 };
+  if (selected === null || selected === key) return { fill: 0.8, stroke: 1, dot: 1 };
+  return { fill: 0.1, stroke: 0.3, dot: 0.3 };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1088,15 +1103,16 @@ type OptionBuildContext = {
 // Grid insets plus the footer band reserved for the brush. ECharts 6 contains
 // axis labels automatically (the legacy `containLabel` flag now only triggers a
 // deprecation warning).
-function buildChartLayout({ legendSlot, showBrush, brushHeight }: OptionBuildContext): {
+function buildChartLayout({ legendSlot, xAxisSlot, showBrush, brushHeight }: OptionBuildContext): {
   grid: GridComponentOption;
   brushBottom: number;
 } {
   const legendTop = legendSlot.present && legendSlot.verticalAlign === "top";
   const legendBottom = legendSlot.present && legendSlot.verticalAlign === "bottom";
   // Clearance covers the x-axis labels plus the same breathing room the
-  // Recharts twin leaves between them and the brush.
-  const brushGap = showBrush ? brushHeight + 30 : 0;
+  // Recharts twin leaves between them and the brush. An x-axis TITLE renders
+  // below the labels (nameGap), so it needs its own band above the brush frame.
+  const brushGap = showBrush ? brushHeight + 30 + (xAxisSlot.label ? 22 : 0) : 0;
 
   return {
     grid: {
@@ -1109,12 +1125,30 @@ function buildChartLayout({ legendSlot, showBrush, brushHeight }: OptionBuildCon
   };
 }
 
+// Composites a translucent color over an opaque base into a FLAT color. The
+// tick dots need this: a translucent stroke double-paints where its round caps
+// overlap the line body, which reads as two stacked colors.
+function flattenColor(color: string, base: string): string {
+  const parse = (value: string) =>
+    value
+      .match(/rgba?\(([^)]+)\)/)?.[1]
+      .split(",")
+      .map((part) => Number.parseFloat(part)) ?? [0, 0, 0, 1];
+  const [r, g, b, a = 1] = parse(color);
+  const [baseR, baseG, baseB] = parse(base);
+  const mix = (channel: number, baseChannel: number) =>
+    Math.round(channel * a + baseChannel * (1 - a));
+  return `rgb(${mix(r, baseR)}, ${mix(g, baseG)}, ${mix(b, baseB)})`;
+}
+
 function buildMainAxes(ctx: OptionBuildContext): { xAxis: XAxisOption; yAxis: YAxisOption } {
   const { xAxisSlot, yAxisSlot, showGrid, isLoading, isExpanded, categories, loadingData } = ctx;
   const { tokens } = ctx.resolved;
 
   const axisLabelColor = tokens.mutedForeground;
   const splitLineColor = withAlpha(tokens.border, GRID_LINE_OPACITY);
+  // Gridline gray as an opaque color — see flattenColor.
+  const tickDotColor = flattenColor(splitLineColor, tokens.background);
 
   const xTickFormatter = xAxisSlot.tickFormatter;
   const yTickFormatter = yAxisSlot.tickFormatter;
@@ -1124,12 +1158,24 @@ function buildMainAxes(ctx: OptionBuildContext): { xAxis: XAxisOption; yAxis: YA
     boundaryGap: false,
     show: true,
     data: isLoading ? loadingData().map((_, i) => i) : categories,
+    // Axis title — same size/color as the tick labels, pushed clear of them.
+    name: isLoading ? undefined : xAxisSlot.label,
+    nameLocation: "middle",
+    nameGap: 30,
+    nameTextStyle: { color: axisLabelColor, fontSize: 10 },
     axisLine: { show: false },
-    axisTick: { show: false },
+    // Tick DOTS: a near-zero-length tick whose round caps form a true circle,
+    // in the gridline gray (flattened opaque so the caps don't stack).
+    axisTick: {
+      show: !isLoading && xAxisSlot.present,
+      length: 0.5,
+      lineStyle: { color: tickDotColor, width: 3, cap: "round" },
+    },
     splitLine: { show: false },
     axisLabel: {
       show: !isLoading && xAxisSlot.present,
       color: axisLabelColor,
+      fontSize: 10,
       margin: 8,
       formatter: xTickFormatter
         ? (value: string, index: number) => xTickFormatter(value, index)
@@ -1144,8 +1190,18 @@ function buildMainAxes(ctx: OptionBuildContext): { xAxis: XAxisOption; yAxis: YA
     type: "value",
     show: yAxisSlot.present || showGrid,
     max: isExpanded ? 1 : undefined,
+    // Axis title — rendered rotated alongside the tick labels, same styling.
+    name: isLoading ? undefined : yAxisSlot.label,
+    nameLocation: "middle",
+    nameGap: 38,
+    nameTextStyle: { color: axisLabelColor, fontSize: 10 },
     axisLine: { show: false },
-    axisTick: { show: false },
+    // Same tick dots as the x-axis, beside each value label.
+    axisTick: {
+      show: yAxisSlot.present && !isLoading,
+      length: 0.5,
+      lineStyle: { color: tickDotColor, width: 3, cap: "round" },
+    },
     splitLine: {
       // Hidden while loading — the skeleton floats on a clean canvas.
       show: showGrid && !isLoading,
@@ -1156,6 +1212,7 @@ function buildMainAxes(ctx: OptionBuildContext): { xAxis: XAxisOption; yAxis: YA
       // Recharts YAxis unmounts during loading too.
       show: yAxisSlot.present && !isLoading,
       color: axisLabelColor,
+      fontSize: 10,
       margin: 8,
       formatter: isExpanded
         ? (value: number) => `${Math.round(value * 100)}%`
@@ -1217,7 +1274,7 @@ function createTooltipFormatter(ctx: OptionBuildContext) {
       .join("");
 
     return `<div class="grid min-w-32 items-start gap-1.5 border border-border/50 px-2.5 py-1.5 text-xs shadow-xl ${roundnessClass[tooltipSlot.roundness]} ${tooltipVariantClass[tooltipSlot.variant]}">
-      <div class="font-medium">${label}</div>
+      <div class="font-medium text-primary">${label}</div>
       <div class="grid gap-1.5">${body}</div>
     </div>`;
   };
@@ -1294,8 +1351,9 @@ function buildBrushOption(
 
     // The mini chart mirrors the click selection: unselected series recede
     // by the same ratios as the main plot.
+    // Dim ratios normalize against the base opacities (stroke 1, fill 0.8).
     const opacity = getOpacity(selectedDataKey, key);
-    const strokeDim = opacity.stroke / 0.8;
+    const strokeDim = opacity.stroke;
     const fillDim = opacity.fill / 0.8;
 
     return {
@@ -1505,19 +1563,83 @@ function buildAreaSeries(ctx: OptionBuildContext): LineSeriesOption[] {
       },
       emphasis: {
         // focus "series" blurs every other series in this grid while one is
-        // hovered — the hover twin of the click selection.
-        focus: enableHoverHighlight ? "series" : "none",
+        // hovered — the hover twin of the click selection. Suppressed entirely
+        // while a series is click-selected: the selection dim owns the canvas,
+        // so hover highlighting stops until the selection clears (the option
+        // rebuilds on selection change, making this a build-time conditional).
+        focus: enableHoverHighlight && !hasSelection ? "series" : "none",
         scale: restingVisible ? activeDot.size / Math.max(restingDot.size, 1) : 1,
         ...(multiColor ? {} : { itemStyle: { ...activeDot.itemStyle, opacity: 1 } }),
       },
-      // Blur styling mirrors the click-selection dim (fill 0.2 / stroke 0.3 / dot 0.3).
+      // Blur styling mirrors the click-selection dim (fill 0.1 / stroke 0.3 / dot 0.3).
       blur: {
         lineStyle: { opacity: 0.3 },
-        areaStyle: { opacity: 0.2 },
+        areaStyle: { opacity: 0.1 },
         itemStyle: { opacity: 0.3 },
       },
     };
   });
+}
+
+// Per-series PLOTTED top value per category index — expanded normalization and
+// stack accumulation applied — so pointer hit-testing can reason in data space.
+function computePlottedTops(ctx: OptionBuildContext): Record<string, number[]> {
+  const { data, areas, seriesKeys, isStacked, isExpanded } = ctx;
+  const rowTotals = isExpanded
+    ? data.map((row) => seriesKeys.reduce((sum, key) => sum + (Number(row[key]) || 0), 0))
+    : [];
+  const running = new Array(data.length).fill(0);
+  const tops: Record<string, number[]> = {};
+  for (const area of areas) {
+    const key = area.dataKey;
+    tops[key] = data.map((row, i) => {
+      let value = Number(row[key]) || 0;
+      if (isExpanded) value = rowTotals[i] ? value / rowTotals[i] : 0;
+      return isStacked ? (running[i] += value) : value;
+    });
+  }
+  return tops;
+}
+
+// Overlapping area polygons all contain the same pixel, so ECharts' native hit
+// test lands on whichever series drew topmost — not the band the user SEES.
+// Resolve the intended series geometrically: a plotted line within grab
+// distance of the pointer wins outright; otherwise the point belongs to the
+// nearest line ABOVE it (the boundary of the band the pointer is inside).
+// Returns null when the pointer is outside the grid or above every line.
+function resolveAreaAtPixel(
+  chart: EChartsInstance,
+  tops: Record<string, number[]>,
+  keys: string[],
+  x: number,
+  y: number,
+): string | null {
+  if (keys.length < 2) return null;
+  if (!chart.containPixel({ gridIndex: 0 }, [x, y])) return null;
+  const [rawIndex] = chart.convertFromPixel({ gridIndex: 0 }, [x, y]);
+  const index = Math.round(rawIndex);
+
+  let nearest: string | null = null;
+  let nearestDist = Infinity;
+  let above: string | null = null;
+  let abovePixelY = -Infinity;
+  for (const key of keys) {
+    const value = tops[key]?.[index];
+    if (value === undefined) continue;
+    const pixelY = chart.convertToPixel({ gridIndex: 0 }, [index, value])[1];
+    const dist = Math.abs(pixelY - y);
+    if (dist < nearestDist) {
+      nearestDist = dist;
+      nearest = key;
+    }
+    // Pixel y grows downward: a line above the pointer has the larger pixelY
+    // among those ≤ the pointer's.
+    if (pixelY <= y && pixelY > abovePixelY) {
+      abovePixelY = pixelY;
+      above = key;
+    }
+  }
+  return nearestDist <= 10 ? nearest : above;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1535,6 +1657,7 @@ type LiveState = {
   loadingRows: number[] | null; // skeleton data, lazily rolled and re-rolled per shimmer sweep
   categories: string[]; // x labels of the last build, for the brush label pills
   dataLength: number; // row count, for the datazoom index math
+  plottedTops: Record<string, number[]>; // per-series plotted line value per index, for pointer hit-testing
   brushRange: BrushRange; // live zoom window — carried through every rebuild
   brushGeom: BrushGeometry | null; // brush footer layout of the last build
   brushOverlay: BrushOverlayElements | null; // zrender elements, owned by syncBrushOverlay
@@ -1579,6 +1702,7 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
   animationType = "left-to-right",
   enableHoverHighlight = false,
   defaultSelectedDataKey = null,
+  selectedDataKey: selectedDataKeyProp,
   onSelectionChange,
   isLoading = false,
   loadingPoints = LOADING_DEFAULT_POINTS,
@@ -1609,6 +1733,7 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
     loadingRows: null,
     categories: [],
     dataLength: 0,
+    plottedTops: {},
     brushRange: { start: 0, end: 100 },
     brushGeom: null,
     brushOverlay: null,
@@ -1633,7 +1758,11 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
   );
   const shouldReduceMotion = useReducedMotion();
 
-  const [selectedDataKey, setSelectedDataKey] = useState<string | null>(defaultSelectedDataKey);
+  // Selection is controlled when the `selectedDataKey` prop is provided;
+  // otherwise the internal state (seeded by defaultSelectedDataKey) drives it.
+  const [internalSelectedKey, setSelectedDataKey] = useState<string | null>(defaultSelectedDataKey);
+  const selectedDataKey =
+    selectedDataKeyProp !== undefined ? selectedDataKeyProp : internalSelectedKey;
 
   // Hover-highlight mirrors into the legend (React state) and tooltip
   // (live.hoveredKey — its formatter runs on every hover, and pushing an option
@@ -1693,15 +1822,28 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
   };
   live.dataLength = data.length;
 
+  // Reads the CURRENT selection through live.handlers so the identity stays
+  // stable for the init effect's click closure, and stays correct when the
+  // selection is controlled from outside.
   const toggleSelection = useCallback(
     (key: string) => {
-      setSelectedDataKey((prev) => {
-        const next = prev === key ? null : key;
-        onSelectionChange?.(next);
-        return next;
-      });
+      const next = live.handlers.selectedDataKey === key ? null : key;
+      // Making a selection hands the canvas to the selection dim — clear any
+      // active hover highlight at that moment so it doesn't linger in the
+      // legend/tooltip or fight the notMerge rebuild that follows.
+      if (next !== null && live.hoveredKey !== null) {
+        const previous = live.hoveredKey;
+        live.hoveredKey = null;
+        setHoveredDataKey(null);
+        echartsRef.current?.dispatchAction({
+          type: "downplay",
+          seriesIndex: live.handlers.seriesKeys.indexOf(previous),
+        });
+      }
+      setSelectedDataKey(next);
+      live.handlers.onSelectionChange?.(next);
     },
-    [onSelectionChange],
+    [live],
   );
 
   // Reposition the brush overlays from the live refs — safe to call from drag
@@ -1782,6 +1924,8 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
       getHoveredKey: () => live.hoveredKey,
     };
 
+    live.plottedTops = computePlottedTops(ctx);
+
     const { grid, brushBottom } = buildChartLayout(ctx);
     live.brushGeom = showBrush ? { bottom: brushBottom, height: brushHeight } : null;
 
@@ -1857,32 +2001,85 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
 
     chart.on("click", (params) => {
       const { clickableKeys: clickable, seriesKeys: keys } = live.handlers;
-      const p = params as { seriesId?: string; seriesIndex?: number };
+      const p = params as {
+        seriesId?: string;
+        seriesIndex?: number;
+        event?: { offsetX?: number; offsetY?: number };
+      };
       // Symbol clicks carry seriesId; area-polygon clicks (triggerLineEvent)
       // only carry seriesIndex — recover the key by position. Main series come
       // first in the series array, so the index maps directly.
-      const id =
-        p.seriesId ?? (typeof p.seriesIndex === "number" ? keys[p.seriesIndex] : undefined);
+      let id = p.seriesId ?? (typeof p.seriesIndex === "number" ? keys[p.seriesIndex] : undefined);
+      // Overlapping polygons: the native hit is the topmost series, not the
+      // band the pointer is visually inside — resolve geometrically.
+      if (typeof p.event?.offsetX === "number" && typeof p.event?.offsetY === "number") {
+        const resolved = resolveAreaAtPixel(
+          chart,
+          live.plottedTops,
+          keys,
+          p.event.offsetX,
+          p.event.offsetY,
+        );
+        if (resolved) id = resolved;
+      }
       if (typeof id === "string" && clickable.has(id)) toggleSelection(id);
     });
 
-    // Hover-highlight bookkeeping — the canvas blur is ECharts-native, but the
-    // HTML legend and tooltip need to know which series is hovered.
+    // Hover-highlight is POINTER-driven, not series-mouseover-driven:
+    // overlapping polygons would pin the native hover on the topmost series and
+    // never re-fire while the pointer moves within it. A zrender mousemove
+    // tracker resolves the visually-hovered band, drives the canvas emphasis
+    // via dispatchAction, and mirrors into the HTML legend (React state) and
+    // tooltip (live.hoveredKey — its formatter runs per pointer move).
+    const applyHoverKey = (key: string | null) => {
+      if (live.hoveredKey === key) return;
+      const keys = live.handlers.seriesKeys;
+      const previous = live.hoveredKey;
+      live.hoveredKey = key;
+      setHoveredDataKey(key);
+      if (previous) chart.dispatchAction({ type: "downplay", seriesIndex: keys.indexOf(previous) });
+      if (key) chart.dispatchAction({ type: "highlight", seriesIndex: keys.indexOf(key) });
+    };
+    const zrHover = chart.getZr();
+    const onZrHoverMove = (event: { offsetX?: number; offsetY?: number }) => {
+      if (!live.handlers.enableHoverHighlight) return;
+      // A click selection owns the canvas dim — hover highlighting stops
+      // entirely while one exists and resumes once it clears.
+      if (live.handlers.selectedDataKey !== null) return;
+      applyHoverKey(
+        resolveAreaAtPixel(
+          chart,
+          live.plottedTops,
+          live.handlers.seriesKeys,
+          event.offsetX ?? -1,
+          event.offsetY ?? -1,
+        ),
+      );
+    };
+    const onZrHoverOut = () => {
+      if (live.handlers.enableHoverHighlight) applyHoverKey(null);
+    };
+    zrHover.on("mousemove", onZrHoverMove);
+    zrHover.on("globalout", onZrHoverOut);
+
+    // The native hover still emphasizes whichever element the pointer entered —
+    // cancel it whenever it disagrees with the tracker's resolved key.
     chart.on("mouseover", (params) => {
       const { enableHoverHighlight: hoverOn, seriesKeys: keys } = live.handlers;
       if (!hoverOn) return;
-      const p = params as { seriesId?: string; seriesIndex?: number; componentType?: string };
-      if (p.componentType !== "series") return;
-      const id =
-        p.seriesId ?? (typeof p.seriesIndex === "number" ? keys[p.seriesIndex] : undefined);
-      if (typeof id !== "string" || id.startsWith("__")) return;
-      live.hoveredKey = id;
-      setHoveredDataKey(id);
-    });
-    chart.on("mouseout", () => {
-      if (live.hoveredKey === null) return;
-      live.hoveredKey = null;
-      setHoveredDataKey(null);
+      // While a selection is active, hover highlighting is disabled — never
+      // dispatch emphasis/downplay so the selection dim is the only dimming.
+      if (live.handlers.selectedDataKey !== null) return;
+      const p = params as { seriesIndex?: number; componentType?: string };
+      if (p.componentType !== "series" || typeof p.seriesIndex !== "number") return;
+      const key = keys[p.seriesIndex];
+      if (!key || key.startsWith("__")) return;
+      if (key !== live.hoveredKey) {
+        chart.dispatchAction({ type: "downplay", seriesIndex: p.seriesIndex });
+        if (live.hoveredKey) {
+          chart.dispatchAction({ type: "highlight", seriesIndex: keys.indexOf(live.hoveredKey) });
+        }
+      }
     });
 
     chart.on("datazoom", () => {
@@ -1936,6 +2133,8 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
     zr.on("globalout", onZrOut);
 
     return () => {
+      zrHover.off("mousemove", onZrHoverMove);
+      zrHover.off("globalout", onZrHoverOut);
       zr.off("mousemove", onZrMove);
       zr.off("globalout", onZrOut);
       resizeObserver.disconnect();

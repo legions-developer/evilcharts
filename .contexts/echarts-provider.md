@@ -48,21 +48,22 @@ chart types SVG can't reach and for scale (tens of thousands of points).
 
 ## 3. File map
 
-| Path | Role |
-|---|---|
-| `src/registry/charts/echarts/area-chart.tsx` | The whole chart. ~2200 lines, one file, on purpose. **Reference implementation for every future echarts chart.** Section order: constants/knobs → public types → compound parts + children collection → color plumbing → fills/dots → brush overlay → misc helpers → pure option builders → `LiveState` → component. |
-| `src/registry/registry-chart.ts` | `echarts-area-chart` entry: `dependencies: ["echarts", "motion"]`, no registryDependencies, target `components/evilcharts/charts/echarts/area-chart.tsx` |
-| `src/registry/examples/ex-*-echarts-area-chart.tsx` | 20 examples, near-verbatim copies of the recharts twins (import swap + `EChartsExampleAreaChart` export) |
-| `src/content/docs/echarts/` | Provider index + `area-chart/static.mdx` (per-part API reference) |
-| `src/globals/constants/providers.ts` | Provider ids, metadata, `available` flags, `providerFromPathname` |
-| `src/components/docs/sidebar/provider-switcher.tsx` | Base UI switcher (uses `render` prop, `data-popup-open`, `w-(--anchor-width)`; `DropdownMenuLabel` must sit inside `DropdownMenuGroup` or Base UI throws at runtime) |
-| `src/lib/agent-docs.ts` | Provider-aware llms.txt/MCP page derivation, gated by `available` |
-| `next.config.ts` | Legacy-URL redirects (`/docs/<chart>` → `/docs/recharts/<chart>/static`), `.md` rewrites at 3 segment depths |
+| Path                                                | Role                                                                                                                                                                                                                                                                                                                 |
+| --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/registry/charts/echarts/area-chart.tsx`        | The whole chart. ~2200 lines, one file, on purpose. **Reference implementation for every future echarts chart.** Section order: constants/knobs → public types → compound parts + children collection → color plumbing → fills/dots → brush overlay → misc helpers → pure option builders → `LiveState` → component. |
+| `src/registry/registry-chart.ts`                    | `echarts-area-chart` entry: `dependencies: ["echarts", "motion"]`, no registryDependencies, target `components/evilcharts/charts/echarts/area-chart.tsx`                                                                                                                                                             |
+| `src/registry/examples/ex-*-echarts-area-chart.tsx` | 20 examples, near-verbatim copies of the recharts twins (import swap + `EChartsExampleAreaChart` export)                                                                                                                                                                                                             |
+| `src/content/docs/echarts/`                         | Provider index + `area-chart/static.mdx` (per-part API reference)                                                                                                                                                                                                                                                    |
+| `src/globals/constants/providers.ts`                | Provider ids, metadata, `available` flags, `providerFromPathname`                                                                                                                                                                                                                                                    |
+| `src/components/docs/sidebar/provider-switcher.tsx` | Base UI switcher (uses `render` prop, `data-popup-open`, `w-(--anchor-width)`; `DropdownMenuLabel` must sit inside `DropdownMenuGroup` or Base UI throws at runtime)                                                                                                                                                 |
+| `src/lib/agent-docs.ts`                             | Provider-aware llms.txt/MCP page derivation, gated by `available`                                                                                                                                                                                                                                                    |
+| `next.config.ts`                                    | Legacy-URL redirects (`/docs/<chart>` → `/docs/recharts/<chart>/static`), `.md` rewrites at 3 segment depths                                                                                                                                                                                                         |
 
 Adding a chart = component file + `registry-chart.ts` entry + example files +
 `registry-example.ts` entries + `src/content/docs/echarts/<chart>/{static.mdx,meta.json}`
-+ add the folder to `src/content/docs/echarts/meta.json` `pages` + `bun run registry:fresh`.
-The sidebar, redirects, and agent surfaces pick new pages up automatically.
+
+- add the folder to `src/content/docs/echarts/meta.json` `pages` + `bun run registry:fresh`.
+  The sidebar, redirects, and agent surfaces pick new pages up automatically.
 
 ## 4. Color system (the cross-engine contract)
 
@@ -81,7 +82,7 @@ The sidebar, redirects, and agent surfaces pick new pages up automatically.
 - **Theme knobs live in a constants block at the top of the file**
   (`GRID_LINE_OPACITY`, `LOADING_*`, `BRUSH_*`). Tune there, not inline. Note
   `GRID_LINE_OPACITY = 1`: canvas spreads 1px dashes across device pixels at
-  2× DPR, so full token alpha lands at the same *perceived* brightness as
+  2× DPR, so full token alpha lands at the same _perceived_ brightness as
   recharts' SVG `border/50`. This was measured, not guessed.
 - Tooltip and legend are HTML inside `[data-chart]`, so they use CSS vars and
   Tailwind classes directly — no resolution needed there.
@@ -148,6 +149,10 @@ The sidebar, redirects, and agent surfaces pick new pages up automatically.
   `<CartesianGrid>` draws without a visible YAxis, so the y-axis stays
   `show: true` whenever `<Grid/>` is present and only its `axisLabel` is gated
   on `<YAxis/>` presence.
+- **Axis tick labels and axis names render at `fontSize: 10`** (both
+  `axisLabel.fontSize` and `nameTextStyle.fontSize` where a name exists), set
+  explicitly in `buildMainAxes` — ECharts' default is 12, which read too large
+  next to the recharts twins.
 - **Area polygons don't emit mouse events by default.** Set
   `triggerLineEvent: true` (per clickable series) so clicking the fill works.
 - **Polygon click params omit `seriesId`** (symbol clicks include it). The click
@@ -204,14 +209,20 @@ The sidebar, redirects, and agent surfaces pick new pages up automatically.
 
 `enableHoverHighlight` (root prop, default false) uses ECharts-native
 `emphasis.focus: "series"` + `blur` styles (dim ratios match click-selection:
-fill 0.2 / stroke 0.3 / dot 0.3, blur scopes to the coordinate system so the
-mini brush is unaffected). The hovered key mirrors into:
+base stroke 1.0, dim fill 0.1 / stroke 0.3 / dot 0.3, blur scopes to the
+coordinate system so the mini brush is unaffected). **Hover highlighting is
+suspended while a click-selection is active** — the native `emphasis.focus` is
+gated on `!hasSelection` (a build-time conditional, so the option rebuilds on
+selection change and resumes automatically when the selection clears) and the JS
+hover trackers bail when `selectedDataKey !== null`, so a standing selection is
+never fought by pointer-driven emphasis/blur. The hovered key mirrors into:
+
 - the HTML **legend** via React state (`hoveredDataKey`), and
 - the **tooltip** via `live.hoveredKey`, read inside the formatter through the
   build context's `getHoveredKey` accessor —
-**never via setOption**: pushing an option mid-hover resets ECharts' blur state.
-Registered through `chart.on("mouseover"/"mouseout")` with the same
-seriesIndex fallback as clicks; `__`-prefixed internal series are ignored.
+  **never via setOption**: pushing an option mid-hover resets ECharts' blur state.
+  Registered through `chart.on("mouseover"/"mouseout")` with the same
+  seriesIndex fallback as clicks; `__`-prefixed internal series are ignored.
 
 ## 9. Loading state
 

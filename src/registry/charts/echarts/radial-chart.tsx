@@ -96,7 +96,7 @@ const GLOW_LAYERS = [
   { widthAdd: 10, opacity: 0.16, blur: 9 },
   { widthAdd: 4, opacity: 0.3, blur: 5 }, // innermost — hugs the bar, brightest
 ] as const;
-const SELECTED_DIM_OPACITY = 0.3; // unselected bars while a selection is active
+const SELECTED_DIM_OPACITY = 0.15; // unselected bars while a selection is active
 // The skeleton track stays faintly visible; a bright band is CLIPPED to a small
 // sweeping window (only the arc slice inside it exists) and swept diagonally
 // across the rings, like a clip-path sliding over the chart.

@@ -224,6 +224,7 @@ export interface XAxisProps {
   // Category-axis values are always stringified, so the formatter sees a string —
   // letting examples share `(value) => value.substring(0, 3)` with the Recharts twin.
   tickFormatter?: (value: string, index: number) => string; // formats x tick labels
+  label?: string; // axis title, centered below the tick labels
 }
 
 /** Presence shows the x-axis category labels. Renders nothing. */
@@ -232,6 +233,7 @@ export const XAxis: FC<XAxisProps> = () => null;
 export interface YAxisProps {
   dataKey?: string; // reserved for parity with the Recharts twin
   tickFormatter?: (value: number, index: number) => string; // formats y tick labels
+  label?: string; // axis title, rotated alongside the tick labels
 }
 
 /** Presence shows the y value axis. Renders nothing. */
@@ -282,11 +284,13 @@ type XAxisSlot = {
   present: boolean;
   dataKey?: string;
   tickFormatter?: (value: string, index: number) => string;
+  label?: string;
 };
 type YAxisSlot = {
   present: boolean;
   dataKey?: string;
   tickFormatter?: (value: number, index: number) => string;
+  label?: string;
 };
 type TooltipSlot = {
   present: boolean;
@@ -362,10 +366,20 @@ function collectConfig(children: ReactNode): CollectedConfig {
       });
     } else if (type === XAxis) {
       const props = child.props as XAxisProps;
-      xAxis = { present: true, dataKey: props.dataKey, tickFormatter: props.tickFormatter };
+      xAxis = {
+        present: true,
+        dataKey: props.dataKey,
+        tickFormatter: props.tickFormatter,
+        label: props.label,
+      };
     } else if (type === YAxis) {
       const props = child.props as YAxisProps;
-      yAxis = { present: true, dataKey: props.dataKey, tickFormatter: props.tickFormatter };
+      yAxis = {
+        present: true,
+        dataKey: props.dataKey,
+        tickFormatter: props.tickFormatter,
+        label: props.label,
+      };
     } else if (type === Grid) {
       showGrid = true;
     } else if (type === Tooltip) {
@@ -1028,15 +1042,16 @@ type OptionBuildContext = {
 // Grid insets plus the footer band reserved for the brush. ECharts 6 contains
 // axis labels automatically (the legacy `containLabel` flag now only triggers a
 // deprecation warning).
-function buildChartLayout({ legendSlot, showBrush, brushHeight }: OptionBuildContext): {
+function buildChartLayout({ legendSlot, xAxisSlot, showBrush, brushHeight }: OptionBuildContext): {
   grid: GridComponentOption;
   brushBottom: number;
 } {
   const legendTop = legendSlot.present && legendSlot.verticalAlign === "top";
   const legendBottom = legendSlot.present && legendSlot.verticalAlign === "bottom";
   // Clearance covers the x-axis labels plus the same breathing room the
-  // Recharts twin leaves between them and the brush.
-  const brushGap = showBrush ? brushHeight + 30 : 0;
+  // Recharts twin leaves between them and the brush. An x-axis TITLE renders
+  // below the labels (nameGap), so it needs its own band above the brush frame.
+  const brushGap = showBrush ? brushHeight + 30 + (xAxisSlot.label ? 22 : 0) : 0;
 
   return {
     grid: {
@@ -1049,12 +1064,30 @@ function buildChartLayout({ legendSlot, showBrush, brushHeight }: OptionBuildCon
   };
 }
 
+// Composites a translucent color over an opaque base into a FLAT color. The
+// tick dots need this: a translucent stroke double-paints where its round caps
+// overlap the line body, which reads as two stacked colors.
+function flattenColor(color: string, base: string): string {
+  const parse = (value: string) =>
+    value
+      .match(/rgba?\(([^)]+)\)/)?.[1]
+      .split(",")
+      .map((part) => Number.parseFloat(part)) ?? [0, 0, 0, 1];
+  const [r, g, b, a = 1] = parse(color);
+  const [baseR, baseG, baseB] = parse(base);
+  const mix = (channel: number, baseChannel: number) =>
+    Math.round(channel * a + baseChannel * (1 - a));
+  return `rgb(${mix(r, baseR)}, ${mix(g, baseG)}, ${mix(b, baseB)})`;
+}
+
 function buildMainAxes(ctx: OptionBuildContext): { xAxis: XAxisOption; yAxis: YAxisOption } {
   const { xAxisSlot, yAxisSlot, showGrid, isLoading, categories, loadingData } = ctx;
   const { tokens } = ctx.resolved;
 
   const axisLabelColor = tokens.mutedForeground;
   const splitLineColor = withAlpha(tokens.border, GRID_LINE_OPACITY);
+  // Gridline gray as an opaque color — see flattenColor.
+  const tickDotColor = flattenColor(splitLineColor, tokens.background);
 
   const xTickFormatter = xAxisSlot.tickFormatter;
   const yTickFormatter = yAxisSlot.tickFormatter;
@@ -1064,12 +1097,24 @@ function buildMainAxes(ctx: OptionBuildContext): { xAxis: XAxisOption; yAxis: YA
     boundaryGap: false,
     show: true,
     data: isLoading ? loadingData().map((_, i) => i) : categories,
+    // Axis title — same size/color as the tick labels, pushed clear of them.
+    name: isLoading ? undefined : xAxisSlot.label,
+    nameLocation: "middle",
+    nameGap: 30,
+    nameTextStyle: { color: axisLabelColor, fontSize: 10 },
     axisLine: { show: false },
-    axisTick: { show: false },
+    // Tick DOTS: a near-zero-length tick whose round caps form a true circle,
+    // in the gridline gray (flattened opaque so the caps don't stack).
+    axisTick: {
+      show: !isLoading && xAxisSlot.present,
+      length: 0.5,
+      lineStyle: { color: tickDotColor, width: 3, cap: "round" },
+    },
     splitLine: { show: false },
     axisLabel: {
       show: !isLoading && xAxisSlot.present,
       color: axisLabelColor,
+      fontSize: 10,
       margin: 8,
       formatter: xTickFormatter
         ? (value: string, index: number) => xTickFormatter(value, index)
@@ -1083,8 +1128,18 @@ function buildMainAxes(ctx: OptionBuildContext): { xAxis: XAxisOption; yAxis: YA
   const yAxis: YAxisOption = {
     type: "value",
     show: yAxisSlot.present || showGrid,
+    // Axis title — rendered rotated alongside the tick labels, same styling.
+    name: isLoading ? undefined : yAxisSlot.label,
+    nameLocation: "middle",
+    nameGap: 38,
+    nameTextStyle: { color: axisLabelColor, fontSize: 10 },
     axisLine: { show: false },
-    axisTick: { show: false },
+    // Same tick dots as the x-axis, beside each value label.
+    axisTick: {
+      show: yAxisSlot.present && !isLoading,
+      length: 0.5,
+      lineStyle: { color: tickDotColor, width: 3, cap: "round" },
+    },
     splitLine: {
       // Hidden while loading — the skeleton floats on a clean canvas.
       show: showGrid && !isLoading,
@@ -1095,6 +1150,7 @@ function buildMainAxes(ctx: OptionBuildContext): { xAxis: XAxisOption; yAxis: YA
       // Recharts YAxis unmounts during loading too.
       show: yAxisSlot.present && !isLoading,
       color: axisLabelColor,
+      fontSize: 10,
       margin: 8,
       formatter: yTickFormatter
         ? (value: number, index: number) => yTickFormatter(value, index)
@@ -1482,8 +1538,12 @@ function buildLineSeries(ctx: OptionBuildContext): LineSeriesOption[] {
       emphasis: {
         // focus "series" blurs every other series in this grid while one is
         // hovered — the hover twin of the click selection (opt-in via
-        // enableHoverHighlight); otherwise the active dot is the only emphasis.
-        focus: enableHoverHighlight ? "series" : "none",
+        // enableHoverHighlight). Suppressed entirely while a series is
+        // click-selected: the selection dim owns the canvas, so hover
+        // highlighting stops until the selection clears (the option rebuilds on
+        // selection change, making this a build-time conditional). Otherwise the
+        // active dot is the only emphasis.
+        focus: enableHoverHighlight && !hasSelection ? "series" : "none",
         scale: restingVisible ? activeDot.size / Math.max(restingDot.size, 1) : 1,
         ...(multiColor ? {} : { itemStyle: { ...activeDot.itemStyle, opacity: 1 } }),
       },
@@ -1724,13 +1784,27 @@ export function EChartsLineChart<TData extends Record<string, unknown>>({
 
   const toggleSelection = useCallback(
     (key: string) => {
+      // A new click selection takes over the canvas dim, so any live hover
+      // highlight is torn down at this moment — the mouseover guard then keeps it
+      // from re-arming while the selection stands. Hover is only ever active
+      // while NO selection exists (see that guard), so a hovered key here always
+      // means this click is establishing a selection.
+      if (live.hoveredKey !== null) {
+        const chart = echartsRef.current;
+        const companions = chart ? live.companionIdsByKey.get(live.hoveredKey) : undefined;
+        if (chart && companions) {
+          for (const seriesId of companions) chart.dispatchAction({ type: "downplay", seriesId });
+        }
+        live.hoveredKey = null;
+        setHoveredDataKey(null);
+      }
       setSelectedDataKey((prev) => {
         const next = prev === key ? null : key;
         onSelectionChange?.(next);
         return next;
       });
     },
-    [onSelectionChange],
+    [live, onSelectionChange],
   );
 
   // Reposition the brush overlays from the live refs — safe to call from drag
@@ -1917,6 +1991,10 @@ export function EChartsLineChart<TData extends Record<string, unknown>>({
     chart.on("mouseover", (params) => {
       const { enableHoverHighlight: hoverOn } = live.handlers;
       if (!hoverOn) return;
+      // While a series is click-selected, hover highlighting is disabled — the
+      // selection dim owns the canvas, so never arm hover emphasis/blur (or the
+      // legend/tooltip hover dimming) until the selection clears.
+      if (live.handlers.selectedDataKey !== null) return;
       const p = params as { seriesId?: string; seriesIndex?: number; componentType?: string };
       if (p.componentType !== "series") return;
       const id =
