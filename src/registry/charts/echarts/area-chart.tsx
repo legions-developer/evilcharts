@@ -55,8 +55,8 @@ const AXIS_POINTER_OPACITY = 1; // tooltip cursor line, × border alpha
 // inside it exists (stroke + fill), everything outside is fully transparent,
 // like a clip-path sliding across the chart.
 const LOADING_STROKE_OPACITY = 0.5; // outline inside the window, × foreground alpha
-const LOADING_SHIMMER_MAX_OPACITY = 0.18; // fill inside the window, × foreground alpha
-const LOADING_SHIMMER_BAND = 0.12; // window half-width, fraction of chart width
+const LOADING_SHIMMER_MAX_OPACITY = 0.1; // fill inside the window, × foreground alpha
+const LOADING_SHIMMER_BAND = 0.2; // window half-width, fraction of chart width
 const LOADING_SHIMMER_FEATHER = 0.08; // eased edge softening of the clip window
 const BRUSH_STROKE_OPACITY = 0.5; // mini-chart series stroke
 const BRUSH_FILL_OPACITY = 0.15; // mini-chart series fade, at the top stop
