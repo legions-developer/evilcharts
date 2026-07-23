@@ -41,6 +41,14 @@ const nextConfig: NextConfig = {
         permanent: false,
       },
 
+      // ECharts has no provider index page — the intro is shared at /docs — so
+      // the bare provider URL lands on its components overview.
+      {
+        source: "/docs/echarts",
+        destination: "/docs/echarts/components",
+        permanent: false,
+      },
+
       // ── Chart folders have no index page; land on the default variant ─────
       // /docs/recharts/area-chart → /docs/recharts/area-chart/static
       {

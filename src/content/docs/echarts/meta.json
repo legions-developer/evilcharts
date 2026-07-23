@@ -1,4 +1,15 @@
 {
   "title": "ECharts",
-  "pages": ["index", "area-chart"]
+  "pages": [
+    "installation",
+    "components",
+    "area-chart",
+    "line-chart",
+    "bar-chart",
+    "composed-chart",
+    "radar-chart",
+    "pie-chart",
+    "radial-chart",
+    "sankey-chart"
+  ]
 }

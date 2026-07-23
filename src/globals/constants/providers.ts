@@ -41,8 +41,14 @@ export const PROVIDER_META: Record<Provider, ProviderMeta> = {
   },
 };
 
+// localStorage key remembering the last provider the reader was in, so shared
+// pages (/docs, /docs/chart-config) keep the switcher on their engine across reloads.
+export const PROVIDER_STORAGE_KEY = "evilcharts-provider";
+
 export function providerHref(provider: Provider) {
-  return `/docs/${provider}`;
+  // The shared intro lives at /docs for both engines. Recharts still has its own
+  // index page; ECharts does not — its landing is the components overview.
+  return provider === "echarts" ? "/docs/echarts/components" : `/docs/${provider}`;
 }
 
 /**

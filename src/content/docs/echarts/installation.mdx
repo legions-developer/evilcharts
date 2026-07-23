@@ -1,0 +1,44 @@
+---
+title: Installation
+description: how to install evilcharts echarts components & use them in your project
+image: /og/og-image.png
+---
+
+EvilCharts is designed to be a plug-and-play solution for beautiful, interactive charts in your Next.js projects. The ECharts provider renders to canvas through Apache ECharts — same config contract, same install flow, built for scale.
+
+## Steps
+<Steps>
+  <Step>
+    <StepTitle>Install ECharts</StepTitle>
+    <StepContent>
+      <StepDescription>
+        Install Apache ECharts, the charting library that powers this provider. This is a required dependency for all ECharts components.
+
+        Learn more at the <Link href="https://echarts.apache.org/handbook/en/basics/import" _blank>ECharts import guide</Link>.
+      </StepDescription>
+      <CommandBlock commands={["echarts"]} />
+    </StepContent>
+  </Step>
+
+  <Step>
+    <StepTitle>Setup shadcn/ui</StepTitle>
+    <StepContent>
+      <StepDescription>
+        Initialize shadcn/ui in your project. This sets up Tailwind CSS, theme configuration, and component structure. Skip this step if you already have shadcn/ui installed.
+
+        Check out the <Link href="https://ui.shadcn.com/docs/installation/next" _blank>shadcn/ui Next.js installation docs</Link> for more details.
+      </StepDescription>
+      <CliBlock commands={["init"]} />
+    </StepContent>
+  </Step>
+
+  <Step>
+    <StepTitle>Add EvilCharts ECharts Components</StepTitle>
+    <StepContent>
+      <StepDescription>
+        Add chart components to your project using the CLI. ECharts components are prefixed with `echarts-` — replace `{chart-name}` with your desired chart type (e.g., `area-chart`, `bar-chart`, `line-chart`, `pie-chart`). Each component is fully self-contained: installing one never pulls in Recharts.
+      </StepDescription>
+      <CliBlock commands={["@evilcharts/echarts-{chart-name}"]} />
+    </StepContent>
+  </Step>
+</Steps>

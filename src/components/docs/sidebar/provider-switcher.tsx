@@ -9,7 +9,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  DEFAULT_PROVIDER,
   PROVIDER_META,
   providerFromPathname,
   providerHref,
@@ -49,32 +48,42 @@ function ProviderIcon({ provider, className }: { provider: Provider; className?:
   return <Icon className={cn(PROVIDER_TINT[provider], className)} aria-hidden="true" />;
 }
 
-export function ProviderSwitcher({ existingUrls }: { existingUrls: Set<string> }) {
+export function ProviderSwitcher({
+  existingUrls,
+  activeProvider,
+  onProviderChange,
+}: {
+  existingUrls: Set<string>;
+  /** Resolved provider — from the pathname, or sticky on shared pages. */
+  activeProvider: Provider;
+  /** Persists the selection so shared pages keep showing this engine. */
+  onProviderChange: (provider: Provider) => void;
+}) {
   const pathname = usePathname();
   const router = useRouter();
   const { isMobile, setOpenMobile } = useSidebar();
 
-  const activeProvider = providerFromPathname(pathname);
-  // Shared pages (/docs, /docs/chart-config) have no provider. Show the default's
-  // name so the trigger never renders empty, but leave every item unchecked —
-  // nothing is actually selected.
-  const displayed = PROVIDER_META[activeProvider ?? DEFAULT_PROVIDER];
+  const displayed = PROVIDER_META[activeProvider];
 
   const selectProvider = (provider: Provider) => {
     if (isMobile) {
       setOpenMobile(false);
     }
+    onProviderChange(provider);
+
+    const pathProvider = providerFromPathname(pathname);
+
+    // Shared pages (/docs, /docs/chart-config) belong to both engines — stay
+    // put; only the selection flips.
+    if (!pathProvider || pathProvider === provider) return;
 
     // Hold your place across the switch when the counterpart page exists:
     // /docs/recharts/area-chart/static → /docs/echarts/area-chart/static.
-    // Otherwise the provider index is the only destination we can promise.
-    if (activeProvider) {
-      const candidate = pathname.replace(`/docs/${activeProvider}`, `/docs/${provider}`);
-
-      if (existingUrls.has(candidate)) {
-        router.push(candidate);
-        return;
-      }
+    // Otherwise the provider landing is the only destination we can promise.
+    const candidate = pathname.replace(`/docs/${pathProvider}`, `/docs/${provider}`);
+    if (existingUrls.has(candidate)) {
+      router.push(candidate);
+      return;
     }
 
     router.push(providerHref(provider));
