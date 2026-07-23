@@ -51,14 +51,13 @@ const LOADING_DEFAULT_POINTS = 14;
 // the same apparent brightness.
 const GRID_LINE_OPACITY = 1; // dashed y-axis split lines, × border alpha
 const AXIS_POINTER_OPACITY = 1; // tooltip cursor line, × border alpha
-// The Recharts skeleton MASKS the whole loading area with the moving band:
-// line and fill exist only inside the sheen and vanish outside it. The canvas
-// equivalent sweeps the same alpha bell through BOTH the stroke and the fill.
-const LOADING_STROKE_BASE_OPACITY = 0.06; // outline outside the sheen, × foreground alpha
-const LOADING_STROKE_OPACITY = 0.45; // outline at the sheen's peak, × foreground alpha
-const LOADING_FILL_BASE_OPACITY = 0.02; // fill outside the sheen, × foreground alpha
-const LOADING_SHIMMER_MAX_OPACITY = 0.28; // fill at the sheen's peak, × foreground alpha
-const LOADING_SHIMMER_BAND = 0.22; // sheen half-width, fraction of chart width
+// The skeleton is CLIPPED to a small sweeping window — only the wave section
+// inside it exists (stroke + fill), everything outside is fully transparent,
+// like a clip-path sliding across the chart.
+const LOADING_STROKE_OPACITY = 0.5; // outline inside the window, × foreground alpha
+const LOADING_SHIMMER_MAX_OPACITY = 0.3; // fill inside the window, × foreground alpha
+const LOADING_SHIMMER_BAND = 0.12; // window half-width, fraction of chart width
+const LOADING_SHIMMER_FEATHER = 0.04; // edge softening so the clip isn't aliased
 const BRUSH_STROKE_OPACITY = 0.5; // mini-chart series stroke
 const BRUSH_FILL_OPACITY = 0.15; // mini-chart series fade, at the top stop
 const BRUSH_BORDER_OPACITY = 1; // brush frame, × border alpha (evil-brush uses the full token)
@@ -912,19 +911,39 @@ function getLoadingData(points: number): number[] {
   return rows;
 }
 
-// A soft bell of alpha stops (sin² eased, 17 slots) between `base` and `peak`,
-// centred on the sheen. `center` may run outside [0, 1] so the sheen fully
-// enters and exits the frame instead of piling up at the edges.
-function shimmerStops(center: number, color: string, base: number, peak: number) {
-  return Array.from({ length: 17 }, (_, i) => {
-    const offset = i / 16;
-    const dist = Math.abs(offset - center);
-    const eased =
-      dist >= LOADING_SHIMMER_BAND
-        ? 0
-        : Math.sin((1 - dist / LOADING_SHIMMER_BAND) * (Math.PI / 2)) ** 2;
-    return { offset, color: withAlpha(color, base + eased * (peak - base)) };
-  });
+// Gradient stops forming a hard clip window around `center`: full `peak` alpha
+// inside, zero outside, with a small feather so the edge isn't aliased.
+// `center` may run outside [0, 1] so the window fully enters and exits the frame.
+function shimmerWindowStops(center: number, color: string, peak: number) {
+  const half = LOADING_SHIMMER_BAND;
+  const feather = LOADING_SHIMMER_FEATHER;
+
+  const alphaAt = (x: number) => {
+    const dist = Math.abs(x - center);
+    if (dist <= half - feather) return peak;
+    if (dist >= half) return 0;
+    return peak * (1 - (dist - (half - feather)) / feather);
+  };
+
+  const offsets = [
+    0,
+    center - half,
+    center - half + feather,
+    center,
+    center + half - feather,
+    center + half,
+    1,
+  ]
+    .filter((x) => x >= 0 && x <= 1)
+    .sort((a, b) => a - b);
+
+  const stops: { offset: number; color: string }[] = [];
+  for (const offset of offsets) {
+    if (stops.length === 0 || offset - stops[stops.length - 1].offset > 1e-4) {
+      stops.push({ offset, color: withAlpha(color, alphaAt(offset)) });
+    }
+  }
+  return stops;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1427,8 +1446,9 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
             step: curve.step,
             showSymbol: false,
             silent: true,
-            lineStyle: { color: withAlpha(tokens.foreground, LOADING_STROKE_BASE_OPACITY), width: 1 },
-            areaStyle: { color: withAlpha(tokens.foreground, LOADING_FILL_BASE_OPACITY) },
+            // Invisible until the first shimmer tick positions the clip window.
+            lineStyle: { color: withAlpha(tokens.foreground, 0), width: 1 },
+            areaStyle: { color: withAlpha(tokens.foreground, 0) },
             z: 1,
           },
         ],
@@ -1862,26 +1882,20 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
 
       // Read tokens per frame, so a theme flip mid-loading retints the shimmer.
       const foreground = resolvedRef.current?.tokens.foreground ?? "rgba(120, 120, 120, 1)";
-      // Sweep from fully off-screen left to fully off-screen right, and lean the
-      // gradient diagonally — a vertical band reads as a scanline, not a sheen.
-      // BOTH stroke and fill ride the bell: outside the band the wave all but
-      // vanishes, so the sheen acts as the mask window, like the Recharts twin.
+      // Sweep the clip window from fully off-screen left to fully off-screen
+      // right. Stroke and fill share it — only the wave section inside the
+      // window exists, everything else is transparent.
       const center = phase * (1 + 2 * LOADING_SHIMMER_BAND) - LOADING_SHIMMER_BAND;
-      const sheen = (base: number, peak: number) =>
-        new echarts.graphic.LinearGradient(0, 0, 1, 0.55, shimmerStops(center, foreground, base, peak));
+      const clip = (peak: number) =>
+        new echarts.graphic.LinearGradient(0, 0, 1, 0, shimmerWindowStops(center, foreground, peak));
       chart.setOption(
         {
           series: [
             {
               id: "__loading",
               data: loadingData(),
-              lineStyle: {
-                color: sheen(LOADING_STROKE_BASE_OPACITY, LOADING_STROKE_OPACITY),
-                width: 1,
-              },
-              areaStyle: {
-                color: sheen(LOADING_FILL_BASE_OPACITY, LOADING_SHIMMER_MAX_OPACITY),
-              },
+              lineStyle: { color: clip(LOADING_STROKE_OPACITY), width: 1 },
+              areaStyle: { color: clip(LOADING_SHIMMER_MAX_OPACITY) },
             },
           ],
         },

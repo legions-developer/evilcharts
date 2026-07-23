@@ -188,10 +188,13 @@ seriesIndex fallback as clicks; `__`-prefixed internal series are ignored.
   parity: its skeleton is a single `LoadingArea`. Data is a smooth random walk
   (16–58 band), not raw noise. Lazy-created (`loadingData()`) — an impure
   `useRef` initializer would re-roll `Math.random()` every render.
-- Shimmer: a wide, soft sin²-eased bell (`LOADING_SHIMMER_BAND` ±0.3, low peak)
-  leaned diagonally, swept fully off-screen on both sides by a rAF loop
-  (2s linear); data regenerates only while the band is off-screen. The loop
-  reads theme tokens per frame, so theme flips retint mid-loading.
+- Shimmer = a HARD CLIP WINDOW (`shimmerWindowStops`): stroke and fill are fully
+  transparent outside a small sweeping section (`LOADING_SHIMMER_BAND` half-width,
+  `LOADING_SHIMMER_FEATHER` edge softening) — only the wave slice inside the
+  window exists, like a clip-path sliding across. Swept fully off-screen on both
+  sides by a rAF loop (2s linear); data regenerates only while the window is
+  off-screen. The loop reads theme tokens per frame, so theme flips retint
+  mid-loading.
 - While loading: y-axis labels hidden, x labels hidden, legend hidden, tooltip
   off. The centered "Loading" pill scales in with motion.
 
