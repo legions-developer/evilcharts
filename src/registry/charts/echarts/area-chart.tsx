@@ -36,7 +36,9 @@ type EChartsOption = Parameters<EChartsInstance["setOption"]>[0];
 const STROKE_WIDTH = 0.8;
 const LOADING_ANIMATION_DURATION = 2000; // shimmer loop, in milliseconds
 const REVEAL_DURATION = 1000; // intro draw-in length, in milliseconds
-const REVEAL_EASING = "cubicOut"; // ECharts easing for the intro draw-in
+// NOTE: the intro draw-in runs ECharts' RAW default entrance animation. Custom
+// easing was tried and abandoned — ECharts hardcodes the line-entrance clip to
+// linear and ignores animationEasing at every level (verified empirically).
 const LOADING_DEFAULT_POINTS = 14;
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1784,13 +1786,12 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
     // them here, right before the push, rather than round-tripping through state.
     resolvedRef.current = resolveColors(container, config, seriesKeys);
 
-    const push = (animation: boolean) => {
+    const push = (withEntrance: boolean) => {
       const option = buildOption();
       const merged = chartOptions ? { ...option, ...chartOptions } : option;
       Object.assign(merged, {
-        animation,
+        animation: withEntrance,
         animationDuration: REVEAL_DURATION,
-        animationEasing: REVEAL_EASING,
         animationDurationUpdate: 0,
       });
       chart.setOption(merged as EChartsOption, { notMerge: true });
