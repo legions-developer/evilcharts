@@ -7,6 +7,9 @@ building the next ECharts chart.
 
 Built 2026-07-23 on branch `introducing-echarts`
 (commits `5869767` provider split → `72b513d` chart → `ef80460` examples/docs → `16c7075` animation switch).
+Refactored the same day with zero behavior change: `buildOption` split into pure
+module-level builders, all imperative refs consolidated into one `LiveState`
+object, and the option surface typed via echarts `ComposeOption` (§5).
 
 ---
 
@@ -47,7 +50,7 @@ chart types SVG can't reach and for scale (tens of thousands of points).
 
 | Path | Role |
 |---|---|
-| `src/registry/charts/echarts/area-chart.tsx` | The whole chart. ~2000 lines, one file, on purpose. **Reference implementation for every future echarts chart.** |
+| `src/registry/charts/echarts/area-chart.tsx` | The whole chart. ~2200 lines, one file, on purpose. **Reference implementation for every future echarts chart.** Section order: constants/knobs → public types → compound parts + children collection → color plumbing → fills/dots → brush overlay → misc helpers → pure option builders → `LiveState` → component. |
 | `src/registry/registry-chart.ts` | `echarts-area-chart` entry: `dependencies: ["echarts", "motion"]`, no registryDependencies, target `components/evilcharts/charts/echarts/area-chart.tsx` |
 | `src/registry/examples/ex-*-echarts-area-chart.tsx` | 20 examples, near-verbatim copies of the recharts twins (import swap + `EChartsExampleAreaChart` export) |
 | `src/content/docs/echarts/` | Provider index + `area-chart/static.mdx` (per-part API reference) |
@@ -83,27 +86,49 @@ The sidebar, redirects, and agent surfaces pick new pages up automatically.
 - Tooltip and legend are HTML inside `[data-chart]`, so they use CSS vars and
   Tailwind classes directly — no resolution needed there.
 
-## 5. React architecture (post "You Might Not Need an Effect" refactor)
+## 5. React architecture (pure builders + LiveState)
 
-- **Resolved colors are a ref (`resolvedRef`), not state.** They're consumed only
-  by the option builder and rAF loops, never by render. As state they caused a
-  double render per mount and an effect chain.
+- **Pure option builders.** `buildOption` is a thin orchestrator: it snapshots
+  the imperative surface (refs, renderer size) into a plain `OptionBuildContext`
+  and delegates to module-level pure functions — `buildChartLayout`,
+  `buildMainAxes`, `createTooltipFormatter`/`buildTooltipOption`,
+  `buildBrushOption`, `buildLoadingOption`, `buildAreaSeries`. The builders
+  touch no React state and no chart instance, so each option fragment can be
+  reasoned about in isolation. The context's `getHoveredKey` is an accessor on
+  purpose — it's read at tooltip-render time, not build time (§8).
+- **`live` — the single imperative-state object** (`LiveState`, one
+  `useRef({...}).current`): `resolved`, `hoveredKey`, `hasRevealed`,
+  `revealEndsAt`, `loadingRows`, `categories`, `dataLength`, `brushRange`,
+  `brushGeom`, `brushOverlay`, `brushHover`, `handlers` (latest callbacks/flags,
+  refreshed every render), `repush`. Everything the event handlers, rAF loops,
+  and theme/resize paths read or write outside the render cycle lives here —
+  new imperative state belongs in `LiveState`, not in a new ref.
+- **Typing.** The option surface is
+  `ComposeOption<LineSeriesOption | GridComponentOption | TooltipComponentOption | DataZoomComponentOption>`
+  from the modular entry points; `XAxisOption`/`YAxisOption` are derived from the
+  composed option because the modular entries don't export axis types. Builder
+  literals are fully type-checked; the only cast in the file is
+  `merged as EChartsOption` where the untyped `chartOptions` escape hatch is
+  spread in. Area fills use zrender's `ImagePatternObject` directly.
+- **Resolved colors are `live.resolved`, not state.** They're consumed only
+  by the option builders and rAF loops, never by render. As state they caused a
+  double render per mount and an effect chain ("You Might Not Need an Effect").
 - **One sync effect** resolves colors → builds the option (`buildOption`
   useCallback) → pushes with `setOption(…, { notMerge: true })`. It also assigns
-  `repushRef.current`, the update-style re-entry used by paths that bypass React:
+  `live.repush`, the update-style re-entry used by paths that bypass React:
   the theme `MutationObserver` (`.dark` class flips) and the `ResizeObserver`.
 - **ResizeObserver guard**: observers fire once immediately after `observe()`.
   The callback bails when mount size already equals `chart.getWidth()/getHeight()` —
   without this, the initial no-op fire repushed one frame into the entrance and
   killed the reveal clip.
-- **StrictMode resilience**: `hasRevealedRef` (the play-entrance-once guard) is
+- **StrictMode resilience**: `live.hasRevealed` (the play-entrance-once guard) is
   reset in the init effect's **cleanup**, tying its lifetime to the chart
   instance. Dev StrictMode mounts→unmounts→remounts; without the reset the
   throwaway instance consumed the reveal and the surviving one rendered static.
 - **Never push options during continuous interactions.** Two bugs came from
   this: (a) per-frame dash-offset `setOption`s during the entrance recomputed
   the reveal clip until it crawled — the dash rAF now waits until
-  `revealEndsAtRef`; (b) graphic updates via `setOption` per `datazoom` event
+  `live.revealEndsAt`; (b) graphic updates via `setOption` per `datazoom` event
   re-rendered the dataZoom component and reset its drag anchor, making handles
   progressively lag the pointer — the brush overlays are raw zrender now (§7).
 - The intro draw-in is ECharts-native (`animation: true` on the FIRST real push
@@ -143,12 +168,17 @@ The sidebar, redirects, and agent surfaces pick new pages up automatically.
   `devicePixelRatio` and scale back down for crispness.
 - **`step` curve**: recharts `step` is d3 `curveStep` = transition at the
   MIDPOINT → ECharts `step: "middle"`, not `"end"`.
-- **Dot sizes are per-variant** (`DOT_SIZES`: default 7, border 12, colored-border 8)
-  mirroring recharts r3/r6/r3+ring. Flattening them makes the hover ring look
-  BIGGER than a haloed resting dot — backwards.
+- **Dot sizes are per-variant** (`DOT_SIZES`: default 6, border 8, colored-border 6)
+  mirroring recharts r3/r6/r3+ring proportions. Flattening them makes the hover
+  ring look BIGGER than a haloed resting dot — backwards.
 - **notMerge resets dataZoom** — the slider option always carries
-  `start/end` from `brushRangeRef` so repushes (theme, selection) don't snap
+  `start/end` from `live.brushRange` so repushes (theme, selection) don't snap
   the zoom back to 0–100.
+- **The line entrance ignores `animationEasing` at every level** — ECharts
+  hardcodes its line-entrance clip to linear (verified empirically: measured
+  ~linear progress with cubic easings set globally AND per-series). Custom
+  reveal easing was implemented and removed; the intro is the raw ECharts
+  default. Don't try again without checking the echarts source first.
 
 ## 7. The brush (evil-brush parity on canvas)
 
@@ -177,7 +207,8 @@ The sidebar, redirects, and agent surfaces pick new pages up automatically.
 fill 0.2 / stroke 0.3 / dot 0.3, blur scopes to the coordinate system so the
 mini brush is unaffected). The hovered key mirrors into:
 - the HTML **legend** via React state (`hoveredDataKey`), and
-- the **tooltip** via `hoveredKeyRef` read inside the formatter —
+- the **tooltip** via `live.hoveredKey`, read inside the formatter through the
+  build context's `getHoveredKey` accessor —
 **never via setOption**: pushing an option mid-hover resets ECharts' blur state.
 Registered through `chart.on("mouseover"/"mouseout")` with the same
 seriesIndex fallback as clicks; `__`-prefixed internal series are ignored.
