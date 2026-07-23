@@ -97,6 +97,24 @@ Change `variant` and `strokeVariant` on an `<Area>`, or `curveType` and `stackTy
 
 <ComponentPreview title="enableHoverHighlight='true'" name="ex-hover-highlight-echarts-area-chart" />
 
+### Buffer Line
+
+<ComponentPreview className="mb-0" title="enableBufferLine='true'" name="ex-buffer-echarts-area-chart"  />
+<Alert>
+  <AlertContent>
+    With `enableBufferLine`, each area's last segment renders as a dashed tail while the rest stays solid — useful for marking projected, estimated, or incomplete data at the end of a series, as in financial charts and forecasting dashboards.
+  </AlertContent>
+</Alert>
+
+### Hover Reveal
+
+<ComponentPreview title="enableHoverReveal='true'" name="ex-hover-reveal-echarts-area-chart" />
+<Alert>
+  <AlertContent>
+    With `enableHoverReveal`, hovering colors each area's line and fill only up to the pointer's position and mutes everything past it to a neutral gray, with the active dot riding the cursor — a scrubbing effect for reading a series left-to-right. When not hovering, the chart looks completely normal.
+  </AlertContent>
+</Alert>
+
 ### Gradient Colors
 
 <ComponentPreview className="mb-0" title="gradient colors" name="ex-gradient-colors-echarts-area-chart"  />
@@ -165,6 +183,9 @@ The root container. It owns the data, shared selection state, loading skeleton, 
   <ApiRow name="enableHoverHighlight" type="boolean" default="false">
     Highlights the hovered series by dimming the others — the hover twin of click selection, using the same dim levels.
   </ApiRow>
+  <ApiRow name="enableHoverReveal" type="boolean" default="false">
+    On hover, colors each area up to the pointer's x-position and mutes the rest to a neutral gray, with the active dot at the cursor. A standalone hover mode that takes visual precedence over `enableHoverHighlight`; idle, the chart renders normally.
+  </ApiRow>
   <ApiRow name="stackType" type='"default" | "stacked" | "expanded"' default='"default"'>
     How multiple areas combine — independent, stacked, or normalized to 100%.
   </ApiRow>
@@ -222,6 +243,9 @@ A single area series. Each `<Area />` carries its own fill and stroke config, so
   </ApiRow>
   <ApiRow name="isClickable" type="boolean" default="false">
     Makes this area selectable on click. When any area is selected, the rest turn semi-transparent.
+  </ApiRow>
+  <ApiRow name="enableBufferLine" type="boolean" default="false">
+    Renders this area's last segment as a dashed buffer tail while the rest stays solid — useful for projected or incomplete data at the end of a series.
   </ApiRow>
   <ApiRow name="children" type="ReactNode">
     Optional `<Dot />` and `<ActiveDot />` config that adds point markers to this area.

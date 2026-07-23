@@ -131,6 +131,15 @@ Add `isClickable` to any `<Line>` (and to `<Legend>`) to make those series selec
   </AlertContent>
 </Alert>
 
+### Hover Reveal
+
+<ComponentPreview title="enableHoverReveal='true'" name="ex-hover-reveal-echarts-line-chart" />
+<Alert>
+  <AlertContent>
+    With `enableHoverReveal`, hovering colors each line only up to the pointer's position and mutes everything past it to a neutral gray, with the active dot riding the cursor — a scrubbing effect for reading a series left-to-right. When not hovering, the chart looks completely normal.
+  </AlertContent>
+</Alert>
+
 ## Examples
 
 Examples with different settings. Change `strokeVariant` on a `<Line>` or `curveType` on the chart to restyle it.
@@ -192,6 +201,9 @@ The root container. It owns the data, shared selection state, loading skeleton, 
   </ApiRow>
   <ApiRow name="enableHoverHighlight" type="boolean" default="false">
     Highlights the hovered line by dimming the rest — the hover twin of click selection. Dim levels match the selection styling; a glowing line's glow and a buffer line's dashed tail dim and brighten with their parent.
+  </ApiRow>
+  <ApiRow name="enableHoverReveal" type="boolean" default="false">
+    On hover, colors each line up to the pointer's x-position and mutes the rest to a neutral gray, with the active dot at the cursor. A standalone hover mode that takes visual precedence over `enableHoverHighlight`; idle, the chart renders normally.
   </ApiRow>
   <ApiRow name="defaultSelectedDataKey" type="string | null" default="null">
     The series selected on first render.

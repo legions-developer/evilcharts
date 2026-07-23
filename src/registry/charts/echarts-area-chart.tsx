@@ -1,19 +1,6 @@
 "use client";
 
 import {
-  Children,
-  isValidElement,
-  useCallback,
-  useEffect,
-  useId,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type FC,
-  type ReactNode,
-} from "react";
-import {
   tooltipBaseOption,
   tooltipIndicatorHtml,
   tooltipRow,
@@ -40,6 +27,19 @@ import {
   type ChartConfig,
   type ResolvedColors,
 } from "@/registry/ui/echarts-chart";
+import {
+  Children,
+  isValidElement,
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type FC,
+  type ReactNode,
+} from "react";
 import {
   buildBrushDataZoom,
   syncBrushOverlay,
@@ -99,6 +99,10 @@ const REVEAL_DURATION = 1000; // intro draw-in length, in milliseconds
 // easing was tried and abandoned — ECharts hardcodes the line-entrance clip to
 // linear and ignores animationEasing at every level (verified empirically).
 const LOADING_DEFAULT_POINTS = 14;
+// Buffer line: the last segment's stroke renders as this dash while the rest of
+// the area stays solid, echoing the Recharts twin's 4px dash / 3px gap forecast
+// tail. Ported from the line-chart twin.
+const BUFFER_DASH: [number, number] = [4, 3];
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Theme knobs — every neutral line in the chart draws from these. Base colors
@@ -165,6 +169,7 @@ export interface EChartsAreaChartProps<TData extends Record<string, unknown>> {
   animation?: boolean; // master switch for the intro draw-in — false renders instantly
   animationType?: AreaAnimationType; // default intro reveal (first <Area> overrides)
   enableHoverHighlight?: boolean; // hovering a series dims the others, like a temporary selection
+  enableHoverReveal?: boolean; // hovering colors each area up to the pointer's x and mutes the rest
   defaultSelectedDataKey?: string | null; // series selected on first render
   selectedDataKey?: string | null; // controlled selection — overrides internal state when set
   onSelectionChange?: (key: string | null) => void; // fires when the selected series changes
@@ -193,6 +198,7 @@ export interface AreaProps {
   animationType?: AreaAnimationType; // intro reveal — first area drives the wrapper wipe
   connectNulls?: boolean; // join segments across null/missing values
   isClickable?: boolean; // lets this area be selected by clicking it
+  enableBufferLine?: boolean; // renders this area's last segment as a dashed, fill-less buffer
   children?: ReactNode; // optional <Dot> and <ActiveDot> config
 }
 
@@ -270,6 +276,7 @@ type AreaSeriesConfig = {
   animationType?: AreaAnimationType;
   connectNulls: boolean;
   isClickable: boolean;
+  enableBufferLine: boolean;
   dotVariant: DotVariant; // "none" when no <Dot> child is present
   activeDotVariant: DotVariant; // "none" when no <ActiveDot> child is present
 };
@@ -354,6 +361,7 @@ function collectConfig(children: ReactNode): CollectedConfig {
         animationType: props.animationType,
         connectNulls: props.connectNulls ?? false,
         isClickable: props.isClickable ?? false,
+        enableBufferLine: props.enableBufferLine ?? false,
         dotVariant,
         activeDotVariant,
       });
@@ -629,6 +637,18 @@ function shimmerWindowStops(center: number, color: string, peak: number) {
   return stops;
 }
 
+// The `__buffer-` prefix marks the dashed forecast overlay of a buffer area; it
+// carries the SAME key's value, so the tooltip recovers the key from it (see
+// createTooltipFormatter). Every other `__`-prefixed series (mini chart, loading
+// skeleton, hover-reveal base) is truly internal and never surfaces.
+const BUFFER_PREFIX = "__buffer-";
+// The fill-only patch under a buffer area's dashed tail (the main area's fill
+// stops one point early). Internal, so the tooltip drops it.
+const BUFFERFILL_PREFIX = "__bufferfill-";
+// The `__reveal-` prefix marks the muted base layer of a hover-reveal area — see
+// buildAreaSeries. Internal, so the tooltip drops it like the mini/loading rows.
+const REVEAL_PREFIX = "__reveal-";
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Option builders — pure functions from a snapshot context to ECharts option
 // fragments. The component reads its refs and renderer size ONCE per build into
@@ -656,6 +676,9 @@ type OptionBuildContext = {
   showBrush: boolean;
   brushHeight: number;
   enableHoverHighlight: boolean;
+  enableHoverReveal: boolean; // hover colors each area up to the pointer, mutes the rest
+  revealIndex: number | null; // pointer's x-index while revealing (null = idle → chart looks normal)
+  revealSink: Record<string, unknown[]>; // buildAreaSeries writes each area's full per-datum points here for the hover handler
   resolved: ResolvedColors;
   rendererSize: { width: number; height: number }; // 2D gradient textures bake at renderer size
   categories: string[];
@@ -787,17 +810,34 @@ function createTooltipFormatter(ctx: OptionBuildContext) {
     const axisValue = first.axisValue ?? first.name ?? "";
     const label = String(axisValue);
 
+    // Dedupe by effective key: a buffer area contributes both its solid part
+    // (id=key) and its dashed overlay (id=`__buffer-{key}`) at the shared
+    // second-to-last point. Keep the first non-null value seen per key so the
+    // final point (only the overlay has data there) still shows its number.
+    const seen = new Set<string>();
     const body = rows
       .map((param) => {
         const p = param as {
           seriesId?: string;
           seriesName?: string;
-          value?: number | string;
+          value?: number | string | null;
         };
-        // Internal series (the brush's mini chart, the loading skeleton) never
-        // surface in the tooltip.
-        if (String(p.seriesId ?? "").startsWith("__")) return "";
-        const key = p.seriesId ?? p.seriesName ?? "";
+        const rawId = String(p.seriesId ?? "");
+        // Map the dashed buffer overlay back onto its series; drop every other
+        // internal series (mini chart, loading skeleton, hover-reveal base).
+        const key = rawId.startsWith(BUFFER_PREFIX)
+          ? rawId.slice(BUFFER_PREFIX.length)
+          : rawId.startsWith("__")
+            ? ""
+            : (p.seriesId ?? p.seriesName ?? "");
+        if (!key) return "";
+        // A null value means this series does not reach the hovered x (a buffer
+        // area's solid part stops before the last point, a revealed series stops
+        // at the cursor) — skip it, letting another row for the key stand in.
+        if (p.value === null || p.value === undefined) return "";
+        if (seen.has(key)) return "";
+        seen.add(key);
+
         const item = config[key];
         const colorsCount = item ? getColorsCount(item) : 1;
         const labelText = typeof item?.label === "string" ? item.label : (p.seriesName ?? key);
@@ -975,6 +1015,9 @@ function buildAreaSeries(ctx: OptionBuildContext): LineSeriesOption[] {
     selectedDataKey,
     hasSelection,
     enableHoverHighlight,
+    enableHoverReveal,
+    revealIndex,
+    revealSink,
     resolved,
     rendererSize,
   } = ctx;
@@ -984,7 +1027,7 @@ function buildAreaSeries(ctx: OptionBuildContext): LineSeriesOption[] {
     ? data.map((row) => seriesKeys.reduce((sum, key) => sum + (Number(row[key]) || 0), 0))
     : [];
 
-  return areas.map((area) => {
+  return areas.flatMap((area): LineSeriesOption[] => {
     const key = area.dataKey;
     const slots = resolved.series[key] ?? ["rgba(120, 120, 120, 1)"];
     const paint = seriesPaint(slots);
@@ -999,6 +1042,12 @@ function buildAreaSeries(ctx: OptionBuildContext): LineSeriesOption[] {
       const total = rowTotals[i];
       return total ? value / total : 0;
     });
+    const n = values.length;
+    // Hover-reveal is a root-level mode and owns the whole area rendering, so it
+    // takes precedence over a per-area buffer tail when both are set.
+    const reveal = enableHoverReveal;
+    const buffer = !reveal && area.enableBufferLine && n >= 2;
+    const revealActive = reveal && revealIndex !== null;
 
     const restingDot = dotStyle(area.dotVariant, paint, resolved.tokens.background);
     const activeDot = dotStyle(area.activeDotVariant, paint, resolved.tokens.background);
@@ -1006,42 +1055,95 @@ function buildAreaSeries(ctx: OptionBuildContext): LineSeriesOption[] {
     const dotOpacity = opacity.dot;
     const multiColor = slots.length > 1;
 
-    // Multi-color series tint each symbol with the gradient's color at its own
-    // x-position (per-datum itemStyle), like the Recharts dots. The line/area
-    // keep the full gradient.
-    const dataPoints = !multiColor
-      ? values
-      : values.map((value, i) => {
-          const t = values.length > 1 ? i / (values.length - 1) : 0;
-          const pointColor = sampleGradient(slots, t);
-          return {
-            value,
-            itemStyle: {
-              ...dotItemStyle(
-                restingVisible ? area.dotVariant : area.activeDotVariant,
-                pointColor,
-                resolved.tokens.background,
-              ),
-              opacity: dotOpacity,
-            },
-            emphasis: {
+    // The reveal truncates the line to the cursor, which would COMPRESS a
+    // bbox-relative stroke gradient into the shorter span — misaligning it from
+    // the plot-anchored fill texture and the index-sampled dots. Anchor the
+    // stroke to the plot in absolute pixels so every x keeps its own color.
+    const strokePaint =
+      reveal && multiColor
+        ? new echarts.graphic.LinearGradient(
+            8,
+            0,
+            Math.max(rendererSize.width - 8, 9),
+            0,
+            slots.map((color, i) => ({ offset: i / (slots.length - 1), color })),
+            true,
+          )
+        : paint;
+
+    // Turn a value list into ECharts data — attaching per-datum symbol colors
+    // for multi-color areas (like the Recharts dots; the line/fill keep the full
+    // gradient), and passing `null` gaps through so a buffer area's two parts
+    // each draw only their own segment.
+    type AreaPoint =
+      | number
+      | null
+      | {
+          value: number;
+          itemStyle: Record<string, unknown>;
+          emphasis: { itemStyle: Record<string, unknown> };
+        };
+    const toPoints = (vals: (number | null)[]): AreaPoint[] =>
+      !multiColor
+        ? vals
+        : vals.map((value, i): AreaPoint => {
+            if (value === null) return null;
+            const t = vals.length > 1 ? i / (vals.length - 1) : 0;
+            const pointColor = sampleGradient(slots, t);
+            return {
+              value,
               itemStyle: {
                 ...dotItemStyle(
-                  area.activeDotVariant === "none" ? "default" : area.activeDotVariant,
+                  restingVisible ? area.dotVariant : area.activeDotVariant,
                   pointColor,
                   resolved.tokens.background,
                 ),
-                opacity: 1,
+                opacity: dotOpacity,
               },
-            },
-          };
-        });
+              emphasis: {
+                itemStyle: {
+                  ...dotItemStyle(
+                    area.activeDotVariant === "none" ? "default" : area.activeDotVariant,
+                    pointColor,
+                    resolved.tokens.background,
+                  ),
+                  opacity: 1,
+                },
+              },
+            };
+          });
 
-    return {
+    // Buffer area: the solid MAIN part drops the last point (its final segment —
+    // both fill and stroke — becomes the dashed, fill-less overlay); the overlay
+    // carries only the last two points. Reveal instead TRUNCATES the real series
+    // at the cursor's x-index (points beyond it null'd), so its line + fill stop
+    // there and the muted base layer shows through past it. When idle
+    // (revealIndex null) the real series carries its full data — the chart looks
+    // completely normal.
+    // Snapshot the FULL per-datum points (with the multi-color dot itemStyle) so
+    // the reveal hover handler can slice them without losing each dot's sampled
+    // gradient color — plain values would fall back to the default palette.
+    if (reveal) revealSink[key] = toPoints(values);
+
+    const mainValues: (number | null)[] = buffer
+      ? values.map((v, i) => (i === n - 1 ? null : v))
+      : revealActive
+        ? sliceToNull(values, revealIndex as number)
+        : values;
+
+    // A buffer area keeps its body solid and dashes only the tail overlay, so
+    // the main stroke is always solid regardless of strokeVariant (matches the
+    // Recharts twin, which suppresses the base dasharray while buffering).
+    const mainDash: "solid" | [number, number] =
+      buffer || area.strokeVariant === "solid" ? "solid" : ([3, 3] as [number, number]);
+
+    const z = isSelected ? 3 : hasSelection ? 1 : 2;
+
+    const mainSeries: LineSeriesOption = {
       id: key,
       name: typeof config[key]?.label === "string" ? config[key]?.label : key,
       type: "line",
-      data: dataPoints,
+      data: toPoints(mainValues),
       stack: isStacked ? "total" : undefined,
       smooth: curve.smooth,
       step: curve.step,
@@ -1053,12 +1155,12 @@ function buildAreaSeries(ctx: OptionBuildContext): LineSeriesOption[] {
       showSymbol: restingVisible,
       symbol: "circle",
       symbolSize: restingVisible ? restingDot.size : activeDot.size,
-      z: isSelected ? 3 : hasSelection ? 1 : 2,
+      z,
       lineStyle: {
-        color: paint,
+        color: strokePaint,
         width: STROKE_WIDTH,
         opacity: opacity.stroke,
-        type: area.strokeVariant === "solid" ? "solid" : ([3, 3] as [number, number]),
+        type: mainDash,
         dashOffset: 0,
       },
       itemStyle: multiColor
@@ -1077,7 +1179,9 @@ function buildAreaSeries(ctx: OptionBuildContext): LineSeriesOption[] {
         // while a series is click-selected: the selection dim owns the canvas,
         // so hover highlighting stops until the selection clears (the option
         // rebuilds on selection change, making this a build-time conditional).
-        focus: enableHoverHighlight && !hasSelection ? "series" : "none",
+        // Reveal owns the hover visual, so native focus-blur stands down when it
+        // is on (they must not blend).
+        focus: enableHoverHighlight && !enableHoverReveal && !hasSelection ? "series" : "none",
         scale: restingVisible ? activeDot.size / Math.max(restingDot.size, 1) : 1,
         ...(multiColor ? {} : { itemStyle: { ...activeDot.itemStyle, opacity: 1 } }),
       },
@@ -1088,7 +1192,138 @@ function buildAreaSeries(ctx: OptionBuildContext): LineSeriesOption[] {
         itemStyle: { opacity: 0.3 },
       },
     };
+
+    // Hover-reveal: a muted gray BASE layer of the FULL series sits one z below
+    // the real one. It is invisible while idle (opacity 0 → the chart looks
+    // normal) and fades in only while hovering, so the region PAST the cursor —
+    // where the truncated real series has stopped — shows as neutral gray.
+    if (reveal) {
+      const muted = resolved.tokens.mutedForeground;
+      const revealBase: LineSeriesOption = {
+        id: `${REVEAL_PREFIX}${key}`,
+        type: "line",
+        // Only the region FROM the cursor onward (null before it), so the gray
+        // never sits under the colored part — the two meet exactly at the
+        // pointer and their colors can't mix.
+        data: revealActive ? sliceFrom(values, revealIndex as number) : values,
+        // Its OWN stack, not "total" — a second series in the real stack would
+        // double every key's contribution (broken geometry). This mirror stack
+        // reproduces the same cumulative shape in a separate layer.
+        stack: isStacked ? "__reveal-total" : undefined,
+        smooth: curve.smooth,
+        step: curve.step,
+        connectNulls: false,
+        silent: true,
+        showSymbol: false,
+        symbol: "circle",
+        z: z - 1,
+        // Neutral gray, NO fill, SAME dash pattern as the colored line.
+        lineStyle: {
+          color: muted,
+          width: STROKE_WIDTH,
+          type: mainDash,
+          opacity: revealActive ? 0.3 : 0,
+        },
+        emphasis: { disabled: true },
+        blur: { lineStyle: { opacity: revealActive ? 0.3 : 0 } },
+        tooltip: { show: false },
+      };
+      return [revealBase, mainSeries];
+    }
+
+    if (!buffer) return [mainSeries];
+
+    // Dashed forecast overlay — draws ONLY the last segment's stroke, with NO
+    // fill (matching the line twin's fill-less buffer). Silent, so it never
+    // intercepts clicks/hover; it still feeds the axis tooltip (silent series
+    // are aggregated by axis), which is why the last point keeps its number.
+    const bufferValues: (number | null)[] = values.map((v, i) => (i >= n - 2 ? v : null));
+    const bufferSeries: LineSeriesOption = {
+      id: `${BUFFER_PREFIX}${key}`,
+      type: "line",
+      data: toPoints(bufferValues),
+      // Own mirror stack — a second series in "total" would double the last
+      // points' stacked height (buffer drawn too high). Same values in the same
+      // order give the identical cumulative height, so the dash lines up.
+      stack: isStacked ? "__buffer-total" : undefined,
+      smooth: curve.smooth,
+      step: curve.step,
+      connectNulls: true,
+      silent: true,
+      showSymbol: restingVisible,
+      symbol: "circle",
+      symbolSize: restingVisible ? restingDot.size : activeDot.size,
+      z,
+      lineStyle: {
+        color: paint,
+        width: STROKE_WIDTH,
+        opacity: opacity.stroke,
+        type: BUFFER_DASH,
+      },
+      itemStyle: multiColor
+        ? { opacity: dotOpacity }
+        : {
+            ...(restingVisible ? restingDot.itemStyle : activeDot.itemStyle),
+            opacity: dotOpacity,
+          },
+      // The dashed tail is a separate silent series, so focus:"series" on its
+      // parent would blur it apart from the area it belongs to. The root
+      // dispatch-links this id (companionIdsByKey) so it focuses WITH its parent;
+      // these styles give it the parent's look while focused and the
+      // click-selection dim while another series is hovered.
+      emphasis: {
+        focus: "none",
+        scale: false,
+        lineStyle: { opacity: opacity.stroke },
+        itemStyle: { opacity: dotOpacity },
+      },
+      blur: { lineStyle: { opacity: 0.3 }, itemStyle: { opacity: 0.3 } },
+    };
+
+    // Fill patch — the main area drops its last point (so the tail stroke can be
+    // the dashed overlay), which also removes the FILL under that last segment.
+    // This fill-only layer (no stroke, no dots) fills just that segment so the
+    // area reads as full under the dashed tail. Its OWN mirror stack keeps the
+    // stacked geometry right — a second series in "total" would double the last
+    // points' cumulative height (same reason as the reveal base + mini chart).
+    const bufferFillSeries: LineSeriesOption = {
+      id: `${BUFFERFILL_PREFIX}${key}`,
+      type: "line",
+      data: toPoints(bufferValues),
+      stack: isStacked ? "__bufferfill-total" : undefined,
+      smooth: curve.smooth,
+      step: curve.step,
+      connectNulls: true,
+      silent: true,
+      showSymbol: false,
+      z: z - 1,
+      lineStyle: { opacity: 0 },
+      areaStyle: {
+        color: fillPaint(area.variant, showUnselected, slots, rendererSize),
+        opacity: opacity.fill,
+      },
+      emphasis: { disabled: true },
+      blur: { areaStyle: { opacity: 0.1 } },
+      tooltip: { show: false },
+    };
+
+    return [mainSeries, bufferSeries, bufferFillSeries];
   });
+}
+
+// Copy a value list with everything AFTER `idx` nulled — the hover-reveal cut:
+// the colored real series keeps its data up to the cursor and drops the rest, so
+// (with connectNulls false) its line and fill stop dead at the pointer.
+function sliceToNull<T>(vals: readonly T[], idx: number): (T | null)[] {
+  return vals.map((v, i) => (i > idx ? null : v));
+}
+
+// Copy a value list with everything BEFORE `idx` nulled — the reveal's gray tail.
+// The muted base keeps only the region from the cursor onward, so it never sits
+// under the colored part; both include `idx` so they meet at the pointer.
+// Generic so it preserves per-datum point objects (multi-color dot itemStyle).
+function sliceFrom<T>(vals: readonly T[], idx: number): (T | null)[] {
+  return vals.map((v, i) => (i < idx ? null : v));
 }
 
 // Per-series PLOTTED top value per category index — expanded normalization and
@@ -1168,6 +1403,10 @@ type LiveState = {
   categories: string[]; // x labels of the last build, for the brush label pills
   dataLength: number; // row count, for the datazoom index math
   plottedTops: Record<string, number[]>; // per-series plotted line value per index, for pointer hit-testing
+  seriesKeyByIndex: (string | undefined)[]; // built series order → key, so a polygon click's seriesIndex recovers its key past interleaved buffer/reveal/mini series
+  companionIdsByKey: Map<string, string[]>; // per-key silent companion series ids (buffer tail, reveal base) — highlighted/downplayed with their parent
+  revealIndex: number | null; // hover-reveal pointer x-index (null = idle); read by builds and the reveal hover handler
+  revealValues: Record<string, unknown[]>; // per-area FULL per-datum points (with dot itemStyle), sliced to the cursor on hover without a rebuild
   brushRange: BrushRange; // live zoom window — carried through every rebuild
   brushGeom: BrushGeometry | null; // brush footer layout of the last build
   brushOverlay: BrushOverlayElements | null; // zrender elements, owned by syncBrushOverlay
@@ -1181,6 +1420,7 @@ type LiveState = {
     brushFormatLabel?: (value: string, index: number) => string;
     seriesKeys: string[];
     enableHoverHighlight: boolean;
+    enableHoverReveal: boolean;
   };
   // Update-style re-push for paths that bypass React entirely (theme flips,
   // resizes) — set by the sync effect.
@@ -1211,6 +1451,7 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
   animation = true,
   animationType = "left-to-right",
   enableHoverHighlight = false,
+  enableHoverReveal = false,
   defaultSelectedDataKey = null,
   selectedDataKey: selectedDataKeyProp,
   onSelectionChange,
@@ -1244,6 +1485,10 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
     categories: [],
     dataLength: 0,
     plottedTops: {},
+    seriesKeyByIndex: [],
+    companionIdsByKey: new Map<string, string[]>(),
+    revealIndex: null,
+    revealValues: {},
     brushRange: { start: 0, end: 100 },
     brushGeom: null,
     brushOverlay: null,
@@ -1256,6 +1501,7 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
       brushFormatLabel,
       seriesKeys: [],
       enableHoverHighlight,
+      enableHoverReveal,
     },
     repush: () => {},
   }).current;
@@ -1329,6 +1575,7 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
     brushFormatLabel,
     seriesKeys,
     enableHoverHighlight,
+    enableHoverReveal,
   };
   live.dataLength = data.length;
 
@@ -1404,6 +1651,10 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
     const categories = data.map((row) => String(row[xCategoryKey]));
     live.categories = categories;
 
+    // buildAreaSeries fills this with each area's full per-datum points (with the
+    // multi-color dot itemStyle) so the reveal hover handler slices real data.
+    const revealSink: Record<string, unknown[]> = {};
+
     const ctx: OptionBuildContext = {
       data,
       config,
@@ -1424,6 +1675,8 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
       showBrush,
       brushHeight,
       enableHoverHighlight,
+      enableHoverReveal,
+      revealIndex: live.revealIndex,
       resolved,
       rendererSize: {
         width: echartsRef.current?.getWidth() ?? mountRef.current?.clientWidth ?? 0,
@@ -1432,6 +1685,7 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
       categories,
       brushRange: live.brushRange,
       getHoveredKey: () => live.hoveredKey,
+      revealSink,
     };
 
     live.plottedTops = computePlottedTops(ctx);
@@ -1445,6 +1699,32 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
 
     const brush = showBrush ? buildBrushOption(ctx, brushBottom) : null;
 
+    const series = [...buildAreaSeries(ctx), ...(brush?.miniSeries ?? [])];
+    // buildAreaSeries has now filled revealSink with each area's full per-datum
+    // points — hand them to the hover handler for slicing.
+    if (enableHoverReveal) live.revealValues = revealSink;
+    // Record the exact series order so an area-polygon click (which reports only
+    // a seriesIndex) can recover its key — buffer/reveal/mini/loading series
+    // break the "index === key position" shortcut, so map each index to its id.
+    live.seriesKeyByIndex = series.map((s) => {
+      const id = String(s.id ?? "");
+      return id && !id.startsWith("__") ? id : undefined;
+    });
+    // Map each key to its silent companion series ids (buffer tail, hover-reveal
+    // base), mirroring exactly what buildAreaSeries emits — the hover handlers
+    // highlight/downplay these with the parent so focus:"series" never strands
+    // an area's own forecast tail or muted reveal base apart from it.
+    const companionIdsByKey = new Map<string, string[]>();
+    for (const area of areas) {
+      const ids: string[] = [];
+      if (area.enableBufferLine && data.length >= 2) {
+        ids.push(`${BUFFER_PREFIX}${area.dataKey}`, `${BUFFERFILL_PREFIX}${area.dataKey}`);
+      }
+      if (enableHoverReveal) ids.push(`${REVEAL_PREFIX}${area.dataKey}`);
+      if (ids.length) companionIdsByKey.set(area.dataKey, ids);
+    }
+    live.companionIdsByKey = companionIdsByKey;
+
     return {
       animation: false,
       grid: brush ? [grid, brush.miniGrid] : grid,
@@ -1452,7 +1732,7 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
       yAxis: brush ? [yAxis, brush.miniYAxis] : yAxis,
       tooltip: buildTooltipOption(ctx),
       dataZoom: brush?.dataZoom,
-      series: [...buildAreaSeries(ctx), ...(brush?.miniSeries ?? [])],
+      series,
     };
   }, [
     live,
@@ -1476,6 +1756,7 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
     showBrush,
     brushHeight,
     enableHoverHighlight,
+    enableHoverReveal,
   ]);
 
   // ── Init + resize + theme observer (once) ────────────────────────────────────
@@ -1517,9 +1798,12 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
         event?: { offsetX?: number; offsetY?: number };
       };
       // Symbol clicks carry seriesId; area-polygon clicks (triggerLineEvent)
-      // only carry seriesIndex — recover the key by position. Main series come
-      // first in the series array, so the index maps directly.
-      let id = p.seriesId ?? (typeof p.seriesIndex === "number" ? keys[p.seriesIndex] : undefined);
+      // only carry seriesIndex — recover the key from the last build's index map,
+      // which accounts for the extra `__buffer-`/`__reveal-`/`__mini-` series
+      // interleaved between the main ones (a raw seriesKeys lookup would miss).
+      let id =
+        p.seriesId ??
+        (typeof p.seriesIndex === "number" ? live.seriesKeyByIndex[p.seriesIndex] : undefined);
       // Overlapping polygons: the native hit is the topmost series, not the
       // band the pointer is visually inside — resolve geometrically.
       if (typeof p.event?.offsetX === "number" && typeof p.event?.offsetY === "number") {
@@ -1543,15 +1827,81 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
     // tooltip (live.hoveredKey — its formatter runs per pointer move).
     const applyHoverKey = (key: string | null) => {
       if (live.hoveredKey === key) return;
-      const keys = live.handlers.seriesKeys;
       const previous = live.hoveredKey;
       live.hoveredKey = key;
       setHoveredDataKey(key);
-      if (previous) chart.dispatchAction({ type: "downplay", seriesIndex: keys.indexOf(previous) });
-      if (key) chart.dispatchAction({ type: "highlight", seriesIndex: keys.indexOf(key) });
+      // Dispatch by seriesId (buffer/reveal series shift the numeric indices), and
+      // link each key's silent companions (buffer tail, reveal base) so
+      // focus:"series" never strands them apart from their parent.
+      if (previous) {
+        chart.dispatchAction({ type: "downplay", seriesId: previous });
+        for (const id of live.companionIdsByKey.get(previous) ?? [])
+          chart.dispatchAction({ type: "downplay", seriesId: id });
+      }
+      if (key) {
+        chart.dispatchAction({ type: "highlight", seriesId: key });
+        for (const id of live.companionIdsByKey.get(key) ?? [])
+          chart.dispatchAction({ type: "highlight", seriesId: id });
+      }
     };
+
+    // Hover-reveal: color each area up to the pointer's x-index, mute the rest.
+    // Purely TARGETED series updates (real series data + muted base opacity) — we
+    // NEVER rebuild the whole option on mousemove, which would replay transitions
+    // and fight the tooltip's axis pointer.
+    const pushReveal = (idx: number | null) => {
+      const keys = live.handlers.seriesKeys;
+      const on = idx !== null;
+      chart.setOption(
+        {
+          series: keys.flatMap((key) => [
+            {
+              id: key,
+              data: on
+                ? sliceToNull(live.revealValues[key] ?? [], idx)
+                : (live.revealValues[key] ?? []),
+            },
+            {
+              id: `${REVEAL_PREFIX}${key}`,
+              // Gray tail keeps only the region from the cursor onward.
+              data: on
+                ? sliceFrom(live.revealValues[key] ?? [], idx)
+                : (live.revealValues[key] ?? []),
+              lineStyle: { opacity: on ? 0.3 : 0 },
+            },
+          ]),
+        },
+        { lazyUpdate: true, silent: true },
+      );
+    };
+    const applyReveal = (event: { offsetX?: number; offsetY?: number }) => {
+      const len = live.dataLength;
+      if (len < 1) return;
+      const x = event.offsetX ?? -1;
+      const y = event.offsetY ?? -1;
+      if (!chart.containPixel({ gridIndex: 0 }, [x, y])) {
+        clearReveal();
+        return;
+      }
+      const raw = chart.convertFromPixel({ gridIndex: 0 }, [x, y])[0];
+      const idx = Math.max(0, Math.min(len - 1, Math.round(raw)));
+      if (idx === live.revealIndex) return;
+      live.revealIndex = idx;
+      pushReveal(idx);
+    };
+    const clearReveal = () => {
+      if (live.revealIndex === null) return;
+      live.revealIndex = null;
+      pushReveal(null);
+    };
+
     const zrHover = chart.getZr();
     const onZrHoverMove = (event: { offsetX?: number; offsetY?: number }) => {
+      // Reveal is a standalone hover mode and takes precedence over highlight.
+      if (live.handlers.enableHoverReveal) {
+        applyReveal(event);
+        return;
+      }
       if (!live.handlers.enableHoverHighlight) return;
       // A click selection owns the canvas dim — hover highlighting stops
       // entirely while one exists and resumes once it clears.
@@ -1567,7 +1917,8 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
       );
     };
     const onZrHoverOut = () => {
-      if (live.handlers.enableHoverHighlight) applyHoverKey(null);
+      if (live.handlers.enableHoverReveal) clearReveal();
+      else if (live.handlers.enableHoverHighlight) applyHoverKey(null);
     };
     zrHover.on("mousemove", onZrHoverMove);
     zrHover.on("globalout", onZrHoverOut);
@@ -1575,19 +1926,19 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
     // The native hover still emphasizes whichever element the pointer entered —
     // cancel it whenever it disagrees with the tracker's resolved key.
     chart.on("mouseover", (params) => {
-      const { enableHoverHighlight: hoverOn, seriesKeys: keys } = live.handlers;
-      if (!hoverOn) return;
+      const { enableHoverHighlight: hoverOn, enableHoverReveal: revealOn } = live.handlers;
+      if (!hoverOn || revealOn) return;
       // While a selection is active, hover highlighting is disabled — never
       // dispatch emphasis/downplay so the selection dim is the only dimming.
       if (live.handlers.selectedDataKey !== null) return;
       const p = params as { seriesIndex?: number; componentType?: string };
       if (p.componentType !== "series" || typeof p.seriesIndex !== "number") return;
-      const key = keys[p.seriesIndex];
+      const key = live.seriesKeyByIndex[p.seriesIndex];
       if (!key || key.startsWith("__")) return;
       if (key !== live.hoveredKey) {
         chart.dispatchAction({ type: "downplay", seriesIndex: p.seriesIndex });
         if (live.hoveredKey) {
-          chart.dispatchAction({ type: "highlight", seriesIndex: keys.indexOf(live.hoveredKey) });
+          chart.dispatchAction({ type: "highlight", seriesId: live.hoveredKey });
         }
       }
     });
@@ -1725,7 +2076,7 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
     const chart = echartsRef.current;
     if (!chart || isLoading) return;
     const animatedKeys = areas
-      .filter((area) => area.strokeVariant === "animated-dashed")
+      .filter((area) => area.strokeVariant === "animated-dashed" && !area.enableBufferLine)
       .map((area) => area.dataKey);
     if (animatedKeys.length === 0 || hasSelection) return;
 

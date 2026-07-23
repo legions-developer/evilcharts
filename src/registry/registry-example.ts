@@ -25,6 +25,28 @@ export const examples: Registry["items"] = [
     ],
   },
   {
+    name: "ex-buffer-echarts-area-chart",
+    registryDependencies: ["@evilcharts/echarts-area-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/echarts/ex-buffer-echarts-area-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-hover-reveal-echarts-area-chart",
+    registryDependencies: ["@evilcharts/echarts-area-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/echarts/ex-hover-reveal-echarts-area-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
     name: "ex-animated-dashed-stroke-echarts-area-chart",
     registryDependencies: ["@evilcharts/echarts-area-chart"],
     type: "registry:block",
@@ -362,6 +384,17 @@ export const examples: Registry["items"] = [
     files: [
       {
         path: "examples/echarts/ex-buffer-echarts-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-hover-reveal-echarts-line-chart",
+    registryDependencies: ["@evilcharts/echarts-line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/echarts/ex-hover-reveal-echarts-line-chart.tsx",
         type: "registry:block",
       },
     ],

@@ -180,6 +180,7 @@ export interface EChartsLineChartProps<TData extends Record<string, unknown>> {
   animation?: boolean; // master switch for the intro draw-in — false renders instantly
   animationType?: LineAnimationType; // default intro reveal (first <Line> overrides)
   enableHoverHighlight?: boolean; // hovering a series dims the others, like a temporary selection
+  enableHoverReveal?: boolean; // hovering colors each line up to the pointer's x and mutes the rest
   defaultSelectedDataKey?: string | null; // series selected on first render
   onSelectionChange?: (key: string | null) => void; // fires when the selected series changes
   isLoading?: boolean; // shows the animated loading skeleton
@@ -589,8 +590,11 @@ function shimmerWindowStops(center: number, color: string, peak: number) {
 // The `__buffer-` prefix marks the dashed forecast overlay of a buffer line; it
 // carries the SAME key's value, so the tooltip recovers the key from it (see
 // createTooltipFormatter). Every other `__`-prefixed series (mini chart, loading
-// skeleton) is truly internal and never surfaces.
+// skeleton, hover-reveal base) is truly internal and never surfaces.
 const BUFFER_PREFIX = "__buffer-";
+// The `__reveal-` prefix marks the muted base layer of a hover-reveal line — see
+// buildLineSeries. Internal, so the tooltip drops it like the mini/loading rows.
+const REVEAL_PREFIX = "__reveal-";
 
 // Legend overlay (legendFillStyle, legendOutlineStyle, LegendIndicator,
 // LegendOverlay) lives in @/registry/ui/echarts-legend and is imported at the
@@ -620,7 +624,11 @@ type OptionBuildContext = {
   showBrush: boolean;
   brushHeight: number;
   enableHoverHighlight: boolean;
+  enableHoverReveal: boolean; // hover colors each line up to the pointer, mutes the rest
+  revealIndex: number | null; // pointer's x-index while revealing (null = idle → chart looks normal)
+  revealSink: Record<string, unknown[]>; // buildLineSeries writes each line's full per-datum points here for the hover handler
   resolved: ResolvedColors;
+  rendererSize: { width: number; height: number }; // anchored reveal stroke gradients span the plot in absolute pixels
   categories: string[];
   brushRange: BrushRange; // zoom window carried through rebuilds
   getHoveredKey: () => string | null; // read per tooltip render — hover never repushes the option
@@ -953,7 +961,11 @@ function buildLineSeries(ctx: OptionBuildContext): LineSeriesOption[] {
     selectedDataKey,
     hasSelection,
     enableHoverHighlight,
+    enableHoverReveal,
+    revealIndex,
+    revealSink,
     resolved,
+    rendererSize,
   } = ctx;
   const background = resolved.tokens.background;
 
@@ -973,7 +985,12 @@ function buildLineSeries(ctx: OptionBuildContext): LineSeriesOption[] {
 
     const values = data.map((row) => Number(row[key]) || 0);
     const n = values.length;
-    const buffer = line.enableBufferLine && n >= 2;
+    // Hover-reveal is a root-level mode and owns the whole line rendering, so it
+    // takes precedence over a per-line buffer tail (and the glow overlay) when
+    // both are set.
+    const reveal = enableHoverReveal;
+    const buffer = !reveal && line.enableBufferLine && n >= 2;
+    const revealActive = reveal && revealIndex !== null;
 
     // The dash pattern for the MAIN line. A buffer line keeps its body solid and
     // dashes only the tail overlay, so its main part is always solid regardless
@@ -981,6 +998,22 @@ function buildLineSeries(ctx: OptionBuildContext): LineSeriesOption[] {
     // dasharray while the buffer shape manages its own).
     const mainDash: "solid" | [number, number] =
       buffer || line.strokeVariant === "solid" ? "solid" : [3, 3];
+
+    // The reveal truncates the line to the cursor, which would COMPRESS a
+    // bbox-relative stroke gradient into the shorter span — misaligning it from
+    // the index-sampled dots. Anchor the stroke to the plot in absolute pixels so
+    // every x keeps its own color even when the line stops short.
+    const strokePaint =
+      reveal && multiColor
+        ? new echarts.graphic.LinearGradient(
+            8,
+            0,
+            Math.max(rendererSize.width - 8, 9),
+            0,
+            slots.map((color, i) => ({ offset: i / (slots.length - 1), color })),
+            true,
+          )
+        : paint;
 
     // Turn a value list into ECharts data — attaching per-datum symbol colors
     // for multi-color lines, and passing `null` gaps through so a buffer line's
@@ -1015,30 +1048,42 @@ function buildLineSeries(ctx: OptionBuildContext): LineSeriesOption[] {
             };
           });
 
+    // Snapshot the FULL per-datum points (with the multi-color dot itemStyle) so
+    // the reveal hover handler can slice them without losing each dot's sampled
+    // gradient color — plain values would fall back to the default palette.
+    if (reveal) revealSink[key] = toPoints(values);
+
     // Buffer line: the solid MAIN part drops the last point (its final segment
-    // becomes the dashed overlay); the overlay carries only the last two points.
+    // becomes the dashed overlay). Reveal instead TRUNCATES the real series at the
+    // cursor's x-index (points beyond it null'd), so its line stops there and the
+    // muted base layer shows through past it. When idle (revealIndex null) the
+    // real series carries its full data — the chart looks completely normal.
     const mainValues: (number | null)[] = buffer
       ? values.map((v, i) => (i === n - 1 ? null : v))
-      : values;
+      : revealActive
+        ? sliceToNull(values, revealIndex as number)
+        : values;
 
     const z = isSelected ? 3 : hasSelection ? 1 : 2;
 
     // Glow overlays sit UNDER the real line (built first, same z; equal-z series
     // paint in array order). They follow the FULL solid path so the halo stays
-    // continuous even beneath a dashed or buffer tail.
-    const glowSeries = line.glowing
-      ? buildGlowSeries({
-          key,
-          paint,
-          slots,
-          values,
-          curve,
-          connectNulls: line.connectNulls,
-          z,
-          selectionDim: opacity.stroke,
-          dotSize: restingVisible ? restingDot.size : 0,
-        })
-      : [];
+    // continuous even beneath a dashed or buffer tail. Suppressed under reveal:
+    // a full-length colored halo would bleed past the cursor and defeat the mute.
+    const glowSeries =
+      line.glowing && !reveal
+        ? buildGlowSeries({
+            key,
+            paint,
+            slots,
+            values,
+            curve,
+            connectNulls: line.connectNulls,
+            z,
+            selectionDim: opacity.stroke,
+            dotSize: restingVisible ? restingDot.size : 0,
+          })
+        : [];
 
     const mainSeries: LineSeriesOption = {
       id: key,
@@ -1057,7 +1102,9 @@ function buildLineSeries(ctx: OptionBuildContext): LineSeriesOption[] {
       symbolSize: restingVisible ? restingDot.size : activeDot.size,
       z,
       lineStyle: {
-        color: paint,
+        // Anchored plot-wide gradient while revealing a multi-color line (see
+        // strokePaint), the normal series paint otherwise.
+        color: strokePaint,
         width: STROKE_WIDTH,
         opacity: opacity.stroke,
         type: mainDash,
@@ -1075,9 +1122,10 @@ function buildLineSeries(ctx: OptionBuildContext): LineSeriesOption[] {
         // enableHoverHighlight). Suppressed entirely while a series is
         // click-selected: the selection dim owns the canvas, so hover
         // highlighting stops until the selection clears (the option rebuilds on
-        // selection change, making this a build-time conditional). Otherwise the
-        // active dot is the only emphasis.
-        focus: enableHoverHighlight && !hasSelection ? "series" : "none",
+        // selection change, making this a build-time conditional). Reveal owns the
+        // hover visual, so native focus-blur stands down when it is on (they must
+        // not blend). Otherwise the active dot is the only emphasis.
+        focus: enableHoverHighlight && !enableHoverReveal && !hasSelection ? "series" : "none",
         scale: restingVisible ? activeDot.size / Math.max(restingDot.size, 1) : 1,
         ...(multiColor ? {} : { itemStyle: { ...activeDot.itemStyle, opacity: 1 } }),
       },
@@ -1088,6 +1136,41 @@ function buildLineSeries(ctx: OptionBuildContext): LineSeriesOption[] {
         itemStyle: { opacity: 0.3 },
       },
     };
+
+    // Hover-reveal: a muted gray BASE line of the FULL series sits one z below the
+    // real one. It is invisible while idle (opacity 0 → the chart looks normal)
+    // and fades in only while hovering, so the region PAST the cursor — where the
+    // truncated real line has stopped — shows as neutral gray. Lines have no fill,
+    // so the base is a line only (no areaStyle) and needs no stack mirror.
+    if (reveal) {
+      const muted = resolved.tokens.mutedForeground;
+      const revealBase: LineSeriesOption = {
+        id: `${REVEAL_PREFIX}${key}`,
+        type: "line",
+        // Only the region FROM the cursor onward (null before it), so the gray
+        // never sits under the colored part — the two meet exactly at the pointer
+        // and their colors can't mix.
+        data: revealActive ? sliceFrom(values, revealIndex as number) : values,
+        smooth: curve.smooth,
+        step: curve.step,
+        connectNulls: false,
+        silent: true,
+        showSymbol: false,
+        symbol: "circle",
+        z: z - 1,
+        // Neutral gray, SAME dash pattern as the colored line, no fill.
+        lineStyle: {
+          color: muted,
+          width: STROKE_WIDTH,
+          type: mainDash,
+          opacity: revealActive ? 0.3 : 0,
+        },
+        emphasis: { disabled: true },
+        blur: { lineStyle: { opacity: revealActive ? 0.3 : 0 } },
+        tooltip: { show: false },
+      };
+      return [revealBase, mainSeries];
+    }
 
     if (!buffer) return [...glowSeries, mainSeries];
 
@@ -1137,6 +1220,21 @@ function buildLineSeries(ctx: OptionBuildContext): LineSeriesOption[] {
   });
 }
 
+// Copy a value list with everything AFTER `idx` nulled — the hover-reveal cut:
+// the colored real line keeps its data up to the cursor and drops the rest, so
+// (with connectNulls false) its stroke stops dead at the pointer.
+function sliceToNull<T>(vals: readonly T[], idx: number): (T | null)[] {
+  return vals.map((v, i) => (i > idx ? null : v));
+}
+
+// Copy a value list with everything BEFORE `idx` nulled — the reveal's gray tail.
+// The muted base keeps only the region from the cursor onward, so it never sits
+// under the colored part; both include `idx` so they meet at the pointer.
+// Generic so it preserves per-datum point objects (multi-color dot itemStyle).
+function sliceFrom<T>(vals: readonly T[], idx: number): (T | null)[] {
+  return vals.map((v, i) => (i < idx ? null : v));
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Live imperative state — everything the ECharts event handlers, rAF loops, and
 // theme/resize repushes read or write OUTSIDE the React render cycle, grouped in
@@ -1166,6 +1264,8 @@ type LiveState = {
   // together with the hovered parent, so focus:"series" can't strand a line's own
   // glow or forecast tail apart from it.
   companionIdsByKey: Map<string, string[]>;
+  revealIndex: number | null; // hover-reveal pointer x-index (null = idle); read by builds and the reveal hover handler
+  revealValues: Record<string, unknown[]>; // per-line FULL per-datum points (with dot itemStyle), sliced to the cursor on hover without a rebuild
   // Latest callbacks/flags for the imperative ECharts event handlers.
   handlers: {
     onBrushChange?: (range: { startIndex: number; endIndex: number }) => void;
@@ -1173,7 +1273,9 @@ type LiveState = {
     clickableKeys: Set<string>;
     selectedDataKey: string | null;
     brushFormatLabel?: (value: string, index: number) => string;
+    seriesKeys: string[];
     enableHoverHighlight: boolean;
+    enableHoverReveal: boolean;
   };
   // Update-style re-push for paths that bypass React entirely (theme flips,
   // resizes) — set by the sync effect.
@@ -1203,6 +1305,7 @@ export function EChartsLineChart<TData extends Record<string, unknown>>({
   animation = true,
   animationType = "left-to-right",
   enableHoverHighlight = false,
+  enableHoverReveal = false,
   defaultSelectedDataKey = null,
   onSelectionChange,
   isLoading = false,
@@ -1240,13 +1343,17 @@ export function EChartsLineChart<TData extends Record<string, unknown>>({
     brushHover: { inside: false, left: false, right: false },
     seriesKeyByIndex: [],
     companionIdsByKey: new Map(),
+    revealIndex: null,
+    revealValues: {},
     handlers: {
       onBrushChange,
       onSelectionChange,
       clickableKeys: new Set<string>(),
       selectedDataKey: defaultSelectedDataKey,
       brushFormatLabel,
+      seriesKeys: [],
       enableHoverHighlight,
+      enableHoverReveal,
     },
     repush: () => {},
   }).current;
@@ -1312,7 +1419,9 @@ export function EChartsLineChart<TData extends Record<string, unknown>>({
     clickableKeys,
     selectedDataKey,
     brushFormatLabel,
+    seriesKeys,
     enableHoverHighlight,
+    enableHoverReveal,
   };
   live.dataLength = data.length;
 
@@ -1389,6 +1498,10 @@ export function EChartsLineChart<TData extends Record<string, unknown>>({
     const categories = data.map((row) => String(row[xCategoryKey]));
     live.categories = categories;
 
+    // buildLineSeries fills this with each line's full per-datum points (with the
+    // multi-color dot itemStyle) so the reveal hover handler slices real data.
+    const revealSink: Record<string, unknown[]> = {};
+
     const ctx: OptionBuildContext = {
       data,
       config,
@@ -1406,7 +1519,14 @@ export function EChartsLineChart<TData extends Record<string, unknown>>({
       showBrush,
       brushHeight,
       enableHoverHighlight,
+      enableHoverReveal,
+      revealIndex: live.revealIndex,
+      revealSink,
       resolved,
+      rendererSize: {
+        width: echartsRef.current?.getWidth() ?? mountRef.current?.clientWidth ?? 0,
+        height: echartsRef.current?.getHeight() ?? mountRef.current?.clientHeight ?? 0,
+      },
       categories,
       brushRange: live.brushRange,
       getHoveredKey: () => live.hoveredKey,
@@ -1422,17 +1542,20 @@ export function EChartsLineChart<TData extends Record<string, unknown>>({
     const brush = showBrush ? buildBrushOption(ctx, brushBottom) : null;
 
     const series = [...buildLineSeries(ctx), ...(brush?.miniSeries ?? [])];
+    // buildLineSeries has now filled revealSink with each line's full per-datum
+    // points — hand them to the hover handler for slicing.
+    if (enableHoverReveal) live.revealValues = revealSink;
     // Record the exact series order so a line-body click (which reports only a
-    // seriesIndex) can recover its key — buffer/mini/loading series break the
-    // "index === key position" shortcut, so map each index to its id here.
+    // seriesIndex) can recover its key — buffer/reveal/mini/loading series break
+    // the "index === key position" shortcut, so map each index to its id here.
     live.seriesKeyByIndex = series.map((s) => {
       const id = String(s.id ?? "");
       return id && !id.startsWith("__") ? id : undefined;
     });
-    // Map each key to its silent companion series ids (glow overlays + buffer
-    // tail), mirroring exactly what buildLineSeries emits — the hover handlers
-    // highlight/downplay these together with the parent so focus:"series" never
-    // strands a line's own glow or forecast tail apart from it.
+    // Map each key to its silent companion series ids (glow overlays, buffer tail,
+    // hover-reveal base), mirroring exactly what buildLineSeries emits — the hover
+    // handlers highlight/downplay these together with the parent so focus:"series"
+    // never strands a line's own glow or forecast tail apart from it.
     const companionIdsByKey = new Map<string, string[]>();
     for (const line of lines) {
       const ids: string[] = [];
@@ -1440,6 +1563,7 @@ export function EChartsLineChart<TData extends Record<string, unknown>>({
         for (let i = 0; i < GLOW_LAYERS.length; i++) ids.push(`__glow-${i}-${line.dataKey}`);
       }
       if (line.enableBufferLine && data.length >= 2) ids.push(`${BUFFER_PREFIX}${line.dataKey}`);
+      if (enableHoverReveal) ids.push(`${REVEAL_PREFIX}${line.dataKey}`);
       if (ids.length) companionIdsByKey.set(line.dataKey, ids);
     }
     live.companionIdsByKey = companionIdsByKey;
@@ -1472,6 +1596,7 @@ export function EChartsLineChart<TData extends Record<string, unknown>>({
     showBrush,
     brushHeight,
     enableHoverHighlight,
+    enableHoverReveal,
   ]);
 
   // ── Init + resize + theme observer (once) ────────────────────────────────────
@@ -1523,8 +1648,9 @@ export function EChartsLineChart<TData extends Record<string, unknown>>({
     // focus-linked to their parent (they are separate series, so focus:"series"
     // would otherwise blur a line's own glow or forecast tail).
     chart.on("mouseover", (params) => {
-      const { enableHoverHighlight: hoverOn } = live.handlers;
-      if (!hoverOn) return;
+      const { enableHoverHighlight: hoverOn, enableHoverReveal: revealOn } = live.handlers;
+      // Reveal owns the hover visual, so native highlight stands down while it is on.
+      if (!hoverOn || revealOn) return;
       // While a series is click-selected, hover highlighting is disabled — the
       // selection dim owns the canvas, so never arm hover emphasis/blur (or the
       // legend/tooltip hover dimming) until the selection clears.
@@ -1552,6 +1678,66 @@ export function EChartsLineChart<TData extends Record<string, unknown>>({
         for (const seriesId of companions) chart.dispatchAction({ type: "downplay", seriesId });
       }
     });
+
+    // Hover-reveal: color each line up to the pointer's x-index, mute the rest.
+    // Purely TARGETED series updates (real series data + muted base opacity) — we
+    // NEVER rebuild the whole option on mousemove, which would replay transitions
+    // and fight the tooltip's axis pointer.
+    const zrReveal = chart.getZr();
+    const pushReveal = (idx: number | null) => {
+      const keys = live.handlers.seriesKeys;
+      const on = idx !== null;
+      chart.setOption(
+        {
+          series: keys.flatMap((key) => [
+            {
+              id: key,
+              data: on
+                ? sliceToNull(live.revealValues[key] ?? [], idx)
+                : (live.revealValues[key] ?? []),
+            },
+            {
+              id: `${REVEAL_PREFIX}${key}`,
+              // Gray tail keeps only the region from the cursor onward.
+              data: on
+                ? sliceFrom(live.revealValues[key] ?? [], idx)
+                : (live.revealValues[key] ?? []),
+              lineStyle: { opacity: on ? 0.3 : 0 },
+            },
+          ]),
+        },
+        { lazyUpdate: true, silent: true },
+      );
+    };
+    const clearReveal = () => {
+      if (live.revealIndex === null) return;
+      live.revealIndex = null;
+      pushReveal(null);
+    };
+    const applyReveal = (event: { offsetX?: number; offsetY?: number }) => {
+      const len = live.dataLength;
+      if (len < 1) return;
+      const x = event.offsetX ?? -1;
+      const y = event.offsetY ?? -1;
+      if (!chart.containPixel({ gridIndex: 0 }, [x, y])) {
+        clearReveal();
+        return;
+      }
+      const raw = chart.convertFromPixel({ gridIndex: 0 }, [x, y])[0];
+      const idx = Math.max(0, Math.min(len - 1, Math.round(raw)));
+      if (idx === live.revealIndex) return;
+      live.revealIndex = idx;
+      pushReveal(idx);
+    };
+    const onZrRevealMove = (event: { offsetX?: number; offsetY?: number }) => {
+      if (!live.handlers.enableHoverReveal) return;
+      applyReveal(event);
+    };
+    const onZrRevealOut = () => {
+      if (live.handlers.enableHoverReveal) clearReveal();
+    };
+    zrReveal.on("mousemove", onZrRevealMove);
+    zrReveal.on("globalout", onZrRevealOut);
 
     chart.on("datazoom", () => {
       const option = chart.getOption() as { dataZoom?: { start?: number; end?: number }[] };
@@ -1604,6 +1790,8 @@ export function EChartsLineChart<TData extends Record<string, unknown>>({
     zr.on("globalout", onZrOut);
 
     return () => {
+      zrReveal.off("mousemove", onZrRevealMove);
+      zrReveal.off("globalout", onZrRevealOut);
       zr.off("mousemove", onZrMove);
       zr.off("globalout", onZrOut);
       resizeObserver.disconnect();
