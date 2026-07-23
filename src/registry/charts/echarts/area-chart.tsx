@@ -55,9 +55,9 @@ const AXIS_POINTER_OPACITY = 1; // tooltip cursor line, × border alpha
 // inside it exists (stroke + fill), everything outside is fully transparent,
 // like a clip-path sliding across the chart.
 const LOADING_STROKE_OPACITY = 0.5; // outline inside the window, × foreground alpha
-const LOADING_SHIMMER_MAX_OPACITY = 0.1; // fill inside the window, × foreground alpha
+const LOADING_SHIMMER_MAX_OPACITY = 0.03; // fill inside the window, × foreground alpha
 const LOADING_SHIMMER_BAND = 0.2; // window half-width, fraction of chart width
-const LOADING_SHIMMER_FEATHER = 0.08; // eased edge softening of the clip window
+const LOADING_SHIMMER_FEATHER = 0.2; // eased edge softening of the clip window
 const BRUSH_STROKE_OPACITY = 0.5; // mini-chart series stroke
 const BRUSH_FILL_OPACITY = 0.15; // mini-chart series fade, at the top stop
 const BRUSH_BORDER_OPACITY = 1; // brush frame, × border alpha (evil-brush uses the full token)
@@ -1885,12 +1885,29 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
       // Read tokens per frame, so a theme flip mid-loading retints the shimmer.
       const foreground = resolvedRef.current?.tokens.foreground ?? "rgba(120, 120, 120, 1)";
       // Sweep the clip window from fully off-screen left to fully off-screen
-      // right. Stroke and fill share it — only the wave section inside the
-      // window exists, everything else is transparent.
-      const center = phase * (1 + 2 * LOADING_SHIMMER_BAND) - LOADING_SHIMMER_BAND;
-      // 45° lean — the window travels along the diagonal, not as a vertical bar.
+      // right, leaned 45°. The gradient uses ABSOLUTE pixel coordinates shared
+      // by stroke and fill — bbox-relative coords put the window at different
+      // positions for the line vs the area polygon (their bounding boxes
+      // differ), which made the line trail the fill near the sweep's end.
+      const w = chart.getWidth();
+      const h = chart.getHeight();
+      if (!w || !h) {
+        raf = requestAnimationFrame(tick);
+        return;
+      }
+      // Farthest plot corner projected onto the 45° axis — keeps the sweep
+      // tight instead of dawdling off-plot at the end of each loop.
+      const maxT = (w + h) / (2 * w);
+      const center = phase * (maxT + 2 * LOADING_SHIMMER_BAND) - LOADING_SHIMMER_BAND;
       const clip = (peak: number) =>
-        new echarts.graphic.LinearGradient(0, 0, 1, 1, shimmerWindowStops(center, foreground, peak));
+        new echarts.graphic.LinearGradient(
+          0,
+          0,
+          w,
+          w,
+          shimmerWindowStops(center, foreground, peak),
+          true,
+        );
       chart.setOption(
         {
           series: [
