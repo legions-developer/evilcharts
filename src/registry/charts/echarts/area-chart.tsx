@@ -51,9 +51,11 @@ const LOADING_DEFAULT_POINTS = 14;
 // the same apparent brightness.
 const GRID_LINE_OPACITY = 1; // dashed y-axis split lines, × border alpha
 const AXIS_POINTER_OPACITY = 1; // tooltip cursor line, × border alpha
-const LOADING_STROKE_OPACITY = 0.4; // skeleton outline, × foreground alpha
-const LOADING_FILL_OPACITY = 0.04; // skeleton resting fill, × foreground alpha
-const LOADING_SHIMMER_MAX_OPACITY = 0.3; // shimmer band peak, × foreground alpha
+const LOADING_STROKE_OPACITY = 0.28; // skeleton outline, × foreground alpha
+const LOADING_FILL_OPACITY = 0.06; // skeleton resting fill, × foreground alpha
+const LOADING_SHIMMER_MAX_OPACITY = 0.16; // shimmer sheen peak, × foreground alpha
+const LOADING_SHIMMER_BAND = 0.3; // sheen half-width, fraction of chart width
+const LOADING_BAND_SCALE = 0.45; // upper ghost bands hug the base wave at this ratio
 const BRUSH_STROKE_OPACITY = 0.5; // mini-chart series stroke
 const BRUSH_FILL_OPACITY = 0.15; // mini-chart series fade, at the top stop
 const BRUSH_BORDER_OPACITY = 1; // brush frame, × border alpha (evil-brush uses the full token)
@@ -907,13 +909,25 @@ function getLoadingData(points: number): number[] {
   return rows;
 }
 
-// A moving bell of alpha stops (sin² eased, 17 slots) that sweeps a tight sheen
-// through the skeleton fill. `center` in [0, 1] positions the band's peak.
+// The stacked skeleton: a full base wave, with every further ghost a thin band
+// hugging it — the silhouette of a stacked chart, not floating wires.
+function buildLoadingWaves(count: number, points: number): number[][] {
+  return Array.from({ length: count }, (_, i) =>
+    getLoadingData(points).map((v) => (i === 0 ? v : Math.round(v * LOADING_BAND_SCALE))),
+  );
+}
+
+// A wide, soft bell of alpha stops (sin² eased, 17 slots) that sweeps a sheen
+// through the skeleton fill. `center` may run outside [0, 1] so the sheen fully
+// enters and exits the frame instead of piling up at the edges.
 function shimmerStops(center: number, color: string) {
   return Array.from({ length: 17 }, (_, i) => {
     const offset = i / 16;
     const dist = Math.abs(offset - center);
-    const eased = dist >= 0.12 ? 0 : Math.sin((1 - dist / 0.12) * (Math.PI / 2)) ** 2;
+    const eased =
+      dist >= LOADING_SHIMMER_BAND
+        ? 0
+        : Math.sin((1 - dist / LOADING_SHIMMER_BAND) * (Math.PI / 2)) ** 2;
     return {
       offset,
       color: withAlpha(
@@ -1055,7 +1069,7 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
   const loadingWaves = useCallback(
     (count: number) => {
       if (!loadingDataRef.current || loadingDataRef.current.length !== count) {
-        loadingDataRef.current = Array.from({ length: count }, () => getLoadingData(loadingPoints));
+        loadingDataRef.current = buildLoadingWaves(count, loadingPoints);
       }
       return loadingDataRef.current;
     },
@@ -1861,18 +1875,21 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
       // Wrapped past 1 → the band is off-screen; swap in fresh random data.
       if (phase < lastPhase) {
         loadingDataRef.current =
-          loadingDataRef.current?.map(() => getLoadingData(loadingPoints)) ?? null;
+          buildLoadingWaves(loadingDataRef.current?.length ?? 1, loadingPoints);
       }
       lastPhase = phase;
 
       // Read tokens per frame, so a theme flip mid-loading retints the shimmer.
       const foreground = resolvedRef.current?.tokens.foreground ?? "rgba(120, 120, 120, 1)";
+      // Sweep from fully off-screen left to fully off-screen right, and lean the
+      // gradient diagonally — a vertical band reads as a scanline, not a sheen.
+      const center = phase * (1 + 2 * LOADING_SHIMMER_BAND) - LOADING_SHIMMER_BAND;
       const gradient = new echarts.graphic.LinearGradient(
         0,
         0,
         1,
-        0,
-        shimmerStops(phase, foreground),
+        0.55,
+        shimmerStops(center, foreground),
       );
       chart.setOption(
         {
