@@ -25,8 +25,11 @@ Help me understand how to use it. Be ready to explain concepts, give examples, o
 }
 
 const menuItems = {
-  markdown: (url: string) => (
-    <a href={`${url}.md`} target="_blank" rel="noopener noreferrer">
+  // Same-origin view — a RELATIVE href, so it works on localhost/previews too.
+  // The absolute SITE_URL would point at production, which may not have this
+  // page deployed yet. The AI links below genuinely want absolute prod URLs.
+  markdown: (_url: string, path: string) => (
+    <a href={`${path}.md`} target="_blank" rel="noopener noreferrer">
       <svg strokeLinejoin="round" viewBox="0 0 22 16">
         <path
           fillRule="evenodd"
@@ -135,7 +138,7 @@ const menuItems = {
   ),
 };
 
-export function DocsCopyPage({ mdx, url }: { mdx: string; url: string }) {
+export function DocsCopyPage({ mdx, url, path }: { mdx: string; url: string; path: string }) {
   const { copy, copied } = useClipboard();
 
   const trigger = (
@@ -171,7 +174,7 @@ export function DocsCopyPage({ mdx, url }: { mdx: string; url: string }) {
               <DropdownMenuItem
                 className="hover:bg-muted/50! text-muted-foreground/80 hover:text-primary! cursor-pointer text-[13px]"
                 key={key}
-                render={value(url)}
+                render={value(url, path)}
               />
             ))}
           </DropdownMenuContent>
