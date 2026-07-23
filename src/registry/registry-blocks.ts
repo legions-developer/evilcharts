@@ -59,4 +59,18 @@ export const blocks: Registry["items"] = [
       },
     ],
   },
+  {
+    name: "latency-echarts-area-chart",
+    description: "Latency percentile monitor with an HTML stat row, on the ECharts area chart",
+    dependencies: ["echarts", "motion"],
+    registryDependencies: ["@evilcharts/echarts-area-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "blocks/b-latency-echarts-area-chart.tsx",
+        type: "registry:block",
+        target: TARGET_BASE_PATH + "/latency-echarts-area-chart.tsx",
+      },
+    ],
+  },
 ];

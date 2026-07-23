@@ -4147,4 +4147,22 @@ export const Index: Record<string, any> = {
     categories: undefined,
     meta: undefined,
   },
+  "latency-echarts-area-chart": {
+    name: "latency-echarts-area-chart",
+    description: "Latency percentile monitor with an HTML stat row, on the ECharts area chart",
+    type: "registry:block",
+    registryDependencies: ["@evilcharts/echarts-area-chart"],
+    files: [{
+      path: "@/registry/blocks/b-latency-echarts-area-chart.tsx",
+      type: "registry:block",
+      target: "components/evilcharts/blocks/latency-echarts-area-chart.tsx"
+    }],
+    component: React.lazy(async () => {
+      const mod = await import("@/registry/blocks/b-latency-echarts-area-chart.tsx")
+      const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
+      return { default: mod.default || mod[exportName] }
+    }),
+    categories: undefined,
+    meta: undefined,
+  },
   }
