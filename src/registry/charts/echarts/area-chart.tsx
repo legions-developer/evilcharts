@@ -55,9 +55,9 @@ const AXIS_POINTER_OPACITY = 1; // tooltip cursor line, × border alpha
 // inside it exists (stroke + fill), everything outside is fully transparent,
 // like a clip-path sliding across the chart.
 const LOADING_STROKE_OPACITY = 0.5; // outline inside the window, × foreground alpha
-const LOADING_SHIMMER_MAX_OPACITY = 0.3; // fill inside the window, × foreground alpha
+const LOADING_SHIMMER_MAX_OPACITY = 0.18; // fill inside the window, × foreground alpha
 const LOADING_SHIMMER_BAND = 0.12; // window half-width, fraction of chart width
-const LOADING_SHIMMER_FEATHER = 0.04; // edge softening so the clip isn't aliased
+const LOADING_SHIMMER_FEATHER = 0.08; // eased edge softening of the clip window
 const BRUSH_STROKE_OPACITY = 0.5; // mini-chart series stroke
 const BRUSH_FILL_OPACITY = 0.15; // mini-chart series fade, at the top stop
 const BRUSH_BORDER_OPACITY = 1; // brush frame, × border alpha (evil-brush uses the full token)
@@ -922,7 +922,8 @@ function shimmerWindowStops(center: number, color: string, peak: number) {
     const dist = Math.abs(x - center);
     if (dist <= half - feather) return peak;
     if (dist >= half) return 0;
-    return peak * (1 - (dist - (half - feather)) / feather);
+    // Sine-eased falloff — a linear ramp still reads as a hard cut.
+    return peak * Math.sin(((1 - (dist - (half - feather)) / feather) * Math.PI) / 2);
   };
 
   const offsets = [
@@ -1283,7 +1284,8 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
       axisLine: { show: false },
       axisTick: { show: false },
       splitLine: {
-        show: showGrid,
+        // Hidden while loading — the skeleton floats on a clean canvas.
+        show: showGrid && !isLoading,
         lineStyle: { color: splitLineColor, type: [3, 3] as [number, number], width: 1 },
       },
       axisLabel: {
@@ -1886,8 +1888,9 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
       // right. Stroke and fill share it — only the wave section inside the
       // window exists, everything else is transparent.
       const center = phase * (1 + 2 * LOADING_SHIMMER_BAND) - LOADING_SHIMMER_BAND;
+      // 45° lean — the window travels along the diagonal, not as a vertical bar.
       const clip = (peak: number) =>
-        new echarts.graphic.LinearGradient(0, 0, 1, 0, shimmerWindowStops(center, foreground, peak));
+        new echarts.graphic.LinearGradient(0, 0, 1, 1, shimmerWindowStops(center, foreground, peak));
       chart.setOption(
         {
           series: [
