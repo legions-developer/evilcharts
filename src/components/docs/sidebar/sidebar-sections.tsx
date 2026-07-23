@@ -8,8 +8,8 @@ import {
 import { DEFAULT_PROVIDER, providerFromPathname } from "@/globals/constants/providers";
 import type { Root as PageTreeRoot } from "fumadocs-core/page-tree";
 import { RenderDefaultOptions } from "./render-default-options";
-import { flattenTree } from "fumadocs-core/page-tree";
 import { ProviderSwitcher } from "./provider-switcher";
+import { flattenTree } from "fumadocs-core/page-tree";
 import { usePathname } from "next/navigation";
 import { NavMain } from "./nav-main";
 import { useMemo } from "react";
@@ -36,7 +36,7 @@ export function SidebarSections({ tree }: { tree: PageTreeRoot }) {
 
   return (
     <>
-      <div className="px-2 pb-1 group-data-[collapsible=icon]:hidden">
+      <div className="px-2 group-data-[collapsible=icon]:hidden">
         <ProviderSwitcher existingUrls={existingUrls} />
       </div>
       <RenderDefaultOptions

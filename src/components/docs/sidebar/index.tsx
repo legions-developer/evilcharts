@@ -16,7 +16,7 @@ import * as React from "react";
 export function DocsSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader className="p-4 pt-6">
+      <SidebarHeader className="px-4 pt-6 pb-3">
         <EvilChartWordmark height="20" width="130" className="z-10" />
       </SidebarHeader>
       <SidebarContent className={cn("scroll-fade select-none", "pt-2 pb-14")}>

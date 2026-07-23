@@ -1,7 +1,7 @@
 "use client";
 
-import { Menu as DropdownMenuPrimitive } from "@base-ui/react/menu";
 import { CheckIcon, ChevronRightIcon, CircleIcon } from "lucide-react";
+import { Menu as DropdownMenuPrimitive } from "@base-ui/react/menu";
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
@@ -39,7 +39,7 @@ function DropdownMenuContent({
         <DropdownMenuPrimitive.Popup
           data-slot="dropdown-menu-content"
           className={cn(
-            "bg-popover text-popover-foreground transition ease-in-out data-starting-style:opacity-0 data-ending-style:opacity-0 data-starting-style:scale-95 data-ending-style:scale-95 data-[side=bottom]:data-starting-style:-translate-y-2 data-[side=left]:data-starting-style:translate-x-2 data-[side=right]:data-starting-style:-translate-x-2 data-[side=top]:data-starting-style:translate-y-2 z-50 max-h-(--available-height) min-w-32 origin-(--transform-origin) overflow-x-hidden overflow-y-auto rounded-md border p-1 shadow-md outline-none",
+            "bg-popover text-popover-foreground z-50 max-h-(--available-height) min-w-32 origin-(--transform-origin) overflow-x-hidden overflow-y-auto rounded-md border p-1 shadow-md transition ease-in-out outline-none data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0 data-[side=bottom]:data-starting-style:-translate-y-2 data-[side=left]:data-starting-style:translate-x-2 data-[side=right]:data-starting-style:-translate-x-2 data-[side=top]:data-starting-style:translate-y-2",
             className,
           )}
           {...props}
@@ -195,10 +195,7 @@ function DropdownMenuSubTrigger({
   );
 }
 
-function DropdownMenuSubContent({
-  className,
-  ...props
-}: DropdownMenuPrimitive.Popup.Props) {
+function DropdownMenuSubContent({ className, ...props }: DropdownMenuPrimitive.Popup.Props) {
   return (
     <DropdownMenuPrimitive.Portal>
       <DropdownMenuPrimitive.Positioner
@@ -211,7 +208,7 @@ function DropdownMenuSubContent({
         <DropdownMenuPrimitive.Popup
           data-slot="dropdown-menu-sub-content"
           className={cn(
-            "bg-popover text-popover-foreground transition ease-in-out data-starting-style:opacity-0 data-ending-style:opacity-0 data-starting-style:scale-95 data-ending-style:scale-95 data-[side=bottom]:data-starting-style:-translate-y-2 data-[side=left]:data-starting-style:translate-x-2 data-[side=right]:data-starting-style:-translate-x-2 data-[side=top]:data-starting-style:translate-y-2 z-50 min-w-32 origin-(--transform-origin) overflow-hidden rounded-md border p-1 shadow-lg outline-none",
+            "bg-popover text-popover-foreground z-50 min-w-32 origin-(--transform-origin) overflow-hidden rounded-md border p-1 shadow-lg transition ease-in-out outline-none data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0 data-[side=bottom]:data-starting-style:-translate-y-2 data-[side=left]:data-starting-style:translate-x-2 data-[side=right]:data-starting-style:-translate-x-2 data-[side=top]:data-starting-style:translate-y-2",
             className,
           )}
           {...props}

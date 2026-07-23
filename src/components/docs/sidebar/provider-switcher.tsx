@@ -9,36 +9,44 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  useSidebar,
-} from "@/components/ui/sidebar";
-import {
   DEFAULT_PROVIDER,
-  PROVIDERS,
   PROVIDER_META,
   providerFromPathname,
   providerHref,
   type Provider,
 } from "@/globals/constants/providers";
+import {
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  useSidebar,
+} from "@/components/ui/sidebar";
 import { CheckIcon, EChartsIcon, ReactIcon } from "@/assets/icons";
-import { CaretDown } from "@carbon/icons-react";
 import { usePathname, useRouter } from "next/navigation";
+import { CaretDown } from "@carbon/icons-react";
 import { cn } from "@/lib/utils";
 
-// Each engine wears its own mark: Recharts renders through React, so it gets the
-// React logo; ECharts gets Apache's. Both inherit currentColor, matching every
-// other icon in the sidebar.
+// Each engine wears its own mark in its own brand color: Recharts renders
+// through React, so it gets the React logo in React blue; ECharts gets
+// Apache's mark in its red.
 const PROVIDER_ICONS: Record<Provider, React.ComponentType<{ className?: string }>> = {
-  recharts: ReactIcon,
   echarts: EChartsIcon,
+  recharts: ReactIcon,
 };
+
+const PROVIDER_TINT: Record<Provider, string> = {
+  echarts: "text-[#E43861]",
+  recharts: "text-[#60DAFB]",
+};
+
+// Menu display order only — PROVIDERS' order elsewhere (redirect regexes,
+// llms.txt sections) is intentionally untouched.
+const MENU_ORDER: Provider[] = ["echarts", "recharts"];
 
 function ProviderIcon({ provider, className }: { provider: Provider; className?: string }) {
   const Icon = PROVIDER_ICONS[provider];
 
-  return <Icon className={className} aria-hidden="true" />;
+  return <Icon className={cn(PROVIDER_TINT[provider], className)} aria-hidden="true" />;
 }
 
 export function ProviderSwitcher({ existingUrls }: { existingUrls: Set<string> }) {
@@ -87,8 +95,8 @@ export function ProviderSwitcher({ existingUrls }: { existingUrls: Set<string> }
               />
             }
           >
-            <ProviderIcon provider={displayed.id} className="size-5!" />
-            <div className="grid flex-1 text-left leading-tight">
+            <ProviderIcon provider={displayed.id} className="size-7!" />
+            <div className="ml-0.5 grid flex-1 text-left leading-tight">
               <span className="truncate text-sm font-medium">{displayed.name}</span>
               <span className="text-muted-foreground truncate text-[11px]">
                 {displayed.tagline}
@@ -100,13 +108,13 @@ export function ProviderSwitcher({ existingUrls }: { existingUrls: Set<string> }
             align="start"
             side="bottom"
             sideOffset={4}
-            className="w-(--anchor-width)"
+            className="bg-background w-(--anchor-width)"
           >
             <DropdownMenuGroup>
               <DropdownMenuLabel className="text-muted-foreground text-xs">
                 Rendering engine
               </DropdownMenuLabel>
-              {PROVIDERS.map((id) => {
+              {MENU_ORDER.map((id) => {
                 const meta = PROVIDER_META[id];
                 const isActive = activeProvider === id;
 
@@ -116,8 +124,8 @@ export function ProviderSwitcher({ existingUrls }: { existingUrls: Set<string> }
                     onClick={() => selectProvider(id)}
                     className="gap-2 p-2"
                   >
-                    <ProviderIcon provider={id} className="size-5!" />
-                    <div className="grid flex-1 leading-tight">
+                    <ProviderIcon provider={id} className="size-6!" />
+                    <div className="ml-0.5 grid flex-1 leading-tight">
                       <span className="flex items-center gap-1.5 text-sm">
                         {meta.name}
                         {!meta.available && (
