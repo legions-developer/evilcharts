@@ -51,13 +51,14 @@ const LOADING_DEFAULT_POINTS = 14;
 // the same apparent brightness.
 const GRID_LINE_OPACITY = 1; // dashed y-axis split lines, × border alpha
 const AXIS_POINTER_OPACITY = 1; // tooltip cursor line, × border alpha
-const LOADING_STROKE_OPACITY = 0.28; // skeleton outline, × foreground alpha
-// Outside the sheen the fill is near-invisible — the band reads as a contained,
-// clipped glint passing through (Recharts masks its fill the same way), not a
-// permanent glow flooding the plot.
-const LOADING_FILL_OPACITY = 0.035; // skeleton resting fill, × foreground alpha
-const LOADING_SHIMMER_MAX_OPACITY = 0.3; // shimmer sheen peak, × foreground alpha
-const LOADING_SHIMMER_BAND = 0.18; // sheen half-width, fraction of chart width
+// The Recharts skeleton MASKS the whole loading area with the moving band:
+// line and fill exist only inside the sheen and vanish outside it. The canvas
+// equivalent sweeps the same alpha bell through BOTH the stroke and the fill.
+const LOADING_STROKE_BASE_OPACITY = 0.06; // outline outside the sheen, × foreground alpha
+const LOADING_STROKE_OPACITY = 0.45; // outline at the sheen's peak, × foreground alpha
+const LOADING_FILL_BASE_OPACITY = 0.02; // fill outside the sheen, × foreground alpha
+const LOADING_SHIMMER_MAX_OPACITY = 0.28; // fill at the sheen's peak, × foreground alpha
+const LOADING_SHIMMER_BAND = 0.22; // sheen half-width, fraction of chart width
 const BRUSH_STROKE_OPACITY = 0.5; // mini-chart series stroke
 const BRUSH_FILL_OPACITY = 0.15; // mini-chart series fade, at the top stop
 const BRUSH_BORDER_OPACITY = 1; // brush frame, × border alpha (evil-brush uses the full token)
@@ -911,10 +912,10 @@ function getLoadingData(points: number): number[] {
   return rows;
 }
 
-// A wide, soft bell of alpha stops (sin² eased, 17 slots) that sweeps a sheen
-// through the skeleton fill. `center` may run outside [0, 1] so the sheen fully
+// A soft bell of alpha stops (sin² eased, 17 slots) between `base` and `peak`,
+// centred on the sheen. `center` may run outside [0, 1] so the sheen fully
 // enters and exits the frame instead of piling up at the edges.
-function shimmerStops(center: number, color: string) {
+function shimmerStops(center: number, color: string, base: number, peak: number) {
   return Array.from({ length: 17 }, (_, i) => {
     const offset = i / 16;
     const dist = Math.abs(offset - center);
@@ -922,13 +923,7 @@ function shimmerStops(center: number, color: string) {
       dist >= LOADING_SHIMMER_BAND
         ? 0
         : Math.sin((1 - dist / LOADING_SHIMMER_BAND) * (Math.PI / 2)) ** 2;
-    return {
-      offset,
-      color: withAlpha(
-        color,
-        LOADING_FILL_OPACITY + eased * (LOADING_SHIMMER_MAX_OPACITY - LOADING_FILL_OPACITY),
-      ),
-    };
+    return { offset, color: withAlpha(color, base + eased * (peak - base)) };
   });
 }
 
@@ -1432,8 +1427,8 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
             step: curve.step,
             showSymbol: false,
             silent: true,
-            lineStyle: { color: tokens.foreground, width: 1, opacity: LOADING_STROKE_OPACITY },
-            areaStyle: { color: withAlpha(tokens.foreground, LOADING_FILL_OPACITY) },
+            lineStyle: { color: withAlpha(tokens.foreground, LOADING_STROKE_BASE_OPACITY), width: 1 },
+            areaStyle: { color: withAlpha(tokens.foreground, LOADING_FILL_BASE_OPACITY) },
             z: 1,
           },
         ],
@@ -1869,16 +1864,27 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
       const foreground = resolvedRef.current?.tokens.foreground ?? "rgba(120, 120, 120, 1)";
       // Sweep from fully off-screen left to fully off-screen right, and lean the
       // gradient diagonally — a vertical band reads as a scanline, not a sheen.
+      // BOTH stroke and fill ride the bell: outside the band the wave all but
+      // vanishes, so the sheen acts as the mask window, like the Recharts twin.
       const center = phase * (1 + 2 * LOADING_SHIMMER_BAND) - LOADING_SHIMMER_BAND;
-      const gradient = new echarts.graphic.LinearGradient(
-        0,
-        0,
-        1,
-        0.55,
-        shimmerStops(center, foreground),
-      );
+      const sheen = (base: number, peak: number) =>
+        new echarts.graphic.LinearGradient(0, 0, 1, 0.55, shimmerStops(center, foreground, base, peak));
       chart.setOption(
-        { series: [{ id: "__loading", data: loadingData(), areaStyle: { color: gradient } }] },
+        {
+          series: [
+            {
+              id: "__loading",
+              data: loadingData(),
+              lineStyle: {
+                color: sheen(LOADING_STROKE_BASE_OPACITY, LOADING_STROKE_OPACITY),
+                width: 1,
+              },
+              areaStyle: {
+                color: sheen(LOADING_FILL_BASE_OPACITY, LOADING_SHIMMER_MAX_OPACITY),
+              },
+            },
+          ],
+        },
         { silent: true, lazyUpdate: true },
       );
       raf = requestAnimationFrame(tick);
