@@ -12,6 +12,7 @@ Deep context documents for specific subsystems live in `.contexts/` — read `.c
 
 - Always use Fable for main task/research and use opus 4.8 model for subagents/workflows always.
 - if message contains any link to urls, and according to message you need context or data from url, then use Firecrawl MCP (only use if its available else proceed with default method)
+- agent-browser screenshots are temp files — NEVER commit or push them. Save them to the session scratchpad (not the repo); if one lands in the repo, delete it right after reading it, and always sweep for stray images before any commit/push.
 
 ## Commands
 
