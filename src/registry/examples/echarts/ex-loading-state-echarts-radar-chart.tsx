@@ -8,7 +8,7 @@ import {
   Tooltip,
   Legend,
   type ChartConfig,
-} from "@/registry/charts/echarts/radar-chart";
+} from "@/registry/charts/echarts-radar-chart";
 
 const chartConfig = {
   desktop: {

@@ -10,7 +10,7 @@ import {
   Dot,
   ActiveDot,
   type ChartConfig,
-} from "@/registry/charts/echarts/radar-chart";
+} from "@/registry/charts/echarts-radar-chart";
 
 const data = [
   { skill: "JavaScript", desktop: 186, mobile: 80 },

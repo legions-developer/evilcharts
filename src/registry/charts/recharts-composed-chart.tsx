@@ -29,16 +29,16 @@ import {
   getColorsCount,
   getLoadingData,
   LoadingIndicator,
-} from "@/registry/ui/recharts/chart";
+} from "@/registry/ui/recharts-chart";
 import {
   ChartTooltip,
   ChartTooltipContent,
   type TooltipRoundness,
   type TooltipVariant,
-} from "@/registry/ui/recharts/tooltip";
-import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/recharts/legend";
-import { EvilBrush, useEvilBrush, type EvilBrushRange } from "@/registry/ui/recharts/evil-brush";
-import { ChartDot, type DotVariant } from "@/registry/ui/recharts/dot";
+} from "@/registry/ui/recharts-tooltip";
+import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/recharts-legend";
+import { EvilBrush, useEvilBrush, type EvilBrushRange } from "@/registry/ui/recharts-brush";
+import { ChartDot, type DotVariant } from "@/registry/ui/recharts-dot";
 import { motion, useReducedMotion } from "motion/react";
 
 // Constants

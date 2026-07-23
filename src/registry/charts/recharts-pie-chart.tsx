@@ -26,15 +26,15 @@ import {
   ChartTooltipContent,
   type TooltipRoundness,
   type TooltipVariant,
-} from "@/registry/ui/recharts/tooltip";
+} from "@/registry/ui/recharts-tooltip";
 import {
   type ChartConfig,
   ChartContainer,
   getColorsCount,
   LoadingIndicator,
-} from "@/registry/ui/recharts/chart";
-import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/recharts/legend";
-import { ChartBackground, type BackgroundVariant } from "@/registry/ui/recharts/background";
+} from "@/registry/ui/recharts-chart";
+import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/recharts-legend";
+import { ChartBackground, type BackgroundVariant } from "@/registry/ui/recharts-background";
 import { motion } from "motion/react";
 
 // Constants

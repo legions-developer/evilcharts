@@ -9,9 +9,9 @@ export const ui: Registry["items"] = [
     dependencies: ["recharts"],
     files: [
       {
-        path: "ui/recharts/chart.tsx",
+        path: "ui/recharts-chart.tsx",
         type: "registry:component",
-        target: TARGET_BASE_PATH + "/recharts/chart.tsx",
+        target: TARGET_BASE_PATH + "/recharts-chart.tsx",
       },
     ],
   },
@@ -21,9 +21,9 @@ export const ui: Registry["items"] = [
     dependencies: ["recharts"],
     files: [
       {
-        path: "ui/recharts/tooltip.tsx",
+        path: "ui/recharts-tooltip.tsx",
         type: "registry:component",
-        target: TARGET_BASE_PATH + "/recharts/tooltip.tsx",
+        target: TARGET_BASE_PATH + "/recharts-tooltip.tsx",
       },
     ],
   },
@@ -33,9 +33,9 @@ export const ui: Registry["items"] = [
     dependencies: ["recharts"],
     files: [
       {
-        path: "ui/recharts/legend.tsx",
+        path: "ui/recharts-legend.tsx",
         type: "registry:component",
-        target: TARGET_BASE_PATH + "/recharts/legend.tsx",
+        target: TARGET_BASE_PATH + "/recharts-legend.tsx",
       },
     ],
   },
@@ -45,9 +45,9 @@ export const ui: Registry["items"] = [
     dependencies: ["recharts"],
     files: [
       {
-        path: "ui/recharts/dot.tsx",
+        path: "ui/recharts-dot.tsx",
         type: "registry:component",
-        target: TARGET_BASE_PATH + "/recharts/dot.tsx",
+        target: TARGET_BASE_PATH + "/recharts-dot.tsx",
       },
     ],
   },
@@ -58,9 +58,9 @@ export const ui: Registry["items"] = [
     dependencies: ["recharts"],
     files: [
       {
-        path: "ui/recharts/evil-brush.tsx",
+        path: "ui/recharts-brush.tsx",
         type: "registry:component",
-        target: TARGET_BASE_PATH + "/recharts/evil-brush.tsx",
+        target: TARGET_BASE_PATH + "/recharts-brush.tsx",
       },
     ],
   },
@@ -70,9 +70,9 @@ export const ui: Registry["items"] = [
     dependencies: ["recharts"],
     files: [
       {
-        path: "ui/recharts/background.tsx",
+        path: "ui/recharts-background.tsx",
         type: "registry:component",
-        target: TARGET_BASE_PATH + "/recharts/background.tsx",
+        target: TARGET_BASE_PATH + "/recharts-background.tsx",
       },
     ],
   },
@@ -85,9 +85,9 @@ export const ui: Registry["items"] = [
     dependencies: ["echarts"],
     files: [
       {
-        path: "ui/echarts/chart.tsx",
+        path: "ui/echarts-chart.tsx",
         type: "registry:component",
-        target: TARGET_BASE_PATH + "/echarts/chart.tsx",
+        target: TARGET_BASE_PATH + "/echarts-chart.tsx",
       },
     ],
   },
@@ -98,9 +98,9 @@ export const ui: Registry["items"] = [
     registryDependencies: ["@evilcharts/echarts-chart"],
     files: [
       {
-        path: "ui/echarts/tooltip.tsx",
+        path: "ui/echarts-tooltip.tsx",
         type: "registry:component",
-        target: TARGET_BASE_PATH + "/echarts/tooltip.tsx",
+        target: TARGET_BASE_PATH + "/echarts-tooltip.tsx",
       },
     ],
   },
@@ -110,9 +110,9 @@ export const ui: Registry["items"] = [
     registryDependencies: ["@evilcharts/echarts-chart"],
     files: [
       {
-        path: "ui/echarts/legend.tsx",
+        path: "ui/echarts-legend.tsx",
         type: "registry:component",
-        target: TARGET_BASE_PATH + "/echarts/legend.tsx",
+        target: TARGET_BASE_PATH + "/echarts-legend.tsx",
       },
     ],
   },
@@ -122,9 +122,9 @@ export const ui: Registry["items"] = [
     dependencies: ["echarts"],
     files: [
       {
-        path: "ui/echarts/dot.tsx",
+        path: "ui/echarts-dot.tsx",
         type: "registry:component",
-        target: TARGET_BASE_PATH + "/echarts/dot.tsx",
+        target: TARGET_BASE_PATH + "/echarts-dot.tsx",
       },
     ],
   },
@@ -135,9 +135,9 @@ export const ui: Registry["items"] = [
     registryDependencies: ["@evilcharts/echarts-chart"],
     files: [
       {
-        path: "ui/echarts/evil-brush.tsx",
+        path: "ui/echarts-brush.tsx",
         type: "registry:component",
-        target: TARGET_BASE_PATH + "/echarts/evil-brush.tsx",
+        target: TARGET_BASE_PATH + "/echarts-brush.tsx",
       },
     ],
   },

@@ -27,16 +27,16 @@ import {
   ChartTooltipContent,
   type TooltipRoundness,
   type TooltipVariant,
-} from "@/registry/ui/recharts/tooltip";
+} from "@/registry/ui/recharts-tooltip";
 import {
   type ChartConfig,
   ChartContainer,
   getColorsCount,
   LoadingIndicator,
-} from "@/registry/ui/recharts/chart";
-import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/recharts/legend";
-import { ChartBackground, type BackgroundVariant } from "@/registry/ui/recharts/background";
-import { ChartDot, type DotVariant } from "@/registry/ui/recharts/dot";
+} from "@/registry/ui/recharts-chart";
+import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/recharts-legend";
+import { ChartBackground, type BackgroundVariant } from "@/registry/ui/recharts-background";
+import { ChartDot, type DotVariant } from "@/registry/ui/recharts-dot";
 
 // Constants
 const STROKE_WIDTH = 1;

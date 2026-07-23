@@ -7,7 +7,7 @@ import {
   Tooltip,
   type SankeyData,
   type ChartConfig,
-} from "@/registry/charts/echarts/sankey-chart";
+} from "@/registry/charts/echarts-sankey-chart";
 
 // Data pipeline - sources through processing to destinations
 const data: SankeyData = {

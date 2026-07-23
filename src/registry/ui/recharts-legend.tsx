@@ -1,4 +1,4 @@
-import { getPayloadConfigFromPayload, getColorsCount, useChart } from "@/registry/ui/recharts/chart";
+import { getPayloadConfigFromPayload, getColorsCount, useChart } from "@/registry/ui/recharts-chart";
 import * as RechartsPrimitive from "recharts";
 import { cn } from "@/lib/utils";
 import * as React from "react";

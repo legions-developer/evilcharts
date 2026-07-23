@@ -6,7 +6,7 @@ import {
   getColorsCount,
   getLoadingData,
   LoadingIndicator,
-} from "@/registry/ui/recharts/chart";
+} from "@/registry/ui/recharts-chart";
 import {
   CartesianGrid,
   Curve,
@@ -21,10 +21,10 @@ import {
   ChartTooltipContent,
   type TooltipRoundness,
   type TooltipVariant,
-} from "@/registry/ui/recharts/tooltip";
-import { EvilBrush, useEvilBrush, type EvilBrushRange } from "@/registry/ui/recharts/evil-brush";
-import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/recharts/legend";
-import { ChartDot, type DotVariant } from "@/registry/ui/recharts/dot";
+} from "@/registry/ui/recharts-tooltip";
+import { EvilBrush, useEvilBrush, type EvilBrushRange } from "@/registry/ui/recharts-brush";
+import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/recharts-legend";
+import { ChartDot, type DotVariant } from "@/registry/ui/recharts-dot";
 import {
   Children,
   createContext,

@@ -7,7 +7,7 @@ import {
   Tooltip,
   type SankeyData,
   type ChartConfig,
-} from "@/registry/charts/echarts/sankey-chart";
+} from "@/registry/charts/echarts-sankey-chart";
 
 // E-commerce journey - traffic to purchase
 const data: SankeyData = {

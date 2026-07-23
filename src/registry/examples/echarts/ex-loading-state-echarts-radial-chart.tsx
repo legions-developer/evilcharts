@@ -6,7 +6,7 @@ import {
   Tooltip,
   Legend,
   type ChartConfig,
-} from "@/registry/charts/echarts/radial-chart";
+} from "@/registry/charts/echarts-radial-chart";
 
 const data = [
   { browser: "chrome", visitors: 275 },

@@ -1,6 +1,6 @@
 "use client";
 
-import { type ChartConfig, ChartContainer } from "@/registry/ui/recharts/chart";
+import { type ChartConfig, ChartContainer } from "@/registry/ui/recharts-chart";
 import { Bar, BarChart, Rectangle, XAxis } from "recharts";
 import { motion, AnimatePresence } from "motion/react";
 

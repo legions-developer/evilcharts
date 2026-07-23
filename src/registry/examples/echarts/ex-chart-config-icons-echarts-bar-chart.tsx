@@ -8,7 +8,7 @@ import {
   Tooltip,
   Legend,
   type ChartConfig,
-} from "@/registry/charts/echarts/bar-chart";
+} from "@/registry/charts/echarts-bar-chart";
 import { Monitor, Smartphone } from "lucide-react";
 
 const data = [

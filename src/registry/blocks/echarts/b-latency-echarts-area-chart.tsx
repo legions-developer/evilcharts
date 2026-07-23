@@ -8,7 +8,7 @@ import {
   XAxis,
   YAxis,
   type ChartConfig,
-} from "@/registry/charts/echarts/area-chart";
+} from "@/registry/charts/echarts-area-chart";
 import { useState } from "react";
 
 // One palette for both themes — dashboard colors that hold up on light and dark.

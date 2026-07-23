@@ -13,12 +13,12 @@ export const Index: Record<string, any> = {
     type: "registry:component",
     registryDependencies: undefined,
     files: [{
-      path: "@/registry/ui/recharts/chart.tsx",
+      path: "@/registry/ui/recharts-chart.tsx",
       type: "registry:component",
-      target: "components/evilcharts/ui/recharts/chart.tsx"
+      target: "components/evilcharts/ui/recharts-chart.tsx"
     }],
     component: React.lazy(async () => {
-      const mod = await import("@/registry/ui/recharts/chart.tsx")
+      const mod = await import("@/registry/ui/recharts-chart.tsx")
       const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
       return { default: mod.default || mod[exportName] }
     }),
@@ -31,12 +31,12 @@ export const Index: Record<string, any> = {
     type: "registry:component",
     registryDependencies: undefined,
     files: [{
-      path: "@/registry/ui/recharts/tooltip.tsx",
+      path: "@/registry/ui/recharts-tooltip.tsx",
       type: "registry:component",
-      target: "components/evilcharts/ui/recharts/tooltip.tsx"
+      target: "components/evilcharts/ui/recharts-tooltip.tsx"
     }],
     component: React.lazy(async () => {
-      const mod = await import("@/registry/ui/recharts/tooltip.tsx")
+      const mod = await import("@/registry/ui/recharts-tooltip.tsx")
       const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
       return { default: mod.default || mod[exportName] }
     }),
@@ -49,12 +49,12 @@ export const Index: Record<string, any> = {
     type: "registry:component",
     registryDependencies: undefined,
     files: [{
-      path: "@/registry/ui/recharts/legend.tsx",
+      path: "@/registry/ui/recharts-legend.tsx",
       type: "registry:component",
-      target: "components/evilcharts/ui/recharts/legend.tsx"
+      target: "components/evilcharts/ui/recharts-legend.tsx"
     }],
     component: React.lazy(async () => {
-      const mod = await import("@/registry/ui/recharts/legend.tsx")
+      const mod = await import("@/registry/ui/recharts-legend.tsx")
       const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
       return { default: mod.default || mod[exportName] }
     }),
@@ -67,12 +67,12 @@ export const Index: Record<string, any> = {
     type: "registry:component",
     registryDependencies: undefined,
     files: [{
-      path: "@/registry/ui/recharts/dot.tsx",
+      path: "@/registry/ui/recharts-dot.tsx",
       type: "registry:component",
-      target: "components/evilcharts/ui/recharts/dot.tsx"
+      target: "components/evilcharts/ui/recharts-dot.tsx"
     }],
     component: React.lazy(async () => {
-      const mod = await import("@/registry/ui/recharts/dot.tsx")
+      const mod = await import("@/registry/ui/recharts-dot.tsx")
       const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
       return { default: mod.default || mod[exportName] }
     }),
@@ -85,12 +85,12 @@ export const Index: Record<string, any> = {
     type: "registry:component",
     registryDependencies: ["@evilcharts/recharts-chart"],
     files: [{
-      path: "@/registry/ui/recharts/evil-brush.tsx",
+      path: "@/registry/ui/recharts-brush.tsx",
       type: "registry:component",
-      target: "components/evilcharts/ui/recharts/evil-brush.tsx"
+      target: "components/evilcharts/ui/recharts-brush.tsx"
     }],
     component: React.lazy(async () => {
-      const mod = await import("@/registry/ui/recharts/evil-brush.tsx")
+      const mod = await import("@/registry/ui/recharts-brush.tsx")
       const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
       return { default: mod.default || mod[exportName] }
     }),
@@ -103,12 +103,12 @@ export const Index: Record<string, any> = {
     type: "registry:component",
     registryDependencies: undefined,
     files: [{
-      path: "@/registry/ui/recharts/background.tsx",
+      path: "@/registry/ui/recharts-background.tsx",
       type: "registry:component",
-      target: "components/evilcharts/ui/recharts/background.tsx"
+      target: "components/evilcharts/ui/recharts-background.tsx"
     }],
     component: React.lazy(async () => {
-      const mod = await import("@/registry/ui/recharts/background.tsx")
+      const mod = await import("@/registry/ui/recharts-background.tsx")
       const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
       return { default: mod.default || mod[exportName] }
     }),
@@ -121,12 +121,12 @@ export const Index: Record<string, any> = {
     type: "registry:component",
     registryDependencies: undefined,
     files: [{
-      path: "@/registry/ui/echarts/chart.tsx",
+      path: "@/registry/ui/echarts-chart.tsx",
       type: "registry:component",
-      target: "components/evilcharts/ui/echarts/chart.tsx"
+      target: "components/evilcharts/ui/echarts-chart.tsx"
     }],
     component: React.lazy(async () => {
-      const mod = await import("@/registry/ui/echarts/chart.tsx")
+      const mod = await import("@/registry/ui/echarts-chart.tsx")
       const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
       return { default: mod.default || mod[exportName] }
     }),
@@ -139,12 +139,12 @@ export const Index: Record<string, any> = {
     type: "registry:component",
     registryDependencies: ["@evilcharts/echarts-chart"],
     files: [{
-      path: "@/registry/ui/echarts/tooltip.tsx",
+      path: "@/registry/ui/echarts-tooltip.tsx",
       type: "registry:component",
-      target: "components/evilcharts/ui/echarts/tooltip.tsx"
+      target: "components/evilcharts/ui/echarts-tooltip.tsx"
     }],
     component: React.lazy(async () => {
-      const mod = await import("@/registry/ui/echarts/tooltip.tsx")
+      const mod = await import("@/registry/ui/echarts-tooltip.tsx")
       const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
       return { default: mod.default || mod[exportName] }
     }),
@@ -157,12 +157,12 @@ export const Index: Record<string, any> = {
     type: "registry:component",
     registryDependencies: ["@evilcharts/echarts-chart"],
     files: [{
-      path: "@/registry/ui/echarts/legend.tsx",
+      path: "@/registry/ui/echarts-legend.tsx",
       type: "registry:component",
-      target: "components/evilcharts/ui/echarts/legend.tsx"
+      target: "components/evilcharts/ui/echarts-legend.tsx"
     }],
     component: React.lazy(async () => {
-      const mod = await import("@/registry/ui/echarts/legend.tsx")
+      const mod = await import("@/registry/ui/echarts-legend.tsx")
       const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
       return { default: mod.default || mod[exportName] }
     }),
@@ -175,12 +175,12 @@ export const Index: Record<string, any> = {
     type: "registry:component",
     registryDependencies: undefined,
     files: [{
-      path: "@/registry/ui/echarts/dot.tsx",
+      path: "@/registry/ui/echarts-dot.tsx",
       type: "registry:component",
-      target: "components/evilcharts/ui/echarts/dot.tsx"
+      target: "components/evilcharts/ui/echarts-dot.tsx"
     }],
     component: React.lazy(async () => {
-      const mod = await import("@/registry/ui/echarts/dot.tsx")
+      const mod = await import("@/registry/ui/echarts-dot.tsx")
       const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
       return { default: mod.default || mod[exportName] }
     }),
@@ -193,12 +193,12 @@ export const Index: Record<string, any> = {
     type: "registry:component",
     registryDependencies: ["@evilcharts/echarts-chart"],
     files: [{
-      path: "@/registry/ui/echarts/evil-brush.tsx",
+      path: "@/registry/ui/echarts-brush.tsx",
       type: "registry:component",
-      target: "components/evilcharts/ui/echarts/evil-brush.tsx"
+      target: "components/evilcharts/ui/echarts-brush.tsx"
     }],
     component: React.lazy(async () => {
-      const mod = await import("@/registry/ui/echarts/evil-brush.tsx")
+      const mod = await import("@/registry/ui/echarts-brush.tsx")
       const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
       return { default: mod.default || mod[exportName] }
     }),
@@ -211,12 +211,12 @@ export const Index: Record<string, any> = {
     type: "registry:component",
     registryDependencies: ["@evilcharts/echarts-chart","@evilcharts/echarts-tooltip","@evilcharts/echarts-legend","@evilcharts/echarts-dot","@evilcharts/echarts-brush"],
     files: [{
-      path: "@/registry/charts/echarts/area-chart.tsx",
+      path: "@/registry/charts/echarts-area-chart.tsx",
       type: "registry:component",
-      target: "components/evilcharts/charts/echarts/area-chart.tsx"
+      target: "components/evilcharts/charts/echarts-area-chart.tsx"
     }],
     component: React.lazy(async () => {
-      const mod = await import("@/registry/charts/echarts/area-chart.tsx")
+      const mod = await import("@/registry/charts/echarts-area-chart.tsx")
       const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
       return { default: mod.default || mod[exportName] }
     }),
@@ -229,12 +229,12 @@ export const Index: Record<string, any> = {
     type: "registry:component",
     registryDependencies: ["@evilcharts/echarts-chart","@evilcharts/echarts-dot","@evilcharts/echarts-tooltip","@evilcharts/echarts-legend","@evilcharts/echarts-brush"],
     files: [{
-      path: "@/registry/charts/echarts/line-chart.tsx",
+      path: "@/registry/charts/echarts-line-chart.tsx",
       type: "registry:component",
-      target: "components/evilcharts/charts/echarts/line-chart.tsx"
+      target: "components/evilcharts/charts/echarts-line-chart.tsx"
     }],
     component: React.lazy(async () => {
-      const mod = await import("@/registry/charts/echarts/line-chart.tsx")
+      const mod = await import("@/registry/charts/echarts-line-chart.tsx")
       const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
       return { default: mod.default || mod[exportName] }
     }),
@@ -247,12 +247,12 @@ export const Index: Record<string, any> = {
     type: "registry:component",
     registryDependencies: ["@evilcharts/echarts-chart","@evilcharts/echarts-tooltip","@evilcharts/echarts-dot","@evilcharts/echarts-legend","@evilcharts/echarts-brush"],
     files: [{
-      path: "@/registry/charts/echarts/bar-chart.tsx",
+      path: "@/registry/charts/echarts-bar-chart.tsx",
       type: "registry:component",
-      target: "components/evilcharts/charts/echarts/bar-chart.tsx"
+      target: "components/evilcharts/charts/echarts-bar-chart.tsx"
     }],
     component: React.lazy(async () => {
-      const mod = await import("@/registry/charts/echarts/bar-chart.tsx")
+      const mod = await import("@/registry/charts/echarts-bar-chart.tsx")
       const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
       return { default: mod.default || mod[exportName] }
     }),
@@ -265,12 +265,12 @@ export const Index: Record<string, any> = {
     type: "registry:component",
     registryDependencies: ["@evilcharts/echarts-chart","@evilcharts/echarts-tooltip","@evilcharts/echarts-dot","@evilcharts/echarts-legend","@evilcharts/echarts-brush"],
     files: [{
-      path: "@/registry/charts/echarts/composed-chart.tsx",
+      path: "@/registry/charts/echarts-composed-chart.tsx",
       type: "registry:component",
-      target: "components/evilcharts/charts/echarts/composed-chart.tsx"
+      target: "components/evilcharts/charts/echarts-composed-chart.tsx"
     }],
     component: React.lazy(async () => {
-      const mod = await import("@/registry/charts/echarts/composed-chart.tsx")
+      const mod = await import("@/registry/charts/echarts-composed-chart.tsx")
       const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
       return { default: mod.default || mod[exportName] }
     }),
@@ -283,12 +283,12 @@ export const Index: Record<string, any> = {
     type: "registry:component",
     registryDependencies: ["@evilcharts/echarts-chart","@evilcharts/echarts-tooltip","@evilcharts/echarts-dot","@evilcharts/echarts-legend"],
     files: [{
-      path: "@/registry/charts/echarts/radar-chart.tsx",
+      path: "@/registry/charts/echarts-radar-chart.tsx",
       type: "registry:component",
-      target: "components/evilcharts/charts/echarts/radar-chart.tsx"
+      target: "components/evilcharts/charts/echarts-radar-chart.tsx"
     }],
     component: React.lazy(async () => {
-      const mod = await import("@/registry/charts/echarts/radar-chart.tsx")
+      const mod = await import("@/registry/charts/echarts-radar-chart.tsx")
       const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
       return { default: mod.default || mod[exportName] }
     }),
@@ -301,12 +301,12 @@ export const Index: Record<string, any> = {
     type: "registry:component",
     registryDependencies: ["@evilcharts/echarts-chart","@evilcharts/echarts-tooltip","@evilcharts/echarts-legend"],
     files: [{
-      path: "@/registry/charts/echarts/pie-chart.tsx",
+      path: "@/registry/charts/echarts-pie-chart.tsx",
       type: "registry:component",
-      target: "components/evilcharts/charts/echarts/pie-chart.tsx"
+      target: "components/evilcharts/charts/echarts-pie-chart.tsx"
     }],
     component: React.lazy(async () => {
-      const mod = await import("@/registry/charts/echarts/pie-chart.tsx")
+      const mod = await import("@/registry/charts/echarts-pie-chart.tsx")
       const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
       return { default: mod.default || mod[exportName] }
     }),
@@ -319,12 +319,12 @@ export const Index: Record<string, any> = {
     type: "registry:component",
     registryDependencies: ["@evilcharts/echarts-chart","@evilcharts/echarts-tooltip","@evilcharts/echarts-legend"],
     files: [{
-      path: "@/registry/charts/echarts/radial-chart.tsx",
+      path: "@/registry/charts/echarts-radial-chart.tsx",
       type: "registry:component",
-      target: "components/evilcharts/charts/echarts/radial-chart.tsx"
+      target: "components/evilcharts/charts/echarts-radial-chart.tsx"
     }],
     component: React.lazy(async () => {
-      const mod = await import("@/registry/charts/echarts/radial-chart.tsx")
+      const mod = await import("@/registry/charts/echarts-radial-chart.tsx")
       const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
       return { default: mod.default || mod[exportName] }
     }),
@@ -337,12 +337,12 @@ export const Index: Record<string, any> = {
     type: "registry:component",
     registryDependencies: ["@evilcharts/echarts-chart","@evilcharts/echarts-tooltip","@evilcharts/echarts-dot"],
     files: [{
-      path: "@/registry/charts/echarts/sankey-chart.tsx",
+      path: "@/registry/charts/echarts-sankey-chart.tsx",
       type: "registry:component",
-      target: "components/evilcharts/charts/echarts/sankey-chart.tsx"
+      target: "components/evilcharts/charts/echarts-sankey-chart.tsx"
     }],
     component: React.lazy(async () => {
-      const mod = await import("@/registry/charts/echarts/sankey-chart.tsx")
+      const mod = await import("@/registry/charts/echarts-sankey-chart.tsx")
       const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
       return { default: mod.default || mod[exportName] }
     }),
@@ -355,12 +355,12 @@ export const Index: Record<string, any> = {
     type: "registry:component",
     registryDependencies: ["@evilcharts/recharts-chart","@evilcharts/recharts-tooltip","@evilcharts/recharts-legend","@evilcharts/recharts-dot","@evilcharts/recharts-brush","@evilcharts/recharts-background"],
     files: [{
-      path: "@/registry/charts/recharts/area-chart.tsx",
+      path: "@/registry/charts/recharts-area-chart.tsx",
       type: "registry:component",
-      target: "components/evilcharts/charts/recharts/area-chart.tsx"
+      target: "components/evilcharts/charts/recharts-area-chart.tsx"
     }],
     component: React.lazy(async () => {
-      const mod = await import("@/registry/charts/recharts/area-chart.tsx")
+      const mod = await import("@/registry/charts/recharts-area-chart.tsx")
       const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
       return { default: mod.default || mod[exportName] }
     }),
@@ -373,12 +373,12 @@ export const Index: Record<string, any> = {
     type: "registry:component",
     registryDependencies: ["@evilcharts/recharts-chart","@evilcharts/recharts-tooltip","@evilcharts/recharts-legend","@evilcharts/recharts-dot","@evilcharts/recharts-brush","@evilcharts/recharts-background"],
     files: [{
-      path: "@/registry/charts/recharts/line-chart.tsx",
+      path: "@/registry/charts/recharts-line-chart.tsx",
       type: "registry:component",
-      target: "components/evilcharts/charts/recharts/line-chart.tsx"
+      target: "components/evilcharts/charts/recharts-line-chart.tsx"
     }],
     component: React.lazy(async () => {
-      const mod = await import("@/registry/charts/recharts/line-chart.tsx")
+      const mod = await import("@/registry/charts/recharts-line-chart.tsx")
       const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
       return { default: mod.default || mod[exportName] }
     }),
@@ -391,12 +391,12 @@ export const Index: Record<string, any> = {
     type: "registry:component",
     registryDependencies: ["@evilcharts/recharts-chart","@evilcharts/recharts-tooltip","@evilcharts/recharts-legend","@evilcharts/recharts-brush","@evilcharts/recharts-background"],
     files: [{
-      path: "@/registry/charts/recharts/bar-chart.tsx",
+      path: "@/registry/charts/recharts-bar-chart.tsx",
       type: "registry:component",
-      target: "components/evilcharts/charts/recharts/bar-chart.tsx"
+      target: "components/evilcharts/charts/recharts-bar-chart.tsx"
     }],
     component: React.lazy(async () => {
-      const mod = await import("@/registry/charts/recharts/bar-chart.tsx")
+      const mod = await import("@/registry/charts/recharts-bar-chart.tsx")
       const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
       return { default: mod.default || mod[exportName] }
     }),
@@ -409,12 +409,12 @@ export const Index: Record<string, any> = {
     type: "registry:component",
     registryDependencies: ["@evilcharts/recharts-chart","@evilcharts/recharts-tooltip","@evilcharts/recharts-legend","@evilcharts/recharts-dot","@evilcharts/recharts-brush","@evilcharts/recharts-background"],
     files: [{
-      path: "@/registry/charts/recharts/composed-chart.tsx",
+      path: "@/registry/charts/recharts-composed-chart.tsx",
       type: "registry:component",
-      target: "components/evilcharts/charts/recharts/composed-chart.tsx"
+      target: "components/evilcharts/charts/recharts-composed-chart.tsx"
     }],
     component: React.lazy(async () => {
-      const mod = await import("@/registry/charts/recharts/composed-chart.tsx")
+      const mod = await import("@/registry/charts/recharts-composed-chart.tsx")
       const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
       return { default: mod.default || mod[exportName] }
     }),
@@ -427,12 +427,12 @@ export const Index: Record<string, any> = {
     type: "registry:component",
     registryDependencies: ["@evilcharts/recharts-chart","@evilcharts/recharts-tooltip","@evilcharts/recharts-legend","@evilcharts/recharts-background"],
     files: [{
-      path: "@/registry/charts/recharts/pie-chart.tsx",
+      path: "@/registry/charts/recharts-pie-chart.tsx",
       type: "registry:component",
-      target: "components/evilcharts/charts/recharts/pie-chart.tsx"
+      target: "components/evilcharts/charts/recharts-pie-chart.tsx"
     }],
     component: React.lazy(async () => {
-      const mod = await import("@/registry/charts/recharts/pie-chart.tsx")
+      const mod = await import("@/registry/charts/recharts-pie-chart.tsx")
       const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
       return { default: mod.default || mod[exportName] }
     }),
@@ -445,12 +445,12 @@ export const Index: Record<string, any> = {
     type: "registry:component",
     registryDependencies: ["@evilcharts/recharts-chart","@evilcharts/recharts-tooltip","@evilcharts/recharts-legend","@evilcharts/recharts-background"],
     files: [{
-      path: "@/registry/charts/recharts/radial-chart.tsx",
+      path: "@/registry/charts/recharts-radial-chart.tsx",
       type: "registry:component",
-      target: "components/evilcharts/charts/recharts/radial-chart.tsx"
+      target: "components/evilcharts/charts/recharts-radial-chart.tsx"
     }],
     component: React.lazy(async () => {
-      const mod = await import("@/registry/charts/recharts/radial-chart.tsx")
+      const mod = await import("@/registry/charts/recharts-radial-chart.tsx")
       const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
       return { default: mod.default || mod[exportName] }
     }),
@@ -463,12 +463,12 @@ export const Index: Record<string, any> = {
     type: "registry:component",
     registryDependencies: ["@evilcharts/recharts-chart","@evilcharts/recharts-tooltip","@evilcharts/recharts-legend","@evilcharts/recharts-dot","@evilcharts/recharts-background"],
     files: [{
-      path: "@/registry/charts/recharts/radar-chart.tsx",
+      path: "@/registry/charts/recharts-radar-chart.tsx",
       type: "registry:component",
-      target: "components/evilcharts/charts/recharts/radar-chart.tsx"
+      target: "components/evilcharts/charts/recharts-radar-chart.tsx"
     }],
     component: React.lazy(async () => {
-      const mod = await import("@/registry/charts/recharts/radar-chart.tsx")
+      const mod = await import("@/registry/charts/recharts-radar-chart.tsx")
       const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
       return { default: mod.default || mod[exportName] }
     }),
@@ -481,12 +481,12 @@ export const Index: Record<string, any> = {
     type: "registry:component",
     registryDependencies: ["@evilcharts/recharts-chart","@evilcharts/recharts-tooltip","@evilcharts/recharts-background"],
     files: [{
-      path: "@/registry/charts/recharts/sankey-chart.tsx",
+      path: "@/registry/charts/recharts-sankey-chart.tsx",
       type: "registry:component",
-      target: "components/evilcharts/charts/recharts/sankey-chart.tsx"
+      target: "components/evilcharts/charts/recharts-sankey-chart.tsx"
     }],
     component: React.lazy(async () => {
-      const mod = await import("@/registry/charts/recharts/sankey-chart.tsx")
+      const mod = await import("@/registry/charts/recharts-sankey-chart.tsx")
       const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
       return { default: mod.default || mod[exportName] }
     }),
@@ -4173,7 +4173,7 @@ export const Index: Record<string, any> = {
     files: [{
       path: "@/registry/blocks/recharts/b-monospace-bar-chart.tsx",
       type: "registry:block",
-      target: "components/evilcharts/blocks/recharts/monospace-bar-chart.tsx"
+      target: "components/evilcharts/blocks/monospace-bar-chart.tsx"
     }],
     component: React.lazy(async () => {
       const mod = await import("@/registry/blocks/recharts/b-monospace-bar-chart.tsx")
@@ -4191,7 +4191,7 @@ export const Index: Record<string, any> = {
     files: [{
       path: "@/registry/blocks/recharts/b-hover-trace-bar-chart.tsx",
       type: "registry:block",
-      target: "components/evilcharts/blocks/recharts/hover-trace-bar-chart.tsx"
+      target: "components/evilcharts/blocks/hover-trace-bar-chart.tsx"
     }],
     component: React.lazy(async () => {
       const mod = await import("@/registry/blocks/recharts/b-hover-trace-bar-chart.tsx")
@@ -4209,7 +4209,7 @@ export const Index: Record<string, any> = {
     files: [{
       path: "@/registry/blocks/recharts/b-grid-bar-chart.tsx",
       type: "registry:block",
-      target: "components/evilcharts/blocks/recharts/grid-bar-chart.tsx"
+      target: "components/evilcharts/blocks/grid-bar-chart.tsx"
     }],
     component: React.lazy(async () => {
       const mod = await import("@/registry/blocks/recharts/b-grid-bar-chart.tsx")
@@ -4227,7 +4227,7 @@ export const Index: Record<string, any> = {
     files: [{
       path: "@/registry/blocks/recharts/b-isometric-bar-chart.tsx",
       type: "registry:block",
-      target: "components/evilcharts/blocks/recharts/isometric-bar-chart.tsx"
+      target: "components/evilcharts/blocks/isometric-bar-chart.tsx"
     }],
     component: React.lazy(async () => {
       const mod = await import("@/registry/blocks/recharts/b-isometric-bar-chart.tsx")
@@ -4245,7 +4245,7 @@ export const Index: Record<string, any> = {
     files: [{
       path: "@/registry/blocks/echarts/b-latency-echarts-area-chart.tsx",
       type: "registry:block",
-      target: "components/evilcharts/blocks/echarts/latency-echarts-area-chart.tsx"
+      target: "components/evilcharts/blocks/latency-echarts-area-chart.tsx"
     }],
     component: React.lazy(async () => {
       const mod = await import("@/registry/blocks/echarts/b-latency-echarts-area-chart.tsx")

@@ -8,8 +8,8 @@ import {
   Legend,
   Tooltip,
   ActiveDot,
-} from "@/registry/charts/recharts/line-chart";
-import { type ChartConfig } from "@/registry/ui/recharts/chart";
+} from "@/registry/charts/recharts-line-chart";
+import { type ChartConfig } from "@/registry/ui/recharts-chart";
 
 const chartConfig = {
   desktop: {

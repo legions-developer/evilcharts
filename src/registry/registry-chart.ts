@@ -19,9 +19,9 @@ export const charts: Registry["items"] = [
     type: "registry:component",
     files: [
       {
-        path: "charts/echarts/area-chart.tsx",
+        path: "charts/echarts-area-chart.tsx",
         type: "registry:component",
-        target: TARGET_BASE_PATH + "/echarts/area-chart.tsx",
+        target: TARGET_BASE_PATH + "/echarts-area-chart.tsx",
       },
     ],
   },
@@ -39,9 +39,9 @@ export const charts: Registry["items"] = [
     type: "registry:component",
     files: [
       {
-        path: "charts/echarts/line-chart.tsx",
+        path: "charts/echarts-line-chart.tsx",
         type: "registry:component",
-        target: TARGET_BASE_PATH + "/echarts/line-chart.tsx",
+        target: TARGET_BASE_PATH + "/echarts-line-chart.tsx",
       },
     ],
   },
@@ -59,9 +59,9 @@ export const charts: Registry["items"] = [
     type: "registry:component",
     files: [
       {
-        path: "charts/echarts/bar-chart.tsx",
+        path: "charts/echarts-bar-chart.tsx",
         type: "registry:component",
-        target: TARGET_BASE_PATH + "/echarts/bar-chart.tsx",
+        target: TARGET_BASE_PATH + "/echarts-bar-chart.tsx",
       },
     ],
   },
@@ -79,9 +79,9 @@ export const charts: Registry["items"] = [
     type: "registry:component",
     files: [
       {
-        path: "charts/echarts/composed-chart.tsx",
+        path: "charts/echarts-composed-chart.tsx",
         type: "registry:component",
-        target: TARGET_BASE_PATH + "/echarts/composed-chart.tsx",
+        target: TARGET_BASE_PATH + "/echarts-composed-chart.tsx",
       },
     ],
   },
@@ -98,9 +98,9 @@ export const charts: Registry["items"] = [
     type: "registry:component",
     files: [
       {
-        path: "charts/echarts/radar-chart.tsx",
+        path: "charts/echarts-radar-chart.tsx",
         type: "registry:component",
-        target: TARGET_BASE_PATH + "/echarts/radar-chart.tsx",
+        target: TARGET_BASE_PATH + "/echarts-radar-chart.tsx",
       },
     ],
   },
@@ -116,9 +116,9 @@ export const charts: Registry["items"] = [
     type: "registry:component",
     files: [
       {
-        path: "charts/echarts/pie-chart.tsx",
+        path: "charts/echarts-pie-chart.tsx",
         type: "registry:component",
-        target: TARGET_BASE_PATH + "/echarts/pie-chart.tsx",
+        target: TARGET_BASE_PATH + "/echarts-pie-chart.tsx",
       },
     ],
   },
@@ -134,9 +134,9 @@ export const charts: Registry["items"] = [
     type: "registry:component",
     files: [
       {
-        path: "charts/echarts/radial-chart.tsx",
+        path: "charts/echarts-radial-chart.tsx",
         type: "registry:component",
-        target: TARGET_BASE_PATH + "/echarts/radial-chart.tsx",
+        target: TARGET_BASE_PATH + "/echarts-radial-chart.tsx",
       },
     ],
   },
@@ -152,9 +152,9 @@ export const charts: Registry["items"] = [
     type: "registry:component",
     files: [
       {
-        path: "charts/echarts/sankey-chart.tsx",
+        path: "charts/echarts-sankey-chart.tsx",
         type: "registry:component",
-        target: TARGET_BASE_PATH + "/echarts/sankey-chart.tsx",
+        target: TARGET_BASE_PATH + "/echarts-sankey-chart.tsx",
       },
     ],
   },
@@ -173,9 +173,9 @@ export const charts: Registry["items"] = [
     type: "registry:component",
     files: [
       {
-        path: "charts/recharts/area-chart.tsx",
+        path: "charts/recharts-area-chart.tsx",
         type: "registry:component",
-        target: TARGET_BASE_PATH + "/recharts/area-chart.tsx",
+        target: TARGET_BASE_PATH + "/recharts-area-chart.tsx",
       },
     ],
   },
@@ -194,9 +194,9 @@ export const charts: Registry["items"] = [
     type: "registry:component",
     files: [
       {
-        path: "charts/recharts/line-chart.tsx",
+        path: "charts/recharts-line-chart.tsx",
         type: "registry:component",
-        target: TARGET_BASE_PATH + "/recharts/line-chart.tsx",
+        target: TARGET_BASE_PATH + "/recharts-line-chart.tsx",
       },
     ],
   },
@@ -214,9 +214,9 @@ export const charts: Registry["items"] = [
     type: "registry:component",
     files: [
       {
-        path: "charts/recharts/bar-chart.tsx",
+        path: "charts/recharts-bar-chart.tsx",
         type: "registry:component",
-        target: TARGET_BASE_PATH + "/recharts/bar-chart.tsx",
+        target: TARGET_BASE_PATH + "/recharts-bar-chart.tsx",
       },
     ],
   },
@@ -235,9 +235,9 @@ export const charts: Registry["items"] = [
     type: "registry:component",
     files: [
       {
-        path: "charts/recharts/composed-chart.tsx",
+        path: "charts/recharts-composed-chart.tsx",
         type: "registry:component",
-        target: TARGET_BASE_PATH + "/recharts/composed-chart.tsx",
+        target: TARGET_BASE_PATH + "/recharts-composed-chart.tsx",
       },
     ],
   },
@@ -254,9 +254,9 @@ export const charts: Registry["items"] = [
     type: "registry:component",
     files: [
       {
-        path: "charts/recharts/pie-chart.tsx",
+        path: "charts/recharts-pie-chart.tsx",
         type: "registry:component",
-        target: TARGET_BASE_PATH + "/recharts/pie-chart.tsx",
+        target: TARGET_BASE_PATH + "/recharts-pie-chart.tsx",
       },
     ],
   },
@@ -273,9 +273,9 @@ export const charts: Registry["items"] = [
     type: "registry:component",
     files: [
       {
-        path: "charts/recharts/radial-chart.tsx",
+        path: "charts/recharts-radial-chart.tsx",
         type: "registry:component",
-        target: TARGET_BASE_PATH + "/recharts/radial-chart.tsx",
+        target: TARGET_BASE_PATH + "/recharts-radial-chart.tsx",
       },
     ],
   },
@@ -293,9 +293,9 @@ export const charts: Registry["items"] = [
     type: "registry:component",
     files: [
       {
-        path: "charts/recharts/radar-chart.tsx",
+        path: "charts/recharts-radar-chart.tsx",
         type: "registry:component",
-        target: TARGET_BASE_PATH + "/recharts/radar-chart.tsx",
+        target: TARGET_BASE_PATH + "/recharts-radar-chart.tsx",
       },
     ],
   },
@@ -311,9 +311,9 @@ export const charts: Registry["items"] = [
     type: "registry:component",
     files: [
       {
-        path: "charts/recharts/sankey-chart.tsx",
+        path: "charts/recharts-sankey-chart.tsx",
         type: "registry:component",
-        target: TARGET_BASE_PATH + "/recharts/sankey-chart.tsx",
+        target: TARGET_BASE_PATH + "/recharts-sankey-chart.tsx",
       },
     ],
   },

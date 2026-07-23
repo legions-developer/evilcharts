@@ -6,8 +6,8 @@ import {
   XAxis,
   Legend,
   Tooltip,
-} from "@/registry/charts/recharts/line-chart";
-import { type ChartConfig } from "@/registry/ui/recharts/chart";
+} from "@/registry/charts/recharts-line-chart";
+import { type ChartConfig } from "@/registry/ui/recharts-chart";
 
 const data = [
   { month: "January", desktop: 342, mobile: 184 },

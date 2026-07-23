@@ -1,7 +1,7 @@
 "use client";
 
-import { EvilPieChart, Pie, Label, Tooltip, Legend } from "@/registry/charts/recharts/pie-chart";
-import { type ChartConfig } from "@/registry/ui/recharts/chart";
+import { EvilPieChart, Pie, Label, Tooltip, Legend } from "@/registry/charts/recharts-pie-chart";
+import { type ChartConfig } from "@/registry/ui/recharts-chart";
 
 const data = [
   { browser: "chrome", visitors: 275 },

@@ -9,7 +9,7 @@ import {
   type TooltipPosition,
   type TooltipRoundness,
   type TooltipVariant,
-} from "@/registry/ui/echarts/tooltip";
+} from "@/registry/ui/echarts-tooltip";
 import {
   Children,
   isValidElement,
@@ -30,9 +30,9 @@ import {
   withAlpha,
   type ChartConfig,
   type ResolvedColors,
-} from "@/registry/ui/echarts/chart";
+} from "@/registry/ui/echarts-chart";
 import { TooltipComponent, type TooltipComponentOption } from "echarts/components";
-import { LegendOverlay, type LegendVariant } from "@/registry/ui/echarts/legend";
+import { LegendOverlay, type LegendVariant } from "@/registry/ui/echarts-legend";
 import { PieChart, type PieSeriesOption } from "echarts/charts";
 import { motion, useReducedMotion } from "motion/react";
 import { CanvasRenderer } from "echarts/renderers";
@@ -354,7 +354,7 @@ function collectConfig(children: ReactNode): CollectedConfig {
 }
 
 // Color plumbing (ChartConfig, getColorsCount, buildChartCss, withAlpha,
-// ResolvedColors, resolveColors) now lives in @/registry/ui/echarts/chart and is
+// ResolvedColors, resolveColors) now lives in @/registry/ui/echarts-chart and is
 // imported at the top of this file. The pie keeps its own DIAGONAL sectorPaint
 // below (the shared seriesPaint is a horizontal gradient).
 

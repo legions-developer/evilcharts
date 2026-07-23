@@ -8,7 +8,7 @@ import {
   Tooltip,
   type SankeyData,
   type ChartConfig,
-} from "@/registry/charts/echarts/sankey-chart";
+} from "@/registry/charts/echarts-sankey-chart";
 
 // Sales report data - similar to the design with CRT, PPT, DMG categories
 const data: SankeyData = {

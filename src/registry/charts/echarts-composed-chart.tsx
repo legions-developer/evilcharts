@@ -8,7 +8,7 @@ import {
   type TooltipPosition,
   type TooltipRoundness,
   type TooltipVariant,
-} from "@/registry/ui/echarts/tooltip";
+} from "@/registry/ui/echarts-tooltip";
 import {
   DataZoomComponent,
   GridComponent,
@@ -26,7 +26,7 @@ import {
   withAlpha,
   type ChartConfig,
   type ResolvedColors,
-} from "@/registry/ui/echarts/chart";
+} from "@/registry/ui/echarts-chart";
 import {
   Children,
   isValidElement,
@@ -46,19 +46,13 @@ import {
   type BrushGeometry,
   type BrushOverlayElements,
   type BrushRange,
-} from "@/registry/ui/echarts/evil-brush";
-import {
-  dotItemStyle,
-  dotStyle,
-  sampleGradient,
-  type DotItemStyleOption,
-  type DotVariant,
-} from "@/registry/ui/echarts/dot";
-import { LegendOverlay, type LegendVariant } from "@/registry/ui/echarts/legend";
-import { LineChart, type LineSeriesOption } from "echarts/charts";
+} from "@/registry/ui/echarts-brush";
+import { dotItemStyle, dotStyle, sampleGradient, type DotVariant } from "@/registry/ui/echarts-dot";
+import { BarChart, LineChart, type BarSeriesOption, type LineSeriesOption } from "echarts/charts";
+import { LegendOverlay, type LegendVariant } from "@/registry/ui/echarts-legend";
+import type { ComposeOption, ImagePatternObject } from "echarts/core";
 import { motion, useReducedMotion } from "motion/react";
 import { CanvasRenderer } from "echarts/renderers";
-import type { ComposeOption } from "echarts/core";
 import * as echarts from "echarts/core";
 
 // Re-export the shared types that were previously declared inline here, so
@@ -72,20 +66,32 @@ export type {
   TooltipVariant,
 };
 
-// Modular registration keeps the bundle lean — only the pieces this chart needs.
-// `DataZoomComponent` bundles both the slider (brush footer) and inside (wheel/drag)
-// zoom. The brush's frame/handles/labels are raw zrender elements, not the
-// graphic component — see syncBrushOverlay. No GraphicComponent is registered.
-echarts.use([LineChart, GridComponent, TooltipComponent, DataZoomComponent, CanvasRenderer]);
+// Modular registration keeps the bundle lean — only the pieces a composed chart
+// needs. A composed chart mixes `BarChart` and `LineChart` series in one grid.
+// `DataZoomComponent` bundles both the slider (brush footer) and inside (wheel/
+// drag) zoom; the brush's frame/handles/labels are raw zrender elements, NOT the
+// graphic component (never registered) — see syncBrushOverlay.
+echarts.use([
+  BarChart,
+  LineChart,
+  GridComponent,
+  TooltipComponent,
+  DataZoomComponent,
+  CanvasRenderer,
+]);
 
 type EChartsInstance = ReturnType<typeof echarts.init>;
 
-// The exact option surface this chart uses — line series, grid, tooltip, and
-// dataZoom, plus the axis options they pull in as dependencies. Narrower than
+// The exact option surface this chart uses — bar + line series, grid, tooltip,
+// and dataZoom, plus the axis options they pull in as dependencies. Narrower than
 // echarts' full EChartsOption, so a misspelled key fails the compile instead of
 // silently reaching setOption.
 type EChartsOption = ComposeOption<
-  LineSeriesOption | GridComponentOption | TooltipComponentOption | DataZoomComponentOption
+  | BarSeriesOption
+  | LineSeriesOption
+  | GridComponentOption
+  | TooltipComponentOption
+  | DataZoomComponentOption
 >;
 
 // Single-entry views of the composed option's array-or-single fields — the
@@ -94,37 +100,33 @@ type ArrayItem<T> = T extends readonly (infer U)[] ? U : T;
 type XAxisOption = ArrayItem<NonNullable<EChartsOption["xAxis"]>>;
 type YAxisOption = ArrayItem<NonNullable<EChartsOption["yAxis"]>>;
 
-// DotItemStyleOption now lives in @/registry/ui/echarts/dot and is imported at
-// the top of this file.
+// The fill/paint any bar or line resolves to — a solid string, a gradient object,
+// or a tiling canvas pattern (hatched). Assignable to itemStyle/lineStyle color.
+type SeriesPaint = string | echarts.graphic.LinearGradient | ImagePatternObject;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
 // ─────────────────────────────────────────────────────────────────────────────
 
-const STROKE_WIDTH = 0.8;
+const STROKE_WIDTH = 2; // line stroke width — the Recharts twin draws lines at 2px
+const AXIS_POINTER_WIDTH = 1; // tooltip cursor line
+const DEFAULT_BAR_RADIUS = 4; // bar corner radius, matching the Recharts twin
 const LOADING_ANIMATION_DURATION = 2000; // shimmer loop, in milliseconds
 const REVEAL_DURATION = 1000; // intro draw-in length, in milliseconds
-// NOTE: the intro draw-in runs ECharts' RAW default entrance animation. Custom
-// easing was tried and abandoned in the area twin — ECharts hardcodes the
-// line-entrance clip to linear and ignores animationEasing at every level.
-const LOADING_DEFAULT_POINTS = 14;
-// Buffer line: the last segment renders as this dash while the rest stays solid,
-// echoing the Recharts twin's 4px dash / 3px gap forecast tail.
-const BUFFER_DASH: [number, number] = [4, 3];
-
-// <Line glowing> glow. Canvas has no SVG blur filter, so the glow is a stack of
-// SILENT, symbol-free copies of the line laid UNDER the real one: same gradient
-// paint, growing width, shrinking low opacity. Wide low-alpha gradient strokes
-// pool into a soft halo that follows the series' own color along its whole
-// length — the way the Recharts twin's feGaussianBlur wraps the entire line. A
-// single shadowColor tint (the old approach) flattened a multi-stop gradient to
-// one hue and barely reached past the dots. Widest & faintest last; `symbolPad`
-// grows the glow disc under each visible dot so haloed markers bloom too.
-const GLOW_LAYERS: { width: number; opacity: number; symbolPad: number }[] = [
-  { width: 4, opacity: 0.3, symbolPad: 2 },
-  { width: 9, opacity: 0.15, symbolPad: 7 },
-  { width: 16, opacity: 0.07, symbolPad: 14 },
-];
+// The bar entrance is a per-datum grow-in staggered by `animationType`, exactly
+// like the ECharts bar chart. Unlike the line's clip (which ECharts hardcodes to
+// linear left-to-right), bars are independent rectangles, so the direction values
+// are honored via a per-datum `animationDelay`.
+const BAR_GROW_DURATION = 500; // per-bar grow-in length, in milliseconds
+const BAR_STAGGER = 50; // delay between consecutive bars in the reveal, in milliseconds
+// NOTE: the LINE intro runs ECharts' RAW default entrance — lines trace in
+// left-to-right. Custom easing/direction was tried and abandoned for the line:
+// ECharts hardcodes the line-entrance clip to linear and ignores animationEasing
+// at every level (verified empirically). The `animationType` direction values are
+// kept as recharts-parity aliases and drive the BAR stagger.
+const LOADING_DEFAULT_BARS = 12;
+const DASH_PATTERN: [number, number] = [5, 5]; // dashed stroke — the twin uses "5 5"
+const DASH_PERIOD = 10; // sum of DASH_PATTERN — the animated sweep travels one period per second
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Theme knobs — every neutral line in the chart draws from these. Base colors
@@ -138,21 +140,55 @@ const GLOW_LAYERS: { width: number; opacity: number; symbolPad: number }[] = [
 // the same apparent brightness.
 const GRID_LINE_OPACITY = 1; // dashed y-axis split lines, × border alpha
 const AXIS_POINTER_OPACITY = 1; // tooltip cursor line, × border alpha
-// The skeleton is CLIPPED to a small sweeping window — only the stroke section
-// inside it exists, everything outside is fully transparent, like a clip-path
-// sliding across the chart.
-const LOADING_STROKE_OPACITY = 0.5; // outline inside the window, × foreground alpha
+// The skeleton bars are CLIPPED to a small sweeping window — only the bars inside
+// it are painted, everything outside is fully transparent, like a clip-path
+// sliding diagonally across the chart.
+const LOADING_BAR_MAX_OPACITY = 0.22; // skeleton bar fill inside the window, × foreground alpha
+const LOADING_LINE_MAX_OPACITY = 0.5; // skeleton line stroke inside the window, × foreground alpha
+const LOADING_LINE_WIDTH = 2; // skeleton line stroke width
 const LOADING_SHIMMER_BAND = 0.2; // window half-width, fraction of chart width
 const LOADING_SHIMMER_FEATHER = 0.2; // eased edge softening of the clip window
-const BRUSH_STROKE_OPACITY = 0.5; // mini-chart series stroke (evil-brush "line" variant)
+const BRUSH_STROKE_OPACITY = 0.5; // mini-chart series stroke
+const BRUSH_FILL_OPACITY = 0.15; // mini-chart series fade, at the top stop
 const BRUSH_FILLER_OPACITY = 0; // selected-range wash — evil-brush draws none
+// Glow — the canvas analogue of the Recharts feGaussianBlur filters.
+// Bars: a soft outer canvas shadow. The Recharts BarGlowFilter blurs the fill at
+// stdDeviation 8 and merges it under the shape, so the halo is generous and soft;
+// a canvas shadowBlur reproduces that. shadowColor is sampled PER-DATUM for
+// multi-color bars (§sampleGradient) so the halo follows the palette, not a single
+// wrong tint.
+const BAR_GLOW_BLUR = 16; // bar glow radius, canvas shadowBlur
+const BAR_GLOW_OPACITY = 0.6; // bar glow strength, × series color alpha
+// Lines: a single shadowColor can't follow a horizontal color gradient — it reads
+// as one flat tint hugging the dots. Instead we stack a few SILENT overlay copies
+// of the stroke UNDER the real line, painted with the SAME gradient, widening and
+// fading outward. Wide low-alpha gradient strokes read as a soft colored blur that
+// tracks the series color along its whole length, matching the SVG blur.
+const LINE_GLOW_LAYERS: { width: number; opacity: number }[] = [
+  { width: 6, opacity: 0.3 }, // × series color alpha
+  { width: 12, opacity: 0.15 },
+  { width: 20, opacity: 0.07 },
+];
+// The dim applied to unselected series once one series is selected. Line strokes
+// and dots drop to SELECTION_DIM (0.3, matching the Recharts twin); bar FILLS
+// recede further to SELECTION_DIM_FILL so a dimmed column fades back like the area
+// chart's dimmed fill while thin strokes and dots stay legible.
+const SELECTION_DIM = 0.3;
+const SELECTION_DIM_FILL = 0.15;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Public types
 // ─────────────────────────────────────────────────────────────────────────────
 
+export type BarVariant =
+  | "default"
+  | "hatched"
+  | "duotone"
+  | "duotone-reverse"
+  | "gradient"
+  | "stripped";
 export type StrokeVariant = "solid" | "dashed" | "animated-dashed";
-export type LineAnimationType =
+export type ComposedAnimationType =
   | "none"
   | "left-to-right"
   | "right-to-left"
@@ -171,50 +207,69 @@ export type CurveType =
 // now live in the shared @/registry/ui/echarts/* modules and are imported +
 // re-exported at the top of this file.
 
-export interface EChartsLineChartProps<TData extends Record<string, unknown>> {
+export interface EChartsComposedChartProps<TData extends Record<string, unknown>> {
   data: TData[]; // rows rendered by the chart
-  config: ChartConfig; // series colors + labels
+  config: ChartConfig; // series colors + labels for every bar and line
   xDataKey?: keyof TData & string; // x category key — falls back to the <XAxis> dataKey / first free column
   className?: string; // extra classes for the chart container
   curveType?: CurveType; // default curve interpolation each <Line> inherits
   animation?: boolean; // master switch for the intro draw-in — false renders instantly
-  animationType?: LineAnimationType; // default intro reveal (first <Line> overrides)
-  enableHoverHighlight?: boolean; // hovering a series dims the others, like a temporary selection
+  animationType?: ComposedAnimationType; // default intro reveal (first series overrides)
+  barGap?: number | string; // gap between bars sharing a category (ECharts accepts "30%" or a pixel number)
+  barCategoryGap?: number | string; // gap between bar categories
   defaultSelectedDataKey?: string | null; // series selected on first render
   onSelectionChange?: (key: string | null) => void; // fires when the selected series changes
   isLoading?: boolean; // shows the animated loading skeleton
-  loadingPoints?: number; // number of points in the loading skeleton
+  loadingBars?: number; // number of bars in the loading skeleton
   showBrush?: boolean; // renders a zoom brush below the chart
   brushHeight?: number; // height of the brush preview in pixels
   brushFormatLabel?: (value: string, index: number) => string; // formats brush handle labels
   onBrushChange?: (range: { startIndex: number; endIndex: number }) => void; // brush range callback
   chartOptions?: Record<string, unknown>; // escape hatch merged over the built ECharts option
-  children?: ReactNode; // declarative config — <Line>, <XAxis>, <Grid>, <Tooltip>, <Legend>, …
+  children?: ReactNode; // declarative config — <Bar>, <Line>, <XAxis>, <Grid>, <Tooltip>, <Legend>, …
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Composible parts — DECLARATIVE CONFIG. Every part renders `null`; the root
-// walks `children` by reference (child.type === Line, …) to collect its props.
+// walks `children` by reference (child.type === Bar, …) to collect its props.
 // Presence semantics mirror the Recharts twin: omit a child and that part does
 // not render. These are never mounted into the tree — they only carry props.
 // ─────────────────────────────────────────────────────────────────────────────
 
+export interface BarProps {
+  dataKey: string; // series key — must exist on the data + config
+  variant?: BarVariant; // fill style for this bar only
+  radius?: number; // corner radius of the bar in pixels
+  glow?: boolean; // applies a soft neon glow to this bar
+  animationType?: ComposedAnimationType; // grow-in order — the first series drives the chart
+  isClickable?: boolean; // lets this bar be selected by clicking it
+  enableHoverHighlight?: boolean; // dims the other columns of this bar when one is hovered
+  barProps?: Partial<BarSeriesOption>; // escape hatch merged into the raw ECharts bar series
+}
+
+/**
+ * A single bar series. Declares its own fill variant, radius, glow, and
+ * clickability. Renders nothing — the root reads these props to build the
+ * ECharts bar series.
+ */
+export const Bar: FC<BarProps> = () => null;
+
 export interface LineProps {
   dataKey: string; // series key — must exist on the data + config
-  strokeVariant?: StrokeVariant; // stroke style for this line
+  strokeVariant?: StrokeVariant; // stroke style for this line only
   curveType?: CurveType; // curve interpolation — falls back to the root curveType
-  animationType?: LineAnimationType; // intro reveal — first line drives the wrapper wipe
+  animationType?: ComposedAnimationType; // intro reveal — the first series drives the chart
   connectNulls?: boolean; // join segments across null/missing values
+  glow?: boolean; // applies a soft neon glow to this line
   isClickable?: boolean; // lets this line be selected by clicking it
-  glowing?: boolean; // applies a soft outer glow to this line
-  enableBufferLine?: boolean; // renders this line's last segment as a dashed buffer
   children?: ReactNode; // optional <Dot> and <ActiveDot> config
+  lineProps?: Partial<LineSeriesOption>; // escape hatch merged into the raw ECharts line series
 }
 
 /**
  * A single line series. Declares its own stroke/curve/glow/clickability and,
  * optionally, resting/active point markers via composed <Dot> / <ActiveDot>.
- * Renders nothing — the root reads these props to build the ECharts series.
+ * Renders nothing — the root reads these props to build the ECharts line series.
  */
 export const Line: FC<LineProps> = () => null;
 
@@ -254,6 +309,7 @@ export const Grid: FC = () => null;
 export interface TooltipProps {
   variant?: TooltipVariant; // visual style of the tooltip surface
   roundness?: TooltipRoundness; // border-radius of the tooltip
+  defaultIndex?: number; // data index shown by default with no hover
   cursor?: boolean; // whether the vertical cursor line follows the pointer
   position?: TooltipPosition; // "variable" follows both axes (default); "fixed" pins the tooltip near the top and tracks the pointer's X
 }
@@ -274,20 +330,33 @@ export const Legend: FC<LegendProps> = () => null;
 // ─────────────────────────────────────────────────────────────────────────────
 // Children collection — walk the declarative config into plain objects the
 // option builder consumes. <Dot> / <ActiveDot> are read from each <Line>'s own
-// children; a missing dot child means that marker does not render.
+// children; a missing dot child means that marker does not render. Bars and lines
+// are kept in separate ordered lists so the series array is [...bars, ...lines] —
+// bars render behind lines, matching the Recharts twin's JSX order.
 // ─────────────────────────────────────────────────────────────────────────────
+
+type BarSeriesConfig = {
+  dataKey: string;
+  variant: BarVariant;
+  radius: number;
+  glow: boolean;
+  animationType?: ComposedAnimationType;
+  isClickable: boolean;
+  enableHoverHighlight: boolean;
+  barProps?: Partial<BarSeriesOption>;
+};
 
 type LineSeriesConfig = {
   dataKey: string;
   strokeVariant: StrokeVariant;
   curveType?: CurveType;
-  animationType?: LineAnimationType;
+  animationType?: ComposedAnimationType;
   connectNulls: boolean;
+  glow: boolean;
   isClickable: boolean;
-  glowing: boolean;
-  enableBufferLine: boolean;
   dotVariant: DotVariant; // "none" when no <Dot> child is present
   activeDotVariant: DotVariant; // "none" when no <ActiveDot> child is present
+  lineProps?: Partial<LineSeriesOption>;
 };
 
 type XAxisSlot = {
@@ -306,6 +375,7 @@ type TooltipSlot = {
   present: boolean;
   variant: TooltipVariant;
   roundness: TooltipRoundness;
+  defaultIndex?: number;
   cursor: boolean;
   position: TooltipPosition;
 };
@@ -318,6 +388,7 @@ type LegendSlot = {
 };
 
 type CollectedConfig = {
+  bars: BarSeriesConfig[];
   lines: LineSeriesConfig[];
   xAxis: XAxisSlot;
   yAxis: YAxisSlot;
@@ -327,6 +398,7 @@ type CollectedConfig = {
 };
 
 function collectConfig(children: ReactNode): CollectedConfig {
+  const bars: BarSeriesConfig[] = [];
   const lines: LineSeriesConfig[] = [];
   let xAxis: XAxisSlot = { present: false };
   let yAxis: YAxisSlot = { present: false };
@@ -350,7 +422,19 @@ function collectConfig(children: ReactNode): CollectedConfig {
     if (!isValidElement(child)) return;
     const type = child.type;
 
-    if (type === Line) {
+    if (type === Bar) {
+      const props = child.props as BarProps;
+      bars.push({
+        dataKey: props.dataKey,
+        variant: props.variant ?? "default",
+        radius: props.radius ?? DEFAULT_BAR_RADIUS,
+        glow: props.glow ?? false,
+        animationType: props.animationType,
+        isClickable: props.isClickable ?? false,
+        enableHoverHighlight: props.enableHoverHighlight ?? false,
+        barProps: props.barProps,
+      });
+    } else if (type === Line) {
       const props = child.props as LineProps;
       let dotVariant: DotVariant = "none";
       let activeDotVariant: DotVariant = "none";
@@ -364,17 +448,15 @@ function collectConfig(children: ReactNode): CollectedConfig {
       });
       lines.push({
         dataKey: props.dataKey,
-        // The Recharts twin defaults a <Line> to a solid stroke (its <Area>
-        // defaults to dashed — a divergence intentionally preserved here).
         strokeVariant: props.strokeVariant ?? "solid",
         curveType: props.curveType,
         animationType: props.animationType,
         connectNulls: props.connectNulls ?? false,
+        glow: props.glow ?? false,
         isClickable: props.isClickable ?? false,
-        glowing: props.glowing ?? false,
-        enableBufferLine: props.enableBufferLine ?? false,
         dotVariant,
         activeDotVariant,
+        lineProps: props.lineProps,
       });
     } else if (type === XAxis) {
       const props = child.props as XAxisProps;
@@ -400,6 +482,7 @@ function collectConfig(children: ReactNode): CollectedConfig {
         present: true,
         variant: props.variant ?? "default",
         roundness: props.roundness ?? "lg",
+        defaultIndex: props.defaultIndex,
         cursor: props.cursor ?? true,
         position: props.position ?? "variable",
       };
@@ -415,118 +498,198 @@ function collectConfig(children: ReactNode): CollectedConfig {
     }
   });
 
-  return { lines, xAxis, yAxis, showGrid, tooltip, legend };
+  return { bars, lines, xAxis, yAxis, showGrid, tooltip, legend };
 }
 
 // Color plumbing (ChartConfig, getColorsCount, distributeColors, buildChartCss,
 // normalizeColor, withAlpha, ResolvedColors, resolveColors, seriesPaint) now
-// lives in @/registry/ui/echarts/chart and is imported at the top of this file.
-// Dot helpers (DotVariant, DotItemStyleOption, DotStyle, DOT_SIZES, dotItemStyle,
-// dotStyle, sampleGradient) live in @/registry/ui/echarts/dot.
-
-// Builds the stacked glow overlay series for one <Line glowing> (see
-// GLOW_LAYERS). Each copy is silent, tooltip-less, and z-ordered beneath the real
-// line, so the widening low-alpha gradient strokes read as a soft colored blur
-// that tracks the series' gradient exactly like the stroke does. When the line
-// shows resting dots, each copy also draws an oversized faint symbol — coloured
-// per-datum via sampleGradient — so the markers bloom too. `selectionDim` fades
-// the whole glow with its parent when another series is selected; the
-// emphasis/blur styles let it focus/dim WITH its parent under
-// enableHoverHighlight (the root dispatch-links these ids — see companionIdsByKey).
-function buildGlowSeries(params: {
-  key: string;
-  paint: string | echarts.graphic.LinearGradient;
-  slots: string[];
-  values: (number | null)[];
-  curve: { smooth: boolean; step: "middle" | false };
-  connectNulls: boolean;
-  z: number;
-  selectionDim: number;
-  dotSize: number;
-}): LineSeriesOption[] {
-  const { key, paint, slots, values, curve, connectNulls, z, selectionDim, dotSize } = params;
-  const multiColor = slots.length > 1;
-  const base = slots[0] ?? "rgba(120, 120, 120, 1)";
-  const showDots = dotSize > 0;
-
-  return GLOW_LAYERS.map((layer, i): LineSeriesOption => {
-    const glowOpacity = layer.opacity * selectionDim;
-    const blurOpacity = glowOpacity * 0.3;
-    // Per-datum halo colours so a gradient glow tints each dot at its own
-    // x-position, matching sampleGradient on the real dots.
-    const glowData: LinePoint[] =
-      !multiColor || !showDots
-        ? values
-        : values.map((value, idx): LinePoint => {
-            if (value === null) return null;
-            const t = values.length > 1 ? idx / (values.length - 1) : 0;
-            const color = sampleGradient(slots, t);
-            return {
-              value,
-              itemStyle: { color, opacity: glowOpacity },
-              emphasis: { itemStyle: { color, opacity: glowOpacity } },
-            };
-          });
-
-    return {
-      id: `__glow-${i}-${key}`,
-      type: "line",
-      data: glowData,
-      smooth: curve.smooth,
-      step: curve.step,
-      connectNulls,
-      silent: true,
-      showSymbol: showDots,
-      symbol: "circle",
-      symbolSize: showDots ? dotSize + layer.symbolPad : 0,
-      tooltip: { show: false },
-      z,
-      lineStyle: {
-        color: paint,
-        width: layer.width,
-        opacity: glowOpacity,
-        cap: "round",
-        join: "round",
-      },
-      itemStyle: multiColor ? { opacity: glowOpacity } : { color: base, opacity: glowOpacity },
-      // Focus/dim WITH the parent line: on the parent's hover the root highlights
-      // these ids (emphasis → normal glow); when another series is hovered the
-      // parent's focus:"series" blurs these to a fainter still.
-      emphasis: {
-        focus: "none",
-        scale: false,
-        lineStyle: { opacity: glowOpacity },
-        itemStyle: { opacity: glowOpacity },
-      },
-      blur: { lineStyle: { opacity: blurOpacity }, itemStyle: { opacity: blurOpacity } },
-    };
-  });
-}
-
-// Brush overlays (BrushRange, BrushGeometry, BrushOverlayElements,
-// BrushOverlayParams, syncBrushOverlay) live in @/registry/ui/echarts/evil-brush
-// and are imported at the top of this file.
+// lives in @/registry/ui/echarts-chart and is imported at the top of this file.
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Curve mapping — linear → straight, step → step:"middle", everything else → smooth.
+// Bar fills — the ECharts analogue of the Recharts bar variants. Bars are opaque
+// colored shapes (unlike the translucent area fills), so these paint at full
+// strength. Each is applied per-bar: ECharts gradient itemStyle defaults to
+// `global: false`, so the gradient coordinates are relative to EACH bar's own
+// bounding box — exactly what recharts' objectBoundingBox patterns do.
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Diagonal two-tone hatch, tinted with the bar's color. The stripe is drawn
+// STRAIGHT (a vertical bar in a 5px tile) and the pattern itself is rotated 45° —
+// zrender applies pattern transforms the same way ECharts decals do. Baking the
+// diagonal into the tile would clip the stroke at the corners and read as
+// periodic gaps once tiled. Tiles render at devicePixelRatio and scale back down
+// so the texture stays crisp on retina canvases.
+function barHatchPattern(color: string): ImagePatternObject | null {
+  if (typeof document === "undefined") return null;
+  const dpr = Math.max(window.devicePixelRatio || 1, 1);
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return null;
+
+  const period = 5;
+  const stripe = 1.5;
+  canvas.width = period * dpr;
+  canvas.height = period * dpr;
+  ctx.scale(dpr, dpr);
+
+  // Dimmed field with a full-strength stripe every 5px — the recharts hatch mask
+  // is exactly this (background at 30% alpha, stripe at full).
+  ctx.fillStyle = withAlpha(color, 0.3);
+  ctx.fillRect(0, 0, period, period);
+  ctx.fillStyle = color;
+  ctx.fillRect(0, 0, stripe, period);
+
+  return {
+    image: canvas,
+    repeat: "repeat",
+    rotation: -Math.PI / 4,
+    scaleX: 1 / dpr,
+    scaleY: 1 / dpr,
+  };
+}
+
+// A vertical top→bottom gradient through the series color slots (recharts'
+// VerticalColorGradient). A single color collapses to a solid string.
+function verticalColorGradient(slots: string[]): string | echarts.graphic.LinearGradient {
+  if (slots.length <= 1) return slots[0] ?? "rgba(120, 120, 120, 1)";
+  return new echarts.graphic.LinearGradient(
+    0,
+    0,
+    0,
+    1,
+    slots.map((color, i) => ({ offset: i / (slots.length - 1), color })),
+  );
+}
+
+// Resolves a bar variant into an ECharts fill. Multi-color configs (only the
+// `default` variant appears multi-color in practice) run the full vertical color
+// gradient; the horizontal-split / textured variants are authored single-color in
+// the twin, so they tint from the first slot.
+function barFillPaint(variant: BarVariant, slots: string[]): SeriesPaint {
+  const base = slots[0] ?? "rgba(120, 120, 120, 1)";
+  const multi = slots.length > 1;
+
+  switch (variant) {
+    case "gradient": {
+      // Bar color faded toward the baseline — full near the top (≤20%), gone by
+      // 90% — recharts' GradientPattern mask, expressed directly as vertical alpha.
+      const fade = (t: number) => (t <= 0.2 ? 1 : t >= 0.9 ? 0 : 1 - (t - 0.2) / 0.7);
+      if (multi) {
+        return new echarts.graphic.LinearGradient(
+          0,
+          0,
+          0,
+          1,
+          slots.map((color, i) => {
+            const t = i / (slots.length - 1);
+            return { offset: t, color: withAlpha(color, fade(t)) };
+          }),
+        );
+      }
+      return new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+        { offset: 0, color: withAlpha(base, 1) },
+        { offset: 0.2, color: withAlpha(base, 1) },
+        { offset: 0.9, color: withAlpha(base, 0) },
+        { offset: 1, color: withAlpha(base, 0) },
+      ]);
+    }
+    case "duotone":
+    case "duotone-reverse": {
+      // Horizontal two-tone split: one half full strength, the other at 40%.
+      const reverse = variant === "duotone-reverse";
+      const dim = withAlpha(base, 0.4);
+      const left = reverse ? base : dim;
+      const right = reverse ? dim : base;
+      return new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+        { offset: 0, color: left },
+        { offset: 0.5, color: left },
+        { offset: 0.5, color: right },
+        { offset: 1, color: right },
+      ]);
+    }
+    case "stripped": {
+      // A faint wash (0.4 → 0.1 down the bar) under a bright top edge — the
+      // canvas analogue of recharts' low-opacity gradient plus its solid top
+      // strip. The strip lives inside the gradient (a full-alpha stop in the top
+      // ~5%) since ECharts bars can't carry a separate top-only fill.
+      return new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+        { offset: 0, color: withAlpha(base, 1) },
+        { offset: 0.05, color: withAlpha(base, 0.4) },
+        { offset: 1, color: withAlpha(base, 0.1) },
+      ]);
+    }
+    case "hatched":
+      return barHatchPattern(base) ?? base;
+    case "default":
+    default:
+      return verticalColorGradient(slots);
+  }
+}
+
+// Dot helpers (DotStyle, dotItemStyle, DOT_SIZES, dotStyle, sampleGradient) now
+// live in @/registry/ui/echarts-dot and are imported at the top of this file.
+
+// Brush overlays + the dataZoom slider builder (BrushRange, BrushGeometry,
+// BrushOverlayElements, syncBrushOverlay, buildBrushDataZoom) now live in
+// @/registry/ui/echarts-brush and are imported at the top of this file. The
+// per-chart mini-series (which differ per chart type) are still built below.
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Curve mapping — linear → straight, step → step:"middle", everything else →
+// smooth. Recharts "step" is d3's curveStep: the transition happens at the
+// MIDPOINT between points, so each dot sits centered on its plateau.
 // ─────────────────────────────────────────────────────────────────────────────
 
 function curveConfig(curveType: CurveType): { smooth: boolean; step: "middle" | false } {
-  // Recharts "step" is d3's curveStep: the transition happens at the MIDPOINT
-  // between points, so each dot sits centered on its plateau.
   if (curveType === "step") return { smooth: false, step: "middle" };
   if (curveType === "linear") return { smooth: false, step: false };
   return { smooth: true, step: false };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Selection opacities — dims a series only when another one is selected. Lines
-// have no fill, so only the stroke and dots carry an opacity here.
+// Selection dim (§ recharts getOpacity / getBarOpacity) — a series dims only when
+// ANOTHER series is selected; the selected (or no-selection) series stays at full
+// strength. Line strokes and dots use seriesDim (0.3); bar FILLS use seriesFillDim
+// (0.15) so the dimmed columns recede further than the lines, like the area
+// chart's dimmed fill.
 // ─────────────────────────────────────────────────────────────────────────────
 
-function getOpacity(selected: string | null, key: string) {
-  if (selected === null || selected === key) return { stroke: 1, dot: 1 };
-  return { stroke: 0.3, dot: 0.3 };
+function seriesDim(selected: string | null, key: string): number {
+  return selected === null || selected === key ? 1 : SELECTION_DIM;
+}
+
+function seriesFillDim(selected: string | null, key: string): number {
+  return selected === null || selected === key ? 1 : SELECTION_DIM_FILL;
+}
+
+function seriesLabel(config: ChartConfig, key: string): string {
+  const label = config[key]?.label;
+  return typeof label === "string" ? label : key;
+}
+
+// How many stagger steps a bar at `index` waits before it grows in — the order
+// encoded by `animationType`. Bars are independent rectangles, so (unlike the
+// line's single left-to-right clip) the direction values are honored here via a
+// per-datum `animationDelay`. Ported verbatim from the ECharts bar chart.
+function barStaggerDelay(type: ComposedAnimationType, index: number, count: number): number {
+  if (type === "none" || count <= 0) return 0;
+  const last = count - 1;
+  const center = last / 2;
+  let step: number;
+  switch (type) {
+    case "right-to-left":
+      step = last - index;
+      break;
+    case "center-out":
+      step = Math.abs(index - center);
+      break;
+    case "edges-in":
+      step = center - Math.abs(index - center);
+      break;
+    default: // left-to-right
+      step = index;
+  }
+  return step * BAR_STAGGER;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -581,20 +744,11 @@ function shimmerWindowStops(center: number, color: string, peak: number) {
   return stops;
 }
 
-// Tooltip HTML primitives (roundnessClass, tooltipVariantClass,
-// tooltipIndicatorHtml, tooltipRow, tooltipShell) live in
-// @/registry/ui/echarts/tooltip; indicatorBackground lives in
-// @/registry/ui/echarts/chart. Both are imported at the top of this file.
-
-// The `__buffer-` prefix marks the dashed forecast overlay of a buffer line; it
-// carries the SAME key's value, so the tooltip recovers the key from it (see
-// createTooltipFormatter). Every other `__`-prefixed series (mini chart, loading
-// skeleton) is truly internal and never surfaces.
-const BUFFER_PREFIX = "__buffer-";
-
-// Legend overlay (legendFillStyle, legendOutlineStyle, LegendIndicator,
-// LegendOverlay) lives in @/registry/ui/echarts/legend and is imported at the
-// top of this file.
+// Tooltip HTML primitives (roundnessClass, tooltipVariantClass, tooltipShell,
+// tooltipRow, tooltipIndicatorHtml, tooltipBaseOption) live in
+// @/registry/ui/echarts-tooltip; the legend overlay + its indicators
+// (indicatorBackground, legendFillStyle, legendOutlineStyle, LegendIndicator,
+// LegendOverlay) live in @/registry/ui/echarts-legend — both imported at the top.
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Option builders — pure functions from a snapshot context to ECharts option
@@ -606,24 +760,27 @@ const BUFFER_PREFIX = "__buffer-";
 type OptionBuildContext = {
   data: Record<string, unknown>[];
   config: ChartConfig;
+  bars: BarSeriesConfig[];
   lines: LineSeriesConfig[];
+  seriesKeys: string[];
   curveType: CurveType;
+  animationType: ComposedAnimationType; // default bar grow-in order (each bar may override)
+  barGap?: number | string;
+  barCategoryGap?: number | string;
   selectedDataKey: string | null;
-  hasSelection: boolean;
   showGrid: boolean;
   xAxisSlot: XAxisSlot;
   yAxisSlot: YAxisSlot;
   tooltipSlot: TooltipSlot;
   legendSlot: LegendSlot;
   isLoading: boolean;
-  loadingData: () => number[];
+  loadingData: () => number[]; // skeleton BAR heights, lazily rolled per shimmer sweep
+  loadingLineData: () => number[]; // skeleton LINE values, an independent walk from the bars
   showBrush: boolean;
   brushHeight: number;
-  enableHoverHighlight: boolean;
   resolved: ResolvedColors;
   categories: string[];
   brushRange: BrushRange; // zoom window carried through rebuilds
-  getHoveredKey: () => string | null; // read per tooltip render — hover never repushes the option
 };
 
 // Grid insets plus the footer band reserved for the brush. ECharts 6 contains
@@ -652,20 +809,23 @@ function buildChartLayout({ legendSlot, xAxisSlot, showBrush, brushHeight }: Opt
 }
 
 function buildMainAxes(ctx: OptionBuildContext): { xAxis: XAxisOption; yAxis: YAxisOption } {
-  const { xAxisSlot, yAxisSlot, showGrid, isLoading, categories, loadingData } = ctx;
+  const { xAxisSlot, yAxisSlot, showGrid, isLoading, bars, categories, loadingData } = ctx;
   const { tokens } = ctx.resolved;
 
   const axisLabelColor = tokens.mutedForeground;
   const splitLineColor = withAlpha(tokens.border, GRID_LINE_OPACITY);
   // Gridline gray as an opaque color — see flattenColor.
   const tickDotColor = flattenColor(splitLineColor, tokens.background);
+  // Bars need band spacing (points centered in categories); a line-only chart
+  // spans edge to edge. The loading skeleton is bars, so it always bands.
+  const hasBars = bars.length > 0 || isLoading;
 
   const xTickFormatter = xAxisSlot.tickFormatter;
   const yTickFormatter = yAxisSlot.tickFormatter;
 
   const xAxis: XAxisOption = {
     type: "category",
-    boundaryGap: false,
+    boundaryGap: hasBars,
     show: true,
     data: isLoading ? loadingData().map((_, i) => i) : categories,
     // Axis title — same size/color as the tick labels, pushed clear of them.
@@ -695,10 +855,12 @@ function buildMainAxes(ctx: OptionBuildContext): { xAxis: XAxisOption; yAxis: YA
 
   // An ECharts axis with `show: false` hides its splitLines too, but Recharts'
   // <CartesianGrid> draws with or without a visible <YAxis>. Keep the axis on
-  // whenever <Grid/> is present and gate the LABELS on <YAxis/> instead.
+  // whenever <Grid/> is present and gate the LABELS on <YAxis/> instead. Bars
+  // baseline at 0, matching the Recharts twin's value axis.
   const yAxis: YAxisOption = {
     type: "value",
     show: yAxisSlot.present || showGrid,
+    min: bars.length > 0 ? 0 : undefined,
     // Axis title — rendered rotated alongside the tick labels, same styling.
     name: isLoading ? undefined : yAxisSlot.label,
     nameLocation: "middle",
@@ -732,11 +894,9 @@ function buildMainAxes(ctx: OptionBuildContext): { xAxis: XAxisOption; yAxis: YA
   return { xAxis, yAxis };
 }
 
-// Tooltip HTML builder, closed over the build context. `trigger: "axis"` hands
-// the formatter every series' value at the hovered x; buffer overlays and the
-// mini/loading series are folded out here (see BUFFER_PREFIX).
+// Tooltip HTML builder, closed over the build context.
 function createTooltipFormatter(ctx: OptionBuildContext) {
-  const { config, selectedDataKey, tooltipSlot, getHoveredKey } = ctx;
+  const { config, selectedDataKey, tooltipSlot } = ctx;
 
   return (params: unknown): string => {
     const rows = Array.isArray(params) ? params : [params];
@@ -747,43 +907,21 @@ function createTooltipFormatter(ctx: OptionBuildContext) {
     const axisValue = first.axisValue ?? first.name ?? "";
     const label = String(axisValue);
 
-    // Dedupe by effective key: a buffer line contributes both its solid part
-    // (id=key) and its dashed overlay (id=`__buffer-{key}`) at the shared
-    // second-to-last point. Keep the first non-null value seen per key so the
-    // final point (only the overlay has data there) still shows its number.
-    const seen = new Set<string>();
     const body = rows
       .map((param) => {
         const p = param as {
           seriesId?: string;
           seriesName?: string;
-          value?: number | string | null;
+          value?: number | string;
         };
-        const rawId = String(p.seriesId ?? "");
-        // Map the dashed buffer overlay back onto its series; drop every other
-        // internal series (mini chart, loading skeleton).
-        const key = rawId.startsWith(BUFFER_PREFIX)
-          ? rawId.slice(BUFFER_PREFIX.length)
-          : rawId.startsWith("__")
-            ? ""
-            : (p.seriesId ?? p.seriesName ?? "");
-        if (!key) return "";
-        // A null value means this series does not reach the hovered x (a buffer
-        // line's solid part stops before the last point) — skip it, and let the
-        // overlay row for the same key stand in.
-        if (p.value === null || p.value === undefined) return "";
-        if (seen.has(key)) return "";
-        seen.add(key);
-
+        // Internal series (the brush's mini chart, the loading skeleton) never
+        // surface in the tooltip.
+        if (String(p.seriesId ?? "").startsWith("__")) return "";
+        const key = p.seriesId ?? p.seriesName ?? "";
         const item = config[key];
         const colorsCount = item ? getColorsCount(item) : 1;
         const labelText = typeof item?.label === "string" ? item.label : (p.seriesName ?? key);
-        const hovered = getHoveredKey();
-        const dimmed =
-          (selectedDataKey != null && selectedDataKey !== key) ||
-          (hovered != null && hovered !== key)
-            ? " opacity-30"
-            : "";
+        const dimmed = selectedDataKey != null && selectedDataKey !== key ? " opacity-30" : "";
         const value =
           typeof p.value === "number" ? p.value.toLocaleString() : String(p.value ?? "");
 
@@ -816,17 +954,17 @@ function buildTooltipOption(ctx: OptionBuildContext): TooltipComponentOption {
       tokens,
       position: tooltipSlot.position,
       axisPointerColor: withAlpha(tokens.border, AXIS_POINTER_OPACITY),
-      strokeWidth: STROKE_WIDTH,
+      strokeWidth: AXIS_POINTER_WIDTH,
     }),
     formatter: createTooltipFormatter(ctx),
   };
 }
 
-// ── Brush — the evil-brush "line" look, canvas-style: a real mini chart of the
-// full data (strokes only, no fill, like EvilBrush variant="line") in a second
-// grid, with a transparent slider dataZoom laid over it. Both zoom entries target
-// only the MAIN x-axis, so the mini chart never filters itself. Only called when
-// `showBrush` is set.
+// ── Brush — the evil-brush look, canvas-style: a real mini chart of the full
+// data in a second grid, with a transparent slider dataZoom laid over it. Every
+// bar and line is mirrored as a compact area-line (the EvilBrush "area" variant),
+// so the footer reads as one silhouette. Both zoom entries target only the MAIN
+// x-axis, so the mini chart never filters itself. Only called when `showBrush`.
 function buildBrushOption(
   ctx: OptionBuildContext,
   brushBottom: number,
@@ -837,7 +975,7 @@ function buildBrushOption(
   miniSeries: LineSeriesOption[];
   dataZoom: DataZoomComponentOption[];
 } {
-  const { data, lines, curveType, selectedDataKey, brushHeight, categories } = ctx;
+  const { data, bars, lines, curveType, selectedDataKey, brushHeight, categories } = ctx;
   const { tokens } = ctx.resolved;
 
   const miniGrid: GridComponentOption = {
@@ -861,14 +999,26 @@ function buildBrushOption(
 
   const miniYAxis: YAxisOption = { type: "value", gridIndex: 1, show: false };
 
-  const miniSeries: LineSeriesOption[] = lines.map((line) => {
-    const key = line.dataKey;
-    const base = (ctx.resolved.series[key] ?? [])[0] ?? "rgba(120, 120, 120, 1)";
-    const curve = curveConfig(line.curveType ?? curveType);
+  // Mirror bars and lines alike as area-lines. Bars carry no curve, so they use
+  // the chart default; lines carry their own.
+  const miniInputs = [
+    ...bars.map((bar) => ({ dataKey: bar.dataKey, curveType: undefined, connectNulls: false })),
+    ...lines.map((line) => ({
+      dataKey: line.dataKey,
+      curveType: line.curveType,
+      connectNulls: line.connectNulls,
+    })),
+  ];
 
-    // The mini chart mirrors the click selection: unselected series recede
-    // by the same ratio as the main plot.
-    const strokeDim = getOpacity(selectedDataKey, key).stroke;
+  const miniSeries: LineSeriesOption[] = miniInputs.map((input) => {
+    const key = input.dataKey;
+    const base = (ctx.resolved.series[key] ?? [])[0] ?? "rgba(120, 120, 120, 1)";
+    const curve = curveConfig(input.curveType ?? curveType);
+
+    // The mini chart mirrors the click selection: unselected series recede like
+    // the main plot — the stroke by seriesDim, the fill by the deeper fill dim.
+    const dim = seriesDim(selectedDataKey, key);
+    const fillDim = seriesFillDim(selectedDataKey, key);
 
     return {
       id: `__mini-${key}`,
@@ -878,12 +1028,18 @@ function buildBrushOption(
       data: data.map((row) => Number(row[key]) || 0),
       smooth: curve.smooth,
       step: curve.step,
-      connectNulls: line.connectNulls,
+      connectNulls: input.connectNulls,
       silent: true,
       showSymbol: false,
       emphasis: { disabled: true },
       tooltip: { show: false },
-      lineStyle: { color: base, width: 1, opacity: BRUSH_STROKE_OPACITY * strokeDim },
+      lineStyle: { color: base, width: 1, opacity: BRUSH_STROKE_OPACITY * dim },
+      areaStyle: {
+        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+          { offset: 0, color: withAlpha(base, BRUSH_FILL_OPACITY * fillDim) },
+          { offset: 1, color: withAlpha(base, 0) },
+        ]),
+      },
       z: 0,
     };
   });
@@ -898,15 +1054,16 @@ function buildBrushOption(
   return { miniGrid, miniXAxis, miniYAxis, miniSeries, dataZoom };
 }
 
-// Loading skeleton — ONE gray wave regardless of declared lines (Recharts
-// parity: its skeleton is a single stroke-only LoadingLine), swept by the
-// shimmer rAF. No fill: a <Line> has no area, so the skeleton is stroke-only too.
+// Loading skeleton — a gray bar wave AND a gray line over it, because THIS chart
+// is bars + lines (unlike the pure bar or area chart, whose skeleton is a single
+// shape). Both are swept by the SAME diagonal shimmer window (see the shimmer rAF:
+// one shared absolute-pixel clip gradient drives the bar fill and the line stroke,
+// so they light up together).
 function buildLoadingOption(
   ctx: OptionBuildContext,
   frame: { grid: GridComponentOption; xAxis: XAxisOption; yAxis: YAxisOption },
 ): EChartsOption {
   const { tokens } = ctx.resolved;
-  const curve = curveConfig(ctx.curveType);
 
   return {
     animation: false,
@@ -917,224 +1074,256 @@ function buildLoadingOption(
     series: [
       {
         id: "__loading",
-        type: "line",
+        type: "bar",
         data: ctx.loadingData(),
-        smooth: curve.smooth,
-        step: curve.step,
-        showSymbol: false,
-        silent: true,
+        barCategoryGap: "30%",
         // Invisible until the first shimmer tick positions the clip window.
-        lineStyle: { color: withAlpha(tokens.foreground, 0), width: 1 },
+        itemStyle: {
+          color: withAlpha(tokens.foreground, 0),
+          borderRadius: [DEFAULT_BAR_RADIUS, DEFAULT_BAR_RADIUS, 0, 0],
+        },
+        silent: true,
         z: 1,
+      },
+      {
+        id: "__loading-line",
+        type: "line",
+        data: ctx.loadingLineData(),
+        smooth: true,
+        showSymbol: false,
+        symbol: "none",
+        // Invisible until the first shimmer tick positions the clip window.
+        lineStyle: { color: withAlpha(tokens.foreground, 0), width: LOADING_LINE_WIDTH },
+        silent: true,
+        z: 2,
       },
     ],
   };
 }
 
-// The plotted values for a line, optionally decorated per-datum. Multi-color
-// lines tint each symbol with the gradient's color at its own x-position (like
-// the Recharts dots); single-color lines return the raw numbers. `null` entries
-// pass through untouched — they carve the gap a buffer line's two parts leave.
-type LinePoint =
-  | number
-  | null
-  | {
-      value: number | null;
-      itemStyle: DotItemStyleOption;
-      emphasis: { itemStyle: DotItemStyleOption };
-    };
+function buildBarSeries(ctx: OptionBuildContext): BarSeriesOption[] {
+  const { data, config, bars, animationType, selectedDataKey, resolved, barGap, barCategoryGap } =
+    ctx;
+  // While a series is click-selected the selection dim owns the canvas — hover
+  // highlighting is suspended until it clears (see the emphasis/blur switch below).
+  const hasSelection = selectedDataKey !== null;
 
-function buildLineSeries(ctx: OptionBuildContext): LineSeriesOption[] {
-  const {
-    data,
-    config,
-    lines,
-    curveType,
-    selectedDataKey,
-    hasSelection,
-    enableHoverHighlight,
-    resolved,
-  } = ctx;
-  const background = resolved.tokens.background;
-
-  return lines.flatMap((line): LineSeriesOption[] => {
-    const key = line.dataKey;
+  return bars.map((bar) => {
+    const key = bar.dataKey;
     const slots = resolved.series[key] ?? ["rgba(120, 120, 120, 1)"];
-    const paint = seriesPaint(slots);
-    const isSelected = selectedDataKey === key;
-    const opacity = getOpacity(selectedDataKey, key);
-    const curve = curveConfig(line.curveType ?? curveType);
+    const base = slots[0];
     const multiColor = slots.length > 1;
-
-    const restingDot = dotStyle(line.dotVariant, paint, background);
-    const activeDot = dotStyle(line.activeDotVariant, paint, background);
-    const restingVisible = line.dotVariant !== "none";
-    const dotOpacity = opacity.dot;
-
+    const fillDim = seriesFillDim(selectedDataKey, key);
     const values = data.map((row) => Number(row[key]) || 0);
-    const n = values.length;
-    const buffer = line.enableBufferLine && n >= 2;
+    const barAnim = bar.animationType ?? animationType;
 
-    // The dash pattern for the MAIN line. A buffer line keeps its body solid and
-    // dashes only the tail overlay, so its main part is always solid regardless
-    // of strokeVariant (matches the Recharts twin, which suppresses the base
-    // dasharray while the buffer shape manages its own).
-    const mainDash: "solid" | [number, number] =
-      buffer || line.strokeVariant === "solid" ? "solid" : [3, 3];
+    // Glow — a soft canvas shadow behind the bar, the analogue of the Recharts
+    // feGaussianBlur. A single-color bar tints its whole shadow with its color;
+    // a multi-color bar samples the gradient PER-DATUM so each column's halo
+    // follows the palette at its x-position (a single flat tint would be wrong).
+    const glowSeriesStyle =
+      bar.glow && !multiColor
+        ? { shadowBlur: BAR_GLOW_BLUR, shadowColor: withAlpha(base, BAR_GLOW_OPACITY) }
+        : {};
 
-    // Turn a value list into ECharts data — attaching per-datum symbol colors
-    // for multi-color lines, and passing `null` gaps through so a buffer line's
-    // two parts each draw only their own segment.
-    const toPoints = (vals: (number | null)[]): LinePoint[] =>
-      !multiColor
-        ? vals
-        : vals.map((value, i): LinePoint => {
-            if (value === null) return null;
-            const t = vals.length > 1 ? i / (vals.length - 1) : 0;
-            const pointColor = sampleGradient(slots, t);
+    const dataPoints =
+      bar.glow && multiColor
+        ? values.map((value, i) => {
+            const t = values.length > 1 ? i / (values.length - 1) : 0;
             return {
               value,
               itemStyle: {
-                ...dotItemStyle(
-                  restingVisible ? line.dotVariant : line.activeDotVariant,
-                  pointColor,
-                  background,
-                ),
-                opacity: dotOpacity,
-              },
-              emphasis: {
-                itemStyle: {
-                  ...dotItemStyle(
-                    line.activeDotVariant === "none" ? "default" : line.activeDotVariant,
-                    pointColor,
-                    background,
-                  ),
-                  opacity: 1,
-                },
+                shadowBlur: BAR_GLOW_BLUR,
+                shadowColor: withAlpha(sampleGradient(slots, t), BAR_GLOW_OPACITY),
               },
             };
-          });
+          })
+        : values;
 
-    // Buffer line: the solid MAIN part drops the last point (its final segment
-    // becomes the dashed overlay); the overlay carries only the last two points.
-    const mainValues: (number | null)[] = buffer
-      ? values.map((v, i) => (i === n - 1 ? null : v))
-      : values;
-
-    const z = isSelected ? 3 : hasSelection ? 1 : 2;
-
-    // Glow overlays sit UNDER the real line (built first, same z; equal-z series
-    // paint in array order). They follow the FULL solid path so the halo stays
-    // continuous even beneath a dashed or buffer tail.
-    const glowSeries = line.glowing
-      ? buildGlowSeries({
-          key,
-          paint,
-          slots,
-          values,
-          curve,
-          connectNulls: line.connectNulls,
-          z,
-          selectionDim: opacity.stroke,
-          dotSize: restingVisible ? restingDot.size : 0,
-        })
-      : [];
-
-    const mainSeries: LineSeriesOption = {
+    const series: BarSeriesOption = {
       id: key,
-      name: typeof config[key]?.label === "string" ? config[key]?.label : key,
+      name: seriesLabel(config, key),
+      type: "bar",
+      data: dataPoints,
+      barGap,
+      barCategoryGap,
+      cursor: bar.isClickable ? "pointer" : "default",
+      // Bars sit behind lines (z 2 vs 3), matching the Recharts twin's JSX order.
+      z: 2,
+      itemStyle: {
+        color: barFillPaint(bar.variant, slots),
+        opacity: fillDim,
+        // Stripped bars are square (their solid top strip lives in the fill);
+        // every other variant rounds all four corners like the Recharts twin.
+        borderRadius: bar.variant === "stripped" ? 0 : bar.radius,
+        ...glowSeriesStyle,
+      },
+      // Per-datum grow-in: bars rise from the baseline, staggered by animationType.
+      // Only takes effect on the reveal push (top-level `animation: true`); every
+      // later push sends `animation: false`, so the stagger is dormant then.
+      animationDuration: BAR_GROW_DURATION,
+      animationEasing: "cubicOut",
+      animationDelay: (idx: number) => barStaggerDelay(barAnim, idx, data.length),
+      // Hover-highlight dims the OTHER columns of this bar via ECharts-native
+      // emphasis — `focus: "self"` blurs siblings, `blurScope: "series"` keeps
+      // the blur inside this bar (so lines and other bars are untouched). This is
+      // the canvas equivalent of the twin's per-column dim, driven natively so no
+      // option is pushed mid-hover. Once a series is click-SELECTED, hover
+      // highlighting is suspended: focus drops to "none" and the blur is removed so
+      // hovering no longer re-dims anything (the option rebuilds on selection
+      // change, so this build-time switch flips automatically and resumes on clear).
+      emphasis:
+        bar.enableHoverHighlight && !hasSelection
+          ? { focus: "self", blurScope: "series" }
+          : { focus: "none" },
+      blur:
+        bar.enableHoverHighlight && !hasSelection
+          ? { itemStyle: { opacity: SELECTION_DIM_FILL } }
+          : undefined,
+    };
+
+    return bar.barProps ? { ...series, ...bar.barProps } : series;
+  });
+}
+
+function buildLineSeries(ctx: OptionBuildContext): LineSeriesOption[] {
+  const { data, config, lines, curveType, selectedDataKey, resolved } = ctx;
+
+  return lines.map((line) => {
+    const key = line.dataKey;
+    const slots = resolved.series[key] ?? ["rgba(120, 120, 120, 1)"];
+    const paint = seriesPaint(slots);
+    const dim = seriesDim(selectedDataKey, key);
+    const curve = curveConfig(line.curveType ?? curveType);
+    const values = data.map((row) => Number(row[key]) || 0);
+
+    const restingDot = dotStyle(line.dotVariant, paint, resolved.tokens.background);
+    const activeDot = dotStyle(line.activeDotVariant, paint, resolved.tokens.background);
+    const restingVisible = line.dotVariant !== "none";
+    const multiColor = slots.length > 1;
+
+    // Multi-color lines tint each symbol with the gradient's color at its own
+    // x-position (per-datum itemStyle), like the Recharts dots. The stroke keeps
+    // the full horizontal gradient.
+    const dataPoints = !multiColor
+      ? values
+      : values.map((value, i) => {
+          const t = values.length > 1 ? i / (values.length - 1) : 0;
+          const pointColor = sampleGradient(slots, t);
+          return {
+            value,
+            itemStyle: {
+              ...dotItemStyle(
+                restingVisible ? line.dotVariant : line.activeDotVariant,
+                pointColor,
+                resolved.tokens.background,
+              ),
+              opacity: dim,
+            },
+            emphasis: {
+              itemStyle: {
+                ...dotItemStyle(
+                  line.activeDotVariant === "none" ? "default" : line.activeDotVariant,
+                  pointColor,
+                  resolved.tokens.background,
+                ),
+                opacity: 1,
+              },
+            },
+          };
+        });
+
+    const series: LineSeriesOption = {
+      id: key,
+      name: seriesLabel(config, key),
       type: "line",
-      data: toPoints(mainValues),
+      data: dataPoints,
       smooth: curve.smooth,
       step: curve.step,
       connectNulls: line.connectNulls,
       cursor: line.isClickable ? "pointer" : "default",
-      // By default ECharts only fires mouse events on the symbols — this makes
-      // the line itself clickable too, like the Recharts <Line>.
+      // By default ECharts fires mouse events only on the symbols — this makes
+      // the whole polyline clickable, like the Recharts <Line>.
       triggerLineEvent: line.isClickable,
       showSymbol: restingVisible,
       symbol: "circle",
       symbolSize: restingVisible ? restingDot.size : activeDot.size,
-      z,
+      z: 3,
+      // The glow is NOT a shadowBlur here — a single shadowColor can't follow the
+      // horizontal gradient. It is a stack of silent wide overlay copies painted
+      // with the same gradient, added by buildLineGlowSeries and rendered under
+      // this crisp stroke.
       lineStyle: {
         color: paint,
         width: STROKE_WIDTH,
-        opacity: opacity.stroke,
-        type: mainDash,
+        opacity: dim,
+        type: line.strokeVariant === "solid" ? "solid" : DASH_PATTERN,
         dashOffset: 0,
       },
       itemStyle: multiColor
-        ? { opacity: dotOpacity }
+        ? { opacity: dim }
         : {
             ...(restingVisible ? restingDot.itemStyle : activeDot.itemStyle),
-            opacity: dotOpacity,
+            opacity: dim,
           },
       emphasis: {
-        // focus "series" blurs every other series in this grid while one is
-        // hovered — the hover twin of the click selection (opt-in via
-        // enableHoverHighlight). Suppressed entirely while a series is
-        // click-selected: the selection dim owns the canvas, so hover
-        // highlighting stops until the selection clears (the option rebuilds on
-        // selection change, making this a build-time conditional). Otherwise the
-        // active dot is the only emphasis.
-        focus: enableHoverHighlight && !hasSelection ? "series" : "none",
+        focus: "none",
         scale: restingVisible ? activeDot.size / Math.max(restingDot.size, 1) : 1,
         ...(multiColor ? {} : { itemStyle: { ...activeDot.itemStyle, opacity: 1 } }),
       },
-      // Blur styling mirrors the click-selection dim (stroke 0.3 / dot 0.3);
-      // inert unless a series is focused via enableHoverHighlight.
-      blur: {
-        lineStyle: { opacity: 0.3 },
-        itemStyle: { opacity: 0.3 },
-      },
     };
 
-    if (!buffer) return [...glowSeries, mainSeries];
-
-    // Dashed forecast overlay — draws ONLY the last segment. Silent, so it never
-    // intercepts clicks/hover; it still feeds the axis tooltip (silent series
-    // are aggregated by axis), which is why the last point keeps its number.
-    const bufferValues: (number | null)[] = values.map((v, i) => (i >= n - 2 ? v : null));
-    const bufferSeries: LineSeriesOption = {
-      id: `${BUFFER_PREFIX}${key}`,
-      type: "line",
-      data: toPoints(bufferValues),
-      smooth: curve.smooth,
-      step: curve.step,
-      connectNulls: true,
-      silent: true,
-      showSymbol: restingVisible,
-      symbol: "circle",
-      symbolSize: restingVisible ? restingDot.size : activeDot.size,
-      z,
-      lineStyle: {
-        color: paint,
-        width: STROKE_WIDTH,
-        opacity: opacity.stroke,
-        type: BUFFER_DASH,
-      },
-      itemStyle: multiColor
-        ? { opacity: dotOpacity }
-        : {
-            ...(restingVisible ? restingDot.itemStyle : activeDot.itemStyle),
-            opacity: dotOpacity,
-          },
-      // The dashed tail is a separate silent series, so focus:"series" on its
-      // parent would blur it apart from the line it belongs to. The root
-      // dispatch-links this id (see companionIdsByKey) so it focuses WITH its
-      // parent; these styles give it the parent's look while focused and the
-      // click-selection dim while another series is hovered.
-      emphasis: {
-        focus: "none",
-        scale: false,
-        lineStyle: { opacity: opacity.stroke },
-        itemStyle: { opacity: dotOpacity },
-      },
-      blur: { lineStyle: { opacity: 0.3 }, itemStyle: { opacity: 0.3 } },
-    };
-
-    return [...glowSeries, mainSeries, bufferSeries];
+    return line.lineProps ? { ...series, ...line.lineProps } : series;
   });
+}
+
+// Glow overlay copies for glowing lines — a few SILENT, symbol-less line series
+// painted with the SAME gradient as the real stroke, widening and fading outward
+// (see LINE_GLOW_LAYERS). Stacked UNDER the crisp line, the wide low-alpha
+// gradient strokes read as a soft colored blur that follows the series color along
+// its whole length — the canvas analogue of the Recharts feGaussianBlur, and
+// unlike a single-tint shadowColor it stays color-faithful on multi-stop series.
+//
+// These are appended AFTER the main bar+line series (so the seriesIndex→key map
+// the click handler relies on is unchanged) and pushed under the lines by z: the
+// widest/faintest layer paints first, the real line last.
+function buildLineGlowSeries(ctx: OptionBuildContext): LineSeriesOption[] {
+  const { data, lines, curveType, selectedDataKey, resolved } = ctx;
+
+  return lines
+    .filter((line) => line.glow)
+    .flatMap((line) => {
+      const key = line.dataKey;
+      const slots = resolved.series[key] ?? ["rgba(120, 120, 120, 1)"];
+      const paint = seriesPaint(slots);
+      const dim = seriesDim(selectedDataKey, key);
+      const curve = curveConfig(line.curveType ?? curveType);
+      const values = data.map((row) => Number(row[key]) || 0);
+
+      // Widest (faintest) first so it paints beneath the tighter, brighter layers.
+      return [...LINE_GLOW_LAYERS].reverse().map((layer, i) => ({
+        id: `__glow-${key}-${i}`,
+        type: "line" as const,
+        data: values,
+        smooth: curve.smooth,
+        step: curve.step,
+        connectNulls: line.connectNulls,
+        silent: true,
+        showSymbol: false,
+        symbol: "none" as const,
+        emphasis: { disabled: true },
+        tooltip: { show: false },
+        // Sits above the bars (z 2) but below the crisp line (z 3).
+        z: 2,
+        lineStyle: {
+          color: paint,
+          width: layer.width,
+          opacity: layer.opacity * dim,
+          cap: "round" as const,
+          join: "round" as const,
+        },
+      }));
+    });
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1146,26 +1335,16 @@ function buildLineSeries(ctx: OptionBuildContext): LineSeriesOption[] {
 
 type LiveState = {
   resolved: ResolvedColors | null; // colors read off the live DOM — feeds builds and rAF loops
-  hoveredKey: string | null; // tooltip's view of hover — the legend's twin lives in React state
   hasRevealed: boolean; // the intro draw-in already played on this chart instance
   revealEndsAt: number; // performance.now() timestamp when the entrance settles
-  loadingRows: number[] | null; // skeleton data, lazily rolled and re-rolled per shimmer sweep
+  loadingRows: number[] | null; // skeleton BAR heights, lazily rolled and re-rolled per shimmer sweep
+  loadingLineRows: number[] | null; // skeleton LINE values, an independent walk from the bars
   categories: string[]; // x labels of the last build, for the brush label pills
   dataLength: number; // row count, for the datazoom index math
   brushRange: BrushRange; // live zoom window — carried through every rebuild
   brushGeom: BrushGeometry | null; // brush footer layout of the last build
   brushOverlay: BrushOverlayElements | null; // zrender elements, owned by syncBrushOverlay
   brushHover: { inside: boolean; left: boolean; right: boolean };
-  // seriesIndex → clickable key for the last build, `undefined` for internal
-  // series. A line-body click (triggerLineEvent) reports only a seriesIndex, and
-  // buffer lines add a second (`__buffer-`) series per key — so the index no
-  // longer equals the key's position in seriesKeys and must be mapped explicitly.
-  seriesKeyByIndex: (string | undefined)[];
-  // key → its silent companion series ids (glow overlays + buffer tail) in the
-  // main grid. Under enableHoverHighlight the root highlights/downplays these
-  // together with the hovered parent, so focus:"series" can't strand a line's own
-  // glow or forecast tail apart from it.
-  companionIdsByKey: Map<string, string[]>;
   // Latest callbacks/flags for the imperative ECharts event handlers.
   handlers: {
     onBrushChange?: (range: { startIndex: number; endIndex: number }) => void;
@@ -1173,7 +1352,7 @@ type LiveState = {
     clickableKeys: Set<string>;
     selectedDataKey: string | null;
     brushFormatLabel?: (value: string, index: number) => string;
-    enableHoverHighlight: boolean;
+    seriesKeys: string[];
   };
   // Update-style re-push for paths that bypass React entirely (theme flips,
   // resizes) — set by the sync effect.
@@ -1185,16 +1364,17 @@ type LiveState = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * Apache ECharts port of the EvilCharts line chart, exposing a compound-as-config
- * API so its JSX reads identically to the Recharts twin. The root owns the data,
- * config, selection state, loading skeleton, intro reveal, and optional zoom
- * brush; every visual part — `<Line>`, `<XAxis>`, `<YAxis>`, `<Grid>`,
- * `<Tooltip>`, `<Legend>` — is composed as a declarative child that renders
- * nothing. The root walks those children by reference and drives a single
- * imperative ECharts instance. Fully self-contained: its only dependencies are
- * `react`, `echarts`, and `motion`.
+ * Apache ECharts port of the EvilCharts composed chart, exposing a
+ * compound-as-config API so its JSX reads identically to the Recharts twin. The
+ * root owns the data, config, selection state, loading skeleton, intro reveal,
+ * and optional zoom brush; every visual part — `<Bar>`, `<Line>`, `<XAxis>`,
+ * `<YAxis>`, `<Grid>`, `<Tooltip>`, `<Legend>`, plus `<Dot>` / `<ActiveDot>`
+ * inside a `<Line>` — is composed as a declarative child that renders nothing.
+ * The root walks those children by reference and drives a single imperative
+ * ECharts instance. Fully self-contained: its only dependencies are `react`,
+ * `echarts`, and `motion`.
  */
-export function EChartsLineChart<TData extends Record<string, unknown>>({
+export function EChartsComposedChart<TData extends Record<string, unknown>>({
   data,
   config,
   xDataKey,
@@ -1202,18 +1382,19 @@ export function EChartsLineChart<TData extends Record<string, unknown>>({
   curveType = "linear",
   animation = true,
   animationType = "left-to-right",
-  enableHoverHighlight = false,
+  barGap,
+  barCategoryGap,
   defaultSelectedDataKey = null,
   onSelectionChange,
   isLoading = false,
-  loadingPoints = LOADING_DEFAULT_POINTS,
+  loadingBars = LOADING_DEFAULT_BARS,
   showBrush = false,
   brushHeight = 56,
   brushFormatLabel,
   onBrushChange,
   chartOptions,
   children,
-}: EChartsLineChartProps<TData>) {
+}: EChartsComposedChartProps<TData>) {
   const rawId = useId();
   const chartId = `chart-${rawId.replace(/:/g, "")}`;
 
@@ -1228,47 +1409,47 @@ export function EChartsLineChart<TData extends Record<string, unknown>>({
   // identity is stable for the component's lifetime.
   const live = useRef<LiveState>({
     resolved: null,
-    hoveredKey: null,
     hasRevealed: false,
     revealEndsAt: 0,
     loadingRows: null,
+    loadingLineRows: null,
     categories: [],
     dataLength: 0,
     brushRange: { start: 0, end: 100 },
     brushGeom: null,
     brushOverlay: null,
     brushHover: { inside: false, left: false, right: false },
-    seriesKeyByIndex: [],
-    companionIdsByKey: new Map(),
     handlers: {
       onBrushChange,
       onSelectionChange,
       clickableKeys: new Set<string>(),
       selectedDataKey: defaultSelectedDataKey,
       brushFormatLabel,
-      enableHoverHighlight,
+      seriesKeys: [],
     },
     repush: () => {},
   }).current;
 
   // Skeleton rows roll lazily on first use — an impure useRef initializer would
-  // re-roll Math.random() on every render.
+  // re-roll Math.random() on every render. The bar heights and the line values are
+  // independent walks so the skeleton line rides over the bars rather than tracing
+  // their tops; both re-roll together while the shimmer window is off-screen.
   const loadingData = useCallback(
-    () => (live.loadingRows ??= getLoadingData(loadingPoints)),
-    [live, loadingPoints],
+    () => (live.loadingRows ??= getLoadingData(loadingBars)),
+    [live, loadingBars],
+  );
+  const loadingLineData = useCallback(
+    () => (live.loadingLineRows ??= getLoadingData(loadingBars)),
+    [live, loadingBars],
   );
   const shouldReduceMotion = useReducedMotion();
 
   const [selectedDataKey, setSelectedDataKey] = useState<string | null>(defaultSelectedDataKey);
 
-  // Hover-highlight mirrors into the legend (React state) and tooltip
-  // (live.hoveredKey — its formatter runs on every hover, and pushing an option
-  // to sync it would reset ECharts' native blur state mid-hover).
-  const [hoveredDataKey, setHoveredDataKey] = useState<string | null>(null);
-
   // ── Declarative config, collected from children by reference ─────────────────
   const collected = useMemo(() => collectConfig(children), [children]);
   const {
+    bars,
     lines,
     xAxis: xAxisSlot,
     yAxis: yAxisSlot,
@@ -1277,9 +1458,14 @@ export function EChartsLineChart<TData extends Record<string, unknown>>({
     legend: legendSlot,
   } = collected;
 
-  const seriesKeys = useMemo(() => lines.map((line) => line.dataKey), [lines]);
+  // seriesKeys are ordered bars-then-lines, matching the series array — the click
+  // handler recovers a series key from a polygon click's seriesIndex by position.
+  const seriesKeys = useMemo(
+    () => [...bars.map((bar) => bar.dataKey), ...lines.map((line) => line.dataKey)],
+    [bars, lines],
+  );
 
-  // x category key: <XAxis dataKey> → root xDataKey → first data column no <Line> claims.
+  // x category key: <XAxis dataKey> → root xDataKey → first data column no series claims.
   const xCategoryKey = useMemo(() => {
     if (xAxisSlot.dataKey) return xAxisSlot.dataKey;
     if (xDataKey) return xDataKey as string;
@@ -1292,17 +1478,20 @@ export function EChartsLineChart<TData extends Record<string, unknown>>({
     return "";
   }, [xAxisSlot.dataKey, xDataKey, data, seriesKeys]);
 
-  // The intro draw-in follows the first line's setting, falling back to the root default.
-  const effectiveAnimation = lines[0]?.animationType ?? animationType;
+  // The intro draw-in follows the first declared series' setting, falling back to
+  // the root default.
+  const effectiveAnimation = bars[0]?.animationType ?? lines[0]?.animationType ?? animationType;
 
   const css = useMemo(() => buildChartCss(chartId, config), [chartId, config]);
 
-  const hasSelection = selectedDataKey !== null;
-
   // Which series may be clicked to toggle selection (consulted by the click handler).
   const clickableKeys = useMemo(
-    () => new Set(lines.filter((line) => line.isClickable).map((line) => line.dataKey)),
-    [lines],
+    () =>
+      new Set([
+        ...bars.filter((bar) => bar.isClickable).map((bar) => bar.dataKey),
+        ...lines.filter((line) => line.isClickable).map((line) => line.dataKey),
+      ]),
+    [bars, lines],
   );
 
   // Refresh the handlers' snapshot of the latest callbacks/flags every render.
@@ -1312,33 +1501,19 @@ export function EChartsLineChart<TData extends Record<string, unknown>>({
     clickableKeys,
     selectedDataKey,
     brushFormatLabel,
-    enableHoverHighlight,
+    seriesKeys,
   };
   live.dataLength = data.length;
 
   const toggleSelection = useCallback(
     (key: string) => {
-      // A new click selection takes over the canvas dim, so any live hover
-      // highlight is torn down at this moment — the mouseover guard then keeps it
-      // from re-arming while the selection stands. Hover is only ever active
-      // while NO selection exists (see that guard), so a hovered key here always
-      // means this click is establishing a selection.
-      if (live.hoveredKey !== null) {
-        const chart = echartsRef.current;
-        const companions = chart ? live.companionIdsByKey.get(live.hoveredKey) : undefined;
-        if (chart && companions) {
-          for (const seriesId of companions) chart.dispatchAction({ type: "downplay", seriesId });
-        }
-        live.hoveredKey = null;
-        setHoveredDataKey(null);
-      }
       setSelectedDataKey((prev) => {
         const next = prev === key ? null : key;
         onSelectionChange?.(next);
         return next;
       });
     },
-    [live, onSelectionChange],
+    [onSelectionChange],
   );
 
   // Reposition the brush overlays from the live refs — safe to call from drag
@@ -1392,10 +1567,14 @@ export function EChartsLineChart<TData extends Record<string, unknown>>({
     const ctx: OptionBuildContext = {
       data,
       config,
+      bars,
       lines,
+      seriesKeys,
       curveType,
+      animationType,
+      barGap,
+      barCategoryGap,
       selectedDataKey,
-      hasSelection,
       showGrid,
       xAxisSlot,
       yAxisSlot,
@@ -1403,13 +1582,12 @@ export function EChartsLineChart<TData extends Record<string, unknown>>({
       legendSlot,
       isLoading,
       loadingData,
+      loadingLineData,
       showBrush,
       brushHeight,
-      enableHoverHighlight,
       resolved,
       categories,
       brushRange: live.brushRange,
-      getHoveredKey: () => live.hoveredKey,
     };
 
     const { grid, brushBottom } = buildChartLayout(ctx);
@@ -1421,29 +1599,6 @@ export function EChartsLineChart<TData extends Record<string, unknown>>({
 
     const brush = showBrush ? buildBrushOption(ctx, brushBottom) : null;
 
-    const series = [...buildLineSeries(ctx), ...(brush?.miniSeries ?? [])];
-    // Record the exact series order so a line-body click (which reports only a
-    // seriesIndex) can recover its key — buffer/mini/loading series break the
-    // "index === key position" shortcut, so map each index to its id here.
-    live.seriesKeyByIndex = series.map((s) => {
-      const id = String(s.id ?? "");
-      return id && !id.startsWith("__") ? id : undefined;
-    });
-    // Map each key to its silent companion series ids (glow overlays + buffer
-    // tail), mirroring exactly what buildLineSeries emits — the hover handlers
-    // highlight/downplay these together with the parent so focus:"series" never
-    // strands a line's own glow or forecast tail apart from it.
-    const companionIdsByKey = new Map<string, string[]>();
-    for (const line of lines) {
-      const ids: string[] = [];
-      if (line.glowing) {
-        for (let i = 0; i < GLOW_LAYERS.length; i++) ids.push(`__glow-${i}-${line.dataKey}`);
-      }
-      if (line.enableBufferLine && data.length >= 2) ids.push(`${BUFFER_PREFIX}${line.dataKey}`);
-      if (ids.length) companionIdsByKey.set(line.dataKey, ids);
-    }
-    live.companionIdsByKey = companionIdsByKey;
-
     return {
       animation: false,
       grid: brush ? [grid, brush.miniGrid] : grid,
@@ -1451,17 +1606,29 @@ export function EChartsLineChart<TData extends Record<string, unknown>>({
       yAxis: brush ? [yAxis, brush.miniYAxis] : yAxis,
       tooltip: buildTooltipOption(ctx),
       dataZoom: brush?.dataZoom,
-      series,
+      // bars before lines so the polyline strokes read above the columns. Line
+      // glow copies come AFTER the main series (their z keeps them under the lines
+      // and over the bars) so the seriesIndex→key map for clicks stays intact.
+      series: [
+        ...buildBarSeries(ctx),
+        ...buildLineSeries(ctx),
+        ...buildLineGlowSeries(ctx),
+        ...(brush?.miniSeries ?? []),
+      ],
     };
   }, [
     live,
     data,
     config,
+    bars,
     lines,
+    seriesKeys,
     xCategoryKey,
     curveType,
+    animationType,
+    barGap,
+    barCategoryGap,
     selectedDataKey,
-    hasSelection,
     showGrid,
     xAxisSlot,
     yAxisSlot,
@@ -1469,9 +1636,9 @@ export function EChartsLineChart<TData extends Record<string, unknown>>({
     legendSlot,
     isLoading,
     loadingData,
+    loadingLineData,
     showBrush,
     brushHeight,
-    enableHoverHighlight,
   ]);
 
   // ── Init + resize + theme observer (once) ────────────────────────────────────
@@ -1485,8 +1652,8 @@ export function EChartsLineChart<TData extends Record<string, unknown>>({
 
     const resizeObserver = new ResizeObserver(() => {
       // Observers always fire once right after observe(). Repushing on that
-      // no-op fire would land one frame into the intro and stomp the line's
-      // reveal clip — only react when the renderer size actually changed.
+      // no-op fire would land one frame into the intro and stomp the reveal —
+      // only react when the renderer size actually changed.
       if (mount.clientWidth === chart.getWidth() && mount.clientHeight === chart.getHeight()) {
         return;
       }
@@ -1505,52 +1672,14 @@ export function EChartsLineChart<TData extends Record<string, unknown>>({
     });
 
     chart.on("click", (params) => {
-      const { clickableKeys: clickable } = live.handlers;
+      const { clickableKeys: clickable, seriesKeys: keys } = live.handlers;
       const p = params as { seriesId?: string; seriesIndex?: number };
-      // Symbol clicks carry seriesId; line clicks (triggerLineEvent) only carry
-      // seriesIndex — recover the key from the last build's index map, which
-      // accounts for the extra `__buffer-`/`__mini-` series interleaved between
-      // the main ones (a raw seriesKeys lookup would land on the wrong key).
+      // Symbol clicks carry seriesId; line-polygon clicks (triggerLineEvent)
+      // only carry seriesIndex — recover the key by position. Main series (bars
+      // then lines) come first in the series array, so the index maps directly.
       const id =
-        p.seriesId ??
-        (typeof p.seriesIndex === "number" ? live.seriesKeyByIndex[p.seriesIndex] : undefined);
+        p.seriesId ?? (typeof p.seriesIndex === "number" ? keys[p.seriesIndex] : undefined);
       if (typeof id === "string" && clickable.has(id)) toggleSelection(id);
-    });
-
-    // Hover-highlight bookkeeping — the canvas blur is ECharts-native
-    // (emphasis.focus:"series" + blur), but the HTML legend and tooltip need to
-    // know which series is hovered, and the silent glow/buffer overlays must be
-    // focus-linked to their parent (they are separate series, so focus:"series"
-    // would otherwise blur a line's own glow or forecast tail).
-    chart.on("mouseover", (params) => {
-      const { enableHoverHighlight: hoverOn } = live.handlers;
-      if (!hoverOn) return;
-      // While a series is click-selected, hover highlighting is disabled — the
-      // selection dim owns the canvas, so never arm hover emphasis/blur (or the
-      // legend/tooltip hover dimming) until the selection clears.
-      if (live.handlers.selectedDataKey !== null) return;
-      const p = params as { seriesId?: string; seriesIndex?: number; componentType?: string };
-      if (p.componentType !== "series") return;
-      const id =
-        p.seriesId ??
-        (typeof p.seriesIndex === "number" ? live.seriesKeyByIndex[p.seriesIndex] : undefined);
-      if (typeof id !== "string" || id.startsWith("__")) return;
-      live.hoveredKey = id;
-      setHoveredDataKey(id);
-      const companions = live.companionIdsByKey.get(id);
-      if (companions) {
-        for (const seriesId of companions) chart.dispatchAction({ type: "highlight", seriesId });
-      }
-    });
-    chart.on("mouseout", () => {
-      const prev = live.hoveredKey;
-      if (prev === null) return;
-      live.hoveredKey = null;
-      setHoveredDataKey(null);
-      const companions = live.companionIdsByKey.get(prev);
-      if (companions) {
-        for (const seriesId of companions) chart.dispatchAction({ type: "downplay", seriesId });
-      }
     });
 
     chart.on("datazoom", () => {
@@ -1646,11 +1775,12 @@ export function EChartsLineChart<TData extends Record<string, unknown>>({
     };
 
     // Intro reveal — ECharts' native progressive draw, enabled only for the first
-    // real render: the line traces in, dots pop up as its front passes. Every
-    // later push (selection, theme, zoom) applies instantly, since notMerge would
-    // otherwise replay the entrance on each of them. A loading cycle re-arms it:
-    // the Recharts twin unmounts its <Line>s while loading and replays the intro
-    // on remount, so data → loading → data draws in again here too.
+    // real render: lines trace in, bars grow up from their baseline, dots pop up
+    // as the line front passes. Every later push (selection, theme, zoom) applies
+    // instantly, since notMerge would otherwise replay the entrance on each of
+    // them. A loading cycle re-arms it: the Recharts twin unmounts its series
+    // while loading and replays the intro on remount, so data → loading → data
+    // draws in again here too.
     if (isLoading) live.hasRevealed = false;
     const shouldReveal = !live.hasRevealed && !isLoading;
     if (shouldReveal) live.hasRevealed = true;
@@ -1679,14 +1809,34 @@ export function EChartsLineChart<TData extends Record<string, unknown>>({
     syncBrushOverlayNow,
   ]);
 
+  // ── Default tooltip index — show the tooltip at a fixed point with no hover ───
+  useEffect(() => {
+    const chart = echartsRef.current;
+    if (!chart || isLoading) return;
+    const index = tooltipSlot.defaultIndex;
+    if (!tooltipSlot.present || index == null) return;
+
+    // Let the reveal settle before parking the tooltip, so showTip doesn't fight
+    // the entrance animation.
+    const delay = Math.max(0, live.revealEndsAt - performance.now());
+    const timer = setTimeout(() => {
+      chart.dispatchAction({ type: "showTip", seriesIndex: 0, dataIndex: index });
+    }, delay + 60);
+
+    return () => {
+      clearTimeout(timer);
+      chart.dispatchAction({ type: "hideTip" });
+    };
+  }, [live, isLoading, tooltipSlot.present, tooltipSlot.defaultIndex]);
+
   // ── Animated dashed stroke — rAF sweeps the dash offset while unselected ─────
   useEffect(() => {
     const chart = echartsRef.current;
     if (!chart || isLoading) return;
     const animatedKeys = lines
-      // A buffer line's body is solid (only its tail dashes), so the sweep skips it.
-      .filter((line) => line.strokeVariant === "animated-dashed" && !line.enableBufferLine)
+      .filter((line) => line.strokeVariant === "animated-dashed")
       .map((line) => line.dataKey);
+    const hasSelection = selectedDataKey !== null;
     if (animatedKeys.length === 0 || hasSelection) return;
 
     let raf = 0;
@@ -1694,7 +1844,8 @@ export function EChartsLineChart<TData extends Record<string, unknown>>({
     const begin = () => {
       const loopStart = performance.now();
       const tick = (now: number) => {
-        const offset = -(((now - loopStart) / 1000) % 1) * 6; // 0 → -6 per second
+        // 0 → -DASH_PERIOD per second, so the dashes crawl one full period a second.
+        const offset = -(((now - loopStart) / 1000) % 1) * DASH_PERIOD;
         chart.setOption(
           { series: animatedKeys.map((id) => ({ id, lineStyle: { dashOffset: offset } })) },
           { silent: true, lazyUpdate: true },
@@ -1715,9 +1866,9 @@ export function EChartsLineChart<TData extends Record<string, unknown>>({
       if (delayTimer !== undefined) clearTimeout(delayTimer);
       cancelAnimationFrame(raf);
     };
-  }, [live, lines, hasSelection, isLoading]);
+  }, [live, lines, selectedDataKey, isLoading]);
 
-  // ── Loading shimmer — rAF sweeps a bright band, regenerating data off-screen ─
+  // ── Loading shimmer — rAF sweeps a bright clip window across the skeleton ─────
   useEffect(() => {
     const chart = echartsRef.current;
     if (!chart || !isLoading) return;
@@ -1727,43 +1878,52 @@ export function EChartsLineChart<TData extends Record<string, unknown>>({
     const start = performance.now();
     const tick = (now: number) => {
       const phase = ((((now - start) / LOADING_ANIMATION_DURATION) % 1) + 1) % 1;
-      // Wrapped past 1 → the band is off-screen; swap in fresh random data.
-      if (phase < lastPhase) live.loadingRows = getLoadingData(loadingPoints);
+      // Wrapped past 1 → the window is off-screen; swap in fresh random data for
+      // BOTH the bars and the line so they regenerate together, unseen.
+      if (phase < lastPhase) {
+        live.loadingRows = getLoadingData(loadingBars);
+        live.loadingLineRows = getLoadingData(loadingBars);
+      }
       lastPhase = phase;
 
       // Read tokens per frame, so a theme flip mid-loading retints the shimmer.
       const foreground = live.resolved?.tokens.foreground ?? "rgba(120, 120, 120, 1)";
-      // Sweep the clip window from fully off-screen left to fully off-screen
-      // right, leaned 45°. The gradient uses ABSOLUTE pixel coordinates so the
-      // window lands at the same place along the stroke regardless of the wave's
-      // bounding box.
       const w = chart.getWidth();
       const h = chart.getHeight();
       if (!w || !h) {
         raf = requestAnimationFrame(tick);
         return;
       }
-      // Farthest plot corner projected onto the 45° axis — keeps the sweep
-      // tight instead of dawdling off-plot at the end of each loop.
+      // Sweep the clip window from fully off-screen left to fully off-screen
+      // right, leaned 45°. The gradient uses ABSOLUTE pixel coordinates (global
+      // gradient), so the window sits at the same place for every bar AND the line
+      // — one shared shimmer window revealing the whole skeleton as a clean
+      // diagonal band. Both clips are built from the SAME `center`, so the bars and
+      // the line light up in lockstep; only the peak alpha differs (a thin line
+      // needs more than a wide bar to read at the same brightness).
       const maxT = (w + h) / (2 * w);
       const center = phase * (maxT + 2 * LOADING_SHIMMER_BAND) - LOADING_SHIMMER_BAND;
-      const clip = (peak: number) =>
-        new echarts.graphic.LinearGradient(
-          0,
-          0,
-          w,
-          w,
-          shimmerWindowStops(center, foreground, peak),
-          true,
-        );
+      const barClip = new echarts.graphic.LinearGradient(
+        0,
+        0,
+        w,
+        w,
+        shimmerWindowStops(center, foreground, LOADING_BAR_MAX_OPACITY),
+        true,
+      );
+      const lineClip = new echarts.graphic.LinearGradient(
+        0,
+        0,
+        w,
+        w,
+        shimmerWindowStops(center, foreground, LOADING_LINE_MAX_OPACITY),
+        true,
+      );
       chart.setOption(
         {
           series: [
-            {
-              id: "__loading",
-              data: loadingData(),
-              lineStyle: { color: clip(LOADING_STROKE_OPACITY), width: 1 },
-            },
+            { id: "__loading", data: loadingData(), itemStyle: { color: barClip } },
+            { id: "__loading-line", data: loadingLineData(), lineStyle: { color: lineClip } },
           ],
         },
         { silent: true, lazyUpdate: true },
@@ -1772,7 +1932,7 @@ export function EChartsLineChart<TData extends Record<string, unknown>>({
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [live, isLoading, loadingPoints, loadingData]);
+  }, [live, isLoading, loadingBars, loadingData, loadingLineData]);
 
   // ── Legend overlay position ──────────────────────────────────────────────────
   // Insets match the Recharts legend's breathing room inside the plot frame.
@@ -1808,7 +1968,7 @@ export function EChartsLineChart<TData extends Record<string, unknown>>({
           align={legendSlot.align}
           verticalAlign={legendSlot.verticalAlign}
           selectedKey={selectedDataKey}
-          hoveredKey={hoveredDataKey}
+          hoveredKey={null}
           isClickable={legendSlot.isClickable}
           onToggle={toggleSelection}
           style={legendStyle}

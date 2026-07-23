@@ -7,7 +7,7 @@ import {
   Tooltip,
   type SankeyData,
   type ChartConfig,
-} from "@/registry/charts/echarts/sankey-chart";
+} from "@/registry/charts/echarts-sankey-chart";
 
 // Energy flow - sources to consumption sectors
 const data: SankeyData = {

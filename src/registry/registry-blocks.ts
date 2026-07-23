@@ -13,7 +13,7 @@ export const blocks: Registry["items"] = [
       {
         path: "blocks/recharts/b-monospace-bar-chart.tsx",
         type: "registry:block",
-        target: TARGET_BASE_PATH + "/recharts/monospace-bar-chart.tsx",
+        target: TARGET_BASE_PATH + "/monospace-bar-chart.tsx",
       },
     ],
   },
@@ -27,7 +27,7 @@ export const blocks: Registry["items"] = [
       {
         path: "blocks/recharts/b-hover-trace-bar-chart.tsx",
         type: "registry:block",
-        target: TARGET_BASE_PATH + "/recharts/hover-trace-bar-chart.tsx",
+        target: TARGET_BASE_PATH + "/hover-trace-bar-chart.tsx",
       },
     ],
   },
@@ -41,7 +41,7 @@ export const blocks: Registry["items"] = [
       {
         path: "blocks/recharts/b-grid-bar-chart.tsx",
         type: "registry:block",
-        target: TARGET_BASE_PATH + "/recharts/grid-bar-chart.tsx",
+        target: TARGET_BASE_PATH + "/grid-bar-chart.tsx",
       },
     ],
   },
@@ -55,7 +55,7 @@ export const blocks: Registry["items"] = [
       {
         path: "blocks/recharts/b-isometric-bar-chart.tsx",
         type: "registry:block",
-        target: TARGET_BASE_PATH + "/recharts/isometric-bar-chart.tsx",
+        target: TARGET_BASE_PATH + "/isometric-bar-chart.tsx",
       },
     ],
   },
@@ -69,7 +69,7 @@ export const blocks: Registry["items"] = [
       {
         path: "blocks/echarts/b-latency-echarts-area-chart.tsx",
         type: "registry:block",
-        target: TARGET_BASE_PATH + "/echarts/latency-echarts-area-chart.tsx",
+        target: TARGET_BASE_PATH + "/latency-echarts-area-chart.tsx",
       },
     ],
   },

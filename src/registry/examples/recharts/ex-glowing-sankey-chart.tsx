@@ -1,8 +1,8 @@
 "use client";
 
-import { EvilSankeyChart, Node, Link, Tooltip } from "@/registry/charts/recharts/sankey-chart";
+import { EvilSankeyChart, Node, Link, Tooltip } from "@/registry/charts/recharts-sankey-chart";
 import type { SankeyData } from "recharts";
-import { type ChartConfig } from "@/registry/ui/recharts/chart";
+import { type ChartConfig } from "@/registry/ui/recharts-chart";
 
 // Energy flow - sources to consumption sectors
 const data: SankeyData = {

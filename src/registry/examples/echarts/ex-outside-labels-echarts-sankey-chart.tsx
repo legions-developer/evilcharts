@@ -8,7 +8,7 @@ import {
   Tooltip,
   type SankeyData,
   type ChartConfig,
-} from "@/registry/charts/echarts/sankey-chart";
+} from "@/registry/charts/echarts-sankey-chart";
 
 // Marketing funnel data
 const data: SankeyData = {

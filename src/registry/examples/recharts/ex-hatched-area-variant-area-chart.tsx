@@ -9,8 +9,8 @@ import {
   Tooltip,
   Legend,
   ActiveDot,
-} from "@/registry/charts/recharts/area-chart";
-import { type ChartConfig } from "@/registry/ui/recharts/chart";
+} from "@/registry/charts/recharts-area-chart";
+import { type ChartConfig } from "@/registry/ui/recharts-chart";
 
 const data = [
   { month: "January", desktop: 342, mobile: 245 },

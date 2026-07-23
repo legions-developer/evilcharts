@@ -11,7 +11,7 @@ import {
   Dot,
   ActiveDot,
   type ChartConfig,
-} from "@/registry/charts/echarts/composed-chart";
+} from "@/registry/charts/echarts-composed-chart";
 
 const data = [
   { month: "January", revenue: 4200, profit: 1800 },

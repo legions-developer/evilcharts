@@ -9,7 +9,7 @@ import {
   type TooltipPosition,
   type TooltipRoundness,
   type TooltipVariant,
-} from "@/registry/ui/echarts/tooltip";
+} from "@/registry/ui/echarts-tooltip";
 import {
   Children,
   isValidElement,
@@ -30,15 +30,15 @@ import {
   withAlpha,
   type ChartConfig,
   type ResolvedColors,
-} from "@/registry/ui/echarts/chart";
+} from "@/registry/ui/echarts-chart";
 import {
   RadarComponent,
   TooltipComponent,
   type RadarComponentOption,
   type TooltipComponentOption,
 } from "echarts/components";
-import { dotStyle, sampleGradient, type DotVariant } from "@/registry/ui/echarts/dot";
-import { LegendOverlay, type LegendVariant } from "@/registry/ui/echarts/legend";
+import { dotStyle, sampleGradient, type DotVariant } from "@/registry/ui/echarts-dot";
+import { LegendOverlay, type LegendVariant } from "@/registry/ui/echarts-legend";
 import { RadarChart, type RadarSeriesOption } from "echarts/charts";
 import { motion, useReducedMotion } from "motion/react";
 import { CanvasRenderer } from "echarts/renderers";
@@ -335,7 +335,7 @@ function collectConfig(children: ReactNode): CollectedConfig {
 
 // Color plumbing (ChartConfig, getColorsCount, distributeColors, buildChartCss,
 // normalizeColor, withAlpha, ResolvedColors, resolveColors) now lives in the shared
-// @/registry/ui/echarts/chart module, imported at the top of this file.
+// @/registry/ui/echarts-chart module, imported at the top of this file.
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Radar paints — the ECharts analogue of the twin's SVG gradients.
@@ -377,7 +377,7 @@ function radarFillPaint(slots: string[]): echarts.graphic.RadialGradient {
 }
 
 // Vertex dots (dotStyle/dotItemStyle/DOT_SIZES) and gradient sampling (sampleGradient)
-// now live in the shared @/registry/ui/echarts/dot module, imported at the top of this
+// now live in the shared @/registry/ui/echarts-dot module, imported at the top of this
 // file. A radar series is a SINGLE data item, so every vertex shares one itemStyle:
 // multi-color radars give all dots one representative color via sampleGradient(slots,
 // 0.5) rather than tinting each vertex individually.

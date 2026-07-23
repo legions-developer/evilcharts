@@ -10,8 +10,8 @@ import {
   Legend,
   ActiveDot,
   Dot,
-} from "@/registry/charts/recharts/composed-chart";
-import { type ChartConfig } from "@/registry/ui/recharts/chart";
+} from "@/registry/charts/recharts-composed-chart";
+import { type ChartConfig } from "@/registry/ui/recharts-chart";
 
 const data = [
   { month: "January", revenue: 4200, profit: 1800 },

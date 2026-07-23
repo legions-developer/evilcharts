@@ -3,8 +3,8 @@
 import * as React from "react";
 import { Bar, BarChart, XAxis, YAxis } from "recharts";
 import { motion } from "motion/react";
-import { type ChartConfig, ChartContainer } from "@/registry/ui/recharts/chart";
-import { ChartTooltip, ChartTooltipContent } from "@/registry/ui/recharts/tooltip";
+import { type ChartConfig, ChartContainer } from "@/registry/ui/recharts-chart";
+import { ChartTooltip, ChartTooltipContent } from "@/registry/ui/recharts-tooltip";
 
 const chartData = [
   { month: "January", revenue: 28 },

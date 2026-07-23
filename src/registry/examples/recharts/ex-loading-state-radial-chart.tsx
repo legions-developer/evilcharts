@@ -1,7 +1,7 @@
 "use client";
 
-import { EvilRadialChart, RadialBar, Tooltip, Legend } from "@/registry/charts/recharts/radial-chart";
-import { type ChartConfig } from "@/registry/ui/recharts/chart";
+import { EvilRadialChart, RadialBar, Tooltip, Legend } from "@/registry/charts/recharts-radial-chart";
+import { type ChartConfig } from "@/registry/ui/recharts-chart";
 
 const data = [
   { browser: "chrome", visitors: 275 },

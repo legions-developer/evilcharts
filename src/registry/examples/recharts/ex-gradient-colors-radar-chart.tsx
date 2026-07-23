@@ -9,8 +9,8 @@ import {
   Legend,
   Dot,
   ActiveDot,
-} from "@/registry/charts/recharts/radar-chart";
-import { type ChartConfig } from "@/registry/ui/recharts/chart";
+} from "@/registry/charts/recharts-radar-chart";
+import { type ChartConfig } from "@/registry/ui/recharts-chart";
 
 const data = [
   { skill: "JavaScript", desktop: 186, mobile: 80 },

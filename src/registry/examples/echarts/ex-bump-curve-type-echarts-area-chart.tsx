@@ -11,7 +11,7 @@ import {
   Dot,
   ActiveDot,
   type ChartConfig,
-} from "@/registry/charts/echarts/area-chart";
+} from "@/registry/charts/echarts-area-chart";
 
 const data = [
   { month: "January", desktop: 342, mobile: 245 },

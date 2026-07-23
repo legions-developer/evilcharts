@@ -1,8 +1,8 @@
 "use client";
 
-import { EvilSankeyChart, Node, NodeLabel, Link, Tooltip } from "@/registry/charts/recharts/sankey-chart";
+import { EvilSankeyChart, Node, NodeLabel, Link, Tooltip } from "@/registry/charts/recharts-sankey-chart";
 import type { SankeyData } from "recharts";
-import { type ChartConfig } from "@/registry/ui/recharts/chart";
+import { type ChartConfig } from "@/registry/ui/recharts-chart";
 
 // Sales report data - similar to the design with CRT, PPT, DMG categories
 const data: SankeyData = {

@@ -1,6 +1,6 @@
 "use client";
 
-import { getColorsCount, indicatorBackground, type ChartConfig } from "@/registry/ui/echarts/chart";
+import { getColorsCount, indicatorBackground, type ChartConfig } from "@/registry/ui/echarts-chart";
 import type { CSSProperties } from "react";
 
 // ─────────────────────────────────────────────────────────────────────────────

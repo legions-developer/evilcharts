@@ -6,7 +6,7 @@ import {
   Label,
   Tooltip,
   type ChartConfig,
-} from "@/registry/charts/echarts/pie-chart";
+} from "@/registry/charts/echarts-pie-chart";
 
 const data = [
   { browser: "chrome", visitors: 275 },

@@ -10,7 +10,7 @@ import {
   type BarShapeProps,
   type CartesianViewBox,
 } from "recharts";
-import { type ChartConfig, ChartContainer } from "@/registry/ui/recharts/chart";
+import { type ChartConfig, ChartContainer } from "@/registry/ui/recharts-chart";
 import { useMotionValueEvent, useSpring } from "motion/react";
 import NumberFlow from "@number-flow/react";
 import * as React from "react";

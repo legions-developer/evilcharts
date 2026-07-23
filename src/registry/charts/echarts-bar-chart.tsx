@@ -8,7 +8,7 @@ import {
   type TooltipPosition,
   type TooltipRoundness,
   type TooltipVariant,
-} from "@/registry/ui/echarts/tooltip";
+} from "@/registry/ui/echarts-tooltip";
 import {
   DataZoomComponent,
   GridComponent,
@@ -38,18 +38,18 @@ import {
   withAlpha,
   type ChartConfig,
   type ResolvedColors,
-} from "@/registry/ui/echarts/chart";
+} from "@/registry/ui/echarts-chart";
 import {
   buildBrushDataZoom,
   syncBrushOverlay,
   type BrushGeometry,
   type BrushOverlayElements,
   type BrushRange,
-} from "@/registry/ui/echarts/evil-brush";
-import { LegendOverlay, type LegendVariant } from "@/registry/ui/echarts/legend";
+} from "@/registry/ui/echarts-brush";
+import { LegendOverlay, type LegendVariant } from "@/registry/ui/echarts-legend";
 import type { ComposeOption, ImagePatternObject } from "echarts/core";
 import { BarChart, type BarSeriesOption } from "echarts/charts";
-import { sampleGradient } from "@/registry/ui/echarts/dot";
+import { sampleGradient } from "@/registry/ui/echarts-dot";
 import { motion, useReducedMotion } from "motion/react";
 import { CanvasRenderer } from "echarts/renderers";
 import * as echarts from "echarts/core";
@@ -381,7 +381,7 @@ function collectConfig(children: ReactNode): CollectedConfig {
 
 // Color plumbing (ChartConfig, getColorsCount, distributeColors, buildChartCss,
 // normalizeColor, withAlpha, ResolvedColors, resolveColors, flattenColor) plus
-// the theme keys now live in @/registry/ui/echarts/chart and are imported at the
+// the theme keys now live in @/registry/ui/echarts-chart and are imported at the
 // top of this file.
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -394,7 +394,7 @@ function collectConfig(children: ReactNode): CollectedConfig {
 const GRAY = "rgba(120, 120, 120, 1)";
 
 // sampleGradient (the color the series gradient shows at t ∈ [0, 1]) now lives in
-// @/registry/ui/echarts/dot and is imported at the top of this file.
+// @/registry/ui/echarts-dot and is imported at the top of this file.
 
 // Solid vertical top→bottom color for a series — a plain string when there is
 // one color, else a vertical multi-stop LinearGradient in each bar's own box.
@@ -632,7 +632,7 @@ function barStaggerDelay(type: BarAnimationType, index: number, count: number): 
 
 // The brush overlay primitives (BrushRange, BrushGeometry, BrushOverlayElements,
 // syncBrushOverlay) and the dataZoom builder (buildBrushDataZoom) now live in
-// @/registry/ui/echarts/evil-brush and are imported at the top of this file. The
+// @/registry/ui/echarts-brush and are imported at the top of this file. The
 // tooltip shell/row/styling (roundnessClass, tooltipVariantClass,
 // tooltipShell/tooltipRow/tooltipIndicatorHtml), the legend indicators
 // (LegendIndicator/LegendOverlay + fill/outline styles), and indicatorBackground

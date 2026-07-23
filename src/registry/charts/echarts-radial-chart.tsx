@@ -9,7 +9,7 @@ import {
   type TooltipPosition,
   type TooltipRoundness,
   type TooltipVariant,
-} from "@/registry/ui/echarts/tooltip";
+} from "@/registry/ui/echarts-tooltip";
 import {
   buildChartCss,
   getColorsCount,
@@ -17,7 +17,7 @@ import {
   withAlpha,
   type ChartConfig,
   type ResolvedColors,
-} from "@/registry/ui/echarts/chart";
+} from "@/registry/ui/echarts-chart";
 import {
   Children,
   isValidElement,
@@ -36,7 +36,7 @@ import {
   type PolarComponentOption,
   type TooltipComponentOption,
 } from "echarts/components";
-import { LegendIndicator, type LegendVariant } from "@/registry/ui/echarts/legend";
+import { LegendIndicator, type LegendVariant } from "@/registry/ui/echarts-legend";
 import { BarChart, type BarSeriesOption } from "echarts/charts";
 import { motion, useReducedMotion } from "motion/react";
 import { CanvasRenderer } from "echarts/renderers";
@@ -307,7 +307,7 @@ function collectConfig(children: ReactNode): CollectedConfig {
 // ─────────────────────────────────────────────────────────────────────────────
 // Color plumbing (ChartConfig, getColorsCount, distributeColors, buildChartCss,
 // normalizeColor, withAlpha, ResolvedColors, resolveColors, indicatorBackground)
-// now lives in @/registry/ui/echarts/chart and is imported at the top of this
+// now lives in @/registry/ui/echarts-chart and is imported at the top of this
 // file. Only barPaint below is chart-specific — see its note.
 // ─────────────────────────────────────────────────────────────────────────────
 

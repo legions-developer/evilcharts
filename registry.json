@@ -10,9 +10,9 @@
       ],
       "files": [
         {
-          "path": "src/registry/ui/recharts/chart.tsx",
+          "path": "src/registry/ui/recharts-chart.tsx",
           "type": "registry:component",
-          "target": "components/evilcharts/ui/recharts/chart.tsx"
+          "target": "components/evilcharts/ui/recharts-chart.tsx"
         }
       ]
     },
@@ -24,9 +24,9 @@
       ],
       "files": [
         {
-          "path": "src/registry/ui/recharts/tooltip.tsx",
+          "path": "src/registry/ui/recharts-tooltip.tsx",
           "type": "registry:component",
-          "target": "components/evilcharts/ui/recharts/tooltip.tsx"
+          "target": "components/evilcharts/ui/recharts-tooltip.tsx"
         }
       ]
     },
@@ -38,9 +38,9 @@
       ],
       "files": [
         {
-          "path": "src/registry/ui/recharts/legend.tsx",
+          "path": "src/registry/ui/recharts-legend.tsx",
           "type": "registry:component",
-          "target": "components/evilcharts/ui/recharts/legend.tsx"
+          "target": "components/evilcharts/ui/recharts-legend.tsx"
         }
       ]
     },
@@ -52,9 +52,9 @@
       ],
       "files": [
         {
-          "path": "src/registry/ui/recharts/dot.tsx",
+          "path": "src/registry/ui/recharts-dot.tsx",
           "type": "registry:component",
-          "target": "components/evilcharts/ui/recharts/dot.tsx"
+          "target": "components/evilcharts/ui/recharts-dot.tsx"
         }
       ]
     },
@@ -69,9 +69,9 @@
       ],
       "files": [
         {
-          "path": "src/registry/ui/recharts/evil-brush.tsx",
+          "path": "src/registry/ui/recharts-brush.tsx",
           "type": "registry:component",
-          "target": "components/evilcharts/ui/recharts/evil-brush.tsx"
+          "target": "components/evilcharts/ui/recharts-brush.tsx"
         }
       ]
     },
@@ -83,9 +83,9 @@
       ],
       "files": [
         {
-          "path": "src/registry/ui/recharts/background.tsx",
+          "path": "src/registry/ui/recharts-background.tsx",
           "type": "registry:component",
-          "target": "components/evilcharts/ui/recharts/background.tsx"
+          "target": "components/evilcharts/ui/recharts-background.tsx"
         }
       ]
     },
@@ -97,9 +97,9 @@
       ],
       "files": [
         {
-          "path": "src/registry/ui/echarts/chart.tsx",
+          "path": "src/registry/ui/echarts-chart.tsx",
           "type": "registry:component",
-          "target": "components/evilcharts/ui/echarts/chart.tsx"
+          "target": "components/evilcharts/ui/echarts-chart.tsx"
         }
       ]
     },
@@ -114,9 +114,9 @@
       ],
       "files": [
         {
-          "path": "src/registry/ui/echarts/tooltip.tsx",
+          "path": "src/registry/ui/echarts-tooltip.tsx",
           "type": "registry:component",
-          "target": "components/evilcharts/ui/echarts/tooltip.tsx"
+          "target": "components/evilcharts/ui/echarts-tooltip.tsx"
         }
       ]
     },
@@ -128,9 +128,9 @@
       ],
       "files": [
         {
-          "path": "src/registry/ui/echarts/legend.tsx",
+          "path": "src/registry/ui/echarts-legend.tsx",
           "type": "registry:component",
-          "target": "components/evilcharts/ui/echarts/legend.tsx"
+          "target": "components/evilcharts/ui/echarts-legend.tsx"
         }
       ]
     },
@@ -142,9 +142,9 @@
       ],
       "files": [
         {
-          "path": "src/registry/ui/echarts/dot.tsx",
+          "path": "src/registry/ui/echarts-dot.tsx",
           "type": "registry:component",
-          "target": "components/evilcharts/ui/echarts/dot.tsx"
+          "target": "components/evilcharts/ui/echarts-dot.tsx"
         }
       ]
     },
@@ -159,9 +159,9 @@
       ],
       "files": [
         {
-          "path": "src/registry/ui/echarts/evil-brush.tsx",
+          "path": "src/registry/ui/echarts-brush.tsx",
           "type": "registry:component",
-          "target": "components/evilcharts/ui/echarts/evil-brush.tsx"
+          "target": "components/evilcharts/ui/echarts-brush.tsx"
         }
       ]
     },
@@ -182,9 +182,9 @@
       "type": "registry:component",
       "files": [
         {
-          "path": "src/registry/charts/echarts/area-chart.tsx",
+          "path": "src/registry/charts/echarts-area-chart.tsx",
           "type": "registry:component",
-          "target": "components/evilcharts/charts/echarts/area-chart.tsx"
+          "target": "components/evilcharts/charts/echarts-area-chart.tsx"
         }
       ]
     },
@@ -205,9 +205,9 @@
       "type": "registry:component",
       "files": [
         {
-          "path": "src/registry/charts/echarts/line-chart.tsx",
+          "path": "src/registry/charts/echarts-line-chart.tsx",
           "type": "registry:component",
-          "target": "components/evilcharts/charts/echarts/line-chart.tsx"
+          "target": "components/evilcharts/charts/echarts-line-chart.tsx"
         }
       ]
     },
@@ -228,9 +228,9 @@
       "type": "registry:component",
       "files": [
         {
-          "path": "src/registry/charts/echarts/bar-chart.tsx",
+          "path": "src/registry/charts/echarts-bar-chart.tsx",
           "type": "registry:component",
-          "target": "components/evilcharts/charts/echarts/bar-chart.tsx"
+          "target": "components/evilcharts/charts/echarts-bar-chart.tsx"
         }
       ]
     },
@@ -251,9 +251,9 @@
       "type": "registry:component",
       "files": [
         {
-          "path": "src/registry/charts/echarts/composed-chart.tsx",
+          "path": "src/registry/charts/echarts-composed-chart.tsx",
           "type": "registry:component",
-          "target": "components/evilcharts/charts/echarts/composed-chart.tsx"
+          "target": "components/evilcharts/charts/echarts-composed-chart.tsx"
         }
       ]
     },
@@ -273,9 +273,9 @@
       "type": "registry:component",
       "files": [
         {
-          "path": "src/registry/charts/echarts/radar-chart.tsx",
+          "path": "src/registry/charts/echarts-radar-chart.tsx",
           "type": "registry:component",
-          "target": "components/evilcharts/charts/echarts/radar-chart.tsx"
+          "target": "components/evilcharts/charts/echarts-radar-chart.tsx"
         }
       ]
     },
@@ -294,9 +294,9 @@
       "type": "registry:component",
       "files": [
         {
-          "path": "src/registry/charts/echarts/pie-chart.tsx",
+          "path": "src/registry/charts/echarts-pie-chart.tsx",
           "type": "registry:component",
-          "target": "components/evilcharts/charts/echarts/pie-chart.tsx"
+          "target": "components/evilcharts/charts/echarts-pie-chart.tsx"
         }
       ]
     },
@@ -315,9 +315,9 @@
       "type": "registry:component",
       "files": [
         {
-          "path": "src/registry/charts/echarts/radial-chart.tsx",
+          "path": "src/registry/charts/echarts-radial-chart.tsx",
           "type": "registry:component",
-          "target": "components/evilcharts/charts/echarts/radial-chart.tsx"
+          "target": "components/evilcharts/charts/echarts-radial-chart.tsx"
         }
       ]
     },
@@ -336,9 +336,9 @@
       "type": "registry:component",
       "files": [
         {
-          "path": "src/registry/charts/echarts/sankey-chart.tsx",
+          "path": "src/registry/charts/echarts-sankey-chart.tsx",
           "type": "registry:component",
-          "target": "components/evilcharts/charts/echarts/sankey-chart.tsx"
+          "target": "components/evilcharts/charts/echarts-sankey-chart.tsx"
         }
       ]
     },
@@ -360,9 +360,9 @@
       "type": "registry:component",
       "files": [
         {
-          "path": "src/registry/charts/recharts/area-chart.tsx",
+          "path": "src/registry/charts/recharts-area-chart.tsx",
           "type": "registry:component",
-          "target": "components/evilcharts/charts/recharts/area-chart.tsx"
+          "target": "components/evilcharts/charts/recharts-area-chart.tsx"
         }
       ]
     },
@@ -384,9 +384,9 @@
       "type": "registry:component",
       "files": [
         {
-          "path": "src/registry/charts/recharts/line-chart.tsx",
+          "path": "src/registry/charts/recharts-line-chart.tsx",
           "type": "registry:component",
-          "target": "components/evilcharts/charts/recharts/line-chart.tsx"
+          "target": "components/evilcharts/charts/recharts-line-chart.tsx"
         }
       ]
     },
@@ -407,9 +407,9 @@
       "type": "registry:component",
       "files": [
         {
-          "path": "src/registry/charts/recharts/bar-chart.tsx",
+          "path": "src/registry/charts/recharts-bar-chart.tsx",
           "type": "registry:component",
-          "target": "components/evilcharts/charts/recharts/bar-chart.tsx"
+          "target": "components/evilcharts/charts/recharts-bar-chart.tsx"
         }
       ]
     },
@@ -431,9 +431,9 @@
       "type": "registry:component",
       "files": [
         {
-          "path": "src/registry/charts/recharts/composed-chart.tsx",
+          "path": "src/registry/charts/recharts-composed-chart.tsx",
           "type": "registry:component",
-          "target": "components/evilcharts/charts/recharts/composed-chart.tsx"
+          "target": "components/evilcharts/charts/recharts-composed-chart.tsx"
         }
       ]
     },
@@ -453,9 +453,9 @@
       "type": "registry:component",
       "files": [
         {
-          "path": "src/registry/charts/recharts/pie-chart.tsx",
+          "path": "src/registry/charts/recharts-pie-chart.tsx",
           "type": "registry:component",
-          "target": "components/evilcharts/charts/recharts/pie-chart.tsx"
+          "target": "components/evilcharts/charts/recharts-pie-chart.tsx"
         }
       ]
     },
@@ -475,9 +475,9 @@
       "type": "registry:component",
       "files": [
         {
-          "path": "src/registry/charts/recharts/radial-chart.tsx",
+          "path": "src/registry/charts/recharts-radial-chart.tsx",
           "type": "registry:component",
-          "target": "components/evilcharts/charts/recharts/radial-chart.tsx"
+          "target": "components/evilcharts/charts/recharts-radial-chart.tsx"
         }
       ]
     },
@@ -498,9 +498,9 @@
       "type": "registry:component",
       "files": [
         {
-          "path": "src/registry/charts/recharts/radar-chart.tsx",
+          "path": "src/registry/charts/recharts-radar-chart.tsx",
           "type": "registry:component",
-          "target": "components/evilcharts/charts/recharts/radar-chart.tsx"
+          "target": "components/evilcharts/charts/recharts-radar-chart.tsx"
         }
       ]
     },
@@ -519,9 +519,9 @@
       "type": "registry:component",
       "files": [
         {
-          "path": "src/registry/charts/recharts/sankey-chart.tsx",
+          "path": "src/registry/charts/recharts-sankey-chart.tsx",
           "type": "registry:component",
-          "target": "components/evilcharts/charts/recharts/sankey-chart.tsx"
+          "target": "components/evilcharts/charts/recharts-sankey-chart.tsx"
         }
       ]
     },
@@ -3192,7 +3192,7 @@
         {
           "path": "src/registry/blocks/recharts/b-monospace-bar-chart.tsx",
           "type": "registry:block",
-          "target": "components/evilcharts/blocks/recharts/monospace-bar-chart.tsx"
+          "target": "components/evilcharts/blocks/monospace-bar-chart.tsx"
         }
       ]
     },
@@ -3212,7 +3212,7 @@
         {
           "path": "src/registry/blocks/recharts/b-hover-trace-bar-chart.tsx",
           "type": "registry:block",
-          "target": "components/evilcharts/blocks/recharts/hover-trace-bar-chart.tsx"
+          "target": "components/evilcharts/blocks/hover-trace-bar-chart.tsx"
         }
       ]
     },
@@ -3230,7 +3230,7 @@
         {
           "path": "src/registry/blocks/recharts/b-grid-bar-chart.tsx",
           "type": "registry:block",
-          "target": "components/evilcharts/blocks/recharts/grid-bar-chart.tsx"
+          "target": "components/evilcharts/blocks/grid-bar-chart.tsx"
         }
       ]
     },
@@ -3249,7 +3249,7 @@
         {
           "path": "src/registry/blocks/recharts/b-isometric-bar-chart.tsx",
           "type": "registry:block",
-          "target": "components/evilcharts/blocks/recharts/isometric-bar-chart.tsx"
+          "target": "components/evilcharts/blocks/isometric-bar-chart.tsx"
         }
       ]
     },
@@ -3268,7 +3268,7 @@
         {
           "path": "src/registry/blocks/echarts/b-latency-echarts-area-chart.tsx",
           "type": "registry:block",
-          "target": "components/evilcharts/blocks/echarts/latency-echarts-area-chart.tsx"
+          "target": "components/evilcharts/blocks/latency-echarts-area-chart.tsx"
         }
       ]
     }

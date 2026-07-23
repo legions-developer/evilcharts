@@ -9,7 +9,7 @@ import {
   Tooltip,
   ActiveDot,
   type ChartConfig,
-} from "@/registry/charts/echarts/line-chart";
+} from "@/registry/charts/echarts-line-chart";
 
 const data = [
   { month: "January", desktop: 342, mobile: 184 },

@@ -1,4 +1,4 @@
-import { indicatorBackground, type ResolvedColors } from "@/registry/ui/echarts/chart";
+import { indicatorBackground, type ResolvedColors } from "@/registry/ui/echarts-chart";
 import type { TooltipComponentOption } from "echarts/components";
 
 // ─────────────────────────────────────────────────────────────────────────────

@@ -9,7 +9,7 @@ import {
   type TooltipPosition,
   type TooltipRoundness,
   type TooltipVariant,
-} from "@/registry/ui/echarts/tooltip";
+} from "@/registry/ui/echarts-tooltip";
 import {
   buildChartCss,
   getColorsCount,
@@ -17,7 +17,7 @@ import {
   withAlpha,
   type ChartConfig,
   type ResolvedColors,
-} from "@/registry/ui/echarts/chart";
+} from "@/registry/ui/echarts-chart";
 import {
   Children,
   isValidElement,
@@ -32,7 +32,7 @@ import {
 } from "react";
 import { TooltipComponent, type TooltipComponentOption } from "echarts/components";
 import { SankeyChart, type SankeySeriesOption } from "echarts/charts";
-import { sampleGradient } from "@/registry/ui/echarts/dot";
+import { sampleGradient } from "@/registry/ui/echarts-dot";
 import { motion, useReducedMotion } from "motion/react";
 import { CanvasRenderer } from "echarts/renderers";
 import type { ComposeOption } from "echarts/core";
@@ -140,7 +140,7 @@ const SKELETON_LINKS = [
 
 export type LinkVariant = "gradient" | "solid" | "source" | "target";
 export type NodeLabelPosition = "inside" | "outside";
-// TooltipVariant and TooltipRoundness now live in @/registry/ui/echarts/tooltip and
+// TooltipVariant and TooltipRoundness now live in @/registry/ui/echarts-tooltip and
 // are imported + re-exported at the top of this file.
 // Sankey has no directional draw-in — only "default" (echarts' native reveal) and
 // "none" (off). Kept as a small union for copy-paste parity with the other
@@ -148,7 +148,7 @@ export type NodeLabelPosition = "inside" | "outside";
 export type SankeyAnimationType = "none" | "default";
 
 // ChartConfig (and its AtLeastOneThemeColor constraint) now lives in the shared
-// @/registry/ui/echarts/chart module and is imported + re-exported at the top.
+// @/registry/ui/echarts-chart module and is imported + re-exported at the top.
 
 // A single flow node. `icon` mirrors the Recharts twin's data shape for source
 // compatibility, but canvas can't mount a React node, so it is not rendered.
@@ -342,7 +342,7 @@ function collectConfig(children: ReactNode): CollectedConfig {
 
 // Color plumbing (ChartConfig, getColorsCount, distributeColors, buildChartCss,
 // normalizeColor, withAlpha, ResolvedColors, resolveColors) now lives in
-// @/registry/ui/echarts/chart and is imported at the top of this file. `resolveColors`
+// @/registry/ui/echarts-chart and is imported at the top of this file. `resolveColors`
 // falls back to GRAY (rgba(120, 120, 120, 1)) for an unresolved node slot, matching
 // this file's GRAY constant.
 
@@ -391,7 +391,7 @@ function edgeColor(
 }
 
 // `sampleGradient` — the concrete color a node's/link's gradient shows at position
-// t ∈ [0, 1] — now lives in @/registry/ui/echarts/dot and is imported at the top.
+// t ∈ [0, 1] — now lives in @/registry/ui/echarts-dot and is imported at the top.
 // A canvas shadow can only be cast in a SOLID color, so the glow samples the
 // element's OWN paint at a representative point (its mid color) instead of a
 // foreign tint, keeping the glow in the node's own hue.
@@ -498,7 +498,7 @@ function shimmerWindowStops(center: number, color: string, floor: number, peak: 
 
 // Tooltip HTML primitives (roundnessClass, tooltipVariantClass, tooltipIndicatorHtml,
 // tooltipRow, resolveTooltipPosition, indicatorBackground) now live in
-// @/registry/ui/echarts/tooltip and are imported at the top. The tooltip DOM lives
+// @/registry/ui/echarts-tooltip and are imported at the top. The tooltip DOM lives
 // inside `[data-chart={id}]`, so the injected `--color-*` vars and Tailwind classes
 // resolve directly (no color read).
 

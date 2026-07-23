@@ -1,6 +1,6 @@
 "use client";
 
-import { type ChartConfig, ChartContainer } from "@/registry/ui/recharts/chart";
+import { type ChartConfig, ChartContainer } from "@/registry/ui/recharts-chart";
 import { Bar, BarChart, XAxis } from "recharts";
 const SQUARE_SIZE = 10;
 const GAP = 2;

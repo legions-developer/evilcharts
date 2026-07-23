@@ -1,7 +1,7 @@
 "use client";
 
-import { EvilBarChart, Bar, YAxis, Grid, Tooltip, Legend } from "@/registry/charts/recharts/bar-chart";
-import { type ChartConfig } from "@/registry/ui/recharts/chart";
+import { EvilBarChart, Bar, YAxis, Grid, Tooltip, Legend } from "@/registry/charts/recharts-bar-chart";
+import { type ChartConfig } from "@/registry/ui/recharts-chart";
 
 const data = [
   { month: "January", desktop: 186 },

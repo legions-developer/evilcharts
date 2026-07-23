@@ -1,4 +1,4 @@
-import { withAlpha, type ResolvedColors } from "@/registry/ui/echarts/chart";
+import { withAlpha, type ResolvedColors } from "@/registry/ui/echarts-chart";
 import type { DataZoomComponentOption } from "echarts/components";
 import * as echarts from "echarts/core";
 
