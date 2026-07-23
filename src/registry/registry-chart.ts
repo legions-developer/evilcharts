@@ -19,6 +19,97 @@ export const charts: Registry["items"] = [
     ],
   },
   {
+    name: "echarts-line-chart",
+    description: "Line chart component rendered with Apache ECharts",
+    dependencies: ["echarts", "motion"],
+    type: "registry:component",
+    files: [
+      {
+        path: "charts/echarts/line-chart.tsx",
+        type: "registry:component",
+        target: TARGET_BASE_PATH + "/echarts/line-chart.tsx",
+      },
+    ],
+  },
+  {
+    name: "echarts-bar-chart",
+    description: "Bar chart component rendered with Apache ECharts",
+    dependencies: ["echarts", "motion"],
+    type: "registry:component",
+    files: [
+      {
+        path: "charts/echarts/bar-chart.tsx",
+        type: "registry:component",
+        target: TARGET_BASE_PATH + "/echarts/bar-chart.tsx",
+      },
+    ],
+  },
+  {
+    name: "echarts-composed-chart",
+    description: "Composed chart component rendered with Apache ECharts",
+    dependencies: ["echarts", "motion"],
+    type: "registry:component",
+    files: [
+      {
+        path: "charts/echarts/composed-chart.tsx",
+        type: "registry:component",
+        target: TARGET_BASE_PATH + "/echarts/composed-chart.tsx",
+      },
+    ],
+  },
+  {
+    name: "echarts-radar-chart",
+    description: "Radar chart component rendered with Apache ECharts",
+    dependencies: ["echarts", "motion"],
+    type: "registry:component",
+    files: [
+      {
+        path: "charts/echarts/radar-chart.tsx",
+        type: "registry:component",
+        target: TARGET_BASE_PATH + "/echarts/radar-chart.tsx",
+      },
+    ],
+  },
+  {
+    name: "echarts-pie-chart",
+    description: "Pie chart component rendered with Apache ECharts",
+    dependencies: ["echarts", "motion"],
+    type: "registry:component",
+    files: [
+      {
+        path: "charts/echarts/pie-chart.tsx",
+        type: "registry:component",
+        target: TARGET_BASE_PATH + "/echarts/pie-chart.tsx",
+      },
+    ],
+  },
+  {
+    name: "echarts-radial-chart",
+    description: "Radial chart component rendered with Apache ECharts",
+    dependencies: ["echarts", "motion"],
+    type: "registry:component",
+    files: [
+      {
+        path: "charts/echarts/radial-chart.tsx",
+        type: "registry:component",
+        target: TARGET_BASE_PATH + "/echarts/radial-chart.tsx",
+      },
+    ],
+  },
+  {
+    name: "echarts-sankey-chart",
+    description: "Sankey chart component rendered with Apache ECharts",
+    dependencies: ["echarts", "motion"],
+    type: "registry:component",
+    files: [
+      {
+        path: "charts/echarts/sankey-chart.tsx",
+        type: "registry:component",
+        target: TARGET_BASE_PATH + "/echarts/sankey-chart.tsx",
+      },
+    ],
+  },
+  {
     name: "area-chart",
     description: "Area chart component",
     registryDependencies: [

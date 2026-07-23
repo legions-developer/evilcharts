@@ -222,6 +222,816 @@ export const examples: Registry["items"] = [
       },
     ],
   },
+  // ECharts Line Chart (self-contained ECharts provider examples)
+  {
+    name: "ex-echarts-line-chart",
+    registryDependencies: ["@evilcharts/echarts-line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-echarts-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-gradient-colors-echarts-line-chart",
+    registryDependencies: ["@evilcharts/echarts-line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-gradient-colors-echarts-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-gradient-colors-bump-echarts-line-chart",
+    registryDependencies: ["@evilcharts/echarts-line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-gradient-colors-bump-echarts-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-loading-state-echarts-line-chart",
+    registryDependencies: ["@evilcharts/echarts-line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-loading-state-echarts-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-bump-curve-type-echarts-line-chart",
+    registryDependencies: ["@evilcharts/echarts-line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-bump-curve-type-echarts-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-step-curve-type-echarts-line-chart",
+    registryDependencies: ["@evilcharts/echarts-line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-step-curve-type-echarts-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-monotoney-curve-type-echarts-line-chart",
+    registryDependencies: ["@evilcharts/echarts-line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-monotoney-curve-type-echarts-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-solid-stroke-echarts-line-chart",
+    registryDependencies: ["@evilcharts/echarts-line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-solid-stroke-echarts-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-dashed-stroke-echarts-line-chart",
+    registryDependencies: ["@evilcharts/echarts-line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-dashed-stroke-echarts-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-animated-dashed-stroke-echarts-line-chart",
+    registryDependencies: ["@evilcharts/echarts-line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-animated-dashed-stroke-echarts-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-glowing-desktop-echarts-line-chart",
+    registryDependencies: ["@evilcharts/echarts-line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-glowing-desktop-echarts-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-glowing-mobile-echarts-line-chart",
+    registryDependencies: ["@evilcharts/echarts-line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-glowing-mobile-echarts-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-buffer-echarts-line-chart",
+    registryDependencies: ["@evilcharts/echarts-line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-buffer-echarts-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // ECharts Bar Chart (self-contained ECharts provider examples)
+  {
+    name: "ex-echarts-bar-chart",
+    registryDependencies: ["@evilcharts/echarts-bar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-echarts-bar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-buffer-echarts-bar-chart",
+    registryDependencies: ["@evilcharts/echarts-bar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-buffer-echarts-bar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-gradient-colors-echarts-bar-chart",
+    registryDependencies: ["@evilcharts/echarts-bar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-gradient-colors-echarts-bar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-loading-state-echarts-bar-chart",
+    registryDependencies: ["@evilcharts/echarts-bar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-loading-state-echarts-bar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-default-variant-echarts-bar-chart",
+    registryDependencies: ["@evilcharts/echarts-bar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-default-variant-echarts-bar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-hatched-variant-echarts-bar-chart",
+    registryDependencies: ["@evilcharts/echarts-bar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-hatched-variant-echarts-bar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-duotone-variant-echarts-bar-chart",
+    registryDependencies: ["@evilcharts/echarts-bar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-duotone-variant-echarts-bar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-duotone-reverse-variant-echarts-bar-chart",
+    registryDependencies: ["@evilcharts/echarts-bar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-duotone-reverse-variant-echarts-bar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-gradient-variant-echarts-bar-chart",
+    registryDependencies: ["@evilcharts/echarts-bar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-gradient-variant-echarts-bar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-stripped-variant-echarts-bar-chart",
+    registryDependencies: ["@evilcharts/echarts-bar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-stripped-variant-echarts-bar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-stacked-type-echarts-bar-chart",
+    registryDependencies: ["@evilcharts/echarts-bar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-stacked-type-echarts-bar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-percent-type-echarts-bar-chart",
+    registryDependencies: ["@evilcharts/echarts-bar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-percent-type-echarts-bar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-horizontal-layout-echarts-bar-chart",
+    registryDependencies: ["@evilcharts/echarts-bar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-horizontal-layout-echarts-bar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-hover-highlight-echarts-bar-chart",
+    registryDependencies: ["@evilcharts/echarts-bar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-hover-highlight-echarts-bar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-glowing-desktop-echarts-bar-chart",
+    registryDependencies: ["@evilcharts/echarts-bar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-glowing-desktop-echarts-bar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-glowing-mobile-echarts-bar-chart",
+    registryDependencies: ["@evilcharts/echarts-bar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-glowing-mobile-echarts-bar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-tooltip-default-echarts-bar-chart",
+    registryDependencies: ["@evilcharts/echarts-bar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-tooltip-default-echarts-bar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-tooltip-frosted-glass-echarts-bar-chart",
+    registryDependencies: ["@evilcharts/echarts-bar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-tooltip-frosted-glass-echarts-bar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-chart-config-default-echarts-bar-chart",
+    registryDependencies: ["@evilcharts/echarts-bar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-chart-config-default-echarts-bar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-chart-config-icons-echarts-bar-chart",
+    registryDependencies: ["@evilcharts/echarts-bar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-chart-config-icons-echarts-bar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // ECharts Composed Chart (self-contained ECharts provider examples)
+  {
+    name: "ex-echarts-composed-chart",
+    registryDependencies: ["@evilcharts/echarts-composed-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-echarts-composed-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-gradient-colors-echarts-composed-chart",
+    registryDependencies: ["@evilcharts/echarts-composed-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-gradient-colors-echarts-composed-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-loading-state-echarts-composed-chart",
+    registryDependencies: ["@evilcharts/echarts-composed-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-loading-state-echarts-composed-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-hatched-variant-echarts-composed-chart",
+    registryDependencies: ["@evilcharts/echarts-composed-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-hatched-variant-echarts-composed-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-duotone-variant-echarts-composed-chart",
+    registryDependencies: ["@evilcharts/echarts-composed-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-duotone-variant-echarts-composed-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-gradient-variant-echarts-composed-chart",
+    registryDependencies: ["@evilcharts/echarts-composed-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-gradient-variant-echarts-composed-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-stripped-variant-echarts-composed-chart",
+    registryDependencies: ["@evilcharts/echarts-composed-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-stripped-variant-echarts-composed-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-dashed-stroke-echarts-composed-chart",
+    registryDependencies: ["@evilcharts/echarts-composed-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-dashed-stroke-echarts-composed-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-animated-dashed-stroke-echarts-composed-chart",
+    registryDependencies: ["@evilcharts/echarts-composed-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-animated-dashed-stroke-echarts-composed-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-bump-curve-echarts-composed-chart",
+    registryDependencies: ["@evilcharts/echarts-composed-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-bump-curve-echarts-composed-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-dots-echarts-composed-chart",
+    registryDependencies: ["@evilcharts/echarts-composed-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-dots-echarts-composed-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-hover-highlight-echarts-composed-chart",
+    registryDependencies: ["@evilcharts/echarts-composed-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-hover-highlight-echarts-composed-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-glowing-echarts-composed-chart",
+    registryDependencies: ["@evilcharts/echarts-composed-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-glowing-echarts-composed-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // ECharts Radar Chart (self-contained ECharts provider examples)
+  {
+    name: "ex-echarts-radar-chart",
+    registryDependencies: ["@evilcharts/echarts-radar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-echarts-radar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-lines-variant-echarts-radar-chart",
+    registryDependencies: ["@evilcharts/echarts-radar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-lines-variant-echarts-radar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-circle-grid-echarts-radar-chart",
+    registryDependencies: ["@evilcharts/echarts-radar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-circle-grid-echarts-radar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-gradient-colors-echarts-radar-chart",
+    registryDependencies: ["@evilcharts/echarts-radar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-gradient-colors-echarts-radar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-loading-state-echarts-radar-chart",
+    registryDependencies: ["@evilcharts/echarts-radar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-loading-state-echarts-radar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // ECharts Pie Chart (self-contained ECharts provider examples)
+  {
+    name: "ex-echarts-pie-chart",
+    registryDependencies: ["@evilcharts/echarts-pie-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-echarts-pie-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-gradient-colors-echarts-pie-chart",
+    registryDependencies: ["@evilcharts/echarts-pie-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-gradient-colors-echarts-pie-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-donut-echarts-pie-chart",
+    registryDependencies: ["@evilcharts/echarts-pie-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-donut-echarts-pie-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-padded-echarts-pie-chart",
+    registryDependencies: ["@evilcharts/echarts-pie-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-padded-echarts-pie-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-overlapping-padded-echarts-pie-chart",
+    registryDependencies: ["@evilcharts/echarts-pie-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-overlapping-padded-echarts-pie-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-labels-echarts-pie-chart",
+    registryDependencies: ["@evilcharts/echarts-pie-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-labels-echarts-pie-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-loading-state-echarts-pie-chart",
+    registryDependencies: ["@evilcharts/echarts-pie-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-loading-state-echarts-pie-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-outside-labels-echarts-pie-chart",
+    registryDependencies: ["@evilcharts/echarts-pie-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-outside-labels-echarts-pie-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // ECharts Radial Chart (self-contained ECharts provider examples)
+  {
+    name: "ex-echarts-radial-chart",
+    registryDependencies: ["@evilcharts/echarts-radial-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-echarts-radial-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-semi-variant-echarts-radial-chart",
+    registryDependencies: ["@evilcharts/echarts-radial-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-semi-variant-echarts-radial-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-gradient-colors-echarts-radial-chart",
+    registryDependencies: ["@evilcharts/echarts-radial-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-gradient-colors-echarts-radial-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-loading-state-echarts-radial-chart",
+    registryDependencies: ["@evilcharts/echarts-radial-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-loading-state-echarts-radial-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-glowing-echarts-radial-chart",
+    registryDependencies: ["@evilcharts/echarts-radial-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-glowing-echarts-radial-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // ECharts Sankey Chart (self-contained ECharts provider examples)
+  {
+    name: "ex-echarts-sankey-chart",
+    registryDependencies: ["@evilcharts/echarts-sankey-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-echarts-sankey-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-gradient-colors-echarts-sankey-chart",
+    registryDependencies: ["@evilcharts/echarts-sankey-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-gradient-colors-echarts-sankey-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-loading-state-echarts-sankey-chart",
+    registryDependencies: ["@evilcharts/echarts-sankey-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-loading-state-echarts-sankey-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-solid-link-variant-echarts-sankey-chart",
+    registryDependencies: ["@evilcharts/echarts-sankey-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-solid-link-variant-echarts-sankey-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-source-link-variant-echarts-sankey-chart",
+    registryDependencies: ["@evilcharts/echarts-sankey-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-source-link-variant-echarts-sankey-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-glowing-echarts-sankey-chart",
+    registryDependencies: ["@evilcharts/echarts-sankey-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-glowing-echarts-sankey-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-labeled-nodes-echarts-sankey-chart",
+    registryDependencies: ["@evilcharts/echarts-sankey-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-labeled-nodes-echarts-sankey-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-outside-labels-echarts-sankey-chart",
+    registryDependencies: ["@evilcharts/echarts-sankey-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-outside-labels-echarts-sankey-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-solid-labeled-nodes-echarts-sankey-chart",
+    registryDependencies: ["@evilcharts/echarts-sankey-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/ex-solid-labeled-nodes-echarts-sankey-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
   // Base Area Chart
   {
     name: "ex-area-chart",

@@ -1,0 +1,66 @@
+"use client";
+
+import {
+  EChartsBarChart,
+  Bar,
+  XAxis,
+  Grid,
+  Tooltip,
+  Legend,
+  type ChartConfig,
+} from "@/registry/charts/echarts/bar-chart";
+
+const data = [
+  { month: "January", desktop: 342, mobile: 184 },
+  { month: "February", desktop: 876, mobile: 491 },
+  { month: "March", desktop: 512, mobile: 290 },
+  { month: "April", desktop: 629, mobile: 391 },
+  { month: "May", desktop: 458, mobile: 309 },
+  { month: "June", desktop: 781, mobile: 449 },
+  { month: "July", desktop: 394, mobile: 234 },
+  { month: "August", desktop: 925, mobile: 557 },
+  { month: "September", desktop: 647, mobile: 367 },
+  { month: "October", desktop: 532, mobile: 357 },
+  { month: "November", desktop: 503, mobile: 215 },
+  { month: "December", desktop: 971, mobile: 749 },
+];
+
+const chartConfig = {
+  desktop: {
+    label: "Desktop",
+    colors: {
+      light: ["#047857"],
+      dark: ["#10b981"],
+    },
+  },
+  mobile: {
+    label: "Mobile",
+    colors: {
+      light: ["#be123c"],
+      dark: ["#f43f5e"],
+    },
+  },
+} satisfies ChartConfig;
+
+export function EChartsExampleBarChart() {
+  return (
+    <EChartsBarChart data={data} config={chartConfig} className="h-full w-full p-4">
+      <Grid />
+      <XAxis dataKey="month" tickFormatter={(value) => value.substring(0, 3)} />
+      <Legend isClickable />
+      <Tooltip />
+      <Bar
+        dataKey="desktop"
+        variant="default"
+        bufferBar // [!code highlight]
+        isClickable
+      />
+      <Bar
+        dataKey="mobile"
+        variant="default"
+        bufferBar // [!code highlight]
+        isClickable
+      />
+    </EChartsBarChart>
+  );
+}
