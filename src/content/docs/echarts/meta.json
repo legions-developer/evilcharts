@@ -10,6 +10,9 @@
     "radar-chart",
     "pie-chart",
     "radial-chart",
-    "sankey-chart"
+    "sankey-chart",
+    "ui/tooltip",
+    "ui/legend",
+    "ui/dots"
   ]
 }

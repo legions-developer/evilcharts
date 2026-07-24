@@ -1,0 +1,49 @@
+---
+title: Tooltip
+description: Tooltips that surface the values under the pointer as you hover a chart.
+image: /og/tooltip.png
+---
+
+## Usage
+
+Add `<EChartsAreaChart.Tooltip />` as a child of the chart root. It reads the chart's data and config from context — no props are required to get a working tooltip.
+
+```tsx
+import { EChartsAreaChart } from "@/components/evilcharts/charts/echarts-area-chart";
+
+<EChartsAreaChart data={data} config={chartConfig}>
+  <EChartsAreaChart.Tooltip variant="frosted-glass" roundness="md" position="fixed" />
+</EChartsAreaChart>;
+```
+
+## Variants
+
+Control the tooltip surface with the `variant` prop on the `<Tooltip />` part.
+
+### Default
+
+<ComponentPreview title="variant='default'" name="ex-tooltip-default-echarts-bar-chart" />
+
+### Frosted Glass
+
+<ComponentPreview title="variant='frosted-glass'" name="ex-tooltip-frosted-glass-echarts-bar-chart" />
+
+## API Reference
+
+<ApiTable>
+  <ApiRow name="variant" type='"default" | "frosted-glass"' default='"default"'>
+    Visual style of the tooltip surface.
+  </ApiRow>
+  <ApiRow name="roundness" type='"sm" | "md" | "lg" | "xl"' default='"lg"'>
+    Corner radius of the tooltip container.
+  </ApiRow>
+  <ApiRow name="position" type='"variable" | "fixed"' default='"variable"'>
+    `variable` follows the pointer on both axes; `fixed` pins the tooltip near the top of the chart and tracks the pointer along the X axis only.
+  </ApiRow>
+  <ApiRow name="cursor" type="boolean" default="true">
+    Shows the axis-pointer line that marks the hovered category.
+  </ApiRow>
+  <ApiRow name="defaultIndex" type="number">
+    Data index shown when the chart first renders, before any hover.
+  </ApiRow>
+</ApiTable>

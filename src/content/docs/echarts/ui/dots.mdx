@@ -1,0 +1,52 @@
+---
+title: Dots
+description: Point markers for line, area, and composed charts.
+image: /og/og-image.png
+---
+
+## Usage
+
+Compose a `<Dot />` inside a `<Line />` (or `<Area />`) to render a resting marker at every data point, and an `<ActiveDot />` for the marker shown while that point is hovered. Both read the series color and style from the chart context.
+
+```tsx
+import { EChartsLineChart } from "@/components/evilcharts/charts/echarts-line-chart";
+
+<EChartsLineChart data={data} config={chartConfig} xDataKey="month">
+  <EChartsLineChart.Line dataKey="desktop">
+    <EChartsLineChart.Dot variant="border" />
+    <EChartsLineChart.ActiveDot variant="default" />
+  </EChartsLineChart.Line>
+</EChartsLineChart>;
+```
+
+## Variants
+
+Control the marker style with the `variant` prop on the `<Dot />` (or `<ActiveDot />`) part.
+
+### Default
+
+<ComponentPreview title="variant='default'" name="ex-dot-default-echarts-line-chart" />
+
+### Border
+
+<ComponentPreview title="variant='border'" name="ex-dot-border-echarts-line-chart" />
+
+### Colored Border
+
+<ComponentPreview title="variant='colored-border'" name="ex-dot-colored-border-echarts-line-chart" />
+
+### Ping
+
+<ComponentPreview title="variant='ping'" name="ex-dot-ping-echarts-line-chart" />
+
+`ping` is ECharts-only — a solid core wrapped in a translucent halo.
+
+## API Reference
+
+Both `<Dot />` (the resting marker) and `<ActiveDot />` (the hovered marker) accept the same props and are composed inside a `<Line />` or `<Area />`.
+
+<ApiTable>
+  <ApiRow name="variant" type='"default" | "border" | "colored-border" | "ping" | "none"' default='"default"'>
+    Visual style of the point marker. `<Dot>` sets the resting marker; `<ActiveDot>` sets the marker shown on hover.
+  </ApiRow>
+</ApiTable>

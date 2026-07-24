@@ -399,6 +399,127 @@ export const examples: Registry["items"] = [
       },
     ],
   },
+  {
+    name: "ex-dot-default-echarts-line-chart",
+    registryDependencies: ["@evilcharts/echarts-line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/echarts/ex-dot-default-echarts-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-dot-border-echarts-line-chart",
+    registryDependencies: ["@evilcharts/echarts-line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/echarts/ex-dot-border-echarts-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-dot-colored-border-echarts-line-chart",
+    registryDependencies: ["@evilcharts/echarts-line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/echarts/ex-dot-colored-border-echarts-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-dot-ping-echarts-line-chart",
+    registryDependencies: ["@evilcharts/echarts-line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/echarts/ex-dot-ping-echarts-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-legend-square-echarts-line-chart",
+    registryDependencies: ["@evilcharts/echarts-line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/echarts/ex-legend-square-echarts-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-legend-circle-echarts-line-chart",
+    registryDependencies: ["@evilcharts/echarts-line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/echarts/ex-legend-circle-echarts-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-legend-circle-outline-echarts-line-chart",
+    registryDependencies: ["@evilcharts/echarts-line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/echarts/ex-legend-circle-outline-echarts-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-legend-rounded-square-echarts-line-chart",
+    registryDependencies: ["@evilcharts/echarts-line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/echarts/ex-legend-rounded-square-echarts-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-legend-rounded-square-outline-echarts-line-chart",
+    registryDependencies: ["@evilcharts/echarts-line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/echarts/ex-legend-rounded-square-outline-echarts-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-legend-vertical-bar-echarts-line-chart",
+    registryDependencies: ["@evilcharts/echarts-line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/echarts/ex-legend-vertical-bar-echarts-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-legend-horizontal-bar-echarts-line-chart",
+    registryDependencies: ["@evilcharts/echarts-line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/echarts/ex-legend-horizontal-bar-echarts-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
   // ECharts Bar Chart (self-contained ECharts provider examples)
   {
     name: "ex-echarts-bar-chart",
@@ -1292,6 +1413,40 @@ export const examples: Registry["items"] = [
     files: [
       {
         path: "examples/recharts/ex-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  // Line Chart Dot Variants
+  {
+    name: "ex-dot-default-line-chart",
+    registryDependencies: ["@evilcharts/recharts-line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/recharts/ex-dot-default-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-dot-border-line-chart",
+    registryDependencies: ["@evilcharts/recharts-line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/recharts/ex-dot-border-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-dot-colored-border-line-chart",
+    registryDependencies: ["@evilcharts/recharts-line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/recharts/ex-dot-colored-border-line-chart.tsx",
         type: "registry:block",
       },
     ],

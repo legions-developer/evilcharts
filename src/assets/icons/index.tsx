@@ -1167,6 +1167,32 @@ export function TooltipIcon({
   );
 }
 
+export function DotsIcon({
+  fill = "currentColor",
+  secondaryfill,
+  width = "1em",
+  height = "1em",
+  ...props
+}: IconProps) {
+  secondaryfill = secondaryfill || fill;
+
+  return (
+    <svg
+      height={height}
+      width={width}
+      viewBox="0 0 32 32"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <g fill={fill}>
+        <circle cx="22" cy="22" r="7" fill={fill} />
+        <circle cx="9" cy="9" r="4" fill={secondaryfill} fillOpacity="0.4" />
+        <circle cx="5.5" cy="21.5" r="3.5" fill={secondaryfill} fillOpacity="0.4" />
+      </g>
+    </svg>
+  );
+}
+
 export function ChartLegendIcon({
   fill = "currentColor",
   secondaryfill,

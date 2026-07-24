@@ -1,0 +1,42 @@
+---
+title: Dots
+description: Point markers rendered at each data value along a line or area.
+image: /og/og-image.png
+---
+
+## Usage
+
+Compose a `<Dot>` for the resting marker and an `<ActiveDot>` for the hover marker inside a `<Line>` (or `<Area>`). Each reads the series color and gradient from context.
+
+```tsx
+<EvilLineChart.Line dataKey="desktop">
+  <EvilLineChart.Dot variant="border" />
+  <EvilLineChart.ActiveDot variant="default" />
+</EvilLineChart.Line>
+```
+
+## Variants
+
+Control the marker style with the `variant` prop.
+
+### Default
+
+<ComponentPreview title='<Dot variant="default" />' name="ex-dot-default-line-chart" />
+
+### Border
+
+<ComponentPreview title='<Dot variant="border" />' name="ex-dot-border-line-chart" />
+
+### Colored Border
+
+<ComponentPreview title='<Dot variant="colored-border" />' name="ex-dot-colored-border-line-chart" />
+
+## API Reference
+
+Both `<Dot>` and `<ActiveDot>` are composed inside a `<Line>` or `<Area>`. `<Dot>` renders the resting marker shown on every data point; `<ActiveDot>` renders the marker shown on hover.
+
+<ApiTable>
+  <ApiRow name="variant" type='"default" | "border" | "colored-border"' default='"default"'>
+    Style of the point marker.
+  </ApiRow>
+</ApiTable>

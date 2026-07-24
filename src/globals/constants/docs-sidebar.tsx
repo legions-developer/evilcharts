@@ -2,6 +2,7 @@ import {
   BackgroundIcon,
   ChartConfigIcon,
   ChartLegendIcon,
+  DotsIcon,
   HouseIcon,
   ShapesIcon,
   SquareAddonIcon,
@@ -40,6 +41,9 @@ export function getStartedOptions(provider: Provider): SidebarOption[] {
 }
 
 export function getChartComponentOptions(provider: Provider): SidebarOption[] {
+  // Every entry is gated by existingUrls in the sidebar, so links only appear
+  // where the page exists — ECharts has no Background page, so it stays hidden
+  // there while Tooltip/Legend/Dots surface once their pages are added.
   return [
     {
       name: "Background",
@@ -55,6 +59,11 @@ export function getChartComponentOptions(provider: Provider): SidebarOption[] {
       name: "Legend",
       url: `/docs/${provider}/ui/legend`,
       icon: <ChartLegendIcon />,
+    },
+    {
+      name: "Dots",
+      url: `/docs/${provider}/ui/dots`,
+      icon: <DotsIcon />,
     },
   ];
 }

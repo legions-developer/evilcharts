@@ -1141,6 +1141,204 @@ export const Index: Record<string, any> = {
     categories: undefined,
     meta: undefined,
   },
+  "ex-dot-default-echarts-line-chart": {
+    name: "ex-dot-default-echarts-line-chart",
+    description: "",
+    type: "registry:block",
+    registryDependencies: ["@evilcharts/echarts-line-chart"],
+    files: [{
+      path: "@/registry/examples/echarts/ex-dot-default-echarts-line-chart.tsx",
+      type: "registry:block",
+      target: ""
+    }],
+    component: React.lazy(async () => {
+      const mod = await import("@/registry/examples/echarts/ex-dot-default-echarts-line-chart.tsx")
+      const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
+      return { default: mod.default || mod[exportName] }
+    }),
+    categories: undefined,
+    meta: undefined,
+  },
+  "ex-dot-border-echarts-line-chart": {
+    name: "ex-dot-border-echarts-line-chart",
+    description: "",
+    type: "registry:block",
+    registryDependencies: ["@evilcharts/echarts-line-chart"],
+    files: [{
+      path: "@/registry/examples/echarts/ex-dot-border-echarts-line-chart.tsx",
+      type: "registry:block",
+      target: ""
+    }],
+    component: React.lazy(async () => {
+      const mod = await import("@/registry/examples/echarts/ex-dot-border-echarts-line-chart.tsx")
+      const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
+      return { default: mod.default || mod[exportName] }
+    }),
+    categories: undefined,
+    meta: undefined,
+  },
+  "ex-dot-colored-border-echarts-line-chart": {
+    name: "ex-dot-colored-border-echarts-line-chart",
+    description: "",
+    type: "registry:block",
+    registryDependencies: ["@evilcharts/echarts-line-chart"],
+    files: [{
+      path: "@/registry/examples/echarts/ex-dot-colored-border-echarts-line-chart.tsx",
+      type: "registry:block",
+      target: ""
+    }],
+    component: React.lazy(async () => {
+      const mod = await import("@/registry/examples/echarts/ex-dot-colored-border-echarts-line-chart.tsx")
+      const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
+      return { default: mod.default || mod[exportName] }
+    }),
+    categories: undefined,
+    meta: undefined,
+  },
+  "ex-dot-ping-echarts-line-chart": {
+    name: "ex-dot-ping-echarts-line-chart",
+    description: "",
+    type: "registry:block",
+    registryDependencies: ["@evilcharts/echarts-line-chart"],
+    files: [{
+      path: "@/registry/examples/echarts/ex-dot-ping-echarts-line-chart.tsx",
+      type: "registry:block",
+      target: ""
+    }],
+    component: React.lazy(async () => {
+      const mod = await import("@/registry/examples/echarts/ex-dot-ping-echarts-line-chart.tsx")
+      const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
+      return { default: mod.default || mod[exportName] }
+    }),
+    categories: undefined,
+    meta: undefined,
+  },
+  "ex-legend-square-echarts-line-chart": {
+    name: "ex-legend-square-echarts-line-chart",
+    description: "",
+    type: "registry:block",
+    registryDependencies: ["@evilcharts/echarts-line-chart"],
+    files: [{
+      path: "@/registry/examples/echarts/ex-legend-square-echarts-line-chart.tsx",
+      type: "registry:block",
+      target: ""
+    }],
+    component: React.lazy(async () => {
+      const mod = await import("@/registry/examples/echarts/ex-legend-square-echarts-line-chart.tsx")
+      const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
+      return { default: mod.default || mod[exportName] }
+    }),
+    categories: undefined,
+    meta: undefined,
+  },
+  "ex-legend-circle-echarts-line-chart": {
+    name: "ex-legend-circle-echarts-line-chart",
+    description: "",
+    type: "registry:block",
+    registryDependencies: ["@evilcharts/echarts-line-chart"],
+    files: [{
+      path: "@/registry/examples/echarts/ex-legend-circle-echarts-line-chart.tsx",
+      type: "registry:block",
+      target: ""
+    }],
+    component: React.lazy(async () => {
+      const mod = await import("@/registry/examples/echarts/ex-legend-circle-echarts-line-chart.tsx")
+      const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
+      return { default: mod.default || mod[exportName] }
+    }),
+    categories: undefined,
+    meta: undefined,
+  },
+  "ex-legend-circle-outline-echarts-line-chart": {
+    name: "ex-legend-circle-outline-echarts-line-chart",
+    description: "",
+    type: "registry:block",
+    registryDependencies: ["@evilcharts/echarts-line-chart"],
+    files: [{
+      path: "@/registry/examples/echarts/ex-legend-circle-outline-echarts-line-chart.tsx",
+      type: "registry:block",
+      target: ""
+    }],
+    component: React.lazy(async () => {
+      const mod = await import("@/registry/examples/echarts/ex-legend-circle-outline-echarts-line-chart.tsx")
+      const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
+      return { default: mod.default || mod[exportName] }
+    }),
+    categories: undefined,
+    meta: undefined,
+  },
+  "ex-legend-rounded-square-echarts-line-chart": {
+    name: "ex-legend-rounded-square-echarts-line-chart",
+    description: "",
+    type: "registry:block",
+    registryDependencies: ["@evilcharts/echarts-line-chart"],
+    files: [{
+      path: "@/registry/examples/echarts/ex-legend-rounded-square-echarts-line-chart.tsx",
+      type: "registry:block",
+      target: ""
+    }],
+    component: React.lazy(async () => {
+      const mod = await import("@/registry/examples/echarts/ex-legend-rounded-square-echarts-line-chart.tsx")
+      const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
+      return { default: mod.default || mod[exportName] }
+    }),
+    categories: undefined,
+    meta: undefined,
+  },
+  "ex-legend-rounded-square-outline-echarts-line-chart": {
+    name: "ex-legend-rounded-square-outline-echarts-line-chart",
+    description: "",
+    type: "registry:block",
+    registryDependencies: ["@evilcharts/echarts-line-chart"],
+    files: [{
+      path: "@/registry/examples/echarts/ex-legend-rounded-square-outline-echarts-line-chart.tsx",
+      type: "registry:block",
+      target: ""
+    }],
+    component: React.lazy(async () => {
+      const mod = await import("@/registry/examples/echarts/ex-legend-rounded-square-outline-echarts-line-chart.tsx")
+      const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
+      return { default: mod.default || mod[exportName] }
+    }),
+    categories: undefined,
+    meta: undefined,
+  },
+  "ex-legend-vertical-bar-echarts-line-chart": {
+    name: "ex-legend-vertical-bar-echarts-line-chart",
+    description: "",
+    type: "registry:block",
+    registryDependencies: ["@evilcharts/echarts-line-chart"],
+    files: [{
+      path: "@/registry/examples/echarts/ex-legend-vertical-bar-echarts-line-chart.tsx",
+      type: "registry:block",
+      target: ""
+    }],
+    component: React.lazy(async () => {
+      const mod = await import("@/registry/examples/echarts/ex-legend-vertical-bar-echarts-line-chart.tsx")
+      const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
+      return { default: mod.default || mod[exportName] }
+    }),
+    categories: undefined,
+    meta: undefined,
+  },
+  "ex-legend-horizontal-bar-echarts-line-chart": {
+    name: "ex-legend-horizontal-bar-echarts-line-chart",
+    description: "",
+    type: "registry:block",
+    registryDependencies: ["@evilcharts/echarts-line-chart"],
+    files: [{
+      path: "@/registry/examples/echarts/ex-legend-horizontal-bar-echarts-line-chart.tsx",
+      type: "registry:block",
+      target: ""
+    }],
+    component: React.lazy(async () => {
+      const mod = await import("@/registry/examples/echarts/ex-legend-horizontal-bar-echarts-line-chart.tsx")
+      const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
+      return { default: mod.default || mod[exportName] }
+    }),
+    categories: undefined,
+    meta: undefined,
+  },
   "ex-echarts-bar-chart": {
     name: "ex-echarts-bar-chart",
     description: "",
@@ -2575,6 +2773,60 @@ export const Index: Record<string, any> = {
     }],
     component: React.lazy(async () => {
       const mod = await import("@/registry/examples/recharts/ex-line-chart.tsx")
+      const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
+      return { default: mod.default || mod[exportName] }
+    }),
+    categories: undefined,
+    meta: undefined,
+  },
+  "ex-dot-default-line-chart": {
+    name: "ex-dot-default-line-chart",
+    description: "",
+    type: "registry:block",
+    registryDependencies: ["@evilcharts/recharts-line-chart"],
+    files: [{
+      path: "@/registry/examples/recharts/ex-dot-default-line-chart.tsx",
+      type: "registry:block",
+      target: ""
+    }],
+    component: React.lazy(async () => {
+      const mod = await import("@/registry/examples/recharts/ex-dot-default-line-chart.tsx")
+      const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
+      return { default: mod.default || mod[exportName] }
+    }),
+    categories: undefined,
+    meta: undefined,
+  },
+  "ex-dot-border-line-chart": {
+    name: "ex-dot-border-line-chart",
+    description: "",
+    type: "registry:block",
+    registryDependencies: ["@evilcharts/recharts-line-chart"],
+    files: [{
+      path: "@/registry/examples/recharts/ex-dot-border-line-chart.tsx",
+      type: "registry:block",
+      target: ""
+    }],
+    component: React.lazy(async () => {
+      const mod = await import("@/registry/examples/recharts/ex-dot-border-line-chart.tsx")
+      const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
+      return { default: mod.default || mod[exportName] }
+    }),
+    categories: undefined,
+    meta: undefined,
+  },
+  "ex-dot-colored-border-line-chart": {
+    name: "ex-dot-colored-border-line-chart",
+    description: "",
+    type: "registry:block",
+    registryDependencies: ["@evilcharts/recharts-line-chart"],
+    files: [{
+      path: "@/registry/examples/recharts/ex-dot-colored-border-line-chart.tsx",
+      type: "registry:block",
+      target: ""
+    }],
+    component: React.lazy(async () => {
+      const mod = await import("@/registry/examples/recharts/ex-dot-colored-border-line-chart.tsx")
       const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
       return { default: mod.default || mod[exportName] }
     }),
