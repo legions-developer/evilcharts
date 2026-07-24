@@ -139,7 +139,8 @@ export type AreaVariant =
   | "solid"
   | "dotted"
   | "lines"
-  | "hatched";
+  | "hatched"
+  | "none"; // stroke only — no fill at all
 export type StrokeVariant = "solid" | "dashed" | "animated-dashed";
 export type StackType = "default" | "stacked" | "expanded";
 export type AreaAnimationType =
@@ -461,9 +462,11 @@ function patternFill(
 
   if (kind === "dotted") {
     size(6, 6);
-    ctx.fillStyle = withAlpha(color, 0.5);
+    // Slightly larger dots at 0.7 — the vertical fade + areaStyle opacity temper
+    // them, so at the old 0.5/r0.6 they washed out (especially on shorter areas).
+    ctx.fillStyle = withAlpha(color, 0.7);
     ctx.beginPath();
-    ctx.arc(3, 3, 0.6, 0, Math.PI * 2);
+    ctx.arc(3, 3, 0.85, 0, Math.PI * 2);
     ctx.fill();
     return pattern();
   }
@@ -524,6 +527,56 @@ function gradientFillTexture(
   return canvas;
 }
 
+// A pattern fill (dotted/lines/hatched) faded vertically — opaque at the top
+// (near the line), transparent toward the baseline — so it reads like the
+// gradient variant instead of a flat wall of pattern. The tiling pattern can't
+// itself carry an alpha ramp, so bake it into a plot-sized texture: tile the
+// pattern (reusing patternFill's tile + rotation), then mask it with a vertical
+// alpha ramp via destination-in.
+function patternFadeTexture(
+  kind: "dotted" | "lines" | "hatched",
+  color: string,
+  width: number,
+  height: number,
+): HTMLCanvasElement | null {
+  const patternObj = patternFill(kind, color);
+  if (!patternObj || typeof document === "undefined" || width < 1 || height < 1) return null;
+  const tile = patternObj.image;
+  if (!(tile instanceof HTMLCanvasElement)) return null;
+  const rotation = patternObj.rotation ?? 0;
+  const tileScale = patternObj.scaleX ?? 1; // patternFill draws the tile at dpr; 1/dpr scales it back
+
+  const w = Math.ceil(width);
+  const h = Math.ceil(height);
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return null;
+
+  const pat = ctx.createPattern(tile, "repeat");
+  if (!pat) return null;
+  // Replicate the ECharts ImagePattern transform (rotate the tiling, scale the
+  // dpr tile back to CSS size) so the baked texture matches the plain pattern.
+  if (typeof pat.setTransform === "function") {
+    const m = new DOMMatrix();
+    m.rotateSelf((rotation * 180) / Math.PI);
+    m.scaleSelf(tileScale, tileScale);
+    pat.setTransform(m);
+  }
+  ctx.fillStyle = pat;
+  ctx.fillRect(0, 0, w, h);
+
+  const fade = ctx.createLinearGradient(0, 0, 0, h);
+  fade.addColorStop(0, "rgba(0, 0, 0, 1)"); // top: keep the pattern
+  fade.addColorStop(1, "rgba(0, 0, 0, 0)"); // baseline: fade it out
+  ctx.globalCompositeOperation = "destination-in";
+  ctx.fillStyle = fade;
+  ctx.fillRect(0, 0, w, h);
+
+  return canvas;
+}
+
 // Resolves the area fill for a variant into an ECharts color value. `size` is the
 // full renderer size, used to bake 2D gradients for multi-color series.
 function fillPaint(
@@ -534,6 +587,9 @@ function fillPaint(
 ): string | echarts.graphic.LinearGradient | ImagePatternObject {
   const base = slots[0] ?? "rgba(120, 120, 120, 1)";
   const multi = slots.length > 1;
+
+  // "none" — stroke only, no fill (even when unselected).
+  if (variant === "none") return "transparent";
 
   // A non-selected area in a clickable chart recedes as a 45° stripe texture.
   if (showUnselected) {
@@ -571,8 +627,12 @@ function fillPaint(
     }
     case "dotted":
     case "lines":
-    case "hatched":
+    case "hatched": {
+      // Faded by default (opaque near the line, transparent at the baseline).
+      const texture = patternFadeTexture(variant, base, size.width, size.height);
+      if (texture) return { image: texture, repeat: "no-repeat" };
       return patternFill(variant, base) ?? withAlpha(base, 0.1);
+    }
     default:
       return withAlpha(base, 0.1);
   }

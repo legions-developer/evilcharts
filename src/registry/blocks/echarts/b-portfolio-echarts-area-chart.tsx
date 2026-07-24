@@ -77,7 +77,7 @@ export function EChartsPortfolioAreaChart() {
         config={chartConfig}
         xDataKey="date"
         className="mt-4 min-h-0 w-full flex-1"
-        curveType="natural"
+        curveType="step"
         enableHoverReveal
         chartOptions={{
           grid: { left: 0, right: 0, top: 16, bottom: 0 },
@@ -85,10 +85,10 @@ export function EChartsPortfolioAreaChart() {
         }}
       >
         <EChartsAreaChart.Tooltip variant="frosted-glass" />
-        <EChartsAreaChart.Area dataKey="robinhood" variant="gradient" strokeVariant="solid">
+        <EChartsAreaChart.Area dataKey="robinhood" variant="dotted" strokeVariant="solid">
           <EChartsAreaChart.ActiveDot variant="ping" />
         </EChartsAreaChart.Area>
-        <EChartsAreaChart.Area dataKey="coinbase" variant="gradient" strokeVariant="solid">
+        <EChartsAreaChart.Area dataKey="coinbase" variant="dotted" strokeVariant="solid">
           <EChartsAreaChart.ActiveDot variant="ping" />
         </EChartsAreaChart.Area>
       </EChartsAreaChart>
