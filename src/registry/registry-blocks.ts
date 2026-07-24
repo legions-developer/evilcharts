@@ -87,4 +87,32 @@ export const blocks: Registry["items"] = [
       },
     ],
   },
+  {
+    name: "benchmark-echarts-area-chart",
+    description: "Growth against a dashed benchmark — hatched lead area, rounded step plateaus",
+    dependencies: ["echarts", "motion"],
+    registryDependencies: ["@evilcharts/echarts-area-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "blocks/echarts/b-benchmark-echarts-area-chart.tsx",
+        type: "registry:block",
+        target: TARGET_BASE_PATH + "/benchmark-echarts-area-chart.tsx",
+      },
+    ],
+  },
+  {
+    name: "market-share-echarts-pie-chart",
+    description: "Grayscale donut with a center total and a two-column value legend",
+    dependencies: ["echarts", "motion"],
+    registryDependencies: ["@evilcharts/echarts-pie-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "blocks/echarts/b-market-share-echarts-pie-chart.tsx",
+        type: "registry:block",
+        target: TARGET_BASE_PATH + "/market-share-echarts-pie-chart.tsx",
+      },
+    ],
+  },
 ];

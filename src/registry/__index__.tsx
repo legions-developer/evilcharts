@@ -4579,4 +4579,40 @@ export const Index: Record<string, any> = {
     categories: undefined,
     meta: undefined,
   },
+  "benchmark-echarts-area-chart": {
+    name: "benchmark-echarts-area-chart",
+    description: "Growth against a dashed benchmark — hatched lead area, rounded step plateaus",
+    type: "registry:block",
+    registryDependencies: ["@evilcharts/echarts-area-chart"],
+    files: [{
+      path: "@/registry/blocks/echarts/b-benchmark-echarts-area-chart.tsx",
+      type: "registry:block",
+      target: "components/evilcharts/blocks/benchmark-echarts-area-chart.tsx"
+    }],
+    component: React.lazy(async () => {
+      const mod = await import("@/registry/blocks/echarts/b-benchmark-echarts-area-chart.tsx")
+      const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
+      return { default: mod.default || mod[exportName] }
+    }),
+    categories: undefined,
+    meta: undefined,
+  },
+  "market-share-echarts-pie-chart": {
+    name: "market-share-echarts-pie-chart",
+    description: "Grayscale donut with a center total and a two-column value legend",
+    type: "registry:block",
+    registryDependencies: ["@evilcharts/echarts-pie-chart"],
+    files: [{
+      path: "@/registry/blocks/echarts/b-market-share-echarts-pie-chart.tsx",
+      type: "registry:block",
+      target: "components/evilcharts/blocks/market-share-echarts-pie-chart.tsx"
+    }],
+    component: React.lazy(async () => {
+      const mod = await import("@/registry/blocks/echarts/b-market-share-echarts-pie-chart.tsx")
+      const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
+      return { default: mod.default || mod[exportName] }
+    }),
+    categories: undefined,
+    meta: undefined,
+  },
   }
