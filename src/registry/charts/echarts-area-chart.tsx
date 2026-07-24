@@ -10,6 +10,15 @@ import {
   type TooltipVariant,
 } from "@/registry/ui/echarts-tooltip";
 import {
+  Brush,
+  buildBrushDataZoom,
+  syncBrushOverlay,
+  type BrushGeometry,
+  type BrushOverlayElements,
+  type BrushProps,
+  type BrushRange,
+} from "@/registry/ui/echarts-brush";
+import {
   DataZoomComponent,
   GridComponent,
   TooltipComponent,
@@ -40,15 +49,6 @@ import {
   type FC,
   type ReactNode,
 } from "react";
-import {
-  Brush,
-  buildBrushDataZoom,
-  syncBrushOverlay,
-  type BrushGeometry,
-  type BrushOverlayElements,
-  type BrushProps,
-  type BrushRange,
-} from "@/registry/ui/echarts-brush";
 import { dotItemStyle, dotStyle, sampleGradient, type DotVariant } from "@/registry/ui/echarts-dot";
 import { LegendOverlay, type LegendVariant } from "@/registry/ui/echarts-legend";
 import type { ComposeOption, ImagePatternObject } from "echarts/core";
@@ -94,7 +94,7 @@ type YAxisOption = ArrayItem<NonNullable<EChartsOption["yAxis"]>>;
 // Constants
 // ─────────────────────────────────────────────────────────────────────────────
 
-const STROKE_WIDTH = 0.8;
+const STROKE_WIDTH = 0.8; // default series stroke — <Area strokeWidth> overrides it
 const LOADING_ANIMATION_DURATION = 2000; // shimmer loop, in milliseconds
 const REVEAL_DURATION = 1000; // intro draw-in length, in milliseconds
 // NOTE: the intro draw-in runs ECharts' RAW default entrance animation. Custom
@@ -193,6 +193,7 @@ export interface AreaProps {
   dataKey: string; // series key — must exist on the data + config
   variant?: AreaVariant; // fill style for this area only
   strokeVariant?: StrokeVariant; // stroke style for this area
+  strokeWidth?: number; // stroke thickness in pixels for this area
   curveType?: CurveType; // curve interpolation — falls back to the root curveType
   animationType?: AreaAnimationType; // intro reveal — first area drives the wrapper wipe
   connectNulls?: boolean; // join segments across null/missing values
@@ -271,6 +272,7 @@ type AreaSeriesConfig = {
   dataKey: string;
   variant: AreaVariant;
   strokeVariant: StrokeVariant;
+  strokeWidth: number;
   curveType?: CurveType;
   animationType?: AreaAnimationType;
   connectNulls: boolean;
@@ -364,6 +366,7 @@ function collectConfig(children: ReactNode): CollectedConfig {
         dataKey: props.dataKey,
         variant: props.variant ?? "gradient",
         strokeVariant: props.strokeVariant ?? "dashed",
+        strokeWidth: props.strokeWidth ?? STROKE_WIDTH,
         curveType: props.curveType,
         animationType: props.animationType,
         connectNulls: props.connectNulls ?? false,
@@ -1233,7 +1236,7 @@ function buildAreaSeries(ctx: OptionBuildContext): LineSeriesOption[] {
       z,
       lineStyle: {
         color: strokePaint,
-        width: STROKE_WIDTH,
+        width: area.strokeWidth,
         opacity: opacity.stroke,
         type: mainDash,
         dashOffset: 0,
@@ -1295,7 +1298,7 @@ function buildAreaSeries(ctx: OptionBuildContext): LineSeriesOption[] {
         // Neutral gray, NO fill, SAME dash pattern as the colored line.
         lineStyle: {
           color: muted,
-          width: STROKE_WIDTH,
+          width: area.strokeWidth,
           type: mainDash,
           opacity: revealActive ? 0.3 : 0,
         },
@@ -1331,7 +1334,7 @@ function buildAreaSeries(ctx: OptionBuildContext): LineSeriesOption[] {
       z,
       lineStyle: {
         color: paint,
-        width: STROKE_WIDTH,
+        width: area.strokeWidth,
         opacity: opacity.stroke,
         type: BUFFER_DASH,
       },

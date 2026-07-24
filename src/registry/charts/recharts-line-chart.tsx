@@ -1,31 +1,6 @@
 "use client";
 
 import {
-  type ChartConfig,
-  ChartContainer,
-  getColorsCount,
-  getLoadingData,
-  LoadingIndicator,
-} from "@/registry/ui/recharts-chart";
-import {
-  CartesianGrid,
-  Curve,
-  Line as RechartsLine,
-  LineChart as RechartsLineChart,
-  XAxis as RechartsXAxis,
-  YAxis as RechartsYAxis,
-  type CurveProps,
-} from "recharts";
-import {
-  ChartTooltip,
-  ChartTooltipContent,
-  type TooltipRoundness,
-  type TooltipVariant,
-} from "@/registry/ui/recharts-tooltip";
-import { Brush, EvilBrush, useEvilBrush, type BrushProps, type EvilBrushRange } from "@/registry/ui/recharts-brush";
-import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/recharts-legend";
-import { ChartDot, type DotVariant } from "@/registry/ui/recharts-dot";
-import {
   Children,
   createContext,
   isValidElement,
@@ -40,10 +15,45 @@ import {
   type ReactElement,
   type ReactNode,
 } from "react";
+import {
+  CartesianGrid,
+  Curve,
+  Line as RechartsLine,
+  LineChart as RechartsLineChart,
+  XAxis as RechartsXAxis,
+  YAxis as RechartsYAxis,
+  type CurveProps,
+} from "recharts";
+import {
+  type ChartConfig,
+  ChartContainer,
+  getColorsCount,
+  getLoadingData,
+  LoadingIndicator,
+} from "@/registry/ui/recharts-chart";
+import {
+  ChartTooltip,
+  ChartTooltipContent,
+  type TooltipRoundness,
+  type TooltipVariant,
+} from "@/registry/ui/recharts-tooltip";
+import {
+  Brush,
+  EvilBrush,
+  useEvilBrush,
+  type BrushProps,
+  type EvilBrushRange,
+} from "@/registry/ui/recharts-brush";
+import {
+  ChartLegend,
+  ChartLegendContent,
+  type ChartLegendVariant,
+} from "@/registry/ui/recharts-legend";
+import { ChartDot, type DotVariant } from "@/registry/ui/recharts-dot";
 import { motion, useReducedMotion } from "motion/react";
 
 // Constants
-const STROKE_WIDTH = 1;
+const STROKE_WIDTH = 0.8; // default series stroke — <Line strokeWidth> overrides it
 const LOADING_LINE_DATA_KEY = "loading";
 const LOADING_ANIMATION_DURATION = 2000; // in milliseconds
 const REVEAL_DURATION = 1; // intro wipe length, in seconds
@@ -237,7 +247,9 @@ export function EvilLineChart<
           {...chartProps}
         >
           {brush.chartChildren}
-          {isLoading && <LoadingLine chartId={chartId} curveType={curveType} onShimmerExit={onShimmerExit} />}
+          {isLoading && (
+            <LoadingLine chartId={chartId} curveType={curveType} onShimmerExit={onShimmerExit} />
+          )}
         </RechartsLineChart>
       </ChartContainer>
     </LineChartContext>
@@ -251,6 +263,7 @@ export function EvilLineChart<
 type LineProps = {
   dataKey: string; // series key — must exist on the data and config
   strokeVariant?: StrokeVariant; // stroke style for this line only
+  strokeWidth?: number; // stroke thickness in pixels for this line
   curveType?: CurveType; // curve interpolation — falls back to the chart default
   animationType?: LineAnimationType; // intro reveal — falls back to the chart default
   connectNulls?: boolean; // join segments across null/missing values
@@ -271,6 +284,7 @@ type LineProps = {
 function Line({
   dataKey,
   strokeVariant = "solid",
+  strokeWidth = STROKE_WIDTH,
   curveType,
   animationType,
   connectNulls = false,
@@ -341,7 +355,7 @@ function Line({
           filter={glowing ? `url(#${id}-glow-${dataKey})` : undefined}
           dot={dot}
           activeDot={activeDot}
-          strokeWidth={STROKE_WIDTH}
+          strokeWidth={strokeWidth}
           strokeDasharray={getStrokeDasharray(enableBufferLine, isDashed)}
           shape={enableBufferLine ? bufferLineShape : undefined}
           // Recharts' built-in line animation is permanently disabled — it drew

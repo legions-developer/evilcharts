@@ -10,6 +10,15 @@ import {
   type TooltipVariant,
 } from "@/registry/ui/echarts-tooltip";
 import {
+  Brush,
+  buildBrushDataZoom,
+  syncBrushOverlay,
+  type BrushGeometry,
+  type BrushOverlayElements,
+  type BrushProps,
+  type BrushRange,
+} from "@/registry/ui/echarts-brush";
+import {
   DataZoomComponent,
   GridComponent,
   TooltipComponent,
@@ -40,15 +49,6 @@ import {
   type FC,
   type ReactNode,
 } from "react";
-import {
-  Brush,
-  buildBrushDataZoom,
-  syncBrushOverlay,
-  type BrushGeometry,
-  type BrushOverlayElements,
-  type BrushProps,
-  type BrushRange,
-} from "@/registry/ui/echarts-brush";
 import {
   dotItemStyle,
   dotStyle,
@@ -103,7 +103,7 @@ type YAxisOption = ArrayItem<NonNullable<EChartsOption["yAxis"]>>;
 // Constants
 // ─────────────────────────────────────────────────────────────────────────────
 
-const STROKE_WIDTH = 0.8;
+const STROKE_WIDTH = 0.8; // default series stroke — <Line strokeWidth> overrides it
 const LOADING_ANIMATION_DURATION = 2000; // shimmer loop, in milliseconds
 const REVEAL_DURATION = 1000; // intro draw-in length, in milliseconds
 // NOTE: the intro draw-in runs ECharts' RAW default entrance animation. Custom
@@ -201,6 +201,7 @@ export interface EChartsLineChartProps<TData extends Record<string, unknown>> {
 export interface LineProps {
   dataKey: string; // series key — must exist on the data + config
   strokeVariant?: StrokeVariant; // stroke style for this line
+  strokeWidth?: number; // stroke thickness in pixels for this line
   curveType?: CurveType; // curve interpolation — falls back to the root curveType
   animationType?: LineAnimationType; // intro reveal — first line drives the wrapper wipe
   connectNulls?: boolean; // join segments across null/missing values
@@ -279,6 +280,7 @@ const Legend: FC<LegendProps> = () => null;
 type LineSeriesConfig = {
   dataKey: string;
   strokeVariant: StrokeVariant;
+  strokeWidth: number;
   curveType?: CurveType;
   animationType?: LineAnimationType;
   connectNulls: boolean;
@@ -374,6 +376,7 @@ function collectConfig(children: ReactNode): CollectedConfig {
         // The Recharts twin defaults a <Line> to a solid stroke (its <Area>
         // defaults to dashed — a divergence intentionally preserved here).
         strokeVariant: props.strokeVariant ?? "solid",
+        strokeWidth: props.strokeWidth ?? STROKE_WIDTH,
         curveType: props.curveType,
         animationType: props.animationType,
         connectNulls: props.connectNulls ?? false,
@@ -1120,7 +1123,7 @@ function buildLineSeries(ctx: OptionBuildContext): LineSeriesOption[] {
         // Anchored plot-wide gradient while revealing a multi-color line (see
         // strokePaint), the normal series paint otherwise.
         color: strokePaint,
-        width: STROKE_WIDTH,
+        width: line.strokeWidth,
         opacity: opacity.stroke,
         type: mainDash,
         dashOffset: 0,
@@ -1176,7 +1179,7 @@ function buildLineSeries(ctx: OptionBuildContext): LineSeriesOption[] {
         // Neutral gray, SAME dash pattern as the colored line, no fill.
         lineStyle: {
           color: muted,
-          width: STROKE_WIDTH,
+          width: line.strokeWidth,
           type: mainDash,
           opacity: revealActive ? 0.3 : 0,
         },
@@ -1207,7 +1210,7 @@ function buildLineSeries(ctx: OptionBuildContext): LineSeriesOption[] {
       z,
       lineStyle: {
         color: paint,
-        width: STROKE_WIDTH,
+        width: line.strokeWidth,
         opacity: opacity.stroke,
         type: BUFFER_DASH,
       },

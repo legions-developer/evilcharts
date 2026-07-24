@@ -36,13 +36,23 @@ import {
   type TooltipRoundness,
   type TooltipVariant,
 } from "@/registry/ui/recharts-tooltip";
-import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/recharts-legend";
-import { Brush, EvilBrush, useEvilBrush, type BrushProps, type EvilBrushRange } from "@/registry/ui/recharts-brush";
+import {
+  Brush,
+  EvilBrush,
+  useEvilBrush,
+  type BrushProps,
+  type EvilBrushRange,
+} from "@/registry/ui/recharts-brush";
+import {
+  ChartLegend,
+  ChartLegendContent,
+  type ChartLegendVariant,
+} from "@/registry/ui/recharts-legend";
 import { ChartDot, type DotVariant } from "@/registry/ui/recharts-dot";
 import { motion, useReducedMotion } from "motion/react";
 
 // Constants
-const STROKE_WIDTH = 0.8;
+const STROKE_WIDTH = 0.8; // default series stroke — <Area strokeWidth> overrides it
 const LOADING_AREA_DATA_KEY = "loading";
 const LOADING_ANIMATION_DURATION = 2000; // in milliseconds
 const STACK_ID = "evil-stacked";
@@ -275,6 +285,7 @@ type AreaProps = {
   dataKey: string; // series key — must exist on the data and config
   variant?: AreaVariant; // fill style for this area only
   strokeVariant?: StrokeVariant; // stroke style for this area
+  strokeWidth?: number; // stroke thickness in pixels for this area
   curveType?: CurveType; // curve interpolation — falls back to the chart default
   animationType?: AreaAnimationType; // intro reveal — falls back to the chart default
   connectNulls?: boolean; // join segments across null/missing values
@@ -294,6 +305,7 @@ function Area({
   dataKey,
   variant = "gradient",
   strokeVariant = "dashed",
+  strokeWidth = STROKE_WIDTH,
   curveType,
   animationType,
   connectNulls = false,
@@ -350,7 +362,7 @@ function Area({
         stackId={isStacked ? STACK_ID : undefined}
         dot={dot}
         activeDot={activeDot}
-        strokeWidth={STROKE_WIDTH}
+        strokeWidth={strokeWidth}
         strokeDasharray={isDashed ? "3 3" : undefined}
         // Recharts' built-in area animation is permanently disabled — it drew
         // the line after the dots had already popped in. The motion.dev reveal
