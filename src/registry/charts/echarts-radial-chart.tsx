@@ -139,6 +139,10 @@ export interface EChartsRadialChartProps<TData extends Record<string, unknown>> 
   nameKey: keyof TData & string; // data key holding each bar's name
   className?: string; // extra classes for the chart container
   variant?: RadialVariant; // arc shape — full circle or half circle
+  // Value a full sweep represents. Without it the scale is derived from the data,
+  // so the largest bar always fills the arc — set it (e.g. 100) for gauges, where
+  // a single value has to read against a fixed total.
+  max?: number;
   innerRadius?: number | string; // inner radius of the radial bars
   outerRadius?: number | string; // outer radius of the radial bars
   defaultSelectedDataKey?: string | null; // bar selected on first render
@@ -876,6 +880,7 @@ export function EChartsRadialChart<TData extends Record<string, unknown>>({
   nameKey,
   className,
   variant = "full",
+  max,
   innerRadius = DEFAULT_INNER_RADIUS,
   outerRadius = DEFAULT_OUTER_RADIUS,
   defaultSelectedDataKey = null,
@@ -930,10 +935,14 @@ export function EChartsRadialChart<TData extends Record<string, unknown>>({
     [data, radialBar.dataKey],
   );
 
-  // Nice ceiling for the angle axis so the largest ring stops just shy of a full
-  // wrap (Recharts derives an auto-scaled domain; the exact niced max differs
-  // slightly but keeps the same look).
-  const angleMax = useMemo(() => niceCeil(Math.max(0, ...values)), [values]);
+  // An explicit `max` pins what a full sweep means (gauges). Otherwise a nice
+  // ceiling over the data so the largest ring stops just shy of a full wrap
+  // (Recharts derives an auto-scaled domain; the exact niced max differs slightly
+  // but keeps the same look).
+  const angleMax = useMemo(
+    () => (max != null && max > 0 ? max : niceCeil(Math.max(0, ...values))),
+    [max, values],
+  );
 
   const css = useMemo(() => buildChartCss(chartId, config), [chartId, config]);
   const hasSelection = selectedBar !== null;

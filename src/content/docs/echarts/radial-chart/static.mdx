@@ -169,6 +169,9 @@ The root container. It owns the data, shared selection state, loading skeleton, 
   <ApiRow name="variant" type='"full" | "semi"' default='"full"'>
     The chart's arc shape. `"full"` is a full circle (360°); `"semi"` is a half circle (180°).
   </ApiRow>
+  <ApiRow name="max" type="number">
+    Value a full sweep represents. Without it the scale is derived from the data, so the largest bar always fills the arc — set it (e.g. `100`) for gauges, where a single value has to read against a fixed total.
+  </ApiRow>
   <ApiRow name="innerRadius" type="number | string" default='"30%"'>
     Inner radius of the bars, as a number (pixels) or percentage string.
   </ApiRow>

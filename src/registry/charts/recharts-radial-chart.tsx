@@ -1,6 +1,13 @@
 "use client";
 
 import {
+  PolarAngleAxis,
+  RadialBar as RechartsRadialBar,
+  RadialBarChart as RechartsRadialBarChart,
+  Sector,
+  type SectorProps,
+} from "recharts";
+import {
   createContext,
   use,
   useCallback,
@@ -17,12 +24,6 @@ import {
   type TooltipRoundness,
   type TooltipVariant,
 } from "@/registry/ui/recharts-tooltip";
-import {
-  RadialBar as RechartsRadialBar,
-  RadialBarChart as RechartsRadialBarChart,
-  Sector,
-  type SectorProps,
-} from "recharts";
 import {
   type ChartConfig,
   ChartContainer,
@@ -96,6 +97,10 @@ type EvilRadialChartBaseProps<TData extends Record<string, unknown>> = {
   className?: string; // extra classes for the chart container
   chartProps?: RadialBarChartProps; // escape hatch for the raw Recharts chart
   variant?: RadialVariant; // arc shape — full circle or half circle
+  // Value a full sweep represents. Without it the scale is derived from the data,
+  // so the largest bar always fills the arc — set it (e.g. 100) for gauges, where
+  // a single value has to read against a fixed total.
+  max?: number;
   innerRadius?: number | string; // inner radius of the radial bars
   outerRadius?: number | string; // outer radius of the radial bars
   defaultSelectedDataKey?: string | null; // bar selected on first render
@@ -120,6 +125,7 @@ export function EvilRadialChart<TData extends Record<string, unknown>>({
   className,
   chartProps,
   variant = "full",
+  max,
   innerRadius = DEFAULT_INNER_RADIUS,
   outerRadius = DEFAULT_OUTER_RADIUS,
   defaultSelectedDataKey = null,
@@ -179,6 +185,11 @@ export function EvilRadialChart<TData extends Record<string, unknown>>({
           cy={variantConfig.cy}
           {...chartProps}
         >
+          {/* Pinning the angle domain is what lets a single value read against a
+              fixed total instead of auto-scaling to fill the arc. */}
+          {max != null && max > 0 && (
+            <PolarAngleAxis type="number" domain={[0, max]} tick={false} axisLine={false} />
+          )}
           {backgroundVariant && <ChartBackground variant={backgroundVariant} />}
           {children}
           {isLoading && <LoadingRadialBar />}
