@@ -1429,6 +1429,42 @@ export const Index: Record<string, any> = {
     categories: undefined,
     meta: undefined,
   },
+  "ex-expandable-variant-echarts-bar-chart": {
+    name: "ex-expandable-variant-echarts-bar-chart",
+    description: "",
+    type: "registry:block",
+    registryDependencies: ["@evilcharts/echarts-bar-chart"],
+    files: [{
+      path: "@/registry/examples/echarts/ex-expandable-variant-echarts-bar-chart.tsx",
+      type: "registry:block",
+      target: ""
+    }],
+    component: React.lazy(async () => {
+      const mod = await import("@/registry/examples/echarts/ex-expandable-variant-echarts-bar-chart.tsx")
+      const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
+      return { default: mod.default || mod[exportName] }
+    }),
+    categories: undefined,
+    meta: undefined,
+  },
+  "ex-blocks-variant-echarts-bar-chart": {
+    name: "ex-blocks-variant-echarts-bar-chart",
+    description: "",
+    type: "registry:block",
+    registryDependencies: ["@evilcharts/echarts-bar-chart"],
+    files: [{
+      path: "@/registry/examples/echarts/ex-blocks-variant-echarts-bar-chart.tsx",
+      type: "registry:block",
+      target: ""
+    }],
+    component: React.lazy(async () => {
+      const mod = await import("@/registry/examples/echarts/ex-blocks-variant-echarts-bar-chart.tsx")
+      const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
+      return { default: mod.default || mod[exportName] }
+    }),
+    categories: undefined,
+    meta: undefined,
+  },
   "ex-hatched-variant-echarts-bar-chart": {
     name: "ex-hatched-variant-echarts-bar-chart",
     description: "",
@@ -4663,6 +4699,42 @@ export const Index: Record<string, any> = {
     }],
     component: React.lazy(async () => {
       const mod = await import("@/registry/blocks/echarts/b-shipments-echarts-line-chart.tsx")
+      const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
+      return { default: mod.default || mod[exportName] }
+    }),
+    categories: undefined,
+    meta: undefined,
+  },
+  "grid-echarts-bar-chart": {
+    name: "grid-echarts-bar-chart",
+    description: "Bar chart whose columns are stacks of blocks, on the ECharts blocks variant",
+    type: "registry:block",
+    registryDependencies: ["@evilcharts/echarts-bar-chart"],
+    files: [{
+      path: "@/registry/blocks/echarts/b-grid-echarts-bar-chart.tsx",
+      type: "registry:block",
+      target: "components/evilcharts/blocks/grid-echarts-bar-chart.tsx"
+    }],
+    component: React.lazy(async () => {
+      const mod = await import("@/registry/blocks/echarts/b-grid-echarts-bar-chart.tsx")
+      const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
+      return { default: mod.default || mod[exportName] }
+    }),
+    categories: undefined,
+    meta: undefined,
+  },
+  "monospace-echarts-bar-chart": {
+    name: "monospace-echarts-bar-chart",
+    description: "Monospace sales card whose hairline bars expand on hover, on the ECharts bar chart",
+    type: "registry:block",
+    registryDependencies: ["@evilcharts/echarts-bar-chart"],
+    files: [{
+      path: "@/registry/blocks/echarts/b-monospace-echarts-bar-chart.tsx",
+      type: "registry:block",
+      target: "components/evilcharts/blocks/monospace-echarts-bar-chart.tsx"
+    }],
+    component: React.lazy(async () => {
+      const mod = await import("@/registry/blocks/echarts/b-monospace-echarts-bar-chart.tsx")
       const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
       return { default: mod.default || mod[exportName] }
     }),

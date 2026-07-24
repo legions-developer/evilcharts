@@ -213,4 +213,33 @@ export const blocks: Registry["items"] = [
       },
     ],
   },
+  {
+    name: "grid-echarts-bar-chart",
+    description: "Bar chart whose columns are stacks of blocks, on the ECharts blocks variant",
+    dependencies: ["echarts", "motion"],
+    registryDependencies: ["@evilcharts/echarts-bar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "blocks/echarts/b-grid-echarts-bar-chart.tsx",
+        type: "registry:block",
+        target: TARGET_BASE_PATH + "/grid-echarts-bar-chart.tsx",
+      },
+    ],
+  },
+  {
+    name: "monospace-echarts-bar-chart",
+    description:
+      "Monospace sales card whose hairline bars expand on hover, on the ECharts bar chart",
+    dependencies: ["echarts", "motion"],
+    registryDependencies: ["@evilcharts/echarts-bar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "blocks/echarts/b-monospace-echarts-bar-chart.tsx",
+        type: "registry:block",
+        target: TARGET_BASE_PATH + "/monospace-echarts-bar-chart.tsx",
+      },
+    ],
+  },
 ];

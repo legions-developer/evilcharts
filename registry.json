@@ -1202,6 +1202,32 @@
       ]
     },
     {
+      "name": "ex-expandable-variant-echarts-bar-chart",
+      "registryDependencies": [
+        "@evilcharts/echarts-bar-chart"
+      ],
+      "type": "registry:block",
+      "files": [
+        {
+          "path": "src/registry/examples/echarts/ex-expandable-variant-echarts-bar-chart.tsx",
+          "type": "registry:block"
+        }
+      ]
+    },
+    {
+      "name": "ex-blocks-variant-echarts-bar-chart",
+      "registryDependencies": [
+        "@evilcharts/echarts-bar-chart"
+      ],
+      "type": "registry:block",
+      "files": [
+        {
+          "path": "src/registry/examples/echarts/ex-blocks-variant-echarts-bar-chart.tsx",
+          "type": "registry:block"
+        }
+      ]
+    },
+    {
       "name": "ex-hatched-variant-echarts-bar-chart",
       "registryDependencies": [
         "@evilcharts/echarts-bar-chart"
@@ -3628,6 +3654,44 @@
           "path": "src/registry/blocks/echarts/b-shipments-echarts-line-chart.tsx",
           "type": "registry:block",
           "target": "components/evilcharts/blocks/shipments-echarts-line-chart.tsx"
+        }
+      ]
+    },
+    {
+      "name": "grid-echarts-bar-chart",
+      "description": "Bar chart whose columns are stacks of blocks, on the ECharts blocks variant",
+      "dependencies": [
+        "echarts",
+        "motion"
+      ],
+      "registryDependencies": [
+        "@evilcharts/echarts-bar-chart"
+      ],
+      "type": "registry:block",
+      "files": [
+        {
+          "path": "src/registry/blocks/echarts/b-grid-echarts-bar-chart.tsx",
+          "type": "registry:block",
+          "target": "components/evilcharts/blocks/grid-echarts-bar-chart.tsx"
+        }
+      ]
+    },
+    {
+      "name": "monospace-echarts-bar-chart",
+      "description": "Monospace sales card whose hairline bars expand on hover, on the ECharts bar chart",
+      "dependencies": [
+        "echarts",
+        "motion"
+      ],
+      "registryDependencies": [
+        "@evilcharts/echarts-bar-chart"
+      ],
+      "type": "registry:block",
+      "files": [
+        {
+          "path": "src/registry/blocks/echarts/b-monospace-echarts-bar-chart.tsx",
+          "type": "registry:block",
+          "target": "components/evilcharts/blocks/monospace-echarts-bar-chart.tsx"
         }
       ]
     }
