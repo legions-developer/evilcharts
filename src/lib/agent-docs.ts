@@ -17,6 +17,11 @@ const SHARED_DOCS = new Set(["/docs", "/docs/chart-config"]);
 // all it takes to publish one.
 const AVAILABLE_PROVIDERS = PROVIDERS.filter((id) => PROVIDER_META[id].available);
 
+// The provider skill.md points agents at for setup and examples. Deliberately not
+// DEFAULT_PROVIDER — that one drives which engine the docs UI leads with, which may be an
+// engine that hasn't shipped yet. Citing it here would contradict the constraint below.
+const AGENT_PROVIDER = AVAILABLE_PROVIDERS[0] ?? DEFAULT_PROVIDER;
+
 type Page = ReturnType<typeof source.getPages>[number];
 
 // Matches the provider's landing page (/docs/recharts) as well as everything beneath
@@ -158,9 +163,9 @@ Use this skill when a user wants to install, add, customize, or debug EvilCharts
 ## Workflow
 
 1. Read \`/llms.txt\` to find the relevant documentation page.
-2. For setup, follow \`/docs/${DEFAULT_PROVIDER}/installation.md\`.
-3. For chart usage, read the matching chart page such as \`/docs/${DEFAULT_PROVIDER}/bar-chart/static.md\`.
-4. For shared options, read \`/docs/chart-config.md\`, \`/docs/${DEFAULT_PROVIDER}/ui/tooltip.md\`, \`/docs/${DEFAULT_PROVIDER}/ui/legend.md\`, and \`/docs/${DEFAULT_PROVIDER}/ui/background.md\`.
+2. For setup, follow \`/docs/${AGENT_PROVIDER}/installation.md\`.
+3. For chart usage, read the matching chart page such as \`/docs/${AGENT_PROVIDER}/bar-chart/static.md\`.
+4. For shared options, read \`/docs/chart-config.md\`, \`/docs/${AGENT_PROVIDER}/ui/tooltip.md\`, \`/docs/${AGENT_PROVIDER}/ui/legend.md\`, and \`/docs/${AGENT_PROVIDER}/ui/background.md\`.
 5. Add components with the shadcn CLI pattern documented by EvilCharts: \`npx shadcn@latest add @evilcharts/{chart-name}\`.
 
 ## Constraints
