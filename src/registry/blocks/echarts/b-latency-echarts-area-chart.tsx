@@ -4,7 +4,6 @@ import { EChartsAreaChart, type ChartConfig } from "@/registry/charts/echarts-ar
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 
-// One palette for both themes — dashboard colors that hold up on light and dark.
 const SERIES = [
   { key: "p99", label: "P99", color: "#D41F12", latest: 204 },
   { key: "p95", label: "P95", color: "#F37A00", latest: 98 },
@@ -62,8 +61,6 @@ export function EChartsLatencyAreaChart() {
             key={key}
             type="button"
             onClick={() => setSelected((prev) => (prev === key ? null : key))}
-            // border-l only on column boundaries: 2nd column on mobile
-            // (nth-child even), every non-first cell on the 4-col desktop row.
             className={cn(
               "border-border flex cursor-pointer flex-row items-center gap-1.5 px-3 text-left transition-opacity sm:flex-col sm:items-start sm:gap-1.5 sm:px-4 sm:first:pl-1 sm:[&:not(:first-child)]:border-l [&:nth-child(even)]:border-l",
               selected !== null && selected !== key && "opacity-40",

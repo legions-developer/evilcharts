@@ -7,9 +7,6 @@ const SERIES = [
   { key: "coinbase", label: "Coinbase", color: "#2f6bff", pct: 1.15, delta: 617.22 },
 ] as const;
 
-// A month of daily portfolio values — Robinhood peaks early then drifts down,
-// Coinbase dips to a mid-month trough then rallies past it (the crossover the
-// card highlights). Gentle point-to-point moves keep the smoothed curve clean.
 const chartData = [
   { date: "Dec 22", robinhood: 53916, coinbase: 53670 },
   { date: "Dec 23", robinhood: 54380, coinbase: 53080 },
