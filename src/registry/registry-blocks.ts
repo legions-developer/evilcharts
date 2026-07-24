@@ -158,6 +158,34 @@ export const blocks: Registry["items"] = [
     ],
   },
   {
+    name: "ride-echarts-radial-chart",
+    description: "Activity summary card with a distance goal bar and three metric gauges",
+    dependencies: ["echarts", "motion"],
+    registryDependencies: ["@evilcharts/echarts-radial-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "blocks/echarts/b-ride-echarts-radial-chart.tsx",
+        type: "registry:block",
+        target: TARGET_BASE_PATH + "/ride-echarts-radial-chart.tsx",
+      },
+    ],
+  },
+  {
+    name: "cache-tiers-echarts-radial-chart",
+    description: "Semi-circle multi-ring gauge with a stat grid and a share legend",
+    dependencies: ["echarts", "motion"],
+    registryDependencies: ["@evilcharts/echarts-radial-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "blocks/echarts/b-cache-tiers-echarts-radial-chart.tsx",
+        type: "registry:block",
+        target: TARGET_BASE_PATH + "/cache-tiers-echarts-radial-chart.tsx",
+      },
+    ],
+  },
+  {
     name: "revenue-mix-echarts-pie-chart",
     description: "Gapped donut with a center total and a side legend of amounts",
     dependencies: ["echarts", "motion"],

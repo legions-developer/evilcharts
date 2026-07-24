@@ -4651,6 +4651,42 @@ export const Index: Record<string, any> = {
     categories: undefined,
     meta: undefined,
   },
+  "ride-echarts-radial-chart": {
+    name: "ride-echarts-radial-chart",
+    description: "Activity summary card with a distance goal bar and three metric gauges",
+    type: "registry:block",
+    registryDependencies: ["@evilcharts/echarts-radial-chart"],
+    files: [{
+      path: "@/registry/blocks/echarts/b-ride-echarts-radial-chart.tsx",
+      type: "registry:block",
+      target: "components/evilcharts/blocks/ride-echarts-radial-chart.tsx"
+    }],
+    component: React.lazy(async () => {
+      const mod = await import("@/registry/blocks/echarts/b-ride-echarts-radial-chart.tsx")
+      const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
+      return { default: mod.default || mod[exportName] }
+    }),
+    categories: undefined,
+    meta: undefined,
+  },
+  "cache-tiers-echarts-radial-chart": {
+    name: "cache-tiers-echarts-radial-chart",
+    description: "Semi-circle multi-ring gauge with a stat grid and a share legend",
+    type: "registry:block",
+    registryDependencies: ["@evilcharts/echarts-radial-chart"],
+    files: [{
+      path: "@/registry/blocks/echarts/b-cache-tiers-echarts-radial-chart.tsx",
+      type: "registry:block",
+      target: "components/evilcharts/blocks/cache-tiers-echarts-radial-chart.tsx"
+    }],
+    component: React.lazy(async () => {
+      const mod = await import("@/registry/blocks/echarts/b-cache-tiers-echarts-radial-chart.tsx")
+      const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
+      return { default: mod.default || mod[exportName] }
+    }),
+    categories: undefined,
+    meta: undefined,
+  },
   "revenue-mix-echarts-pie-chart": {
     name: "revenue-mix-echarts-pie-chart",
     description: "Gapped donut with a center total and a side legend of amounts",
