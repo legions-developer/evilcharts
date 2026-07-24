@@ -4633,4 +4633,40 @@ export const Index: Record<string, any> = {
     categories: undefined,
     meta: undefined,
   },
+  "payouts-echarts-line-chart": {
+    name: "payouts-echarts-line-chart",
+    description: "Payout trend card with a glowing gradient line and stat rows",
+    type: "registry:block",
+    registryDependencies: ["@evilcharts/echarts-line-chart"],
+    files: [{
+      path: "@/registry/blocks/echarts/b-payouts-echarts-line-chart.tsx",
+      type: "registry:block",
+      target: "components/evilcharts/blocks/payouts-echarts-line-chart.tsx"
+    }],
+    component: React.lazy(async () => {
+      const mod = await import("@/registry/blocks/echarts/b-payouts-echarts-line-chart.tsx")
+      const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
+      return { default: mod.default || mod[exportName] }
+    }),
+    categories: undefined,
+    meta: undefined,
+  },
+  "shipments-echarts-line-chart": {
+    name: "shipments-echarts-line-chart",
+    description: "Week-over-week comparison with a solid and a dashed grayscale line",
+    type: "registry:block",
+    registryDependencies: ["@evilcharts/echarts-line-chart"],
+    files: [{
+      path: "@/registry/blocks/echarts/b-shipments-echarts-line-chart.tsx",
+      type: "registry:block",
+      target: "components/evilcharts/blocks/shipments-echarts-line-chart.tsx"
+    }],
+    component: React.lazy(async () => {
+      const mod = await import("@/registry/blocks/echarts/b-shipments-echarts-line-chart.tsx")
+      const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
+      return { default: mod.default || mod[exportName] }
+    }),
+    categories: undefined,
+    meta: undefined,
+  },
   }

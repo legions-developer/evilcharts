@@ -185,4 +185,32 @@ export const blocks: Registry["items"] = [
       },
     ],
   },
+  {
+    name: "payouts-echarts-line-chart",
+    description: "Payout trend card with a glowing gradient line and stat rows",
+    dependencies: ["echarts", "motion"],
+    registryDependencies: ["@evilcharts/echarts-line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "blocks/echarts/b-payouts-echarts-line-chart.tsx",
+        type: "registry:block",
+        target: TARGET_BASE_PATH + "/payouts-echarts-line-chart.tsx",
+      },
+    ],
+  },
+  {
+    name: "shipments-echarts-line-chart",
+    description: "Week-over-week comparison with a solid and a dashed grayscale line",
+    dependencies: ["echarts", "motion"],
+    registryDependencies: ["@evilcharts/echarts-line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "blocks/echarts/b-shipments-echarts-line-chart.tsx",
+        type: "registry:block",
+        target: TARGET_BASE_PATH + "/shipments-echarts-line-chart.tsx",
+      },
+    ],
+  },
 ];

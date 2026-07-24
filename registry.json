@@ -3592,6 +3592,44 @@
           "target": "components/evilcharts/blocks/reliability-score-echarts-pie-chart.tsx"
         }
       ]
+    },
+    {
+      "name": "payouts-echarts-line-chart",
+      "description": "Payout trend card with a glowing gradient line and stat rows",
+      "dependencies": [
+        "echarts",
+        "motion"
+      ],
+      "registryDependencies": [
+        "@evilcharts/echarts-line-chart"
+      ],
+      "type": "registry:block",
+      "files": [
+        {
+          "path": "src/registry/blocks/echarts/b-payouts-echarts-line-chart.tsx",
+          "type": "registry:block",
+          "target": "components/evilcharts/blocks/payouts-echarts-line-chart.tsx"
+        }
+      ]
+    },
+    {
+      "name": "shipments-echarts-line-chart",
+      "description": "Week-over-week comparison with a solid and a dashed grayscale line",
+      "dependencies": [
+        "echarts",
+        "motion"
+      ],
+      "registryDependencies": [
+        "@evilcharts/echarts-line-chart"
+      ],
+      "type": "registry:block",
+      "files": [
+        {
+          "path": "src/registry/blocks/echarts/b-shipments-echarts-line-chart.tsx",
+          "type": "registry:block",
+          "target": "components/evilcharts/blocks/shipments-echarts-line-chart.tsx"
+        }
+      ]
     }
   ]
 }
