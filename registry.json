@@ -1215,6 +1215,19 @@
       ]
     },
     {
+      "name": "ex-max-highlight-echarts-bar-chart",
+      "registryDependencies": [
+        "@evilcharts/echarts-bar-chart"
+      ],
+      "type": "registry:block",
+      "files": [
+        {
+          "path": "src/registry/examples/echarts/ex-max-highlight-echarts-bar-chart.tsx",
+          "type": "registry:block"
+        }
+      ]
+    },
+    {
       "name": "ex-blocks-variant-echarts-bar-chart",
       "registryDependencies": [
         "@evilcharts/echarts-bar-chart"
@@ -3692,6 +3705,25 @@
           "path": "src/registry/blocks/echarts/b-monospace-echarts-bar-chart.tsx",
           "type": "registry:block",
           "target": "components/evilcharts/blocks/monospace-echarts-bar-chart.tsx"
+        }
+      ]
+    },
+    {
+      "name": "peak-echarts-bar-chart",
+      "description": "Stacked weekly signups with only the best week in color",
+      "dependencies": [
+        "echarts",
+        "motion"
+      ],
+      "registryDependencies": [
+        "@evilcharts/echarts-bar-chart"
+      ],
+      "type": "registry:block",
+      "files": [
+        {
+          "path": "src/registry/blocks/echarts/b-peak-echarts-bar-chart.tsx",
+          "type": "registry:block",
+          "target": "components/evilcharts/blocks/peak-echarts-bar-chart.tsx"
         }
       ]
     }

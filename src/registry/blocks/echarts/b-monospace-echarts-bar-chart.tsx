@@ -81,7 +81,11 @@ export function EChartsMonospaceBarChart() {
           xDataKey="month"
           className="h-full w-full"
         >
-          <EChartsBarChart.XAxis dataKey="month" tickFormatter={(value) => value.slice(0, 3)} />
+          <EChartsBarChart.XAxis
+            dataKey="month"
+            tickFormatter={(value) => value.slice(0, 3)}
+            hideDots
+          />
           <EChartsBarChart.Bar dataKey="sales" variant="expandable" />
         </EChartsBarChart>
       </div>

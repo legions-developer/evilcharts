@@ -84,7 +84,7 @@ export function EChartsGridBarChart() {
           className="h-full w-full"
           barCategoryGap={14}
         >
-          <EChartsBarChart.XAxis dataKey="hour" />
+          <EChartsBarChart.XAxis dataKey="hour" hideDots />
           <EChartsBarChart.Tooltip />
           <EChartsBarChart.Bar dataKey="sessions" variant="blocks" />
         </EChartsBarChart>

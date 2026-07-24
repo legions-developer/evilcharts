@@ -121,6 +121,13 @@ const EXPAND_TAU = 70; // ease time-constant, in milliseconds (exponential appro
 const BLOCK_SIZE = 8; // filled segment height, in pixels
 const BLOCK_GAP = 4; // transparent gap between segments, in pixels
 const BLOCK_TRACK_OPACITY = 0.22; // unfilled block tone, x the muted-foreground alpha
+// Stacked segments would otherwise butt straight into each other and read as one
+// solid column. The separation is a REAL gap — transparent spacer series stacked
+// between the real ones — not a background-colored border: a border paints on all
+// four sides, so it outlines each segment (obvious the moment a bar glows) instead
+// of only parting them.
+const STACK_SEGMENT_GAP = 4; // separation between stacked segments, in pixels
+const MAX_HIGHLIGHT_DIM = 0.16; // non-winning columns under enableMaxValueHighlight, x muted-foreground
 
 // The `stripped` variant caps each bar with a small BRIGHT pill of CONSTANT pixel
 // height (Recharts draws a fixed ~2px strip on top of a dimmed body, identical on
@@ -193,6 +200,10 @@ export interface EChartsBarChartProps<TData extends Record<string, unknown>> {
   barCategoryGap?: number; // gap between categories of bars, in pixels
   defaultSelectedDataKey?: string | null; // series selected on first render
   onSelectionChange?: (key: string | null) => void; // fires when the selected series changes
+  // Colors ONLY the tallest column and mutes the rest. With several series the
+  // comparison is per COLUMN — the totals across every series at that category —
+  // so a whole stack or group lights up together, not one bar inside it.
+  enableMaxValueHighlight?: boolean;
   isLoading?: boolean; // shows the animated loading skeleton
   loadingBars?: number; // number of bars in the loading skeleton
   chartOptions?: Record<string, unknown>; // escape hatch merged over the built ECharts option
@@ -230,6 +241,7 @@ export interface XAxisProps {
   // letting examples share `(value) => value.substring(0, 3)` with the Recharts twin.
   tickFormatter?: (value: string, index: number) => string; // formats x tick labels
   label?: string; // axis title, centered below the x-position tick labels
+  hideDots?: boolean; // hides the tick dots beside this axis's labels
 }
 
 /**
@@ -242,6 +254,7 @@ export interface YAxisProps {
   dataKey?: string; // category key — overrides the root xDataKey (horizontal layout)
   tickFormatter?: (value: string, index: number) => string; // formats y tick labels
   label?: string; // axis title, rotated alongside the y-position tick labels
+  hideDots?: boolean; // hides the tick dots beside this axis's labels
 }
 
 /**
@@ -294,6 +307,7 @@ type AxisSlot = {
   dataKey?: string;
   tickFormatter?: (value: string, index: number) => string;
   label?: string;
+  hideDots: boolean;
 };
 type TooltipSlot = {
   present: boolean;
@@ -328,8 +342,8 @@ type CollectedConfig = {
 
 function collectConfig(children: ReactNode): CollectedConfig {
   const bars: BarSeriesConfig[] = [];
-  let xAxis: AxisSlot = { present: false };
-  let yAxis: AxisSlot = { present: false };
+  let xAxis: AxisSlot = { present: false, hideDots: false };
+  let yAxis: AxisSlot = { present: false, hideDots: false };
   let showGrid = false;
   let tooltip: TooltipSlot = {
     present: false,
@@ -369,6 +383,7 @@ function collectConfig(children: ReactNode): CollectedConfig {
         dataKey: props.dataKey,
         tickFormatter: props.tickFormatter,
         label: props.label,
+        hideDots: props.hideDots ?? false,
       };
     } else if (type === YAxis) {
       const props = child.props as YAxisProps;
@@ -377,6 +392,7 @@ function collectConfig(children: ReactNode): CollectedConfig {
         dataKey: props.dataKey,
         tickFormatter: props.tickFormatter,
         label: props.label,
+        hideDots: props.hideDots ?? false,
       };
     } else if (type === Grid) {
       showGrid = true;
@@ -776,6 +792,7 @@ type OptionBuildContext = {
   // Openness per bar index for the expandable variant, plus which one the pointer
   // is on — driven by the hover rAF, read at build.
   expand: { key: string | null; hovered: number | null; progress: Map<number, number> };
+  maxHighlightIndex: number | null; // column to keep colored under enableMaxValueHighlight
 };
 
 // Grid insets plus the footer band reserved for the brush. ECharts 6 contains
@@ -867,8 +884,12 @@ function buildMainAxes(ctx: OptionBuildContext): { xAxis: XAxisOption; yAxis: YA
     // Tick DOTS: a near-zero-length tick whose round caps form a true circle, in
     // the gridline gray (flattened opaque so the caps don't stack).
     axisTick: {
-      show: !isLoading && categorySlot.present,
+      show: !isLoading && categorySlot.present && !categorySlot.hideDots,
       length: 0.5,
+      // Bars use boundaryGap, so ECharts would drop each tick on the BOUNDARY
+      // between two categories — a dot floating between labels rather than under
+      // one. Align them to the labels instead.
+      alignWithLabel: true,
       lineStyle: { color: tickDotColor, width: 3, cap: "round" as const },
     },
     splitLine: { show: false },
@@ -899,8 +920,10 @@ function buildMainAxes(ctx: OptionBuildContext): { xAxis: XAxisOption; yAxis: YA
     axisLine: { show: false },
     // Same tick dots as the category axis, beside each value label.
     axisTick: {
-      show: valueSlot.present && !isLoading,
+      show: valueSlot.present && !isLoading && !valueSlot.hideDots,
       length: 0.5,
+      // Inert here — ECharts only honors it for CATEGORY ticks, and this axis is
+      // always type:"value". Carried so both axes' tick config stays identical.
       lineStyle: { color: tickDotColor, width: 3, cap: "round" as const },
     },
     splitLine: {
@@ -1125,7 +1148,7 @@ function buildBarSeries(ctx: OptionBuildContext): BarSeriesOption[] {
     ? data.map((row) => seriesKeys.reduce((sum, key) => sum + (Number(row[key]) || 0), 0))
     : [];
 
-  return bars.map((bar) => {
+  const series: BarSeriesOption[] = bars.map((bar) => {
     const key = bar.dataKey;
     const slots = resolved.series[key] ?? [GRAY];
     const base = slots[0] ?? GRAY;
@@ -1140,6 +1163,11 @@ function buildBarSeries(ctx: OptionBuildContext): BarSeriesOption[] {
     const barAnim = bar.animationType ?? animationType;
     const isStripped = bar.variant === "stripped";
     const isExpandable = bar.variant === "expandable";
+    // Under enableMaxValueHighlight every column except the tallest is muted, so a
+    // single flat tone replaces whatever fill the variant would have painted.
+    const mutedFill = withAlpha(resolved.tokens.mutedForeground, MAX_HIGHLIGHT_DIM);
+    const isMuted = (i: number) => ctx.maxHighlightIndex != null && i !== ctx.maxHighlightIndex;
+
     // Openness per datum, driven by the hover rAF. Bars not in the map are shut.
     const expandOf = (i: number) =>
       ctx.expand.key === key ? (ctx.expand.progress.get(i) ?? EXPAND_COLLAPSED) : EXPAND_COLLAPSED;
@@ -1179,25 +1207,35 @@ function buildBarSeries(ctx: OptionBuildContext): BarSeriesOption[] {
     // the bug). A canvas shape carries only one shadow, so the sample is per bar,
     // not within a bar; the wide, soft shadowBlur reads as the Recharts blur's
     // colored halo with no hard rim.
+    // `glowing` haloes every bar in the series; enableMaxValueHighlight haloes only
+    // the winning column — the muted ones must stay flat or the "one bar stands
+    // out" reading collapses. Same shadow either way, so the two share a builder.
+    const glowAt = (i: number) => ({
+      shadowBlur: GLOW_BLUR,
+      shadowColor: withAlpha(
+        sampleGradient(slots, values.length > 1 ? i / (values.length - 1) : 0),
+        GLOW_OPACITY,
+      ),
+    });
     const glowFor = bar.glowing
-      ? (i: number) => ({
-          shadowBlur: GLOW_BLUR,
-          shadowColor: withAlpha(
-            sampleGradient(slots, values.length > 1 ? i / (values.length - 1) : 0),
-            GLOW_OPACITY,
-          ),
-        })
-      : null;
+      ? glowAt
+      : ctx.maxHighlightIndex != null
+        ? (i: number) => (i === ctx.maxHighlightIndex ? glowAt(i) : {})
+        : null;
 
     // Only wrap a datum in an object when it needs per-point overrides (stripped
     // cap, buffer tip, or glow); otherwise keep the bare number so the series
     // itemStyle applies untouched. Stripped and glow touch every datum; buffer only
     // the last one.
     const dataPoints =
-      isStripped || isExpandable || glowFor || (bufferStyle && lastIndex >= 0)
+      isStripped ||
+      isExpandable ||
+      glowFor ||
+      ctx.maxHighlightIndex != null ||
+      (bufferStyle && lastIndex >= 0)
         ? values.map((value, i) => {
             const isBuffer = !!bufferStyle && i === lastIndex;
-            if (!isBuffer && !glowFor && !isStripped && !isExpandable) return value;
+            if (!isBuffer && !glowFor && !isStripped && !isExpandable && !isMuted(i)) return value;
             return {
               value,
               ...(isExpandable ? { label: { show: i === expandHovered } } : {}),
@@ -1220,6 +1258,8 @@ function buildBarSeries(ctx: OptionBuildContext): BarSeriesOption[] {
                   : {}),
                 ...(isBuffer && bufferStyle ? bufferStyle : {}),
                 ...(glowFor ? glowFor(i) : {}),
+                // Last so it overrides the variant's own paint.
+                ...(isMuted(i) ? { color: mutedFill } : {}),
               },
             };
           })
@@ -1278,6 +1318,41 @@ function buildBarSeries(ctx: OptionBuildContext): BarSeriesOption[] {
       animationDelay: (idx: number) => barStaggerDelay(barAnim, idx, data.length),
     };
   });
+
+  // Stacked segments butt together into one solid column, so part them with a REAL
+  // gap: a transparent series stacked between each adjacent pair. A background
+  // -colored border can't do this — a border paints all four sides, outlining every
+  // segment (glaring the moment a bar glows) instead of only separating them.
+  //
+  // The spacer's value is in DATA units, so it is derived from the measured
+  // pixels-per-unit to keep the gap a constant pixel height whatever the scale.
+  // Before the first layout that measurement is null and the gap is simply skipped;
+  // the push re-applies once it exists, in the same frame (see the sync effect).
+  const gapUnits =
+    (isStacked || isPercent) && series.length > 1 && ctx.valuePxPerUnit
+      ? STACK_SEGMENT_GAP / ctx.valuePxPerUnit
+      : 0;
+  if (!gapUnits) return series;
+
+  const spaced: BarSeriesOption[] = [];
+  series.forEach((entry, i) => {
+    spaced.push(entry);
+    if (i === series.length - 1) return;
+    spaced.push({
+      id: `__stackgap-${i}`,
+      type: "bar",
+      stack: isStacked ? "total" : undefined,
+      data: data.map(() => gapUnits),
+      itemStyle: { color: "transparent" },
+      silent: true,
+      tooltip: { show: false },
+      legendHoverLink: false,
+      emphasis: { disabled: true },
+      animation: false,
+      z: 1,
+    });
+  });
+  return spaced;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1314,6 +1389,7 @@ type LiveState = {
     seriesKeys: string[];
     hasStripped: boolean; // any visible stripped bar → run the post-layout cap correction
     hasBlocks: boolean; // any blocks bar → re-push once the bar width is measurable
+    hasStackGap: boolean; // stacked with >1 series → the segment gap needs the axis scale
     expandableKey: string | null; // the expandable series, if any — drives the column hover
     barCategoryGap?: number; // consumer's category gap, needed to derive the bar width
     isHorizontal: boolean; // layout, for measuring the value axis in the finished handler
@@ -1355,6 +1431,7 @@ export function EChartsBarChart<TData extends Record<string, unknown>>({
   barCategoryGap,
   defaultSelectedDataKey = null,
   onSelectionChange,
+  enableMaxValueHighlight = false,
   isLoading = false,
   loadingBars = LOADING_DEFAULT_BARS,
   chartOptions,
@@ -1394,6 +1471,7 @@ export function EChartsBarChart<TData extends Record<string, unknown>>({
       seriesKeys: [],
       hasStripped: false,
       hasBlocks: false,
+      hasStackGap: false,
       expandableKey: null,
       isHorizontal: false,
     },
@@ -1453,6 +1531,22 @@ export function EChartsBarChart<TData extends Record<string, unknown>>({
   // The intro grow-in follows the first bar's setting, falling back to the root default.
   const effectiveAnimation = bars[0]?.animationType ?? animationType;
 
+  // The tallest COLUMN, comparing totals across every series so a stack or group
+  // wins together rather than one bar inside it. Null when the flag is off.
+  const maxHighlightIndex = useMemo(() => {
+    if (!enableMaxValueHighlight || !data.length || !seriesKeys.length) return null;
+    let best = 0;
+    let bestTotal = -Infinity;
+    data.forEach((row, i) => {
+      const total = seriesKeys.reduce((sum, key) => sum + (Number(row[key]) || 0), 0);
+      if (total > bestTotal) {
+        bestTotal = total;
+        best = i;
+      }
+    });
+    return best;
+  }, [enableMaxValueHighlight, data, seriesKeys]);
+
   const css = useMemo(() => buildChartCss(chartId, config), [chartId, config]);
 
   const hasSelection = selectedDataKey !== null;
@@ -1475,6 +1569,7 @@ export function EChartsBarChart<TData extends Record<string, unknown>>({
     seriesKeys,
     hasStripped: hasStrippedBars,
     hasBlocks: bars.some((bar) => bar.variant === "blocks"),
+    hasStackGap: (stackType === "stacked" || stackType === "percent") && bars.length > 1,
     expandableKey: bars.find((bar) => bar.variant === "expandable")?.dataKey ?? null,
     barCategoryGap,
     isHorizontal,
@@ -1570,6 +1665,7 @@ export function EChartsBarChart<TData extends Record<string, unknown>>({
       valuePxPerUnit: live.valuePxPerUnit,
       barWidthPx: live.barWidthPx,
       expand: live.expand,
+      maxHighlightIndex,
     };
 
     const { grid, brushBottom } = buildChartLayout(ctx);
@@ -1615,6 +1711,7 @@ export function EChartsBarChart<TData extends Record<string, unknown>>({
     brushHeight,
     barGap,
     barCategoryGap,
+    maxHighlightIndex,
   ]);
 
   // ── Init + resize + theme observer (once) ────────────────────────────────────
@@ -1800,19 +1897,29 @@ export function EChartsBarChart<TData extends Record<string, unknown>>({
 
       apply();
 
-      // The `blocks` variant sizes its squares from the bar width, which only
-      // exists once a coordinate system has been laid out — so the first build
-      // uses the fallback. Measure now and, if it moved, rebuild IMMEDIATELY:
-      // still inside this task, before the browser paints, so the corrected
-      // block grid is the only thing ever shown. Doing this from the async
-      // `finished` handler instead made the bars visibly re-align a frame later.
+      // Two things can only be sized once a coordinate system has been laid out, so
+      // the first build uses fallbacks: the `blocks` variant's square segments (bar
+      // width) and the stacked-segment gap (value-axis pixels-per-unit). Measure
+      // both now and, if either moved, rebuild IMMEDIATELY — still inside this task,
+      // before the browser paints, so the corrected chart is the only thing ever
+      // shown. Doing this from the async `finished` handler instead made the bars
+      // visibly re-align a frame later.
+      let needsRebuild = false;
       if (live.handlers.hasBlocks) {
         const width = measureBarWidthPx(chart, isHorizontal, barCategoryGap);
         if (width != null && (live.barWidthPx == null || Math.abs(width - live.barWidthPx) > 0.5)) {
           live.barWidthPx = width;
-          apply();
+          needsRebuild = true;
         }
       }
+      if (live.handlers.hasStackGap) {
+        const scale = measureValuePxPerUnit(chart, isHorizontal);
+        if (scale != null && (live.valuePxPerUnit == null || live.valuePxPerUnit !== scale)) {
+          live.valuePxPerUnit = scale;
+          needsRebuild = true;
+        }
+      }
+      if (needsRebuild) apply();
       // Mark when the entrance settles, so the stripped-cap correction holds off
       // until the grow finishes (0 = nothing animating, correct immediately).
       const maxStagger = data.length > 1 ? (data.length - 1) * BAR_STAGGER : 0;

@@ -242,4 +242,18 @@ export const blocks: Registry["items"] = [
       },
     ],
   },
+  {
+    name: "peak-echarts-bar-chart",
+    description: "Stacked weekly signups with only the best week in color",
+    dependencies: ["echarts", "motion"],
+    registryDependencies: ["@evilcharts/echarts-bar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "blocks/echarts/b-peak-echarts-bar-chart.tsx",
+        type: "registry:block",
+        target: TARGET_BASE_PATH + "/peak-echarts-bar-chart.tsx",
+      },
+    ],
+  },
 ];

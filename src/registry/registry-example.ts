@@ -588,6 +588,17 @@ export const examples: Registry["items"] = [
     ],
   },
   {
+    name: "ex-max-highlight-echarts-bar-chart",
+    registryDependencies: ["@evilcharts/echarts-bar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/echarts/ex-max-highlight-echarts-bar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
     name: "ex-blocks-variant-echarts-bar-chart",
     registryDependencies: ["@evilcharts/echarts-bar-chart"],
     type: "registry:block",

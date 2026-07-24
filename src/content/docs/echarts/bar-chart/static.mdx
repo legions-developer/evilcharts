@@ -129,6 +129,15 @@ Examples of the bar chart with different `variants`. Each `<Bar>` sets its own `
   </AlertContent>
 </Alert>
 
+### Max Value Highlight
+
+<ComponentPreview className="mb-0" title="<EChartsBarChart enableMaxValueHighlight />" name="ex-max-highlight-echarts-bar-chart"  />
+<Alert>
+  <AlertContent>
+    Set `enableMaxValueHighlight` on the chart to color only its tallest column and mute the rest. With several series the comparison is per column — the totals across every series at that category — so a whole stack or group lights up together rather than one bar inside it.
+  </AlertContent>
+</Alert>
+
 ### Gradient Colors
 
 <ComponentPreview title="gradient colors" name="ex-gradient-colors-echarts-bar-chart"  />
@@ -216,6 +225,9 @@ The root container. It owns the data, shared selection state, loading skeleton, 
   <ApiRow name="onSelectionChange" type="(key: string | null) => void">
     Fires when a series is selected or deselected via a clickable `<Bar />` or `<Legend />`. Receives the selected data key, or `null` when deselected.
   </ApiRow>
+  <ApiRow name="enableMaxValueHighlight" type="boolean" default="false">
+    Colors only the tallest column and mutes every other. With several series the comparison is per column (totals across all series), so a whole stack or group highlights together.
+  </ApiRow>
   <ApiRow name="isLoading" type="boolean" default="false">
     Shows the animated shimmer skeleton while data loads.
   </ApiRow>
@@ -274,6 +286,9 @@ The two axes. In the default (vertical) layout `<XAxis />` is the category axis 
   </ApiRow>
   <ApiRow name="label" type="string">
     An axis title centered outside the tick labels — below the `<XAxis />`, alongside the `<YAxis />`. Hidden while loading.
+  </ApiRow>
+  <ApiRow name="hideDots" type="boolean" default="false">
+    Hides the small tick dots that sit beside this axis's labels.
   </ApiRow>
 </ApiTable>
 

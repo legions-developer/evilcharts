@@ -1447,6 +1447,24 @@ export const Index: Record<string, any> = {
     categories: undefined,
     meta: undefined,
   },
+  "ex-max-highlight-echarts-bar-chart": {
+    name: "ex-max-highlight-echarts-bar-chart",
+    description: "",
+    type: "registry:block",
+    registryDependencies: ["@evilcharts/echarts-bar-chart"],
+    files: [{
+      path: "@/registry/examples/echarts/ex-max-highlight-echarts-bar-chart.tsx",
+      type: "registry:block",
+      target: ""
+    }],
+    component: React.lazy(async () => {
+      const mod = await import("@/registry/examples/echarts/ex-max-highlight-echarts-bar-chart.tsx")
+      const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
+      return { default: mod.default || mod[exportName] }
+    }),
+    categories: undefined,
+    meta: undefined,
+  },
   "ex-blocks-variant-echarts-bar-chart": {
     name: "ex-blocks-variant-echarts-bar-chart",
     description: "",
@@ -4735,6 +4753,24 @@ export const Index: Record<string, any> = {
     }],
     component: React.lazy(async () => {
       const mod = await import("@/registry/blocks/echarts/b-monospace-echarts-bar-chart.tsx")
+      const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
+      return { default: mod.default || mod[exportName] }
+    }),
+    categories: undefined,
+    meta: undefined,
+  },
+  "peak-echarts-bar-chart": {
+    name: "peak-echarts-bar-chart",
+    description: "Stacked weekly signups with only the best week in color",
+    type: "registry:block",
+    registryDependencies: ["@evilcharts/echarts-bar-chart"],
+    files: [{
+      path: "@/registry/blocks/echarts/b-peak-echarts-bar-chart.tsx",
+      type: "registry:block",
+      target: "components/evilcharts/blocks/peak-echarts-bar-chart.tsx"
+    }],
+    component: React.lazy(async () => {
+      const mod = await import("@/registry/blocks/echarts/b-peak-echarts-bar-chart.tsx")
       const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
       return { default: mod.default || mod[exportName] }
     }),
