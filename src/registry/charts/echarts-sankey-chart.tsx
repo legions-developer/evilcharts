@@ -213,7 +213,7 @@ export interface NodeProps {
  * its props and wires them into the ECharts sankey series, so it renders nothing
  * itself. Compose a <NodeLabel> inside it to show labels.
  */
-export const Node: FC<NodeProps> = () => null;
+const Node: FC<NodeProps> = () => null;
 
 export interface NodeLabelProps {
   position?: NodeLabelPosition; // places labels inside or beside the nodes
@@ -226,7 +226,7 @@ export interface NodeLabelProps {
  * configuration slot and renders nothing on its own. With no `position`, no
  * labels show — matching the Recharts twin.
  */
-export const NodeLabel: FC<NodeLabelProps> = () => null;
+const NodeLabel: FC<NodeLabelProps> = () => null;
 
 export interface LinkProps {
   variant?: LinkVariant; // coloring strategy for the link bands
@@ -239,7 +239,7 @@ export interface LinkProps {
  * read by the root and renders nothing itself. The `variant` controls how each
  * link band is colored.
  */
-export const Link: FC<LinkProps> = () => null;
+const Link: FC<LinkProps> = () => null;
 
 export interface TooltipProps {
   variant?: TooltipVariant; // visual style of the tooltip surface
@@ -249,7 +249,7 @@ export interface TooltipProps {
 }
 
 /** Presence enables the hover tooltip. Renders nothing. */
-export const Tooltip: FC<TooltipProps> = () => null;
+const Tooltip: FC<TooltipProps> = () => null;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Children collection — walk the declarative config into plain objects the option
@@ -1318,3 +1318,8 @@ export function EChartsSankeyChart({
     </div>
   );
 }
+
+EChartsSankeyChart.Node = Node;
+EChartsSankeyChart.NodeLabel = NodeLabel;
+EChartsSankeyChart.Link = Link;
+EChartsSankeyChart.Tooltip = Tooltip;

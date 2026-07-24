@@ -1,16 +1,6 @@
 "use client";
 
-import {
-  EChartsRadarChart,
-  Radar,
-  PolarGrid,
-  PolarAngleAxis,
-  Tooltip,
-  Legend,
-  Dot,
-  ActiveDot,
-  type ChartConfig,
-} from "@/registry/charts/echarts-radar-chart";
+import { EChartsRadarChart, type ChartConfig } from "@/registry/charts/echarts-radar-chart";
 
 const data = [
   { skill: "JavaScript", desktop: 186, mobile: 80 },
@@ -41,18 +31,18 @@ const chartConfig = {
 export function EChartsExampleRadarChart() {
   return (
     <EChartsRadarChart data={data} config={chartConfig} className="h-full w-full p-4">
-      <PolarGrid />
-      <PolarAngleAxis dataKey="skill" />
-      <Legend />
-      <Tooltip />
-      <Radar dataKey="desktop" variant="filled">
-        <Dot variant="colored-border" />
-        <ActiveDot variant="default" />
-      </Radar>
-      <Radar dataKey="mobile" variant="filled">
-        <Dot variant="colored-border" />
-        <ActiveDot variant="default" />
-      </Radar>
+      <EChartsRadarChart.PolarGrid />
+      <EChartsRadarChart.PolarAngleAxis dataKey="skill" />
+      <EChartsRadarChart.Legend />
+      <EChartsRadarChart.Tooltip />
+      <EChartsRadarChart.Radar dataKey="desktop" variant="filled">
+        <EChartsRadarChart.Dot variant="colored-border" />
+        <EChartsRadarChart.ActiveDot variant="default" />
+      </EChartsRadarChart.Radar>
+      <EChartsRadarChart.Radar dataKey="mobile" variant="filled">
+        <EChartsRadarChart.Dot variant="colored-border" />
+        <EChartsRadarChart.ActiveDot variant="default" />
+      </EChartsRadarChart.Radar>
     </EChartsRadarChart>
   );
 }

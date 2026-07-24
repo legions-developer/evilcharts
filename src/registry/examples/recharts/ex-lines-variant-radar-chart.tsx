@@ -1,15 +1,6 @@
 "use client";
 
-import {
-  EvilRadarChart,
-  Radar,
-  PolarGrid,
-  PolarAngleAxis,
-  Tooltip,
-  Legend,
-  Dot,
-  ActiveDot,
-} from "@/registry/charts/recharts-radar-chart";
+import { EvilRadarChart } from "@/registry/charts/recharts-radar-chart";
 import { type ChartConfig } from "@/registry/ui/recharts-chart";
 
 const data = [
@@ -41,21 +32,21 @@ const chartConfig = {
 export function EvilExampleRadarChart() {
   return (
     <EvilRadarChart data={data} config={chartConfig} className="h-full w-full p-4">
-      <PolarGrid />
-      <PolarAngleAxis dataKey="skill" />
-      <Legend />
-      <Tooltip />
-      <Radar
+      <EvilRadarChart.PolarGrid />
+      <EvilRadarChart.PolarAngleAxis dataKey="skill" />
+      <EvilRadarChart.Legend />
+      <EvilRadarChart.Tooltip />
+      <EvilRadarChart.Radar
         dataKey="desktop"
         variant="lines" // [!code highlight]
       >
-        <Dot variant="colored-border" />
-        <ActiveDot variant="default" />
-      </Radar>
-      <Radar dataKey="mobile" variant="lines">
-        <Dot variant="colored-border" />
-        <ActiveDot variant="default" />
-      </Radar>
+        <EvilRadarChart.Dot variant="colored-border" />
+        <EvilRadarChart.ActiveDot variant="default" />
+      </EvilRadarChart.Radar>
+      <EvilRadarChart.Radar dataKey="mobile" variant="lines">
+        <EvilRadarChart.Dot variant="colored-border" />
+        <EvilRadarChart.ActiveDot variant="default" />
+      </EvilRadarChart.Radar>
     </EvilRadarChart>
   );
 }

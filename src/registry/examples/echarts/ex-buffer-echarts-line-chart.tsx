@@ -1,15 +1,6 @@
 "use client";
 
-import {
-  EChartsLineChart,
-  Line,
-  XAxis,
-  Legend,
-  Tooltip,
-  Dot,
-  ActiveDot,
-  type ChartConfig,
-} from "@/registry/charts/echarts-line-chart";
+import { EChartsLineChart, type ChartConfig } from "@/registry/charts/echarts-line-chart";
 
 const data = [
   { month: "January", desktop: 342, mobile: 184 },
@@ -49,30 +40,30 @@ export function EChartsExampleLineChart() {
       data={data}
       config={chartConfig}
       className="h-full w-full p-4"
-      showBrush
       xDataKey="month"
     >
-      <XAxis dataKey="month" tickFormatter={(value) => value.substring(0, 3)} />
-      <Legend isClickable />
-      <Tooltip />
-      <Line
+      <EChartsLineChart.XAxis dataKey="month" tickFormatter={(value) => value.substring(0, 3)} />
+      <EChartsLineChart.Brush />
+      <EChartsLineChart.Legend isClickable />
+      <EChartsLineChart.Tooltip />
+      <EChartsLineChart.Line
         dataKey="desktop"
         strokeVariant="solid"
         enableBufferLine // [!code highlight]
         isClickable
       >
-        <Dot variant="border" />
-        <ActiveDot variant="colored-border" />
-      </Line>
-      <Line
+        <EChartsLineChart.Dot variant="border" />
+        <EChartsLineChart.ActiveDot variant="colored-border" />
+      </EChartsLineChart.Line>
+      <EChartsLineChart.Line
         dataKey="mobile"
         strokeVariant="solid"
         enableBufferLine // [!code highlight]
         isClickable
       >
-        <Dot variant="border" />
-        <ActiveDot variant="colored-border" />
-      </Line>
+        <EChartsLineChart.Dot variant="border" />
+        <EChartsLineChart.ActiveDot variant="colored-border" />
+      </EChartsLineChart.Line>
     </EChartsLineChart>
   );
 }

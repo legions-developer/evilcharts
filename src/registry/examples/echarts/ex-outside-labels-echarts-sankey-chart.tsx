@@ -2,10 +2,6 @@
 
 import {
   EChartsSankeyChart,
-  Node,
-  NodeLabel,
-  Link,
-  Tooltip,
   type SankeyData,
   type ChartConfig,
 } from "@/registry/charts/echarts-sankey-chart";
@@ -103,15 +99,15 @@ export function EChartsExampleSankeyChart() {
       nodeWidth={8}
       nodePadding={20}
     >
-      <Node isClickable radius={4}>
-        <NodeLabel
+      <EChartsSankeyChart.Node isClickable radius={4}>
+        <EChartsSankeyChart.NodeLabel
           position="outside" // [!code highlight]
           showValues // [!code highlight]
           valueFormatter={(value) => value.toLocaleString()}
         />
-      </Node>
-      <Link variant="source" />
-      <Tooltip />
+      </EChartsSankeyChart.Node>
+      <EChartsSankeyChart.Link variant="source" />
+      <EChartsSankeyChart.Tooltip />
     </EChartsSankeyChart>
   );
 }

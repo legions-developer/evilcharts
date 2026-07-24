@@ -1,14 +1,6 @@
 "use client";
 
-import {
-  EChartsBarChart,
-  Bar,
-  YAxis,
-  Grid,
-  Tooltip,
-  Legend,
-  type ChartConfig,
-} from "@/registry/charts/echarts-bar-chart";
+import { EChartsBarChart, type ChartConfig } from "@/registry/charts/echarts-bar-chart";
 
 const data = [
   { month: "January", desktop: 186 },
@@ -37,14 +29,14 @@ export function EChartsExampleBarChart() {
       className="h-full w-full p-4"
       layout="horizontal" // [!code highlight]
     >
-      <Grid />
-      <YAxis
+      <EChartsBarChart.Grid />
+      <EChartsBarChart.YAxis
         dataKey="month"
         tickFormatter={(value) => value.substring(0, 3)} // [!code highlight]
       />
-      <Legend />
-      <Tooltip />
-      <Bar dataKey="desktop" variant="default" />
+      <EChartsBarChart.Legend />
+      <EChartsBarChart.Tooltip />
+      <EChartsBarChart.Bar dataKey="desktop" variant="default" />
     </EChartsBarChart>
   );
 }

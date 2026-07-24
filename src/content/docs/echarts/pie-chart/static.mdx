@@ -3,7 +3,7 @@ title: Pie Chart
 description: Static, beautifully designed pie charts with donut, gradient, and pop-out selection, powered by Apache ECharts
 image: /og/og-image.png
 links:
-  github: https://github.com/legions-developer/evilcharts/blob/main/src/registry/charts/echarts/pie-chart.tsx
+  github: https://github.com/legions-developer/evilcharts/blob/main/src/registry/charts/echarts-pie-chart.tsx
   doc: https://echarts.apache.org/en/index.html
   api: https://echarts.apache.org/en/option.html
 ---
@@ -31,12 +31,12 @@ links:
       <Step>
         <StepTitle>Copy and paste the following code snippets into your project.</StepTitle>
         <StepDescription>
-          In your `components` directory, create an `evilcharts` folder with a `charts` subfolder and an `echarts` folder inside. Paste the code below into a new file there. Unlike the Recharts twin, this component is self-contained — everything ECharts needs ships in one file, so there are no extra `ui` sub-components to add.
+          In your `components` directory, create an `evilcharts` folder with a `charts` subfolder inside. Paste the code below into a new `echarts-pie-chart.tsx` file there. Unlike the Recharts twin, this component is self-contained — everything ECharts needs ships in one file, so there are no extra `ui` sub-components to add.
         </StepDescription>
         <StepContent>
           <ComponentSource
             name="echarts-pie-chart"
-            title="components/evilcharts/charts/echarts/pie-chart.tsx"
+            title="components/evilcharts/charts/echarts-pie-chart.tsx"
           />
         </StepContent>
       </Step>
@@ -46,17 +46,10 @@ links:
 
 ## Usage
 
-The ECharts pie chart is composible, sharing the Recharts twin's API shape. `<EChartsPieChart>` is the container; compose the parts you need — `<Legend>`, `<Tooltip>`, `<Background>`, and one `<Pie>` — as its children. The `<Pie>` carries its own shape props (`innerRadius`, `paddingAngle`, `cornerRadius`, …) and an `isClickable` flag.
+The ECharts pie chart is composible, sharing the Recharts twin's API shape. `<EChartsPieChart>` is the container, and every part hangs off it as a compound member — `<EChartsPieChart.Legend>`, `<EChartsPieChart.Tooltip>`, `<EChartsPieChart.Background>`, and one `<EChartsPieChart.Pie>` — so a single import gives you the whole chart. The `<EChartsPieChart.Pie>` carries its own shape props (`innerRadius`, `paddingAngle`, `cornerRadius`, …) and an `isClickable` flag.
 
 ```tsx
-import {
-  EChartsPieChart,
-  Pie,
-  Label,
-  Tooltip,
-  Legend,
-  Background,
-} from "@/components/evilcharts/charts/echarts/pie-chart";
+import { EChartsPieChart, type ChartConfig } from "@/components/evilcharts/charts/echarts-pie-chart";
 ```
 
 ```tsx
@@ -84,11 +77,11 @@ const chartConfig = {
 
 ```tsx
 <EChartsPieChart data={data} dataKey="visitors" nameKey="browser" config={chartConfig}>
-  <Legend isClickable />
-  <Tooltip />
-  <Pie isClickable innerRadius={60} paddingAngle={4} cornerRadius={8}>
-    <Label />
-  </Pie>
+  <EChartsPieChart.Legend isClickable />
+  <EChartsPieChart.Tooltip />
+  <EChartsPieChart.Pie isClickable innerRadius={60} paddingAngle={4} cornerRadius={8}>
+    <EChartsPieChart.Label />
+  </EChartsPieChart.Pie>
 </EChartsPieChart>
 ```
 
@@ -120,9 +113,9 @@ Add `isClickable` to the `<Pie>` (and `<Legend>`) to make sectors selectable. Se
     }
   }}
 >
-  <Legend isClickable />
-  <Tooltip />
-  <Pie isClickable />
+  <EChartsPieChart.Legend isClickable />
+  <EChartsPieChart.Tooltip />
+  <EChartsPieChart.Pie isClickable />
 </EChartsPieChart>
 ```
 

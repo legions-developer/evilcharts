@@ -1,17 +1,6 @@
 "use client";
 
-import {
-  EChartsComposedChart,
-  Bar,
-  Line,
-  XAxis,
-  Grid,
-  Tooltip,
-  Legend,
-  ActiveDot,
-  Dot,
-  type ChartConfig,
-} from "@/registry/charts/echarts-composed-chart";
+import { EChartsComposedChart, type ChartConfig } from "@/registry/charts/echarts-composed-chart";
 
 const data = [
   { month: "January", revenue: 4200, profit: 1800 },
@@ -52,18 +41,17 @@ export function EChartsExampleComposedChart() {
       xDataKey="month"
       data={data}
       config={chartConfig}
-      showBrush
-      brushFormatLabel={(value) => String(value).substring(0, 3)}
     >
-      <Grid />
-      <XAxis dataKey="month" tickFormatter={(value) => value.substring(0, 3)} />
-      <Legend isClickable />
-      <Tooltip />
-      <Bar dataKey="revenue" isClickable />
-      <Line dataKey="profit" isClickable>
-        <ActiveDot variant="colored-border" />
-        <Dot variant="default" />
-      </Line>
+      <EChartsComposedChart.Grid />
+      <EChartsComposedChart.XAxis dataKey="month" tickFormatter={(value) => value.substring(0, 3)} />
+      <EChartsComposedChart.Brush formatLabel={(value) => String(value).substring(0, 3)} />
+      <EChartsComposedChart.Legend isClickable />
+      <EChartsComposedChart.Tooltip />
+      <EChartsComposedChart.Bar dataKey="revenue" isClickable />
+      <EChartsComposedChart.Line dataKey="profit" isClickable>
+        <EChartsComposedChart.ActiveDot variant="colored-border" />
+        <EChartsComposedChart.Dot variant="default" />
+      </EChartsComposedChart.Line>
     </EChartsComposedChart>
   );
 }

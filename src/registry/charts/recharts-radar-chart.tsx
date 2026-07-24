@@ -188,7 +188,7 @@ type RadarProps = {
  * chart without style collisions. Compose <Dot /> and <ActiveDot /> inside it to
  * add point markers.
  */
-export function Radar({
+function Radar({
   dataKey,
   variant = "filled",
   fillOpacity = DEFAULT_FILL_OPACITY,
@@ -258,13 +258,13 @@ type DotProps = {
  * It renders nothing on its own — the parent <Radar /> reads its variant and
  * wires it into the Recharts dot slot.
  */
-export const Dot: FC<DotProps> = () => null;
+const Dot: FC<DotProps> = () => null;
 
 /**
  * Declares the hovered/active point marker for the <Radar /> it is composed
  * inside. Like <Dot />, it is a configuration slot and renders nothing itself.
  */
-export const ActiveDot: FC<DotProps> = () => null;
+const ActiveDot: FC<DotProps> = () => null;
 
 type PolarGridProps = ComponentProps<typeof RechartsPolarGrid>;
 
@@ -272,7 +272,7 @@ type PolarGridProps = ComponentProps<typeof RechartsPolarGrid>;
  * The polar grid lines. Defaults to a dashed polygon grid and forwards every
  * Recharts PolarGrid prop, so `gridType`, `polarRadius`, etc. pass straight through.
  */
-export function PolarGrid({
+function PolarGrid({
   gridType = "polygon",
   stroke = "currentColor",
   strokeOpacity = 0.2,
@@ -297,7 +297,7 @@ type PolarAngleAxisProps = ComponentProps<typeof RechartsPolarAngleAxis>;
  * with the chart's flat default styling and forwards every Recharts
  * PolarAngleAxis prop. Hidden automatically while the chart is loading.
  */
-export function PolarAngleAxis({
+function PolarAngleAxis({
   tick = { fill: "currentColor", fontSize: 12 },
   tickLine = false,
   ...props
@@ -316,7 +316,7 @@ type PolarRadiusAxisProps = ComponentProps<typeof RechartsPolarRadiusAxis>;
  * every Recharts PolarRadiusAxis prop. Hidden automatically while the chart is
  * loading.
  */
-export function PolarRadiusAxis({
+function PolarRadiusAxis({
   tick = { fill: "currentColor", fontSize: 10 },
   tickLine = false,
   axisLine = false,
@@ -339,7 +339,7 @@ type TooltipProps = {
  * The hover tooltip. Reads the chart's selection from context so its content
  * dims unselected series. Hidden automatically while the chart is loading.
  */
-export function Tooltip({ variant, roundness, defaultIndex }: TooltipProps) {
+function Tooltip({ variant, roundness, defaultIndex }: TooltipProps) {
   const { isLoading, selectedDataKey } = useRadarChart();
 
   if (isLoading) return null;
@@ -367,7 +367,7 @@ type LegendProps = {
  * its series, driving the shared selection state read by every <Radar />.
  * Hidden automatically while the chart is loading.
  */
-export function Legend({
+function Legend({
   variant,
   align = "center",
   verticalAlign = "bottom",
@@ -597,3 +597,15 @@ const LoadingRadar = () => {
     />
   );
 };
+
+// Compound API: every part hangs off the root as a static member, so a consumer
+// writes <EvilRadarChart.Radar/>, <EvilRadarChart.Tooltip/>, … from a single import
+// — no colliding named marker exports when several charts share one file.
+EvilRadarChart.Radar = Radar;
+EvilRadarChart.Dot = Dot;
+EvilRadarChart.ActiveDot = ActiveDot;
+EvilRadarChart.PolarGrid = PolarGrid;
+EvilRadarChart.PolarAngleAxis = PolarAngleAxis;
+EvilRadarChart.PolarRadiusAxis = PolarRadiusAxis;
+EvilRadarChart.Tooltip = Tooltip;
+EvilRadarChart.Legend = Legend;

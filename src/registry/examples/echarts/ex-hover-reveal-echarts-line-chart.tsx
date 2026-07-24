@@ -1,15 +1,6 @@
 "use client";
 
-import {
-  EChartsLineChart,
-  Line,
-  XAxis,
-  Grid,
-  Tooltip,
-  Legend,
-  ActiveDot,
-  type ChartConfig,
-} from "@/registry/charts/echarts-line-chart";
+import { EChartsLineChart, type ChartConfig } from "@/registry/charts/echarts-line-chart";
 
 const data = [
   { month: "January", desktop: 342, mobile: 245 },
@@ -51,16 +42,16 @@ export function EChartsExampleLineChart() {
       className="h-full w-full p-4"
       enableHoverReveal // [!code highlight]
     >
-      <Grid />
-      <XAxis dataKey="month" tickFormatter={(value) => value.substring(0, 3)} />
-      <Legend />
-      <Tooltip />
-      <Line dataKey="desktop" strokeVariant="solid">
-        <ActiveDot variant="default" />
-      </Line>
-      <Line dataKey="mobile" strokeVariant="solid">
-        <ActiveDot variant="default" />
-      </Line>
+      <EChartsLineChart.Grid />
+      <EChartsLineChart.XAxis dataKey="month" tickFormatter={(value) => value.substring(0, 3)} />
+      <EChartsLineChart.Legend />
+      <EChartsLineChart.Tooltip />
+      <EChartsLineChart.Line dataKey="desktop" strokeVariant="solid">
+        <EChartsLineChart.ActiveDot variant="default" />
+      </EChartsLineChart.Line>
+      <EChartsLineChart.Line dataKey="mobile" strokeVariant="solid">
+        <EChartsLineChart.ActiveDot variant="default" />
+      </EChartsLineChart.Line>
     </EChartsLineChart>
   );
 }

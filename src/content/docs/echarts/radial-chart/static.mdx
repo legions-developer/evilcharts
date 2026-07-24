@@ -3,7 +3,7 @@ title: Radial Chart
 description: Radial bar charts with full and semi-circle variants, gradient colors, and glow, powered by Apache ECharts
 image: /og/radial-chart.png
 links:
-  github: https://github.com/legions-developer/evilcharts/blob/main/src/registry/charts/echarts/radial-chart.tsx
+  github: https://github.com/legions-developer/evilcharts/blob/main/src/registry/charts/echarts-radial-chart.tsx
   doc: https://echarts.apache.org/en/index.html
   api: https://echarts.apache.org/en/option.html
 ---
@@ -31,12 +31,12 @@ links:
       <Step>
         <StepTitle>Copy and paste the following code snippets into your project.</StepTitle>
         <StepDescription>
-          In your `components` directory, create `evilcharts` → `charts` → `echarts`, then paste the radial-chart code into a new file there. Unlike the Recharts twin, this component is self-contained — it ships everything ECharts needs in one file, so there are no extra `ui` sub-components to add.
+          In your `components` directory, create `evilcharts` → `charts`, then paste the radial-chart code into a new `echarts-radial-chart.tsx` file there. Unlike the Recharts twin, this component is self-contained — it ships everything ECharts needs in one file, so there are no extra `ui` sub-components to add.
         </StepDescription>
         <StepContent>
           <ComponentSource
             name="echarts-radial-chart"
-            title="components/evilcharts/charts/echarts/radial-chart.tsx"
+            title="components/evilcharts/charts/echarts-radial-chart.tsx"
           />
         </StepContent>
       </Step>
@@ -46,15 +46,10 @@ links:
 
 ## Usage
 
-The ECharts radial chart is composible, sharing the Recharts twin's API shape. `<EChartsRadialChart>` is the container; compose the parts you need — `<Legend>`, `<Tooltip>`, and a `<RadialBar>` — as children. `<RadialBar>` carries its own `glowingBars` and `isClickable`, so styling and interactivity live with the series.
+The ECharts radial chart is composible, sharing the Recharts twin's API shape. `<EChartsRadialChart>` is the container, and every part hangs off it as a compound member — `<EChartsRadialChart.Legend>`, `<EChartsRadialChart.Tooltip>`, and a `<EChartsRadialChart.RadialBar>` — so a single import gives you the whole chart. `<RadialBar>` carries its own `glowingBars` and `isClickable`, so styling and interactivity live with the series.
 
 ```tsx
-import {
-  EChartsRadialChart,
-  RadialBar,
-  Tooltip,
-  Legend,
-} from "@/components/evilcharts/charts/echarts/radial-chart";
+import { EChartsRadialChart, type ChartConfig } from "@/components/evilcharts/charts/echarts-radial-chart";
 ```
 
 ```tsx
@@ -82,9 +77,9 @@ const chartConfig = {
 
 ```tsx
 <EChartsRadialChart data={data} nameKey="browser" config={chartConfig} variant="full">
-  <Legend isClickable />
-  <Tooltip />
-  <RadialBar dataKey="visitors" isClickable glowingBars={["chrome"]} />
+  <EChartsRadialChart.Legend isClickable />
+  <EChartsRadialChart.Tooltip />
+  <EChartsRadialChart.RadialBar dataKey="visitors" isClickable glowingBars={["chrome"]} />
 </EChartsRadialChart>
 ```
 
@@ -115,9 +110,9 @@ Add `isClickable` to `<RadialBar>` (and `<Legend>`) to make bars selectable. Han
     }
   }}
 >
-  <Legend isClickable />
-  <Tooltip />
-  <RadialBar dataKey="visitors" isClickable />
+  <EChartsRadialChart.Legend isClickable />
+  <EChartsRadialChart.Tooltip />
+  <EChartsRadialChart.RadialBar dataKey="visitors" isClickable />
 </EChartsRadialChart>
 ```
 

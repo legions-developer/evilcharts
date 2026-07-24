@@ -1,16 +1,6 @@
 "use client";
 
-import {
-  EChartsAreaChart,
-  Area,
-  XAxis,
-  Grid,
-  Tooltip,
-  Legend,
-  Dot,
-  ActiveDot,
-  type ChartConfig,
-} from "@/registry/charts/echarts-area-chart";
+import { EChartsAreaChart, type ChartConfig } from "@/registry/charts/echarts-area-chart";
 
 const data = [
   { month: "January", desktop: 342, mobile: 245 },
@@ -51,22 +41,21 @@ export function EChartsExampleAreaChart() {
       config={chartConfig}
       className="h-full w-full p-4"
       stackType="stacked"
-      showBrush
       xDataKey="month"
-      brushFormatLabel={(value) => String(value).substring(0, 3)}
     >
-      <Grid />
-      <XAxis dataKey="month" tickFormatter={(value) => value.substring(0, 3)} />
-      <Legend isClickable />
-      <Tooltip />
-      <Area dataKey="desktop" variant="gradient" isClickable>
-        <Dot variant="border" />
-        <ActiveDot variant="colored-border" />
-      </Area>
-      <Area dataKey="mobile" variant="gradient" isClickable>
-        <Dot variant="border" />
-        <ActiveDot variant="colored-border" />
-      </Area>
+      <EChartsAreaChart.Grid />
+      <EChartsAreaChart.XAxis dataKey="month" tickFormatter={(value) => value.substring(0, 3)} />
+      <EChartsAreaChart.Brush formatLabel={(value) => String(value).substring(0, 3)} />
+      <EChartsAreaChart.Legend isClickable />
+      <EChartsAreaChart.Tooltip />
+      <EChartsAreaChart.Area dataKey="desktop" variant="gradient" isClickable>
+        <EChartsAreaChart.Dot variant="border" />
+        <EChartsAreaChart.ActiveDot variant="colored-border" />
+      </EChartsAreaChart.Area>
+      <EChartsAreaChart.Area dataKey="mobile" variant="gradient" isClickable>
+        <EChartsAreaChart.Dot variant="border" />
+        <EChartsAreaChart.ActiveDot variant="colored-border" />
+      </EChartsAreaChart.Area>
     </EChartsAreaChart>
   );
 }

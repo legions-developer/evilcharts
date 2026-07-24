@@ -1,16 +1,6 @@
 "use client";
 
-import {
-  EvilComposedChart,
-  Bar,
-  Line,
-  XAxis,
-  Grid,
-  Tooltip,
-  Legend,
-  Dot,
-  ActiveDot,
-} from "@/registry/charts/recharts-composed-chart";
+import { EvilComposedChart } from "@/registry/charts/recharts-composed-chart";
 import { type ChartConfig } from "@/registry/ui/recharts-chart";
 
 const data = [
@@ -48,15 +38,15 @@ const chartConfig = {
 export function EvilExampleComposedChart() {
   return (
     <EvilComposedChart className="h-full w-full p-4" xDataKey="month" data={data} config={chartConfig}>
-      <Grid />
-      <XAxis dataKey="month" tickFormatter={(value) => value.substring(0, 3)} />
-      <Legend isClickable />
-      <Tooltip />
-      <Bar dataKey="revenue" isClickable />
-      <Line dataKey="profit" isClickable>
-        <Dot variant="default" />
-        <ActiveDot variant="border" />
-      </Line>
+      <EvilComposedChart.Grid />
+      <EvilComposedChart.XAxis dataKey="month" tickFormatter={(value) => value.substring(0, 3)} />
+      <EvilComposedChart.Legend isClickable />
+      <EvilComposedChart.Tooltip />
+      <EvilComposedChart.Bar dataKey="revenue" isClickable />
+      <EvilComposedChart.Line dataKey="profit" isClickable>
+        <EvilComposedChart.Dot variant="default" />
+        <EvilComposedChart.ActiveDot variant="border" />
+      </EvilComposedChart.Line>
     </EvilComposedChart>
   );
 }

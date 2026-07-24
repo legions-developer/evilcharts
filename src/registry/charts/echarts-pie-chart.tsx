@@ -202,7 +202,7 @@ export interface PieProps {
  * build the ECharts pie. When clickable, the selected sector pops radially
  * outward. Compose a <Label> inside it to draw labels on each sector.
  */
-export const Pie: FC<PieProps> = () => null;
+const Pie: FC<PieProps> = () => null;
 
 export interface LabelProps {
   dataKey?: string; // data key for the label text — defaults to the pie's value key
@@ -210,7 +210,7 @@ export interface LabelProps {
 }
 
 /** Declares per-sector labels for the enclosing <Pie>. Renders nothing. */
-export const Label: FC<LabelProps> = () => null;
+const Label: FC<LabelProps> = () => null;
 
 export interface TooltipProps {
   variant?: TooltipVariant; // visual style of the tooltip surface
@@ -220,7 +220,7 @@ export interface TooltipProps {
 }
 
 /** Presence enables the hover tooltip. Renders nothing. */
-export const Tooltip: FC<TooltipProps> = () => null;
+const Tooltip: FC<TooltipProps> = () => null;
 
 export interface LegendProps {
   variant?: LegendVariant; // visual style of the legend indicators
@@ -230,14 +230,14 @@ export interface LegendProps {
 }
 
 /** Presence enables the HTML legend overlay. Renders nothing. */
-export const Legend: FC<LegendProps> = () => null;
+const Legend: FC<LegendProps> = () => null;
 
 export interface BackgroundProps {
   variant?: BackgroundVariant; // background pattern style
 }
 
 /** Presence draws a decorative SVG pattern behind the pie. Renders nothing. */
-export const Background: FC<BackgroundProps> = () => null;
+const Background: FC<BackgroundProps> = () => null;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Children collection — walk the declarative config into plain objects the
@@ -1204,3 +1204,12 @@ export function EChartsPieChart<TData extends Record<string, unknown>>({
     </div>
   );
 }
+
+// Compound API: every part hangs off the root as a static member, so a consumer
+// writes <EChartsPieChart.Pie/>, <EChartsPieChart.Tooltip/>, … from a single
+// import — no colliding named marker exports when several charts share one file.
+EChartsPieChart.Pie = Pie;
+EChartsPieChart.Label = Label;
+EChartsPieChart.Tooltip = Tooltip;
+EChartsPieChart.Legend = Legend;
+EChartsPieChart.Background = Background;

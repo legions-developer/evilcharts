@@ -1,6 +1,6 @@
 "use client";
 
-import { EvilBarChart, Bar, XAxis, Grid, Tooltip, Legend } from "@/registry/charts/recharts-bar-chart";
+import { EvilBarChart } from "@/registry/charts/recharts-bar-chart";
 import { type ChartConfig } from "@/registry/ui/recharts-chart";
 
 const chartConfig = {
@@ -28,12 +28,12 @@ export function EvilExampleBarChart() {
       className="h-full w-full p-4"
       isLoading={true} // [!code highlight]
     >
-      <Grid />
-      <XAxis dataKey="month" tickFormatter={(value) => value.substring(0, 3)} />
-      <Legend />
-      <Tooltip />
-      <Bar dataKey="desktop" variant="default" />
-      <Bar dataKey="mobile" variant="default" />
+      <EvilBarChart.Grid />
+      <EvilBarChart.XAxis dataKey="month" tickFormatter={(value) => value.substring(0, 3)} />
+      <EvilBarChart.Legend />
+      <EvilBarChart.Tooltip />
+      <EvilBarChart.Bar dataKey="desktop" variant="default" />
+      <EvilBarChart.Bar dataKey="mobile" variant="default" />
     </EvilBarChart>
   );
 }

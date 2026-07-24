@@ -1,14 +1,6 @@
 "use client";
 
-import {
-  Area,
-  EChartsAreaChart,
-  Grid,
-  Tooltip,
-  XAxis,
-  YAxis,
-  type ChartConfig,
-} from "@/registry/charts/echarts-area-chart";
+import { EChartsAreaChart, type ChartConfig } from "@/registry/charts/echarts-area-chart";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 
@@ -103,18 +95,18 @@ export function EChartsLatencyAreaChart() {
         selectedDataKey={selected}
         onSelectionChange={setSelected}
       >
-        <Grid />
-        <XAxis
+        <EChartsAreaChart.Grid />
+        <EChartsAreaChart.XAxis
           dataKey="time"
           label="Time (UTC)"
           tickFormatter={(value) => value.replace("Today ", "")}
         />
-        <YAxis />
-        <Tooltip />
-        <Area dataKey="p50" variant="gradient" strokeVariant="solid" isClickable />
-        <Area dataKey="p75" variant="gradient" strokeVariant="solid" isClickable />
-        <Area dataKey="p95" variant="gradient" strokeVariant="solid" isClickable />
-        <Area dataKey="p99" variant="gradient" strokeVariant="solid" isClickable />
+        <EChartsAreaChart.YAxis />
+        <EChartsAreaChart.Tooltip />
+        <EChartsAreaChart.Area dataKey="p50" variant="gradient" strokeVariant="solid" isClickable />
+        <EChartsAreaChart.Area dataKey="p75" variant="gradient" strokeVariant="solid" isClickable />
+        <EChartsAreaChart.Area dataKey="p95" variant="gradient" strokeVariant="solid" isClickable />
+        <EChartsAreaChart.Area dataKey="p99" variant="gradient" strokeVariant="solid" isClickable />
       </EChartsAreaChart>
     </div>
   );

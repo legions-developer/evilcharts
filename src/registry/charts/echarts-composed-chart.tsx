@@ -41,10 +41,12 @@ import {
   type ReactNode,
 } from "react";
 import {
+  Brush,
   buildBrushDataZoom,
   syncBrushOverlay,
   type BrushGeometry,
   type BrushOverlayElements,
+  type BrushProps,
   type BrushRange,
 } from "@/registry/ui/echarts-brush";
 import { dotItemStyle, dotStyle, sampleGradient, type DotVariant } from "@/registry/ui/echarts-dot";
@@ -221,10 +223,6 @@ export interface EChartsComposedChartProps<TData extends Record<string, unknown>
   onSelectionChange?: (key: string | null) => void; // fires when the selected series changes
   isLoading?: boolean; // shows the animated loading skeleton
   loadingBars?: number; // number of bars in the loading skeleton
-  showBrush?: boolean; // renders a zoom brush below the chart
-  brushHeight?: number; // height of the brush preview in pixels
-  brushFormatLabel?: (value: string, index: number) => string; // formats brush handle labels
-  onBrushChange?: (range: { startIndex: number; endIndex: number }) => void; // brush range callback
   chartOptions?: Record<string, unknown>; // escape hatch merged over the built ECharts option
   children?: ReactNode; // declarative config — <Bar>, <Line>, <XAxis>, <Grid>, <Tooltip>, <Legend>, …
 }
@@ -252,7 +250,7 @@ export interface BarProps {
  * clickability. Renders nothing — the root reads these props to build the
  * ECharts bar series.
  */
-export const Bar: FC<BarProps> = () => null;
+const Bar: FC<BarProps> = () => null;
 
 export interface LineProps {
   dataKey: string; // series key — must exist on the data + config
@@ -271,17 +269,17 @@ export interface LineProps {
  * optionally, resting/active point markers via composed <Dot> / <ActiveDot>.
  * Renders nothing — the root reads these props to build the ECharts line series.
  */
-export const Line: FC<LineProps> = () => null;
+const Line: FC<LineProps> = () => null;
 
 export interface DotProps {
   variant?: DotVariant; // visual style of the point marker
 }
 
 /** Declares the resting point marker for the enclosing <Line>. Renders nothing. */
-export const Dot: FC<DotProps> = () => null;
+const Dot: FC<DotProps> = () => null;
 
 /** Declares the hovered/active point marker for the enclosing <Line>. Renders nothing. */
-export const ActiveDot: FC<DotProps> = () => null;
+const ActiveDot: FC<DotProps> = () => null;
 
 export interface XAxisProps {
   dataKey?: string; // x category key — overrides the root xDataKey
@@ -292,7 +290,7 @@ export interface XAxisProps {
 }
 
 /** Presence shows the x-axis category labels. Renders nothing. */
-export const XAxis: FC<XAxisProps> = () => null;
+const XAxis: FC<XAxisProps> = () => null;
 
 export interface YAxisProps {
   dataKey?: string; // reserved for parity with the Recharts twin
@@ -301,10 +299,10 @@ export interface YAxisProps {
 }
 
 /** Presence shows the y value axis. Renders nothing. */
-export const YAxis: FC<YAxisProps> = () => null;
+const YAxis: FC<YAxisProps> = () => null;
 
 /** Presence shows the dashed horizontal split lines. Renders nothing. */
-export const Grid: FC = () => null;
+const Grid: FC = () => null;
 
 export interface TooltipProps {
   variant?: TooltipVariant; // visual style of the tooltip surface
@@ -315,7 +313,7 @@ export interface TooltipProps {
 }
 
 /** Presence enables the hover tooltip. Renders nothing. */
-export const Tooltip: FC<TooltipProps> = () => null;
+const Tooltip: FC<TooltipProps> = () => null;
 
 export interface LegendProps {
   variant?: LegendVariant; // visual style of the legend indicators
@@ -325,7 +323,7 @@ export interface LegendProps {
 }
 
 /** Presence enables the HTML legend overlay. Renders nothing. */
-export const Legend: FC<LegendProps> = () => null;
+const Legend: FC<LegendProps> = () => null;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Children collection — walk the declarative config into plain objects the
@@ -386,6 +384,12 @@ type LegendSlot = {
   verticalAlign: "top" | "middle" | "bottom";
   isClickable: boolean;
 };
+type BrushSlot = {
+  present: boolean; // a <Brush> child was passed — replaces the old showBrush prop
+  height?: number;
+  formatLabel?: (value: string, index: number) => string;
+  onChange?: (range: { startIndex: number; endIndex: number }) => void;
+};
 
 type CollectedConfig = {
   bars: BarSeriesConfig[];
@@ -395,6 +399,7 @@ type CollectedConfig = {
   showGrid: boolean;
   tooltip: TooltipSlot;
   legend: LegendSlot;
+  brush: BrushSlot;
 };
 
 function collectConfig(children: ReactNode): CollectedConfig {
@@ -417,6 +422,7 @@ function collectConfig(children: ReactNode): CollectedConfig {
     verticalAlign: "top",
     isClickable: false,
   };
+  let brush: BrushSlot = { present: false };
 
   Children.forEach(children, (child) => {
     if (!isValidElement(child)) return;
@@ -495,10 +501,18 @@ function collectConfig(children: ReactNode): CollectedConfig {
         verticalAlign: props.verticalAlign ?? "top",
         isClickable: props.isClickable ?? false,
       };
+    } else if (type === Brush) {
+      const props = child.props as BrushProps;
+      brush = {
+        present: true,
+        height: props.height,
+        formatLabel: props.formatLabel,
+        onChange: props.onChange,
+      };
     }
   });
 
-  return { bars, lines, xAxis, yAxis, showGrid, tooltip, legend };
+  return { bars, lines, xAxis, yAxis, showGrid, tooltip, legend, brush };
 }
 
 // Color plumbing (ChartConfig, getColorsCount, distributeColors, buildChartCss,
@@ -1388,10 +1402,6 @@ export function EChartsComposedChart<TData extends Record<string, unknown>>({
   onSelectionChange,
   isLoading = false,
   loadingBars = LOADING_DEFAULT_BARS,
-  showBrush = false,
-  brushHeight = 56,
-  brushFormatLabel,
-  onBrushChange,
   chartOptions,
   children,
 }: EChartsComposedChartProps<TData>) {
@@ -1420,11 +1430,11 @@ export function EChartsComposedChart<TData extends Record<string, unknown>>({
     brushOverlay: null,
     brushHover: { inside: false, left: false, right: false },
     handlers: {
-      onBrushChange,
+      onBrushChange: undefined,
       onSelectionChange,
       clickableKeys: new Set<string>(),
       selectedDataKey: defaultSelectedDataKey,
-      brushFormatLabel,
+      brushFormatLabel: undefined,
       seriesKeys: [],
     },
     repush: () => {},
@@ -1456,7 +1466,13 @@ export function EChartsComposedChart<TData extends Record<string, unknown>>({
     showGrid,
     tooltip: tooltipSlot,
     legend: legendSlot,
+    brush: brushSlot,
   } = collected;
+
+  // Brush is declared as a <Brush> child now — presence replaces the old
+  // showBrush prop, and its props feed the same internals.
+  const showBrush = brushSlot.present;
+  const brushHeight = brushSlot.height ?? 56;
 
   // seriesKeys are ordered bars-then-lines, matching the series array — the click
   // handler recovers a series key from a polygon click's seriesIndex by position.
@@ -1496,11 +1512,11 @@ export function EChartsComposedChart<TData extends Record<string, unknown>>({
 
   // Refresh the handlers' snapshot of the latest callbacks/flags every render.
   live.handlers = {
-    onBrushChange,
+    onBrushChange: brushSlot.onChange,
     onSelectionChange,
     clickableKeys,
     selectedDataKey,
-    brushFormatLabel,
+    brushFormatLabel: brushSlot.formatLabel,
     seriesKeys,
   };
   live.dataLength = data.length;
@@ -1991,3 +2007,16 @@ export function EChartsComposedChart<TData extends Record<string, unknown>>({
     </div>
   );
 }
+
+// Composible parts attached as statics, so the chart reads as a single
+// dot-notation namespace: <EChartsComposedChart.Bar />, .Line, .Brush, …
+EChartsComposedChart.Bar = Bar;
+EChartsComposedChart.Line = Line;
+EChartsComposedChart.Dot = Dot;
+EChartsComposedChart.ActiveDot = ActiveDot;
+EChartsComposedChart.XAxis = XAxis;
+EChartsComposedChart.YAxis = YAxis;
+EChartsComposedChart.Grid = Grid;
+EChartsComposedChart.Tooltip = Tooltip;
+EChartsComposedChart.Legend = Legend;
+EChartsComposedChart.Brush = Brush;

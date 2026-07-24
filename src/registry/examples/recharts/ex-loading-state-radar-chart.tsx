@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  EvilRadarChart,
-  Radar,
-  PolarGrid,
-  PolarAngleAxis,
-  Tooltip,
-  Legend,
-} from "@/registry/charts/recharts-radar-chart";
+import { EvilRadarChart } from "@/registry/charts/recharts-radar-chart";
 import { type ChartConfig } from "@/registry/ui/recharts-chart";
 
 const chartConfig = {
@@ -35,12 +28,12 @@ export function EvilExampleRadarChart() {
       className="h-full w-full p-4"
       isLoading={true} // [!code highlight]
     >
-      <PolarGrid />
-      <PolarAngleAxis dataKey="skill" />
-      <Legend />
-      <Tooltip />
-      <Radar dataKey="desktop" variant="filled" />
-      <Radar dataKey="mobile" variant="filled" />
+      <EvilRadarChart.PolarGrid />
+      <EvilRadarChart.PolarAngleAxis dataKey="skill" />
+      <EvilRadarChart.Legend />
+      <EvilRadarChart.Tooltip />
+      <EvilRadarChart.Radar dataKey="desktop" variant="filled" />
+      <EvilRadarChart.Radar dataKey="mobile" variant="filled" />
     </EvilRadarChart>
   );
 }

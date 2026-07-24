@@ -40,10 +40,12 @@ import {
   type ResolvedColors,
 } from "@/registry/ui/echarts-chart";
 import {
+  Brush,
   buildBrushDataZoom,
   syncBrushOverlay,
   type BrushGeometry,
   type BrushOverlayElements,
+  type BrushProps,
   type BrushRange,
 } from "@/registry/ui/echarts-brush";
 import { LegendOverlay, type LegendVariant } from "@/registry/ui/echarts-legend";
@@ -174,12 +176,8 @@ export interface EChartsBarChartProps<TData extends Record<string, unknown>> {
   onSelectionChange?: (key: string | null) => void; // fires when the selected series changes
   isLoading?: boolean; // shows the animated loading skeleton
   loadingBars?: number; // number of bars in the loading skeleton
-  showBrush?: boolean; // renders a zoom brush below the chart (vertical layout only)
-  brushHeight?: number; // height of the brush preview in pixels
-  brushFormatLabel?: (value: string, index: number) => string; // formats brush handle labels
-  onBrushChange?: (range: { startIndex: number; endIndex: number }) => void; // brush range callback
   chartOptions?: Record<string, unknown>; // escape hatch merged over the built ECharts option
-  children?: ReactNode; // declarative config — <Bar>, <XAxis>, <YAxis>, <Grid>, <Tooltip>, <Legend>
+  children?: ReactNode; // declarative config — <Bar>, <XAxis>, <YAxis>, <Grid>, <Tooltip>, <Legend>, <Brush>
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -205,7 +203,7 @@ export interface BarProps {
  * clickability. Renders nothing — the root reads these props to build the
  * ECharts series.
  */
-export const Bar: FC<BarProps> = () => null;
+const Bar: FC<BarProps> = () => null;
 
 export interface XAxisProps {
   dataKey?: string; // category key — overrides the root xDataKey (vertical layout)
@@ -219,7 +217,7 @@ export interface XAxisProps {
  * The x-axis. Category axis in the default (vertical) layout, value axis when
  * `layout="horizontal"`. Presence shows its tick labels. Renders nothing.
  */
-export const XAxis: FC<XAxisProps> = () => null;
+const XAxis: FC<XAxisProps> = () => null;
 
 export interface YAxisProps {
   dataKey?: string; // category key — overrides the root xDataKey (horizontal layout)
@@ -231,10 +229,10 @@ export interface YAxisProps {
  * The y-axis. Value axis in the default (vertical) layout, category axis when
  * `layout="horizontal"`. Presence shows its tick labels. Renders nothing.
  */
-export const YAxis: FC<YAxisProps> = () => null;
+const YAxis: FC<YAxisProps> = () => null;
 
 /** Presence shows the dashed split lines on the value axis. Renders nothing. */
-export const Grid: FC = () => null;
+const Grid: FC = () => null;
 
 export interface TooltipProps {
   variant?: TooltipVariant; // visual style of the tooltip surface
@@ -244,7 +242,7 @@ export interface TooltipProps {
 }
 
 /** Presence enables the hover tooltip. Renders nothing. */
-export const Tooltip: FC<TooltipProps> = () => null;
+const Tooltip: FC<TooltipProps> = () => null;
 
 export interface LegendProps {
   variant?: LegendVariant; // visual style of the legend indicators
@@ -254,7 +252,7 @@ export interface LegendProps {
 }
 
 /** Presence enables the HTML legend overlay. Renders nothing. */
-export const Legend: FC<LegendProps> = () => null;
+const Legend: FC<LegendProps> = () => null;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Children collection — walk the declarative config into plain objects the
@@ -292,6 +290,12 @@ type LegendSlot = {
   verticalAlign: "top" | "middle" | "bottom";
   isClickable: boolean;
 };
+type BrushSlot = {
+  present: boolean; // a <Brush> child was passed — replaces the old showBrush prop
+  height?: number;
+  formatLabel?: (value: string, index: number) => string;
+  onChange?: (range: { startIndex: number; endIndex: number }) => void;
+};
 
 type CollectedConfig = {
   bars: BarSeriesConfig[];
@@ -300,6 +304,7 @@ type CollectedConfig = {
   showGrid: boolean;
   tooltip: TooltipSlot;
   legend: LegendSlot;
+  brush: BrushSlot;
 };
 
 function collectConfig(children: ReactNode): CollectedConfig {
@@ -320,6 +325,7 @@ function collectConfig(children: ReactNode): CollectedConfig {
     verticalAlign: "top",
     isClickable: false,
   };
+  let brush: BrushSlot = { present: false };
 
   Children.forEach(children, (child) => {
     if (!isValidElement(child)) return;
@@ -373,10 +379,18 @@ function collectConfig(children: ReactNode): CollectedConfig {
         verticalAlign: props.verticalAlign ?? "top",
         isClickable: props.isClickable ?? false,
       };
+    } else if (type === Brush) {
+      const props = child.props as BrushProps;
+      brush = {
+        present: true,
+        height: props.height,
+        formatLabel: props.formatLabel,
+        onChange: props.onChange,
+      };
     }
   });
 
-  return { bars, xAxis, yAxis, showGrid, tooltip, legend };
+  return { bars, xAxis, yAxis, showGrid, tooltip, legend, brush };
 }
 
 // Color plumbing (ChartConfig, getColorsCount, distributeColors, buildChartCss,
@@ -1210,10 +1224,6 @@ export function EChartsBarChart<TData extends Record<string, unknown>>({
   onSelectionChange,
   isLoading = false,
   loadingBars = LOADING_DEFAULT_BARS,
-  showBrush = false,
-  brushHeight = 56,
-  brushFormatLabel,
-  onBrushChange,
   chartOptions,
   children,
 }: EChartsBarChartProps<TData>) {
@@ -1241,9 +1251,9 @@ export function EChartsBarChart<TData extends Record<string, unknown>>({
     brushOverlay: null,
     brushHover: { inside: false, left: false, right: false },
     handlers: {
-      onBrushChange,
+      onBrushChange: undefined, // set per-render from the <Brush> child's onChange
       clickableKeys: new Set<string>(),
-      brushFormatLabel,
+      brushFormatLabel: undefined, // set per-render from the <Brush> child's formatLabel
       seriesKeys: [],
       hasStripped: false,
       isHorizontal: false,
@@ -1271,7 +1281,12 @@ export function EChartsBarChart<TData extends Record<string, unknown>>({
     showGrid,
     tooltip: tooltipSlot,
     legend: legendSlot,
+    brush: brushSlot,
   } = collected;
+  // Brush is a <Brush> child now (not props): presence turns it on, its props
+  // carry height/formatLabel/onChange.
+  const showBrush = brushSlot.present;
+  const brushHeight = brushSlot.height ?? 56;
 
   const isHorizontal = layout === "horizontal";
   const isPercent = stackType === "percent";
@@ -1315,9 +1330,9 @@ export function EChartsBarChart<TData extends Record<string, unknown>>({
 
   // Refresh the handlers' snapshot of the latest callbacks/flags every render.
   live.handlers = {
-    onBrushChange,
+    onBrushChange: brushSlot.onChange,
     clickableKeys,
-    brushFormatLabel,
+    brushFormatLabel: brushSlot.formatLabel,
     seriesKeys,
     hasStripped: hasStrippedBars,
     isHorizontal,
@@ -1843,3 +1858,14 @@ function shimmerWindowStops(center: number, color: string, peak: number) {
   }
   return stops;
 }
+
+// Compound API: every part hangs off the root as a static member, so a consumer
+// writes <EChartsBarChart.Bar/>, <EChartsBarChart.Tooltip/>, … from a single
+// import — no colliding named marker exports when several charts share one file.
+EChartsBarChart.Bar = Bar;
+EChartsBarChart.XAxis = XAxis;
+EChartsBarChart.YAxis = YAxis;
+EChartsBarChart.Grid = Grid;
+EChartsBarChart.Tooltip = Tooltip;
+EChartsBarChart.Legend = Legend;
+EChartsBarChart.Brush = Brush;

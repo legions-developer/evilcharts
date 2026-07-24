@@ -182,7 +182,7 @@ export interface RadialBarProps {
  * `glowingBars` to highlight specific bars and `isClickable` to make bars
  * selectable. Renders nothing — the root reads these props to build the series.
  */
-export const RadialBar: FC<RadialBarProps> = () => null;
+const RadialBar: FC<RadialBarProps> = () => null;
 
 export interface TooltipProps {
   variant?: TooltipVariant; // visual style of the tooltip surface
@@ -192,7 +192,7 @@ export interface TooltipProps {
 }
 
 /** Presence enables the hover tooltip. Renders nothing. */
-export const Tooltip: FC<TooltipProps> = () => null;
+const Tooltip: FC<TooltipProps> = () => null;
 
 export interface LegendProps {
   variant?: LegendVariant; // visual style of the legend indicators
@@ -202,7 +202,7 @@ export interface LegendProps {
 }
 
 /** Presence enables the HTML legend overlay. Renders nothing. */
-export const Legend: FC<LegendProps> = () => null;
+const Legend: FC<LegendProps> = () => null;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Children collection — walk the declarative config into plain objects the
@@ -1311,3 +1311,7 @@ export function EChartsRadialChart<TData extends Record<string, unknown>>({
     </div>
   );
 }
+
+EChartsRadialChart.RadialBar = RadialBar;
+EChartsRadialChart.Tooltip = Tooltip;
+EChartsRadialChart.Legend = Legend;

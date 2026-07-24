@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  EChartsPieChart,
-  Pie,
-  Label,
-  Tooltip,
-  Legend,
-  type ChartConfig,
-} from "@/registry/charts/echarts-pie-chart";
+import { EChartsPieChart, type ChartConfig } from "@/registry/charts/echarts-pie-chart";
 
 const data = [
   { browser: "chrome", visitors: 275 },
@@ -64,12 +57,12 @@ export function EChartsExamplePieChart() {
       nameKey="browser"
       config={chartConfig}
     >
-      <Legend isClickable />
-      <Tooltip />
-      <Pie isClickable innerRadius={30} paddingAngle={4} cornerRadius={8}>
-        <Label // [!code highlight]
+      <EChartsPieChart.Legend isClickable />
+      <EChartsPieChart.Tooltip />
+      <EChartsPieChart.Pie isClickable innerRadius={30} paddingAngle={4} cornerRadius={8}>
+        <EChartsPieChart.Label // [!code highlight]
         />
-      </Pie>
+      </EChartsPieChart.Pie>
     </EChartsPieChart>
   );
 }

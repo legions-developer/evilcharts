@@ -3,7 +3,7 @@ title: Sankey Chart
 description: Sankey charts for flow data with nodes and links, plus gradient colors and glow effects
 image: /og/sankey-chart.png
 links:
-  github: https://github.com/legions-developer/evilcharts/blob/main/src/registry/charts/sankey-chart.tsx
+  github: https://github.com/legions-developer/evilcharts/blob/main/src/registry/charts/recharts-sankey-chart.tsx
   doc: https://recharts.github.io/en-US/examples/SimpleSankey/
   api: https://recharts.github.io/en-US/api/Sankey/
 ---
@@ -31,12 +31,12 @@ links:
       <Step>
         <StepTitle>Copy the code below into your project.</StepTitle>
          <StepDescription>
-          Create an `evilcharts` folder with a `charts` subfolder inside your `components` directory, then copy the base sankey-chart code into a new file there.
+          Create an `evilcharts` folder with a `charts` subfolder inside your `components` directory, then copy the base recharts-sankey-chart code into a new file there.
         </StepDescription>
         <StepContent>
           <ComponentSource
             name="recharts-sankey-chart"
-            title="components/evilcharts/charts/sankey-chart.tsx"
+            title="components/evilcharts/charts/recharts-sankey-chart.tsx"
           />
         </StepContent>
       </Step>
@@ -48,7 +48,7 @@ links:
         <StepContent>
           <ComponentSource
             name="recharts-chart"
-            title="components/evilcharts/ui/chart.tsx"
+            title="components/evilcharts/ui/recharts-chart.tsx"
           />
         </StepContent>
       </Step>
@@ -58,17 +58,12 @@ links:
 
 ## Usage
 
-A compound component: `<EvilSankeyChart />` is the container; `<Node />`,
-`<Link />`, and `<Tooltip />` compose as children. Render only the parts you need.
+A compound component: `<EvilSankeyChart />` is the container; `<EvilSankeyChart.Node />`,
+`<EvilSankeyChart.Link />`, and `<EvilSankeyChart.Tooltip />` compose as children. Render only the parts you need.
 
 ```tsx
-import {
-  EvilSankeyChart,
-  Node,
-  NodeLabel,
-  Link,
-  Tooltip,
-} from "@/components/evilcharts/charts/sankey-chart";
+import { EvilSankeyChart } from "@/components/evilcharts/charts/recharts-sankey-chart";
+import { type ChartConfig } from "@/components/evilcharts/ui/recharts-chart";
 import type { SankeyData } from "recharts";
 ```
 
@@ -102,11 +97,11 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 <EvilSankeyChart data={data} config={chartConfig}>
-  <Node isClickable>
-    <NodeLabel position="outside" showValues />
-  </Node>
-  <Link variant="source" />
-  <Tooltip />
+  <EvilSankeyChart.Node isClickable>
+    <EvilSankeyChart.NodeLabel position="outside" showValues />
+  </EvilSankeyChart.Node>
+  <EvilSankeyChart.Link variant="source" />
+  <EvilSankeyChart.Tooltip />
 </EvilSankeyChart>
 ```
 
@@ -127,9 +122,9 @@ root's `onSelectionChange` callback:
     }
   }}
 >
-  <Node isClickable />
-  <Link variant="source" />
-  <Tooltip />
+  <EvilSankeyChart.Node isClickable />
+  <EvilSankeyChart.Link variant="source" />
+  <EvilSankeyChart.Tooltip />
 </EvilSankeyChart>
 ```
 

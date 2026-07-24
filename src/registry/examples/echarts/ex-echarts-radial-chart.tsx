@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  EChartsRadialChart,
-  RadialBar,
-  Tooltip,
-  Legend,
-  type ChartConfig,
-} from "@/registry/charts/echarts-radial-chart";
+import { EChartsRadialChart, type ChartConfig } from "@/registry/charts/echarts-radial-chart";
 
 const data = [
   { browser: "chrome", visitors: 275 },
@@ -63,9 +57,9 @@ export function EChartsExampleRadialChart() {
       config={chartConfig}
       variant="full" // [!code highlight]
     >
-      <Legend isClickable />
-      <Tooltip />
-      <RadialBar dataKey="visitors" isClickable />
+      <EChartsRadialChart.Legend isClickable />
+      <EChartsRadialChart.Tooltip />
+      <EChartsRadialChart.RadialBar dataKey="visitors" isClickable />
     </EChartsRadialChart>
   );
 }

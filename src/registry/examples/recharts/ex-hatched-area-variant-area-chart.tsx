@@ -1,15 +1,6 @@
 "use client";
 
-import {
-  EvilAreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  Grid,
-  Tooltip,
-  Legend,
-  ActiveDot,
-} from "@/registry/charts/recharts-area-chart";
+import { EvilAreaChart } from "@/registry/charts/recharts-area-chart";
 import { type ChartConfig } from "@/registry/ui/recharts-chart";
 
 const data = [
@@ -52,25 +43,25 @@ export function EvilExampleAreaChart() {
       className="h-full w-full p-4"
       stackType="stacked"
     >
-      <Grid />
-      <XAxis dataKey="month" tickFormatter={(value) => value.substring(0, 3)} />
-      <YAxis dataKey="desktop" />
-      <Legend isClickable />
-      <Tooltip />
-      <Area
+      <EvilAreaChart.Grid />
+      <EvilAreaChart.XAxis dataKey="month" tickFormatter={(value) => value.substring(0, 3)} />
+      <EvilAreaChart.YAxis dataKey="desktop" />
+      <EvilAreaChart.Legend isClickable />
+      <EvilAreaChart.Tooltip />
+      <EvilAreaChart.Area
         dataKey="desktop"
         variant="hatched" // [!code highlight]
         isClickable
       >
-        <ActiveDot variant="default" />
-      </Area>
-      <Area
+        <EvilAreaChart.ActiveDot variant="default" />
+      </EvilAreaChart.Area>
+      <EvilAreaChart.Area
         dataKey="mobile"
         variant="hatched" // [!code highlight]
         isClickable
       >
-        <ActiveDot variant="default" />
-      </Area>
+        <EvilAreaChart.ActiveDot variant="default" />
+      </EvilAreaChart.Area>
     </EvilAreaChart>
   );
 }

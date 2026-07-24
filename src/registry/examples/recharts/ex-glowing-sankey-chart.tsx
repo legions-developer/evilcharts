@@ -1,6 +1,6 @@
 "use client";
 
-import { EvilSankeyChart, Node, Link, Tooltip } from "@/registry/charts/recharts-sankey-chart";
+import { EvilSankeyChart } from "@/registry/charts/recharts-sankey-chart";
 import type { SankeyData } from "recharts";
 import { type ChartConfig } from "@/registry/ui/recharts-chart";
 
@@ -98,12 +98,12 @@ const chartConfig = {
 export function EvilExampleSankeyChart() {
   return (
     <EvilSankeyChart className="h-full w-full p-4" data={data} config={chartConfig}>
-      <Node
+      <EvilSankeyChart.Node
         isClickable
         glow={["Solar", "Wind", "Grid"]} // [!code highlight]
       />
-      <Link variant="source" />
-      <Tooltip />
+      <EvilSankeyChart.Link variant="source" />
+      <EvilSankeyChart.Tooltip />
     </EvilSankeyChart>
   );
 }

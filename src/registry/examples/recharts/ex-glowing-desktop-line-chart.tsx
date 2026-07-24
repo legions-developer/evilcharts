@@ -1,14 +1,6 @@
 "use client";
 
-import {
-  EvilLineChart,
-  Line,
-  XAxis,
-  Legend,
-  Tooltip,
-  Dot,
-  ActiveDot,
-} from "@/registry/charts/recharts-line-chart";
+import { EvilLineChart } from "@/registry/charts/recharts-line-chart";
 import { type ChartConfig } from "@/registry/ui/recharts-chart";
 
 const data = [
@@ -46,22 +38,22 @@ const chartConfig = {
 export function EvilExampleLineChart() {
   return (
     <EvilLineChart data={data} config={chartConfig} className="h-full w-full p-4">
-      <XAxis dataKey="month" tickFormatter={(value) => value.substring(0, 3)} />
-      <Legend isClickable />
-      <Tooltip />
-      <Line
+      <EvilLineChart.XAxis dataKey="month" tickFormatter={(value) => value.substring(0, 3)} />
+      <EvilLineChart.Legend isClickable />
+      <EvilLineChart.Tooltip />
+      <EvilLineChart.Line
         dataKey="desktop"
         strokeVariant="solid"
         glowing // [!code highlight]
         isClickable
       >
-        <Dot variant="colored-border" />
-        <ActiveDot variant="default" />
-      </Line>
-      <Line dataKey="mobile" strokeVariant="solid" isClickable>
-        <Dot variant="colored-border" />
-        <ActiveDot variant="default" />
-      </Line>
+        <EvilLineChart.Dot variant="colored-border" />
+        <EvilLineChart.ActiveDot variant="default" />
+      </EvilLineChart.Line>
+      <EvilLineChart.Line dataKey="mobile" strokeVariant="solid" isClickable>
+        <EvilLineChart.Dot variant="colored-border" />
+        <EvilLineChart.ActiveDot variant="default" />
+      </EvilLineChart.Line>
     </EvilLineChart>
   );
 }

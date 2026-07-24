@@ -1,14 +1,6 @@
 "use client";
 
-import {
-  EChartsBarChart,
-  Bar,
-  XAxis,
-  Grid,
-  Tooltip,
-  Legend,
-  type ChartConfig,
-} from "@/registry/charts/echarts-bar-chart";
+import { EChartsBarChart, type ChartConfig } from "@/registry/charts/echarts-bar-chart";
 
 const data = [
   { month: "January", desktop: 342, mobile: 184 },
@@ -45,15 +37,15 @@ const chartConfig = {
 export function EChartsExampleBarChart() {
   return (
     <EChartsBarChart data={data} config={chartConfig} className="h-full w-full p-4">
-      <Grid />
-      <XAxis dataKey="month" tickFormatter={(value: string) => value.substring(0, 3)} />
-      <Legend />
-      <Tooltip
+      <EChartsBarChart.Grid />
+      <EChartsBarChart.XAxis dataKey="month" tickFormatter={(value: string) => value.substring(0, 3)} />
+      <EChartsBarChart.Legend />
+      <EChartsBarChart.Tooltip
         variant="frosted-glass" // [!code highlight]
         defaultIndex={4}
       />
-      <Bar dataKey="desktop" variant="default" />
-      <Bar dataKey="mobile" variant="default" />
+      <EChartsBarChart.Bar dataKey="desktop" variant="default" />
+      <EChartsBarChart.Bar dataKey="mobile" variant="default" />
     </EChartsBarChart>
   );
 }

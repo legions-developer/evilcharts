@@ -3,7 +3,7 @@ title: Sankey Chart
 description: Visualize flow data as nodes and links, powered by Apache ECharts
 image: /og/og-image.png
 links:
-  github: https://github.com/legions-developer/evilcharts/blob/main/src/registry/charts/echarts/sankey-chart.tsx
+  github: https://github.com/legions-developer/evilcharts/blob/main/src/registry/charts/echarts-sankey-chart.tsx
   doc: https://echarts.apache.org/en/index.html
   api: https://echarts.apache.org/en/option.html#series-sankey
 ---
@@ -31,12 +31,12 @@ links:
       <Step>
         <StepTitle>Copy and paste the following code snippets into your project.</StepTitle>
         <StepDescription>
-          First create the folder `evilcharts` and a subfolder `charts` (with an `echarts` folder inside) in your `components` directory, then paste the sankey-chart code into a new file there. Unlike the Recharts twin, this component is self-contained — everything ECharts needs ships in one file, so there are no extra `ui` sub-components to add.
+          First create the folder `evilcharts` and a subfolder `charts` in your `components` directory, then paste the sankey-chart code into a new `echarts-sankey-chart.tsx` file there. Unlike the Recharts twin, this component is self-contained — everything ECharts needs ships in one file, so there are no extra `ui` sub-components to add.
         </StepDescription>
         <StepContent>
           <ComponentSource
             name="echarts-sankey-chart"
-            title="components/evilcharts/charts/echarts/sankey-chart.tsx"
+            title="components/evilcharts/charts/echarts-sankey-chart.tsx"
           />
         </StepContent>
       </Step>
@@ -46,17 +46,10 @@ links:
 
 ## Usage
 
-The ECharts sankey chart is composible, sharing the Recharts twin's API shape. `<EChartsSankeyChart>` is the container; compose the parts you need — `<Node>`, `<NodeLabel>`, `<Link>`, and `<Tooltip>` — as children. Because nodes and links are intrinsic to the flow data, `<Node>` and `<Link>` always render and just configure the diagram; `<NodeLabel>` and `<Tooltip>` follow presence semantics — omit one and it does not render.
+The ECharts sankey chart is composible, sharing the Recharts twin's API shape. `<EChartsSankeyChart>` is the container, and every part hangs off it as a compound member — `<EChartsSankeyChart.Node>`, `<EChartsSankeyChart.NodeLabel>`, `<EChartsSankeyChart.Link>`, and `<EChartsSankeyChart.Tooltip>` — so a single import gives you the whole chart. Because nodes and links are intrinsic to the flow data, `<Node>` and `<Link>` always render and just configure the diagram; `<NodeLabel>` and `<Tooltip>` follow presence semantics — omit one and it does not render.
 
 ```tsx
-import {
-  EChartsSankeyChart,
-  Node,
-  NodeLabel,
-  Link,
-  Tooltip,
-  type SankeyData,
-} from "@/components/evilcharts/charts/echarts/sankey-chart";
+import { EChartsSankeyChart, type ChartConfig, type SankeyData } from "@/components/evilcharts/charts/echarts-sankey-chart";
 ```
 
 ```tsx
@@ -89,11 +82,11 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 <EChartsSankeyChart data={data} config={chartConfig}>
-  <Node isClickable>
-    <NodeLabel position="outside" showValues />
-  </Node>
-  <Link variant="source" />
-  <Tooltip />
+  <EChartsSankeyChart.Node isClickable>
+    <EChartsSankeyChart.NodeLabel position="outside" showValues />
+  </EChartsSankeyChart.Node>
+  <EChartsSankeyChart.Link variant="source" />
+  <EChartsSankeyChart.Tooltip />
 </EChartsSankeyChart>
 ```
 
@@ -129,9 +122,9 @@ the root's `onSelectionChange` callback:
     }
   }}
 >
-  <Node isClickable />
-  <Link variant="source" />
-  <Tooltip />
+  <EChartsSankeyChart.Node isClickable />
+  <EChartsSankeyChart.Link variant="source" />
+  <EChartsSankeyChart.Tooltip />
 </EChartsSankeyChart>
 ```
 

@@ -209,7 +209,7 @@ type RadialBarProps = {
  * never collide with other charts on the page. Pass `glowingBars` to highlight
  * specific bars and `isClickable` to make bars selectable.
  */
-export function RadialBar({
+function RadialBar({
   dataKey,
   cornerRadius = DEFAULT_CORNER_RADIUS,
   barSize = DEFAULT_BAR_SIZE,
@@ -273,7 +273,7 @@ type TooltipProps = {
  * The hover tooltip. Labels each bar by its name from context. Hidden
  * automatically while the chart is loading.
  */
-export function Tooltip({ variant, roundness, defaultIndex }: TooltipProps) {
+function Tooltip({ variant, roundness, defaultIndex }: TooltipProps) {
   const { nameKey, isLoading } = useRadialChart();
 
   if (isLoading) return null;
@@ -301,7 +301,7 @@ type LegendProps = {
  * its bar, driving the shared selection state read by <RadialBar />. Hidden
  * automatically while the chart is loading.
  */
-export function Legend({
+function Legend({
   variant,
   align = "center",
   verticalAlign = "bottom",
@@ -468,3 +468,10 @@ const LoadingRadialBar = () => {
     />
   );
 };
+
+// Compound API: every part hangs off the root as a static member, so a consumer
+// writes <EvilRadialChart.RadialBar/>, <EvilRadialChart.Tooltip/>, … from a single
+// import — no colliding named marker exports when several charts share one file.
+EvilRadialChart.RadialBar = RadialBar;
+EvilRadialChart.Tooltip = Tooltip;
+EvilRadialChart.Legend = Legend;

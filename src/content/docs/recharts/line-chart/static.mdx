@@ -3,7 +3,7 @@ title: Line Chart
 description: Beautifully designed static line charts
 image: /og/line-chart.png
 links:
-  github: https://github.com/legions-developer/evilcharts/blob/main/src/registry/charts/line-chart.tsx
+  github: https://github.com/legions-developer/evilcharts/blob/main/src/registry/charts/recharts-line-chart.tsx
   doc: https://recharts.github.io/en-US/examples/SimpleLineChart/
   api: https://recharts.github.io/en-US/api/LineChart/
 ---
@@ -36,7 +36,7 @@ links:
         <StepContent>
           <ComponentSource
             name="recharts-line-chart"
-            title="components/evilcharts/charts/line-chart.tsx"
+            title="components/evilcharts/charts/recharts-line-chart.tsx"
           />
         </StepContent>
       </Step>
@@ -50,7 +50,7 @@ links:
         <StepContent>
           <ComponentSource
             name="recharts-chart"
-            title="components/evilcharts/ui/chart.tsx"
+            title="components/evilcharts/ui/recharts-chart.tsx"
           />
         </StepContent>
       </Step>
@@ -62,7 +62,7 @@ links:
         <StepContent>
           <ComponentSource
             name="recharts-tooltip"
-            title="components/evilcharts/ui/tooltip.tsx"
+            title="components/evilcharts/ui/recharts-tooltip.tsx"
           />
         </StepContent>
         <StepDescription>
@@ -71,7 +71,7 @@ links:
         <StepContent>
           <ComponentSource
             name="recharts-legend"
-            title="components/evilcharts/ui/legend.tsx"
+            title="components/evilcharts/ui/recharts-legend.tsx"
           />
         </StepContent>
         <StepDescription>
@@ -80,7 +80,7 @@ links:
         <StepContent>
           <ComponentSource
             name="recharts-dot"
-            title="components/evilcharts/ui/dot.tsx"
+            title="components/evilcharts/ui/recharts-dot.tsx"
           />
         </StepContent>
       </Step>
@@ -90,36 +90,27 @@ links:
 
 ## Usage
 
-The line chart is composible. `<EvilLineChart>` is the container; compose the parts you need — `<Grid>`, `<XAxis>`, `<YAxis>`, `<Legend>`, `<Tooltip>`, and one or more `<Line>` — as children. Each `<Line>` sets its own `strokeVariant`, `curveType`, `glowing`, `enableBufferLine`, and `isClickable`, so one chart can mix stroke styles and make only some series interactive.
+The line chart is composible. `<EvilLineChart>` is the container, and every part hangs off it as a compound member — `<EvilLineChart.Grid>`, `<EvilLineChart.XAxis>`, `<EvilLineChart.YAxis>`, `<EvilLineChart.Legend>`, `<EvilLineChart.Tooltip>`, and one or more `<EvilLineChart.Line>` — as children. Each `<Line>` sets its own `strokeVariant`, `curveType`, `glowing`, `enableBufferLine`, and `isClickable`, so one chart can mix stroke styles and make only some series interactive.
 
 ```tsx
-import {
-  EvilLineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Grid,
-  Tooltip,
-  Legend,
-  Dot,
-  ActiveDot,
-} from "@/components/evilcharts/charts/line-chart";
+import { EvilLineChart } from "@/components/evilcharts/charts/recharts-line-chart";
+import { type ChartConfig } from "@/components/evilcharts/ui/recharts-chart";
 ```
 
 ```tsx
 <EvilLineChart data={data} config={chartConfig} curveType="monotone">
-  <Grid />
-  <XAxis dataKey="month" />
-  <YAxis />
-  <Legend isClickable />
-  <Tooltip />
-  <Line dataKey="desktop" strokeVariant="solid" isClickable>
-    <Dot variant="border" />
-    <ActiveDot variant="colored-border" />
-  </Line>
-  <Line dataKey="mobile" strokeVariant="dashed" glowing>
-    <ActiveDot variant="default" />
-  </Line>
+  <EvilLineChart.Grid />
+  <EvilLineChart.XAxis dataKey="month" />
+  <EvilLineChart.YAxis />
+  <EvilLineChart.Legend isClickable />
+  <EvilLineChart.Tooltip />
+  <EvilLineChart.Line dataKey="desktop" strokeVariant="solid" isClickable>
+    <EvilLineChart.Dot variant="border" />
+    <EvilLineChart.ActiveDot variant="colored-border" />
+  </EvilLineChart.Line>
+  <EvilLineChart.Line dataKey="mobile" strokeVariant="dashed" glowing>
+    <EvilLineChart.ActiveDot variant="default" />
+  </EvilLineChart.Line>
 </EvilLineChart>
 ```
 
@@ -139,11 +130,11 @@ Add `isClickable` to any `<Line>` (or `<Legend>`) to make its series selectable,
     }
   }}
 >
-  <XAxis dataKey="month" />
-  <Legend isClickable />
-  <Tooltip />
-  <Line dataKey="desktop" strokeVariant="solid" isClickable />
-  <Line dataKey="mobile" strokeVariant="solid" isClickable />
+  <EvilLineChart.XAxis dataKey="month" />
+  <EvilLineChart.Legend isClickable />
+  <EvilLineChart.Tooltip />
+  <EvilLineChart.Line dataKey="desktop" strokeVariant="solid" isClickable />
+  <EvilLineChart.Line dataKey="mobile" strokeVariant="solid" isClickable />
 </EvilLineChart>
 ```
 
@@ -231,20 +222,8 @@ The root container. It owns the data, selection state, loading skeleton, and opt
   <ApiRow name="loadingPoints" type="number" default="14">
     Data points shown in the loading skeleton.
   </ApiRow>
-  <ApiRow name="showBrush" type="boolean" default="false">
-    Shows a brush below the chart for selecting and zooming into a data range.
-  </ApiRow>
   <ApiRow name="xDataKey" type="keyof TData & string">
     The x-axis data key. Only the brush footer needs it — the axis reads its key from `<XAxis dataKey="…" />`.
-  </ApiRow>
-  <ApiRow name="brushHeight" type="number">
-    Brush preview height, in pixels.
-  </ApiRow>
-  <ApiRow name="brushFormatLabel" type="(value: unknown, index: number) => string">
-    Custom formatter for the brush axis labels.
-  </ApiRow>
-  <ApiRow name="onBrushChange" type="(range: EvilBrushRange) => void">
-    Fires when the brush selection range changes.
   </ApiRow>
   <ApiRow name="chartProps" type="ComponentProps<typeof LineChart>">
     Extra props forwarded to the underlying Recharts LineChart. See the <Link href="https://recharts.github.io/en-US/api/LineChart/" _blank>Recharts LineChart documentation</Link>.
@@ -356,5 +335,21 @@ The series legend. When the chart is clickable, each entry toggles selection of 
   </ApiRow>
   <ApiRow name="isClickable" type="boolean" default="false">
     Lets each legend entry toggle selection of its series.
+  </ApiRow>
+</ApiTable>
+
+<ApiHeading>Brush</ApiHeading>
+
+An optional zoom brush below the chart. Include `<EvilLineChart.Brush />` to render it; dragging the range filters the main chart.
+
+<ApiTable>
+  <ApiRow name="height" type="number">
+    Height of the brush preview strip in pixels.
+  </ApiRow>
+  <ApiRow name="formatLabel" type="(value: unknown, index: number) => string">
+    Formats the range-handle labels below the brush.
+  </ApiRow>
+  <ApiRow name="onChange" type="(range: { startIndex: number; endIndex: number }) => void">
+    Fires when the brush selection range changes.
   </ApiRow>
 </ApiTable>

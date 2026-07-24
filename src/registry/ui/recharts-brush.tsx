@@ -3,7 +3,7 @@
 import { motion, useMotionValue, useMotionValueEvent, useSpring, useTransform } from "motion/react";
 import { ResponsiveContainer, AreaChart, Area, LineChart, Line, BarChart, Bar } from "recharts";
 import { ChartStyle, getColorsCount, type ChartConfig } from "@/registry/ui/recharts-chart";
-import { useCallback, useEffect, type ComponentProps } from "react";
+import { useCallback, useEffect, type ComponentProps, type FC } from "react";
 import type { MotionValue } from "motion/react";
 import { cn } from "@/lib/utils";
 import * as React from "react";
@@ -17,6 +17,21 @@ interface EvilBrushRange {
   startIndex: number;
   endIndex: number;
 }
+
+// ─── Brush marker — the declarative `<Chart.Brush/>` child ─────────────────────
+// Renders nothing; its PRESENCE turns the brush footer on (replacing the old
+// showBrush prop) and its props carry the brush's height, handle-label
+// formatter, and range callback. Shared so every cartesian chart attaches the
+// SAME component to its root.
+
+export interface BrushProps {
+  height?: number; // brush preview strip height in px
+  formatLabel?: (value: unknown, index: number) => string; // formats the range-handle labels
+  onChange?: (range: EvilBrushRange) => void; // fires as the range moves
+}
+
+/** Declares the zoom brush below the chart. Presence renders it; renders nothing itself. */
+export const Brush: FC<BrushProps> = () => null;
 
 interface EvilBrushProps {
   /** Full dataset – always rendered in the miniature chart */

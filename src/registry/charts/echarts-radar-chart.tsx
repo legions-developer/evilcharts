@@ -161,17 +161,17 @@ export interface RadarProps {
  * via composed <Dot> / <ActiveDot>. Renders nothing — the root reads these props
  * to build the ECharts radar series.
  */
-export const Radar: FC<RadarProps> = () => null;
+const Radar: FC<RadarProps> = () => null;
 
 export interface DotProps {
   variant?: DotVariant; // visual style of the vertex marker
 }
 
 /** Declares the resting vertex marker for the enclosing <Radar>. Renders nothing. */
-export const Dot: FC<DotProps> = () => null;
+const Dot: FC<DotProps> = () => null;
 
 /** Declares the hovered/active vertex marker for the enclosing <Radar>. Renders nothing. */
-export const ActiveDot: FC<DotProps> = () => null;
+const ActiveDot: FC<DotProps> = () => null;
 
 export interface PolarGridProps {
   gridType?: GridType; // "polygon" (angular rings) or "circle" (circular rings)
@@ -181,17 +181,17 @@ export interface PolarGridProps {
  * Presence draws the polar grid — the concentric rings and the radial spokes.
  * `gridType` picks the ring shape. Renders nothing.
  */
-export const PolarGrid: FC<PolarGridProps> = () => null;
+const PolarGrid: FC<PolarGridProps> = () => null;
 
 export interface PolarAngleAxisProps {
   dataKey?: string; // data key whose values label the perimeter — overrides auto-detect
 }
 
 /** Presence shows the angle-axis category labels around the perimeter. Renders nothing. */
-export const PolarAngleAxis: FC<PolarAngleAxisProps> = () => null;
+const PolarAngleAxis: FC<PolarAngleAxisProps> = () => null;
 
 /** Presence shows the radial value scale running from the center outward. Renders nothing. */
-export const PolarRadiusAxis: FC = () => null;
+const PolarRadiusAxis: FC = () => null;
 
 export interface TooltipProps {
   variant?: TooltipVariant; // visual style of the tooltip surface
@@ -204,7 +204,7 @@ export interface TooltipProps {
 }
 
 /** Presence enables the hover tooltip. Renders nothing. */
-export const Tooltip: FC<TooltipProps> = () => null;
+const Tooltip: FC<TooltipProps> = () => null;
 
 export interface LegendProps {
   variant?: LegendVariant; // visual style of the legend indicators
@@ -214,7 +214,7 @@ export interface LegendProps {
 }
 
 /** Presence enables the HTML legend overlay. Renders nothing. */
-export const Legend: FC<LegendProps> = () => null;
+const Legend: FC<LegendProps> = () => null;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Children collection — walk the declarative config into plain objects the
@@ -1234,3 +1234,15 @@ export function EChartsRadarChart<TData extends Record<string, unknown>>({
     </div>
   );
 }
+
+// Compound API: every part hangs off the root as a static member, so a consumer
+// writes <EChartsRadarChart.Radar/>, <EChartsRadarChart.Tooltip/>, … from a single
+// import — no colliding named marker exports when several charts share one file.
+EChartsRadarChart.Radar = Radar;
+EChartsRadarChart.Dot = Dot;
+EChartsRadarChart.ActiveDot = ActiveDot;
+EChartsRadarChart.PolarGrid = PolarGrid;
+EChartsRadarChart.PolarAngleAxis = PolarAngleAxis;
+EChartsRadarChart.PolarRadiusAxis = PolarRadiusAxis;
+EChartsRadarChart.Tooltip = Tooltip;
+EChartsRadarChart.Legend = Legend;

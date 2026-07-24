@@ -3,7 +3,7 @@ title: Radar Chart
 description: Radar charts with filled and lines variants, gradient colors, and glow effects
 image: /og/radar-chart.png
 links:
-  github: https://github.com/legions-developer/evilcharts/blob/main/src/registry/charts/radar-chart.tsx
+  github: https://github.com/legions-developer/evilcharts/blob/main/src/registry/charts/recharts-radar-chart.tsx
   doc: https://recharts.github.io/en-US/examples/SimpleRadarChart
   api: https://recharts.github.io/en-US/api/RadarChart
 ---
@@ -36,7 +36,7 @@ links:
         <StepContent>
           <ComponentSource
             name="recharts-radar-chart"
-            title="components/evilcharts/charts/radar-chart.tsx"
+            title="components/evilcharts/charts/recharts-radar-chart.tsx"
           />
         </StepContent>
       </Step>
@@ -50,7 +50,7 @@ links:
         <StepContent>
           <ComponentSource
             name="recharts-chart"
-            title="components/evilcharts/ui/chart.tsx"
+            title="components/evilcharts/ui/recharts-chart.tsx"
           />
         </StepContent>
       </Step>
@@ -62,7 +62,7 @@ links:
         <StepContent>
           <ComponentSource
             name="recharts-tooltip"
-            title="components/evilcharts/ui/tooltip.tsx"
+            title="components/evilcharts/ui/recharts-tooltip.tsx"
           />
         </StepContent>
         <StepDescription>
@@ -71,7 +71,7 @@ links:
         <StepContent>
           <ComponentSource
             name="recharts-legend"
-            title="components/evilcharts/ui/legend.tsx"
+            title="components/evilcharts/ui/recharts-legend.tsx"
           />
         </StepContent>
       </Step>
@@ -81,19 +81,11 @@ links:
 
 ## Usage
 
-`<EvilRadarChart />` is the root of a composible compound component. Every visual part (`<PolarGrid />`, `<PolarAngleAxis />`, `<Tooltip />`, `<Legend />`, and the `<Radar />` series) composes as a child — render only what you need.
+`<EvilRadarChart />` is the root of a composible compound component. Every visual part (`<EvilRadarChart.PolarGrid />`, `<EvilRadarChart.PolarAngleAxis />`, `<EvilRadarChart.Tooltip />`, `<EvilRadarChart.Legend />`, and the `<EvilRadarChart.Radar />` series) composes as a child — render only what you need.
 
 ```tsx
-import {
-  EvilRadarChart,
-  Radar,
-  PolarGrid,
-  PolarAngleAxis,
-  Tooltip,
-  Legend,
-  Dot,
-  ActiveDot,
-} from "@/components/evilcharts/charts/radar-chart";
+import { EvilRadarChart } from "@/components/evilcharts/charts/recharts-radar-chart";
+import { type ChartConfig } from "@/components/evilcharts/ui/recharts-chart";
 ```
 
 ```tsx
@@ -117,15 +109,15 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 <EvilRadarChart data={data} config={chartConfig}>
-  <PolarGrid />
-  <PolarAngleAxis dataKey="skill" />
-  <Legend />
-  <Tooltip />
-  <Radar dataKey="desktop" variant="filled">
-    <Dot variant="colored-border" />
-    <ActiveDot variant="default" />
-  </Radar>
-  <Radar dataKey="mobile" variant="filled" />
+  <EvilRadarChart.PolarGrid />
+  <EvilRadarChart.PolarAngleAxis dataKey="skill" />
+  <EvilRadarChart.Legend />
+  <EvilRadarChart.Tooltip />
+  <EvilRadarChart.Radar dataKey="desktop" variant="filled">
+    <EvilRadarChart.Dot variant="colored-border" />
+    <EvilRadarChart.ActiveDot variant="default" />
+  </EvilRadarChart.Radar>
+  <EvilRadarChart.Radar dataKey="mobile" variant="filled" />
 </EvilRadarChart>
 ```
 
@@ -145,12 +137,12 @@ Set `isClickable` on a `<Radar />` or `<Legend />` to toggle selection by clicki
     }
   }}
 >
-  <PolarGrid />
-  <PolarAngleAxis dataKey="skill" />
-  <Legend isClickable />
-  <Tooltip />
-  <Radar dataKey="desktop" variant="filled" isClickable />
-  <Radar dataKey="mobile" variant="filled" isClickable />
+  <EvilRadarChart.PolarGrid />
+  <EvilRadarChart.PolarAngleAxis dataKey="skill" />
+  <EvilRadarChart.Legend isClickable />
+  <EvilRadarChart.Tooltip />
+  <EvilRadarChart.Radar dataKey="desktop" variant="filled" isClickable />
+  <EvilRadarChart.Radar dataKey="mobile" variant="filled" isClickable />
 </EvilRadarChart>
 ```
 
@@ -165,12 +157,12 @@ Set `isClickable` on a `<Radar />` or `<Legend />` to toggle selection by clicki
 
 ```tsx
 <EvilRadarChart data={[]} config={chartConfig} isLoading>
-  <PolarGrid />
-  <PolarAngleAxis dataKey="skill" />
-  <Legend />
-  <Tooltip />
-  <Radar dataKey="desktop" variant="filled" />
-  <Radar dataKey="mobile" variant="filled" />
+  <EvilRadarChart.PolarGrid />
+  <EvilRadarChart.PolarAngleAxis dataKey="skill" />
+  <EvilRadarChart.Legend />
+  <EvilRadarChart.Tooltip />
+  <EvilRadarChart.Radar dataKey="desktop" variant="filled" />
+  <EvilRadarChart.Radar dataKey="mobile" variant="filled" />
 </EvilRadarChart>
 ```
 

@@ -2,9 +2,6 @@
 
 import {
   EChartsSankeyChart,
-  Node,
-  Link,
-  Tooltip,
   type SankeyData,
   type ChartConfig,
 } from "@/registry/charts/echarts-sankey-chart";
@@ -91,9 +88,9 @@ export function EChartsExampleSankeyChart() {
       config={chartConfig}
       isLoading // [!code highlight]
     >
-      <Node />
-      <Link variant="source" />
-      <Tooltip />
+      <EChartsSankeyChart.Node />
+      <EChartsSankeyChart.Link variant="source" />
+      <EChartsSankeyChart.Tooltip />
     </EChartsSankeyChart>
   );
 }

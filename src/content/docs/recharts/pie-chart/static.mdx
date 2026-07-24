@@ -3,7 +3,7 @@ title: Pie Chart
 description: Static, beautifully designed pie charts with donut, gradient, and glow effects
 image: /og/pie-chart.png
 links:
-  github: https://github.com/legions-developer/evilcharts/blob/main/src/registry/charts/pie-chart.tsx
+  github: https://github.com/legions-developer/evilcharts/blob/main/src/registry/charts/recharts-pie-chart.tsx
   doc: https://recharts.github.io/en-US/examples/SimplePieChart/
   api: https://recharts.github.io/en-US/api/PieChart/
 ---
@@ -36,7 +36,7 @@ links:
         <StepContent>
           <ComponentSource
             name="recharts-pie-chart"
-            title="components/evilcharts/charts/pie-chart.tsx"
+            title="components/evilcharts/charts/recharts-pie-chart.tsx"
           />
         </StepContent>
       </Step>
@@ -50,7 +50,7 @@ links:
         <StepContent>
           <ComponentSource
             name="recharts-chart"
-            title="components/evilcharts/ui/chart.tsx"
+            title="components/evilcharts/ui/recharts-chart.tsx"
           />
         </StepContent>
       </Step>
@@ -62,7 +62,7 @@ links:
         <StepContent>
           <ComponentSource
             name="recharts-tooltip"
-            title="components/evilcharts/ui/tooltip.tsx"
+            title="components/evilcharts/ui/recharts-tooltip.tsx"
           />
         </StepContent>
         <StepDescription>
@@ -71,7 +71,7 @@ links:
         <StepContent>
           <ComponentSource
             name="recharts-legend"
-            title="components/evilcharts/ui/legend.tsx"
+            title="components/evilcharts/ui/recharts-legend.tsx"
           />
         </StepContent>
       </Step>
@@ -81,17 +81,11 @@ links:
 
 ## Usage
 
-The pie chart is composable. `<EvilPieChart>` is the container; compose the parts you need — `<Legend>`, `<Tooltip>`, `<Background>`, and one `<Pie>` — as children. Each `<Pie>` owns its shape props (`innerRadius`, `paddingAngle`, `cornerRadius`, …), `isClickable`, and `glowingSectors`, so one chart can mix any combination.
+The pie chart is composable. `<EvilPieChart>` is the container; compose the parts you need — `<EvilPieChart.Legend>`, `<EvilPieChart.Tooltip>`, `<EvilPieChart.Background>`, and one `<EvilPieChart.Pie>` — as children. Each `<EvilPieChart.Pie>` owns its shape props (`innerRadius`, `paddingAngle`, `cornerRadius`, …), `isClickable`, and `glowingSectors`, so one chart can mix any combination.
 
 ```tsx
-import {
-  EvilPieChart,
-  Pie,
-  Label,
-  Tooltip,
-  Legend,
-  Background,
-} from "@/components/evilcharts/charts/pie-chart";
+import { EvilPieChart } from "@/components/evilcharts/charts/recharts-pie-chart";
+import { type ChartConfig } from "@/components/evilcharts/ui/recharts-chart";
 ```
 
 ```tsx
@@ -119,17 +113,17 @@ const chartConfig = {
 
 ```tsx
 <EvilPieChart data={data} dataKey="visitors" nameKey="browser" config={chartConfig}>
-  <Legend isClickable />
-  <Tooltip />
-  <Pie isClickable innerRadius={60} paddingAngle={4} cornerRadius={8}>
-    <Label />
-  </Pie>
+  <EvilPieChart.Legend isClickable />
+  <EvilPieChart.Tooltip />
+  <EvilPieChart.Pie isClickable innerRadius={60} paddingAngle={4} cornerRadius={8}>
+    <EvilPieChart.Label />
+  </EvilPieChart.Pie>
 </EvilPieChart>
 ```
 
 ### Interactive Selection
 
-Add `isClickable` to `<Pie>` (and `<Legend>`) to make sectors selectable. Handle changes with the `onSelectionChange` callback on `<EvilPieChart>`:
+Add `isClickable` to `<EvilPieChart.Pie>` (and `<EvilPieChart.Legend>`) to make sectors selectable. Handle changes with the `onSelectionChange` callback on `<EvilPieChart>`:
 
 ```tsx
 <EvilPieChart
@@ -145,9 +139,9 @@ Add `isClickable` to `<Pie>` (and `<Legend>`) to make sectors selectable. Handle
     }
   }}
 >
-  <Legend isClickable />
-  <Tooltip />
-  <Pie isClickable />
+  <EvilPieChart.Legend isClickable />
+  <EvilPieChart.Tooltip />
+  <EvilPieChart.Pie isClickable />
 </EvilPieChart>
 ```
 

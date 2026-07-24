@@ -1,6 +1,6 @@
 "use client";
 
-import { EvilPieChart, Pie, Tooltip, Legend } from "@/registry/charts/recharts-pie-chart";
+import { EvilPieChart } from "@/registry/charts/recharts-pie-chart";
 import { type ChartConfig } from "@/registry/ui/recharts-chart";
 
 const data = [
@@ -58,9 +58,9 @@ export function EvilExamplePieChart() {
       nameKey="browser"
       config={chartConfig}
     >
-      <Legend isClickable />
-      <Tooltip />
-      <Pie innerRadius={60} paddingAngle={-25} cornerRadius={99} />
+      <EvilPieChart.Legend isClickable />
+      <EvilPieChart.Tooltip />
+      <EvilPieChart.Pie innerRadius={60} paddingAngle={-25} cornerRadius={99} />
     </EvilPieChart>
   );
 }

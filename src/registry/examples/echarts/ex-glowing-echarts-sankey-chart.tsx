@@ -2,9 +2,6 @@
 
 import {
   EChartsSankeyChart,
-  Node,
-  Link,
-  Tooltip,
   type SankeyData,
   type ChartConfig,
 } from "@/registry/charts/echarts-sankey-chart";
@@ -103,12 +100,12 @@ const chartConfig = {
 export function EChartsExampleSankeyChart() {
   return (
     <EChartsSankeyChart className="h-full w-full p-4" data={data} config={chartConfig}>
-      <Node
+      <EChartsSankeyChart.Node
         isClickable
         glow={["Solar", "Wind", "Grid"]} // [!code highlight]
       />
-      <Link variant="source" />
-      <Tooltip />
+      <EChartsSankeyChart.Link variant="source" />
+      <EChartsSankeyChart.Tooltip />
     </EChartsSankeyChart>
   );
 }

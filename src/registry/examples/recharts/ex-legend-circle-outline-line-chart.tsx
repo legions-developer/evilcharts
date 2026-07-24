@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  EvilLineChart,
-  Line,
-  XAxis,
-  Legend,
-  Tooltip,
-} from "@/registry/charts/recharts-line-chart";
+import { EvilLineChart } from "@/registry/charts/recharts-line-chart";
 import { type ChartConfig } from "@/registry/ui/recharts-chart";
 
 const data = [
@@ -44,13 +38,13 @@ const chartConfig = {
 export function EvilExampleLegendCircleOutlineLineChart() {
   return (
     <EvilLineChart data={data} config={chartConfig} className="h-full w-full p-4">
-      <XAxis dataKey="month" tickFormatter={(value) => value.substring(0, 3)} />
-      <Legend
+      <EvilLineChart.XAxis dataKey="month" tickFormatter={(value) => value.substring(0, 3)} />
+      <EvilLineChart.Legend
         variant="circle-outline" // [!code highlight]
       />
-      <Tooltip />
-      <Line dataKey="desktop" strokeVariant="solid" />
-      <Line dataKey="mobile" strokeVariant="solid" />
+      <EvilLineChart.Tooltip />
+      <EvilLineChart.Line dataKey="desktop" strokeVariant="solid" />
+      <EvilLineChart.Line dataKey="mobile" strokeVariant="solid" />
     </EvilLineChart>
   );
 }

@@ -212,7 +212,7 @@ type NodeProps = {
  * reads its props and wires them into the Recharts Sankey `node` renderer, so it
  * renders nothing itself. Compose a <NodeLabel /> inside it to show labels.
  */
-export const Node: FC<NodeProps> = () => null;
+const Node: FC<NodeProps> = () => null;
 
 type NodeLabelProps = {
   position?: NodeLabelPosition; // places labels inside or beside the nodes
@@ -224,7 +224,7 @@ type NodeLabelProps = {
  * Declares labels for the <Node /> it is composed inside. Like <Node />, it is a
  * configuration slot and renders nothing on its own.
  */
-export const NodeLabel: FC<NodeLabelProps> = () => null;
+const NodeLabel: FC<NodeLabelProps> = () => null;
 
 type LinkProps = {
   variant?: LinkVariant; // coloring strategy for the link bands
@@ -237,7 +237,7 @@ type LinkProps = {
  * slot read by the root and renders nothing itself. The `variant` controls how
  * each link band is colored.
  */
-export const Link: FC<LinkProps> = () => null;
+const Link: FC<LinkProps> = () => null;
 
 type TooltipProps = {
   variant?: TooltipVariant; // visual style of the tooltip surface
@@ -249,7 +249,7 @@ type TooltipProps = {
  * The hover tooltip. Reads the chart's loading state from context and is hidden
  * automatically while the chart shows its skeleton.
  */
-export function Tooltip({ variant, roundness, defaultIndex }: TooltipProps) {
+function Tooltip({ variant, roundness, defaultIndex }: TooltipProps) {
   const { isLoading } = useSankeyChart();
 
   if (isLoading) return null;
@@ -784,3 +784,11 @@ const LoadingSankey = () => {
     </>
   );
 };
+
+// Compound API: every part hangs off the root as a static member, so a consumer
+// writes <EvilSankeyChart.Node/>, <EvilSankeyChart.Tooltip/>, … from a single
+// import — no colliding named marker exports when several charts share one file.
+EvilSankeyChart.Node = Node;
+EvilSankeyChart.NodeLabel = NodeLabel;
+EvilSankeyChart.Link = Link;
+EvilSankeyChart.Tooltip = Tooltip;

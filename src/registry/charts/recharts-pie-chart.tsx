@@ -191,7 +191,7 @@ type PieProps = {
  * the chart is loading it renders an animated skeleton in place of the data.
  * Compose <Label /> inside it to draw labels on each sector.
  */
-export function Pie({
+function Pie({
   variant = "gradient",
   innerRadius = DEFAULT_INNER_RADIUS,
   outerRadius = DEFAULT_OUTER_RADIUS,
@@ -293,7 +293,7 @@ type LabelProps = {
  * nothing on its own — the parent <Pie /> reads its props and wires them into a
  * Recharts LabelList drawn over the sectors.
  */
-export const Label: FC<LabelProps> = () => null;
+const Label: FC<LabelProps> = () => null;
 
 type TooltipProps = {
   variant?: TooltipVariant; // visual style of the tooltip surface
@@ -304,7 +304,7 @@ type TooltipProps = {
 /**
  * The hover tooltip. Hidden automatically while the chart is loading.
  */
-export function Tooltip({ variant, roundness, defaultIndex }: TooltipProps) {
+function Tooltip({ variant, roundness, defaultIndex }: TooltipProps) {
   const { isLoading, nameKey } = usePieChart();
 
   if (isLoading) return null;
@@ -330,7 +330,7 @@ type LegendProps = {
  * The sector legend. When `isClickable` is set, each entry toggles selection of
  * its sector, driving the shared selection state read by the <Pie />.
  */
-export function Legend({
+function Legend({
   variant,
   align = "center",
   verticalAlign = "bottom",
@@ -363,7 +363,7 @@ type BackgroundProps = {
  * An optional decorative pattern drawn behind the pie. Compose it before the
  * <Pie /> so it sits underneath the sectors.
  */
-export function Background({ variant = "dots" }: BackgroundProps) {
+function Background({ variant = "dots" }: BackgroundProps) {
   return <ChartBackground variant={variant} />;
 }
 
@@ -524,3 +524,13 @@ const AnimatedLoadingSector = (props: ComponentProps<typeof Sector> & { index?: 
     </motion.g>
   );
 };
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Static parts attached to the root
+// ─────────────────────────────────────────────────────────────────────────────
+
+EvilPieChart.Pie = Pie;
+EvilPieChart.Label = Label;
+EvilPieChart.Tooltip = Tooltip;
+EvilPieChart.Legend = Legend;
+EvilPieChart.Background = Background;

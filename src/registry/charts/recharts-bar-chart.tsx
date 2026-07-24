@@ -10,7 +10,9 @@ import {
   YAxis as RechartsYAxis,
 } from "recharts";
 import {
+  Children,
   createContext,
+  isValidElement,
   use,
   useCallback,
   useId,
@@ -34,7 +36,7 @@ import {
   type TooltipVariant,
 } from "@/registry/ui/recharts-tooltip";
 import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/recharts-legend";
-import { EvilBrush, useEvilBrush, type EvilBrushRange } from "@/registry/ui/recharts-brush";
+import { Brush, EvilBrush, useEvilBrush, type BrushProps, type EvilBrushRange } from "@/registry/ui/recharts-brush";
 import { ChartBackground, type BackgroundVariant } from "@/registry/ui/recharts-background";
 import { RectRadius } from "recharts/types/shape/Rectangle";
 import { motion, useReducedMotion } from "motion/react";
@@ -128,11 +130,7 @@ type EvilBarChartBaseProps<
   onSelectionChange?: (selectedDataKey: string | null) => void; // fires when the selected series changes
   isLoading?: boolean; // shows the animated loading skeleton
   loadingBars?: number; // number of bars in the loading skeleton
-  showBrush?: boolean; // renders a zoom brush below the chart
-  xDataKey?: keyof TData & string; // x-axis key — only needed for the brush footer
-  brushHeight?: number; // height of the brush preview in pixels
-  brushFormatLabel?: (value: unknown, index: number) => string; // formats brush axis labels
-  onBrushChange?: (range: EvilBrushRange) => void; // fires when the brush range changes
+  xDataKey?: keyof TData & string; // x-axis key — only needed for the <Brush /> footer
 };
 
 type EvilBarChartProps<
@@ -166,11 +164,7 @@ export function EvilBarChart<
   onSelectionChange,
   isLoading = false,
   loadingBars,
-  showBrush = false,
   xDataKey,
-  brushHeight,
-  brushFormatLabel,
-  onBrushChange,
 }: EvilBarChartProps<TData, TConfig>) {
   const chartId = useId().replace(/:/g, ""); // colon-free id keeps CSS/SVG selectors valid
   // Anchors the grow-in to a fixed moment so it plays exactly once — re-renders
@@ -181,6 +175,26 @@ export function EvilBarChart<
   const [isMouseInChart, setIsMouseInChart] = useState(false);
   const { loadingData, onShimmerExit } = useLoadingData(isLoading, loadingBars);
   const { visibleData, brushProps } = useEvilBrush({ data });
+
+  // Brush is a <Brush /> child now (not props): pull it out of the children so
+  // it never reaches the Recharts tree, and drive the footer from its props.
+  const brush = useMemo(() => {
+    // Pull the <Brush> element out of the children (config-only, never rendered
+    // into the Recharts tree); toArray also assigns stable keys to the rest.
+    const parts = Children.toArray(children);
+    const brushEl = parts.find((child) => isValidElement(child) && child.type === Brush);
+    const bp = (isValidElement(brushEl) ? brushEl.props : {}) as BrushProps;
+    return {
+      slot: {
+        present: isValidElement(brushEl),
+        height: bp.height,
+        formatLabel: bp.formatLabel,
+        onChange: bp.onChange,
+      },
+      chartChildren: parts.filter((child) => !(isValidElement(child) && child.type === Brush)),
+    };
+  }, [children]);
+  const showBrush = brush.slot.present;
 
   const isStacked = stackType === "stacked" || stackType === "percent";
   const isHorizontal = layout === "horizontal";
@@ -238,15 +252,15 @@ export function EvilBarChart<
               xDataKey={xDataKey}
               variant="bar"
               barRadius={barRadius}
-              height={brushHeight}
-              formatLabel={brushFormatLabel}
+              height={brush.slot.height}
+              formatLabel={brush.slot.formatLabel}
               stacked={isStacked}
               skipStyle
               className="mt-1"
               {...brushProps}
               onChange={(range) => {
                 brushProps.onChange(range);
-                onBrushChange?.(range);
+                brush.slot.onChange?.(range);
               }}
             />
           )
@@ -267,7 +281,7 @@ export function EvilBarChart<
         >
           {backgroundVariant && <ChartBackground variant={backgroundVariant} />}
           <ReferenceLine color="white" />
-          {children}
+          {brush.chartChildren}
           {isLoading && <LoadingBar chartId={chartId} onShimmerExit={onShimmerExit} />}
         </RechartsBarChart>
       </ChartContainer>
@@ -297,7 +311,7 @@ type BarProps = {
  * each with its own variant, radius, glow, and clickability — can live in one
  * chart without style collisions.
  */
-export function Bar({
+function Bar({
   dataKey,
   variant = "default",
   radius,
@@ -403,7 +417,7 @@ type XAxisProps = ComponentProps<typeof RechartsXAxis>;
  * its axis type from the chart layout — categorical when vertical, numeric
  * when the bars run horizontally.
  */
-export function XAxis({
+function XAxis({
   tickLine = false,
   axisLine = false,
   tickMargin = 8,
@@ -434,7 +448,7 @@ type YAxisProps = ComponentProps<typeof RechartsYAxis>;
  * from the chart layout — numeric when vertical, categorical when the bars run
  * horizontally. Hidden automatically while the chart is loading.
  */
-export function YAxis({
+function YAxis({
   tickLine = false,
   axisLine = false,
   tickMargin = 8,
@@ -467,7 +481,7 @@ type GridProps = ComponentProps<typeof CartesianGrid>;
  * axis based on the chart layout, and forwards every Recharts CartesianGrid
  * prop for full control.
  */
-export function Grid({ strokeDasharray = "3 3", vertical, horizontal, ...props }: GridProps) {
+function Grid({ strokeDasharray = "3 3", vertical, horizontal, ...props }: GridProps) {
   const { isHorizontal } = useBarChart();
 
   return (
@@ -490,7 +504,7 @@ type TooltipProps = {
  * The hover tooltip. Reads the chart's selection from context so its content
  * dims unselected series. Hidden automatically while the chart is loading.
  */
-export function Tooltip({ variant, roundness, defaultIndex }: TooltipProps) {
+function Tooltip({ variant, roundness, defaultIndex }: TooltipProps) {
   const { isLoading, selectedDataKey } = useBarChart();
 
   if (isLoading) return null;
@@ -517,7 +531,7 @@ type LegendProps = {
  * The series legend. When `isClickable` is set, each entry toggles selection of
  * its series, driving the shared selection state read by every <Bar />.
  */
-export function Legend({
+function Legend({
   variant,
   align = "right",
   verticalAlign = "top",
@@ -1271,3 +1285,14 @@ const LoadingBarPattern = ({
     </>
   );
 };
+
+// Compound API: every part hangs off the root as a static member, so a consumer
+// writes <EvilBarChart.Bar/>, <EvilBarChart.Tooltip/>, … from a single import
+// — no colliding named marker exports when several charts share one file.
+EvilBarChart.Bar = Bar;
+EvilBarChart.XAxis = XAxis;
+EvilBarChart.YAxis = YAxis;
+EvilBarChart.Grid = Grid;
+EvilBarChart.Tooltip = Tooltip;
+EvilBarChart.Legend = Legend;
+EvilBarChart.Brush = Brush;

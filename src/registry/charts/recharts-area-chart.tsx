@@ -37,7 +37,7 @@ import {
   type TooltipVariant,
 } from "@/registry/ui/recharts-tooltip";
 import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/recharts-legend";
-import { EvilBrush, useEvilBrush, type EvilBrushRange } from "@/registry/ui/recharts-brush";
+import { Brush, EvilBrush, useEvilBrush, type BrushProps, type EvilBrushRange } from "@/registry/ui/recharts-brush";
 import { ChartDot, type DotVariant } from "@/registry/ui/recharts-dot";
 import { motion, useReducedMotion } from "motion/react";
 
@@ -128,11 +128,7 @@ type EvilAreaChartBaseProps<
   onSelectionChange?: (selectedDataKey: string | null) => void; // fires when the selected series changes
   isLoading?: boolean; // shows the animated loading skeleton
   loadingPoints?: number; // number of points in the loading skeleton
-  showBrush?: boolean; // renders a zoom brush below the chart
-  xDataKey?: keyof TData & string; // x-axis key — only needed for the brush footer
-  brushHeight?: number; // height of the brush preview in pixels
-  brushFormatLabel?: (value: unknown, index: number) => string; // formats brush axis labels
-  onBrushChange?: (range: EvilBrushRange) => void; // fires when the brush range changes
+  xDataKey?: keyof TData & string; // x-axis key — only needed for the <Brush /> footer
 };
 
 type EvilAreaChartProps<
@@ -162,16 +158,32 @@ export function EvilAreaChart<
   onSelectionChange,
   isLoading = false,
   loadingPoints,
-  showBrush = false,
   xDataKey,
-  brushHeight,
-  brushFormatLabel,
-  onBrushChange,
 }: EvilAreaChartProps<TData, TConfig>) {
   const chartId = useId().replace(/:/g, ""); // colon-free id keeps CSS/SVG selectors valid
   const [selectedDataKey, setSelectedDataKey] = useState<string | null>(defaultSelectedDataKey);
   const { loadingData, onShimmerExit } = useLoadingData(isLoading, loadingPoints);
   const { visibleData, brushProps } = useEvilBrush({ data });
+
+  // Brush is a <Brush /> child now (not props): pull it out of the children so
+  // it never reaches the Recharts tree, and drive the footer from its props.
+  const brush = useMemo(() => {
+    // Pull the <Brush> element out of the children (config-only, never rendered
+    // into the Recharts tree); toArray also assigns stable keys to the rest.
+    const parts = Children.toArray(children);
+    const brushEl = parts.find((child) => isValidElement(child) && child.type === Brush);
+    const bp = (isValidElement(brushEl) ? brushEl.props : {}) as BrushProps;
+    return {
+      slot: {
+        present: isValidElement(brushEl),
+        height: bp.height,
+        formatLabel: bp.formatLabel,
+        onChange: bp.onChange,
+      },
+      chartChildren: parts.filter((child) => !(isValidElement(child) && child.type === Brush)),
+    };
+  }, [children]);
+  const showBrush = brush.slot.present;
 
   const isExpanded = stackType === "expanded";
   const isStacked = stackType === "stacked" || isExpanded;
@@ -223,15 +235,15 @@ export function EvilAreaChart<
               xDataKey={xDataKey}
               variant="area"
               curveType={curveType}
-              height={brushHeight}
-              formatLabel={brushFormatLabel}
+              height={brush.slot.height}
+              formatLabel={brush.slot.formatLabel}
               stacked={isStacked}
               skipStyle
               className="mt-1"
               {...brushProps}
               onChange={(range) => {
                 brushProps.onChange(range);
-                onBrushChange?.(range);
+                brush.slot.onChange?.(range);
               }}
             />
           )
@@ -245,7 +257,7 @@ export function EvilAreaChart<
           data={isLoading ? loadingData : displayData}
           {...chartProps}
         >
-          {children}
+          {brush.chartChildren}
           {isLoading && (
             <LoadingArea chartId={chartId} curveType={curveType} onShimmerExit={onShimmerExit} />
           )}
@@ -278,7 +290,7 @@ type AreaProps = {
  * without style collisions. Compose <Dot /> and <ActiveDot /> inside it to add
  * point markers.
  */
-export function Area({
+function Area({
   dataKey,
   variant = "gradient",
   strokeVariant = "dashed",
@@ -381,13 +393,13 @@ type DotProps = {
  * It renders nothing on its own — the parent <Area /> reads its variant and
  * wires it into the Recharts dot slot.
  */
-export const Dot: FC<DotProps> = () => null;
+const Dot: FC<DotProps> = () => null;
 
 /**
  * Declares the hovered/active point marker for the <Area /> it is composed
  * inside. Like <Dot />, it is a configuration slot and renders nothing itself.
  */
-export const ActiveDot: FC<DotProps> = () => null;
+const ActiveDot: FC<DotProps> = () => null;
 
 type XAxisProps = ComponentProps<typeof RechartsXAxis>;
 
@@ -396,7 +408,7 @@ type XAxisProps = ComponentProps<typeof RechartsXAxis>;
  * forwards every Recharts XAxis prop, so `dataKey`, `tickFormatter`, etc. are
  * passed straight through. Hidden automatically while the chart is loading.
  */
-export function XAxis({
+function XAxis({
   tickLine = false,
   axisLine = false,
   tickMargin = 8,
@@ -425,7 +437,7 @@ type YAxisProps = ComponentProps<typeof RechartsYAxis>;
  * chart uses an expanded stack, formats ticks as percentages automatically.
  * Hidden automatically while the chart is loading.
  */
-export function YAxis({
+function YAxis({
   tickLine = false,
   axisLine = false,
   tickMargin = 8,
@@ -457,7 +469,7 @@ type GridProps = ComponentProps<typeof CartesianGrid>;
  * The background grid lines. Defaults to horizontal-only dashed lines and
  * forwards every Recharts CartesianGrid prop for full control.
  */
-export function Grid({ vertical = false, strokeDasharray = "3 3", ...props }: GridProps) {
+function Grid({ vertical = false, strokeDasharray = "3 3", ...props }: GridProps) {
   return <CartesianGrid vertical={vertical} strokeDasharray={strokeDasharray} {...props} />;
 }
 
@@ -472,7 +484,7 @@ type TooltipProps = {
  * The hover tooltip. Reads the chart's selection from context so its content
  * dims unselected series. Hidden automatically while the chart is loading.
  */
-export function Tooltip({ variant, roundness, defaultIndex, cursor = true }: TooltipProps) {
+function Tooltip({ variant, roundness, defaultIndex, cursor = true }: TooltipProps) {
   const { isLoading, selectedDataKey } = useAreaChart();
 
   if (isLoading) return null;
@@ -499,7 +511,7 @@ type LegendProps = {
  * The series legend. When `isClickable` is set, each entry toggles selection of
  * its series, driving the shared selection state read by every <Area />.
  */
-export function Legend({
+function Legend({
   variant,
   align = "right",
   verticalAlign = "top",
@@ -1090,3 +1102,16 @@ const LoadingPattern = ({
     </>
   );
 };
+
+// Compound API: every part hangs off the root as a static member, so a consumer
+// writes <EvilAreaChart.Area/>, <EvilAreaChart.Tooltip/>, … from a single import
+// — no colliding named marker exports when several charts share one file.
+EvilAreaChart.Area = Area;
+EvilAreaChart.Dot = Dot;
+EvilAreaChart.ActiveDot = ActiveDot;
+EvilAreaChart.XAxis = XAxis;
+EvilAreaChart.YAxis = YAxis;
+EvilAreaChart.Grid = Grid;
+EvilAreaChart.Tooltip = Tooltip;
+EvilAreaChart.Legend = Legend;
+EvilAreaChart.Brush = Brush;

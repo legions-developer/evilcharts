@@ -3,7 +3,7 @@ title: Bar Chart
 description: Static, beautifully designed bar charts powered by Apache ECharts
 image: /og/og-image.png
 links:
-  github: https://github.com/legions-developer/evilcharts/blob/main/src/registry/charts/echarts/bar-chart.tsx
+  github: https://github.com/legions-developer/evilcharts/blob/main/src/registry/charts/echarts-bar-chart.tsx
   doc: https://echarts.apache.org/en/index.html
   api: https://echarts.apache.org/en/option.html
 ---
@@ -31,13 +31,13 @@ links:
       <Step>
         <StepTitle>Copy the following code into your project.</StepTitle>
         <StepDescription>
-          In your `components` directory, create the nested folders `evilcharts` → `charts` → `echarts`, then paste the bar-chart code into a new file inside.
+          In your `components` directory, create the nested folders `evilcharts` → `charts`, then paste the bar-chart code into a new `echarts-bar-chart.tsx` file inside.
           Unlike the Recharts twin, this component is fully self-contained — everything ships in one file, with no extra `ui` sub-components to add.
         </StepDescription>
         <StepContent>
           <ComponentSource
             name="echarts-bar-chart"
-            title="components/evilcharts/charts/echarts/bar-chart.tsx"
+            title="components/evilcharts/charts/echarts-bar-chart.tsx"
           />
         </StepContent>
       </Step>
@@ -47,28 +47,20 @@ links:
 
 ## Usage
 
-The ECharts bar chart is composible, sharing the Recharts twin's API shape. `<EChartsBarChart>` is the container; compose only the parts you need — `<Grid>`, `<XAxis>`, `<YAxis>`, `<Legend>`, `<Tooltip>`, and one or more `<Bar>` — as its children. Each `<Bar>` carries its own `variant`, `radius`, `glowing`, `bufferBar`, and `isClickable`, so one chart can mix fill styles and make only some series interactive.
+The ECharts bar chart is composible, sharing the Recharts twin's API shape. `<EChartsBarChart>` is the container, and every part hangs off it as a compound member — `<EChartsBarChart.Grid>`, `<EChartsBarChart.XAxis>`, `<EChartsBarChart.YAxis>`, `<EChartsBarChart.Legend>`, `<EChartsBarChart.Tooltip>`, and one or more `<EChartsBarChart.Bar>` — so a single import gives you the whole chart. Each `<Bar>` carries its own `variant`, `radius`, `glowing`, `bufferBar`, and `isClickable`, so one chart can mix fill styles and make only some series interactive.
 
 ```tsx
-import {
-  EChartsBarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Grid,
-  Tooltip,
-  Legend,
-} from "@/components/evilcharts/charts/echarts/bar-chart";
+import { EChartsBarChart, type ChartConfig } from "@/components/evilcharts/charts/echarts-bar-chart";
 ```
 
 ```tsx
 <EChartsBarChart data={data} config={chartConfig} stackType="default">
-  <Grid />
-  <XAxis dataKey="month" />
-  <Legend isClickable />
-  <Tooltip />
-  <Bar dataKey="desktop" variant="default" isClickable />
-  <Bar dataKey="mobile" variant="hatched" isClickable />
+  <EChartsBarChart.Grid />
+  <EChartsBarChart.XAxis dataKey="month" />
+  <EChartsBarChart.Legend isClickable />
+  <EChartsBarChart.Tooltip />
+  <EChartsBarChart.Bar dataKey="desktop" variant="default" isClickable />
+  <EChartsBarChart.Bar dataKey="mobile" variant="hatched" isClickable />
 </EChartsBarChart>
 ```
 
@@ -98,11 +90,11 @@ Add `isClickable` to any `<Bar>` (and to `<Legend>`) to make those series select
     }
   }}
 >
-  <XAxis dataKey="month" />
-  <Legend isClickable />
-  <Tooltip />
-  <Bar dataKey="desktop" variant="default" isClickable />
-  <Bar dataKey="mobile" variant="default" isClickable />
+  <EChartsBarChart.XAxis dataKey="month" />
+  <EChartsBarChart.Legend isClickable />
+  <EChartsBarChart.Tooltip />
+  <EChartsBarChart.Bar dataKey="desktop" variant="default" isClickable />
+  <EChartsBarChart.Bar dataKey="mobile" variant="default" isClickable />
 </EChartsBarChart>
 ```
 
@@ -223,20 +215,8 @@ The root container. It owns the data, shared selection state, loading skeleton, 
   <ApiRow name="loadingBars" type="number" default="12">
     Number of bars in the loading skeleton.
   </ApiRow>
-  <ApiRow name="showBrush" type="boolean" default="false">
-    Renders ECharts' native `dataZoom` brush below the chart to select and zoom into a data range (vertical layout only).
-  </ApiRow>
   <ApiRow name="xDataKey" type="keyof TData & string">
     The data key used for the category axis. Falls back to the axis `dataKey`; also read by the brush footer.
-  </ApiRow>
-  <ApiRow name="brushHeight" type="number" default="56">
-    Height of the brush preview in pixels.
-  </ApiRow>
-  <ApiRow name="brushFormatLabel" type="(value: string, index: number) => string">
-    Formats the brush handle labels.
-  </ApiRow>
-  <ApiRow name="onBrushChange" type="(range: { startIndex: number; endIndex: number }) => void">
-    Fires when the brush selection range changes.
   </ApiRow>
   <ApiRow name="chartOptions" type="Record<string, unknown>">
     Escape hatch merged over the underlying ECharts option object. See the <Link href="https://echarts.apache.org/en/option.html" _blank>ECharts option documentation</Link>.
@@ -329,5 +309,21 @@ The series legend, rendered as HTML above the canvas. Include it to show the leg
   </ApiRow>
   <ApiRow name="isClickable" type="boolean" default="false">
     Lets each legend entry toggle selection of its series.
+  </ApiRow>
+</ApiTable>
+
+<ApiHeading>Brush</ApiHeading>
+
+An optional zoom brush below the chart — a themed mini chart driven by ECharts' native `dataZoom`. Include `<EChartsBarChart.Brush />` to render it; dragging the range filters the main chart.
+
+<ApiTable>
+  <ApiRow name="height" type="number" default="56">
+    Height of the brush preview strip in pixels.
+  </ApiRow>
+  <ApiRow name="formatLabel" type="(value: string | number, index: number) => string">
+    Formats the range-handle labels below the brush.
+  </ApiRow>
+  <ApiRow name="onChange" type="(range: { startIndex: number; endIndex: number }) => void">
+    Fires when the brush selection range changes.
   </ApiRow>
 </ApiTable>

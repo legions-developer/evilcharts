@@ -1,5 +1,6 @@
 import { withAlpha, type ResolvedColors } from "@/registry/ui/echarts-chart";
 import type { DataZoomComponentOption } from "echarts/components";
+import type { FC } from "react";
 import * as echarts from "echarts/core";
 
 type EChartsInstance = ReturnType<typeof echarts.init>;
@@ -7,6 +8,22 @@ type EChartsInstance = ReturnType<typeof echarts.init>;
 const BRUSH_BORDER_OPACITY = 1; // brush frame, × border alpha (evil-brush uses the full token)
 
 export { BRUSH_BORDER_OPACITY };
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Brush marker — the declarative `<Chart.Brush/>` child. Rendering nothing, its
+// PRESENCE turns the brush on (replacing the old showBrush prop) and its props
+// carry the brush's height, handle-label formatter, and range callback. Shared
+// so every cartesian chart attaches the SAME component to its root.
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface BrushProps {
+  height?: number; // brush preview strip height in px (default 56)
+  formatLabel?: (value: string, index: number) => string; // formats the range-handle labels
+  onChange?: (range: { startIndex: number; endIndex: number }) => void; // fires as the range moves
+}
+
+/** Declares the zoom brush below the chart. Presence renders it; renders nothing itself. */
+export const Brush: FC<BrushProps> = () => null;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Brush overlays — the evil-brush look: a rounded border around the SELECTED

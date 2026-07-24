@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  EChartsPieChart,
-  Pie,
-  Tooltip,
-  Legend,
-  type ChartConfig,
-} from "@/registry/charts/echarts-pie-chart";
+import { EChartsPieChart, type ChartConfig } from "@/registry/charts/echarts-pie-chart";
 
 const data = [
   { browser: "chrome", visitors: 275 },
@@ -64,9 +58,9 @@ export function EChartsExamplePieChart() {
       config={chartConfig}
       isLoading // [!code highlight]
     >
-      <Legend isClickable />
-      <Tooltip />
-      <Pie isClickable />
+      <EChartsPieChart.Legend isClickable />
+      <EChartsPieChart.Tooltip />
+      <EChartsPieChart.Pie isClickable />
     </EChartsPieChart>
   );
 }

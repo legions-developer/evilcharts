@@ -3,7 +3,7 @@ title: Radial Chart
 description: Beautiful radial bar charts with full and semi-circle variants, gradient colors, and glow effects
 image: /og/radial-chart.png
 links:
-  github: https://github.com/legions-developer/evilcharts/blob/main/src/registry/charts/radial-chart.tsx
+  github: https://github.com/legions-developer/evilcharts/blob/main/src/registry/charts/recharts-radial-chart.tsx
   doc: https://recharts.github.io/en-US/examples/SimpleRadialBarChart
   api: https://recharts.github.io/en-US/api/RadialBarChart
 ---
@@ -36,7 +36,7 @@ links:
         <StepContent>
           <ComponentSource
             name="recharts-radial-chart"
-            title="components/evilcharts/charts/radial-chart.tsx"
+            title="components/evilcharts/charts/recharts-radial-chart.tsx"
           />
         </StepContent>
       </Step>
@@ -50,7 +50,7 @@ links:
         <StepContent>
           <ComponentSource
             name="recharts-chart"
-            title="components/evilcharts/ui/chart.tsx"
+            title="components/evilcharts/ui/recharts-chart.tsx"
           />
         </StepContent>
       </Step>
@@ -62,7 +62,7 @@ links:
         <StepContent>
           <ComponentSource
             name="recharts-tooltip"
-            title="components/evilcharts/ui/tooltip.tsx"
+            title="components/evilcharts/ui/recharts-tooltip.tsx"
           />
         </StepContent>
         <StepDescription>
@@ -71,7 +71,7 @@ links:
         <StepContent>
           <ComponentSource
             name="recharts-legend"
-            title="components/evilcharts/ui/legend.tsx"
+            title="components/evilcharts/ui/recharts-legend.tsx"
           />
         </StepContent>
       </Step>
@@ -81,15 +81,11 @@ links:
 
 ## Usage
 
-The radial chart is composable. `<EvilRadialChart>` is the container; add only the parts you need — `<Legend>`, `<Tooltip>`, and a `<RadialBar>` — as children. `glowingBars` and `isClickable` live on `<RadialBar>`, so styling and interactivity stay with the series.
+The radial chart is composable. `<EvilRadialChart>` is the container, and every part hangs off it as a compound member — `<EvilRadialChart.Legend>`, `<EvilRadialChart.Tooltip>`, and a `<EvilRadialChart.RadialBar>` — so a single import gives you the whole chart. `glowingBars` and `isClickable` live on `<EvilRadialChart.RadialBar>`, so styling and interactivity stay with the series.
 
 ```tsx
-import {
-  EvilRadialChart,
-  RadialBar,
-  Tooltip,
-  Legend,
-} from "@/components/evilcharts/charts/radial-chart";
+import { EvilRadialChart } from "@/components/evilcharts/charts/recharts-radial-chart";
+import { type ChartConfig } from "@/components/evilcharts/ui/recharts-chart";
 ```
 
 ```tsx
@@ -117,15 +113,15 @@ const chartConfig = {
 
 ```tsx
 <EvilRadialChart data={data} nameKey="browser" config={chartConfig} variant="full">
-  <Legend isClickable />
-  <Tooltip />
-  <RadialBar dataKey="visitors" isClickable glowingBars={["chrome"]} />
+  <EvilRadialChart.Legend isClickable />
+  <EvilRadialChart.Tooltip />
+  <EvilRadialChart.RadialBar dataKey="visitors" isClickable glowingBars={["chrome"]} />
 </EvilRadialChart>
 ```
 
 ### Interactive Selection
 
-Add `isClickable` to `<RadialBar>` (and `<Legend>`) to make bars selectable, then handle selection with the `onSelectionChange` callback on `<EvilRadialChart>`:
+Add `isClickable` to `<EvilRadialChart.RadialBar>` (and `<EvilRadialChart.Legend>`) to make bars selectable, then handle selection with the `onSelectionChange` callback on `<EvilRadialChart>`:
 
 ```tsx
 <EvilRadialChart
@@ -140,9 +136,9 @@ Add `isClickable` to `<RadialBar>` (and `<Legend>`) to make bars selectable, the
     }
   }}
 >
-  <Legend isClickable />
-  <Tooltip />
-  <RadialBar dataKey="visitors" isClickable />
+  <EvilRadialChart.Legend isClickable />
+  <EvilRadialChart.Tooltip />
+  <EvilRadialChart.RadialBar dataKey="visitors" isClickable />
 </EvilRadialChart>
 ```
 

@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  ActiveDot,
-  Area,
-  EChartsAreaChart,
-  Tooltip,
-  type ChartConfig,
-} from "@/registry/charts/echarts-area-chart";
+import { EChartsAreaChart, type ChartConfig } from "@/registry/charts/echarts-area-chart";
 
 const SERIES = [
   { key: "robinhood", label: "Robinhood", color: "#c3f000", pct: -4.41, delta: -2377.66 },
@@ -90,13 +84,13 @@ export function EChartsPortfolioAreaChart() {
           yAxis: { type: "value", show: false, scale: true, boundaryGap: ["12%", "16%"] },
         }}
       >
-        <Tooltip variant="frosted-glass" />
-        <Area dataKey="robinhood" variant="gradient" strokeVariant="solid">
-          <ActiveDot variant="ping" />
-        </Area>
-        <Area dataKey="coinbase" variant="gradient" strokeVariant="solid">
-          <ActiveDot variant="ping" />
-        </Area>
+        <EChartsAreaChart.Tooltip variant="frosted-glass" />
+        <EChartsAreaChart.Area dataKey="robinhood" variant="gradient" strokeVariant="solid">
+          <EChartsAreaChart.ActiveDot variant="ping" />
+        </EChartsAreaChart.Area>
+        <EChartsAreaChart.Area dataKey="coinbase" variant="gradient" strokeVariant="solid">
+          <EChartsAreaChart.ActiveDot variant="ping" />
+        </EChartsAreaChart.Area>
       </EChartsAreaChart>
     </div>
   );

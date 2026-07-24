@@ -1,16 +1,6 @@
 "use client";
 
-import {
-  EChartsLineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Legend,
-  Tooltip,
-  Dot,
-  ActiveDot,
-  type ChartConfig,
-} from "@/registry/charts/echarts-line-chart";
+import { EChartsLineChart, type ChartConfig } from "@/registry/charts/echarts-line-chart";
 
 const data = [
   { month: "January", desktop: 342, mobile: 184 },
@@ -52,18 +42,18 @@ export function EChartsExampleLineChart() {
       className="h-full w-full p-4"
       curveType="step" // [!code highlight]
     >
-      <XAxis dataKey="month" tickFormatter={(value) => value.substring(0, 3)} />
-      <YAxis dataKey="desktop" />
-      <Legend isClickable />
-      <Tooltip />
-      <Line dataKey="desktop" strokeVariant="solid" isClickable>
-        <Dot variant="default" />
-        <ActiveDot variant="default" />
-      </Line>
-      <Line dataKey="mobile" strokeVariant="solid" isClickable>
-        <Dot variant="default" />
-        <ActiveDot variant="default" />
-      </Line>
+      <EChartsLineChart.XAxis dataKey="month" tickFormatter={(value) => value.substring(0, 3)} />
+      <EChartsLineChart.YAxis dataKey="desktop" />
+      <EChartsLineChart.Legend isClickable />
+      <EChartsLineChart.Tooltip />
+      <EChartsLineChart.Line dataKey="desktop" strokeVariant="solid" isClickable>
+        <EChartsLineChart.Dot variant="default" />
+        <EChartsLineChart.ActiveDot variant="default" />
+      </EChartsLineChart.Line>
+      <EChartsLineChart.Line dataKey="mobile" strokeVariant="solid" isClickable>
+        <EChartsLineChart.Dot variant="default" />
+        <EChartsLineChart.ActiveDot variant="default" />
+      </EChartsLineChart.Line>
     </EChartsLineChart>
   );
 }

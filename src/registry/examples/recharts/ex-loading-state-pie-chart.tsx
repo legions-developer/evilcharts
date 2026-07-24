@@ -1,6 +1,6 @@
 "use client";
 
-import { EvilPieChart, Pie, Tooltip, Legend } from "@/registry/charts/recharts-pie-chart";
+import { EvilPieChart } from "@/registry/charts/recharts-pie-chart";
 import { type ChartConfig } from "@/registry/ui/recharts-chart";
 
 const data = [
@@ -59,9 +59,9 @@ export function EvilExamplePieChart() {
       config={chartConfig}
       isLoading // [!code highlight]
     >
-      <Legend isClickable />
-      <Tooltip />
-      <Pie isClickable />
+      <EvilPieChart.Legend isClickable />
+      <EvilPieChart.Tooltip />
+      <EvilPieChart.Pie isClickable />
     </EvilPieChart>
   );
 }

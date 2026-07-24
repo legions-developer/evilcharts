@@ -1,6 +1,6 @@
 "use client";
 
-import { EvilRadialChart, RadialBar, Tooltip, Legend } from "@/registry/charts/recharts-radial-chart";
+import { EvilRadialChart } from "@/registry/charts/recharts-radial-chart";
 import { type ChartConfig } from "@/registry/ui/recharts-chart";
 
 const data = [
@@ -58,9 +58,9 @@ export function EvilExampleRadialChart() {
       config={chartConfig}
       variant="full" // [!code highlight]
     >
-      <Legend isClickable />
-      <Tooltip />
-      <RadialBar dataKey="visitors" isClickable />
+      <EvilRadialChart.Legend isClickable />
+      <EvilRadialChart.Tooltip />
+      <EvilRadialChart.RadialBar dataKey="visitors" isClickable />
     </EvilRadialChart>
   );
 }

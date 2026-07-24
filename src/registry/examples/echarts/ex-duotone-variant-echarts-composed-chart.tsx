@@ -1,15 +1,6 @@
 "use client";
 
-import {
-  EChartsComposedChart,
-  Bar,
-  Line,
-  XAxis,
-  Grid,
-  Tooltip,
-  Legend,
-  type ChartConfig,
-} from "@/registry/charts/echarts-composed-chart";
+import { EChartsComposedChart, type ChartConfig } from "@/registry/charts/echarts-composed-chart";
 
 const data = [
   { month: "January", revenue: 4200, profit: 1800 },
@@ -51,16 +42,16 @@ export function EChartsExampleComposedChart() {
       data={data}
       config={chartConfig}
     >
-      <Grid />
-      <XAxis dataKey="month" tickFormatter={(value) => value.substring(0, 3)} />
-      <Legend isClickable />
-      <Tooltip />
-      <Bar
+      <EChartsComposedChart.Grid />
+      <EChartsComposedChart.XAxis dataKey="month" tickFormatter={(value) => value.substring(0, 3)} />
+      <EChartsComposedChart.Legend isClickable />
+      <EChartsComposedChart.Tooltip />
+      <EChartsComposedChart.Bar
         dataKey="revenue"
         variant="duotone" // [!code highlight]
         isClickable
       />
-      <Line dataKey="profit" isClickable />
+      <EChartsComposedChart.Line dataKey="profit" isClickable />
     </EChartsComposedChart>
   );
 }

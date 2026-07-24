@@ -1,15 +1,6 @@
 "use client";
 
-import {
-  EChartsAreaChart,
-  Area,
-  XAxis,
-  Grid,
-  Tooltip,
-  Legend,
-  ActiveDot,
-  type ChartConfig,
-} from "@/registry/charts/echarts-area-chart";
+import { EChartsAreaChart, type ChartConfig } from "@/registry/charts/echarts-area-chart";
 
 const data = [
   { month: "January", desktop: 342, mobile: 245 },
@@ -52,16 +43,16 @@ export function EChartsExampleAreaChart() {
       enableHoverReveal // [!code highlight]
       stackType="stacked"
     >
-      <Grid />
-      <XAxis dataKey="month" tickFormatter={(value) => value.substring(0, 3)} />
-      <Legend />
-      <Tooltip />
-      <Area dataKey="desktop" variant="gradient">
-        <ActiveDot variant="default" />
-      </Area>
-      <Area dataKey="mobile" variant="gradient">
-        <ActiveDot variant="default" />
-      </Area>
+      <EChartsAreaChart.Grid />
+      <EChartsAreaChart.XAxis dataKey="month" tickFormatter={(value) => value.substring(0, 3)} />
+      <EChartsAreaChart.Legend />
+      <EChartsAreaChart.Tooltip />
+      <EChartsAreaChart.Area dataKey="desktop" variant="gradient">
+        <EChartsAreaChart.ActiveDot variant="default" />
+      </EChartsAreaChart.Area>
+      <EChartsAreaChart.Area dataKey="mobile" variant="gradient">
+        <EChartsAreaChart.ActiveDot variant="default" />
+      </EChartsAreaChart.Area>
     </EChartsAreaChart>
   );
 }

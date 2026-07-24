@@ -3,7 +3,7 @@ title: Composed Chart
 description: Static, beautifully designed composed charts combining bars and lines
 image: /og/composed-chart.png
 links:
-  github: https://github.com/legions-developer/evilcharts/blob/main/src/registry/charts/composed-chart.tsx
+  github: https://github.com/legions-developer/evilcharts/blob/main/src/registry/charts/recharts-composed-chart.tsx
   doc: https://recharts.github.io/en-US/examples/SimpleLineChart/
   api: https://recharts.github.io/en-US/api/ComposedChart/
 ---
@@ -31,12 +31,12 @@ links:
       <Step>
         <StepTitle>Copy and paste the following code snippets into your project.</StepTitle>
          <StepDescription>
-          Create an `evilcharts` folder with a `charts` subfolder inside `components`, then paste the base composed-chart code into a new file there.
+          Create an `evilcharts` folder with a `charts` subfolder inside `components`, then paste the base recharts-composed-chart code into a new file there.
         </StepDescription>
         <StepContent>
           <ComponentSource
             name="recharts-composed-chart"
-            title="components/evilcharts/charts/composed-chart.tsx"
+            title="components/evilcharts/charts/recharts-composed-chart.tsx"
           />
         </StepContent>
       </Step>
@@ -50,7 +50,7 @@ links:
         <StepContent>
           <ComponentSource
             name="recharts-chart"
-            title="components/evilcharts/ui/chart.tsx"
+            title="components/evilcharts/ui/recharts-chart.tsx"
           />
         </StepContent>
       </Step>
@@ -62,7 +62,7 @@ links:
         <StepContent>
           <ComponentSource
             name="recharts-tooltip"
-            title="components/evilcharts/ui/tooltip.tsx"
+            title="components/evilcharts/ui/recharts-tooltip.tsx"
           />
         </StepContent>
         <StepDescription>
@@ -71,7 +71,7 @@ links:
         <StepContent>
           <ComponentSource
             name="recharts-legend"
-            title="components/evilcharts/ui/legend.tsx"
+            title="components/evilcharts/ui/recharts-legend.tsx"
           />
         </StepContent>
         <StepDescription>
@@ -80,7 +80,7 @@ links:
         <StepContent>
           <ComponentSource
             name="recharts-dot"
-            title="components/evilcharts/ui/dot.tsx"
+            title="components/evilcharts/ui/recharts-dot.tsx"
           />
         </StepContent>
       </Step>
@@ -90,21 +90,11 @@ links:
 
 ## Usage
 
-`<EvilComposedChart>` is the container; compose the parts you need — `<Grid>`, `<XAxis>`, `<YAxis>`, `<Legend>`, `<Tooltip>`, and one or more `<Bar>` and `<Line>` — as children. Each `<Bar>` carries its own `variant`, `glow`, and `isClickable`; each `<Line>` its own `strokeVariant`, `curveType`, `glow`, and `isClickable`, so one chart can mix bar and line styles freely.
+`<EvilComposedChart>` is the container; compose the parts you need — `<EvilComposedChart.Grid>`, `<EvilComposedChart.XAxis>`, `<EvilComposedChart.YAxis>`, `<EvilComposedChart.Legend>`, `<EvilComposedChart.Tooltip>`, and one or more `<EvilComposedChart.Bar>` and `<EvilComposedChart.Line>` — as children. Each `<Bar>` carries its own `variant`, `glow`, and `isClickable`; each `<Line>` its own `strokeVariant`, `curveType`, `glow`, and `isClickable`, so one chart can mix bar and line styles freely.
 
 ```tsx
-import {
-  EvilComposedChart,
-  Bar,
-  Line,
-  XAxis,
-  YAxis,
-  Grid,
-  Tooltip,
-  Legend,
-  Dot,
-  ActiveDot,
-} from "@/components/evilcharts/charts/composed-chart";
+import { EvilComposedChart } from "@/components/evilcharts/charts/recharts-composed-chart";
+import { type ChartConfig } from "@/components/evilcharts/ui/recharts-chart";
 ```
 
 ```tsx
@@ -120,16 +110,16 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 <EvilComposedChart xDataKey="month" data={data} config={chartConfig}>
-  <Grid />
-  <XAxis dataKey="month" />
-  <YAxis />
-  <Legend isClickable />
-  <Tooltip />
-  <Bar dataKey="revenue" variant="gradient" isClickable />
-  <Line dataKey="profit" strokeVariant="dashed" isClickable>
-    <Dot variant="default" />
-    <ActiveDot variant="colored-border" />
-  </Line>
+  <EvilComposedChart.Grid />
+  <EvilComposedChart.XAxis dataKey="month" />
+  <EvilComposedChart.YAxis />
+  <EvilComposedChart.Legend isClickable />
+  <EvilComposedChart.Tooltip />
+  <EvilComposedChart.Bar dataKey="revenue" variant="gradient" isClickable />
+  <EvilComposedChart.Line dataKey="profit" strokeVariant="dashed" isClickable>
+    <EvilComposedChart.Dot variant="default" />
+    <EvilComposedChart.ActiveDot variant="colored-border" />
+  </EvilComposedChart.Line>
 </EvilComposedChart>
 ```
 
@@ -149,11 +139,11 @@ Add `isClickable` to any `<Bar>`, `<Line>`, or `<Legend>` to make those series s
     }
   }}
 >
-  <XAxis dataKey="month" />
-  <Legend isClickable />
-  <Tooltip />
-  <Bar dataKey="revenue" isClickable />
-  <Line dataKey="profit" isClickable />
+  <EvilComposedChart.XAxis dataKey="month" />
+  <EvilComposedChart.Legend isClickable />
+  <EvilComposedChart.Tooltip />
+  <EvilComposedChart.Bar dataKey="revenue" isClickable />
+  <EvilComposedChart.Line dataKey="profit" isClickable />
 </EvilComposedChart>
 ```
 
@@ -262,20 +252,8 @@ The root container. It owns the data, shared selection state, loading skeleton, 
   <ApiRow name="loadingBars" type="number" default="12">
     Number of bars in the loading skeleton.
   </ApiRow>
-  <ApiRow name="showBrush" type="boolean" default="false">
-    Displays a brush below the chart for selecting and zooming into a data range.
-  </ApiRow>
   <ApiRow name="xDataKey" type="keyof TData & string">
     The x-axis data key. Only needed by the brush footer — the axis reads its own key from `<XAxis dataKey="…" />`.
-  </ApiRow>
-  <ApiRow name="brushHeight" type="number">
-    Height of the brush preview area, in pixels.
-  </ApiRow>
-  <ApiRow name="brushFormatLabel" type="(value: unknown, index: number) => string">
-    Custom formatter for the brush axis labels.
-  </ApiRow>
-  <ApiRow name="onBrushChange" type="(range: EvilBrushRange) => void">
-    Fires when the user changes the brush range.
   </ApiRow>
   <ApiRow name="chartProps" type="ComponentProps<typeof ComposedChart>">
     Extra props forwarded to the underlying Recharts ComposedChart. See the <Link href="https://recharts.github.io/en-US/api/ComposedChart/" _blank>Recharts ComposedChart documentation</Link> for available props.
@@ -415,5 +393,21 @@ The series legend. When `isClickable` is set, each entry toggles selection of it
   </ApiRow>
   <ApiRow name="isClickable" type="boolean" default="false">
     Lets each legend entry toggle selection of its series.
+  </ApiRow>
+</ApiTable>
+
+<ApiHeading>Brush</ApiHeading>
+
+An optional zoom brush below the chart. Include `<EvilComposedChart.Brush />` to render it; dragging the range filters the main chart.
+
+<ApiTable>
+  <ApiRow name="height" type="number">
+    Height of the brush preview strip in pixels.
+  </ApiRow>
+  <ApiRow name="formatLabel" type="(value: unknown, index: number) => string">
+    Formats the range-handle labels below the brush.
+  </ApiRow>
+  <ApiRow name="onChange" type="(range: { startIndex: number; endIndex: number }) => void">
+    Fires when the brush selection range changes.
   </ApiRow>
 </ApiTable>

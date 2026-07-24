@@ -1,14 +1,6 @@
 "use client";
 
-import {
-  EChartsRadarChart,
-  Radar,
-  PolarGrid,
-  PolarAngleAxis,
-  Tooltip,
-  Legend,
-  type ChartConfig,
-} from "@/registry/charts/echarts-radar-chart";
+import { EChartsRadarChart, type ChartConfig } from "@/registry/charts/echarts-radar-chart";
 
 const chartConfig = {
   desktop: {
@@ -35,12 +27,12 @@ export function EChartsExampleRadarChart() {
       className="h-full w-full p-4"
       isLoading={true} // [!code highlight]
     >
-      <PolarGrid />
-      <PolarAngleAxis dataKey="skill" />
-      <Legend />
-      <Tooltip />
-      <Radar dataKey="desktop" variant="filled" />
-      <Radar dataKey="mobile" variant="filled" />
+      <EChartsRadarChart.PolarGrid />
+      <EChartsRadarChart.PolarAngleAxis dataKey="skill" />
+      <EChartsRadarChart.Legend />
+      <EChartsRadarChart.Tooltip />
+      <EChartsRadarChart.Radar dataKey="desktop" variant="filled" />
+      <EChartsRadarChart.Radar dataKey="mobile" variant="filled" />
     </EChartsRadarChart>
   );
 }

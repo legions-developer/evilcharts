@@ -3,7 +3,7 @@ title: Radar Chart
 description: Radar charts with filled and lines variants and gradient colors, powered by Apache ECharts
 image: /og/radar-chart.png
 links:
-  github: https://github.com/legions-developer/evilcharts/blob/main/src/registry/charts/echarts/radar-chart.tsx
+  github: https://github.com/legions-developer/evilcharts/blob/main/src/registry/charts/echarts-radar-chart.tsx
   doc: https://echarts.apache.org/en/index.html
   api: https://echarts.apache.org/en/option.html#radar
 ---
@@ -31,12 +31,12 @@ links:
       <Step>
         <StepTitle>Copy and paste the following code snippets into your project.</StepTitle>
         <StepDescription>
-          Create the folder `evilcharts` with a `charts` subfolder (and an `echarts` folder inside) in your `components` directory, then paste the radar-chart code into a new file there. Unlike the Recharts twin, this component is self-contained — everything ECharts needs ships in one file, with no extra `ui` sub-components to add.
+          Create the folder `evilcharts` with a `charts` subfolder in your `components` directory, then paste the radar-chart code into a new `echarts-radar-chart.tsx` file there. Unlike the Recharts twin, this component is self-contained — everything ECharts needs ships in one file, with no extra `ui` sub-components to add.
         </StepDescription>
         <StepContent>
           <ComponentSource
             name="echarts-radar-chart"
-            title="components/evilcharts/charts/echarts/radar-chart.tsx"
+            title="components/evilcharts/charts/echarts-radar-chart.tsx"
           />
         </StepContent>
       </Step>
@@ -46,19 +46,10 @@ links:
 
 ## Usage
 
-The ECharts radar chart is composible, sharing the Recharts twin's API shape. `<EChartsRadarChart>` is the container; compose the parts you need — `<PolarGrid>`, `<PolarAngleAxis>`, `<PolarRadiusAxis>`, `<Legend>`, `<Tooltip>`, and one or more `<Radar>` — as children. Each `<Radar>` carries its own `variant` and `isClickable`, so one chart can mix fill styles and make only some series interactive.
+The ECharts radar chart is composible, sharing the Recharts twin's API shape. `<EChartsRadarChart>` is the container, and every part hangs off it as a compound member — `<EChartsRadarChart.PolarGrid>`, `<EChartsRadarChart.PolarAngleAxis>`, `<EChartsRadarChart.PolarRadiusAxis>`, `<EChartsRadarChart.Legend>`, `<EChartsRadarChart.Tooltip>`, and one or more `<EChartsRadarChart.Radar>` — so a single import gives you the whole chart. Each `<Radar>` carries its own `variant` and `isClickable`, so one chart can mix fill styles and make only some series interactive.
 
 ```tsx
-import {
-  EChartsRadarChart,
-  Radar,
-  PolarGrid,
-  PolarAngleAxis,
-  Tooltip,
-  Legend,
-  Dot,
-  ActiveDot,
-} from "@/components/evilcharts/charts/echarts/radar-chart";
+import { EChartsRadarChart, type ChartConfig } from "@/components/evilcharts/charts/echarts-radar-chart";
 ```
 
 ```tsx
@@ -82,15 +73,15 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 <EChartsRadarChart data={data} config={chartConfig}>
-  <PolarGrid />
-  <PolarAngleAxis dataKey="skill" />
-  <Legend />
-  <Tooltip />
-  <Radar dataKey="desktop" variant="filled">
-    <Dot variant="colored-border" />
-    <ActiveDot variant="default" />
-  </Radar>
-  <Radar dataKey="mobile" variant="filled" />
+  <EChartsRadarChart.PolarGrid />
+  <EChartsRadarChart.PolarAngleAxis dataKey="skill" />
+  <EChartsRadarChart.Legend />
+  <EChartsRadarChart.Tooltip />
+  <EChartsRadarChart.Radar dataKey="desktop" variant="filled">
+    <EChartsRadarChart.Dot variant="colored-border" />
+    <EChartsRadarChart.ActiveDot variant="default" />
+  </EChartsRadarChart.Radar>
+  <EChartsRadarChart.Radar dataKey="mobile" variant="filled" />
 </EChartsRadarChart>
 ```
 
@@ -120,12 +111,12 @@ Set `isClickable` on a `<Radar>` to make it selectable by click, and on `<Legend
     }
   }}
 >
-  <PolarGrid />
-  <PolarAngleAxis dataKey="skill" />
-  <Legend isClickable />
-  <Tooltip />
-  <Radar dataKey="desktop" variant="filled" isClickable />
-  <Radar dataKey="mobile" variant="filled" isClickable />
+  <EChartsRadarChart.PolarGrid />
+  <EChartsRadarChart.PolarAngleAxis dataKey="skill" />
+  <EChartsRadarChart.Legend isClickable />
+  <EChartsRadarChart.Tooltip />
+  <EChartsRadarChart.Radar dataKey="desktop" variant="filled" isClickable />
+  <EChartsRadarChart.Radar dataKey="mobile" variant="filled" isClickable />
 </EChartsRadarChart>
 ```
 
@@ -140,12 +131,12 @@ Set `isClickable` on a `<Radar>` to make it selectable by click, and on `<Legend
 
 ```tsx
 <EChartsRadarChart data={[]} config={chartConfig} isLoading>
-  <PolarGrid />
-  <PolarAngleAxis dataKey="skill" />
-  <Legend />
-  <Tooltip />
-  <Radar dataKey="desktop" variant="filled" />
-  <Radar dataKey="mobile" variant="filled" />
+  <EChartsRadarChart.PolarGrid />
+  <EChartsRadarChart.PolarAngleAxis dataKey="skill" />
+  <EChartsRadarChart.Legend />
+  <EChartsRadarChart.Tooltip />
+  <EChartsRadarChart.Radar dataKey="desktop" variant="filled" />
+  <EChartsRadarChart.Radar dataKey="mobile" variant="filled" />
 </EChartsRadarChart>
 ```
 
