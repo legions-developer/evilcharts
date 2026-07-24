@@ -37,12 +37,7 @@ const chartConfig = {
 
 export function EvilExampleLineChart() {
   return (
-    <EvilLineChart
-      data={data}
-      config={chartConfig}
-      className="h-full w-full p-4"
-      xDataKey="month"
-    >
+    <EvilLineChart data={data} config={chartConfig} className="h-full w-full p-4" xDataKey="month">
       <EvilLineChart.XAxis dataKey="month" tickFormatter={(value) => value.substring(0, 3)} />
       <EvilLineChart.Brush />
       <EvilLineChart.Legend isClickable />
