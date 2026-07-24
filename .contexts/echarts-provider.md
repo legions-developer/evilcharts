@@ -166,7 +166,8 @@ Adding a chart = component file + `registry-chart.ts` entry + example files +
   explicitly in `buildMainAxes` — ECharts' default is 12, which read too large
   next to the recharts twins.
 - **Area polygons don't emit mouse events by default.** Set
-  `triggerLineEvent: true` (per clickable series) so clicking the fill works.
+  `triggerEvent: true` (per clickable series) so clicking the fill works —
+  `triggerLineEvent` did the same but is deprecated in v6 and warns.
 - **Polygon click params omit `seriesId`** (symbol clicks include it). The click
   handler falls back to `seriesIndex → seriesKeys[index]` — valid because main
   series always precede the `__mini-*`/`__loading-*` series, which are `silent`.

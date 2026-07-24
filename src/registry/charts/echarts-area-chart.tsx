@@ -1225,7 +1225,8 @@ function buildAreaSeries(ctx: OptionBuildContext): LineSeriesOption[] {
       cursor: area.isClickable ? "pointer" : "default",
       // By default ECharts only fires mouse events on the symbols — this makes
       // the line AND the filled area clickable, like the Recharts <Area>.
-      triggerLineEvent: area.isClickable,
+      // (`true` covers both; the deprecated `triggerLineEvent` did the same.)
+      triggerEvent: area.isClickable,
       showSymbol: restingVisible,
       symbol: "circle",
       symbolSize: restingVisible ? restingDot.size : activeDot.size,
@@ -1872,7 +1873,7 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
         seriesIndex?: number;
         event?: { offsetX?: number; offsetY?: number };
       };
-      // Symbol clicks carry seriesId; area-polygon clicks (triggerLineEvent)
+      // Symbol clicks carry seriesId; area-polygon clicks (triggerEvent)
       // only carry seriesIndex — recover the key from the last build's index map,
       // which accounts for the extra `__buffer-`/`__reveal-`/`__mini-` series
       // interleaved between the main ones (a raw seriesKeys lookup would miss).

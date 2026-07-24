@@ -1110,7 +1110,8 @@ function buildLineSeries(ctx: OptionBuildContext): LineSeriesOption[] {
       cursor: line.isClickable ? "pointer" : "default",
       // By default ECharts only fires mouse events on the symbols — this makes
       // the line itself clickable too, like the Recharts <Line>.
-      triggerLineEvent: line.isClickable,
+      // (`true` covers both; the deprecated `triggerLineEvent` did the same.)
+      triggerEvent: line.isClickable,
       showSymbol: restingVisible,
       symbol: "circle",
       symbolSize: restingVisible ? restingDot.size : activeDot.size,
@@ -1269,7 +1270,7 @@ type LiveState = {
   brushOverlay: BrushOverlayElements | null; // zrender elements, owned by syncBrushOverlay
   brushHover: { inside: boolean; left: boolean; right: boolean };
   // seriesIndex → clickable key for the last build, `undefined` for internal
-  // series. A line-body click (triggerLineEvent) reports only a seriesIndex, and
+  // series. A line-body click (triggerEvent) reports only a seriesIndex, and
   // buffer lines add a second (`__buffer-`) series per key — so the index no
   // longer equals the key's position in seriesKeys and must be mapped explicitly.
   seriesKeyByIndex: (string | undefined)[];
@@ -1647,7 +1648,7 @@ export function EChartsLineChart<TData extends Record<string, unknown>>({
     chart.on("click", (params) => {
       const { clickableKeys: clickable } = live.handlers;
       const p = params as { seriesId?: string; seriesIndex?: number };
-      // Symbol clicks carry seriesId; line clicks (triggerLineEvent) only carry
+      // Symbol clicks carry seriesId; line clicks (triggerEvent) only carry
       // seriesIndex — recover the key from the last build's index map, which
       // accounts for the extra `__buffer-`/`__mini-` series interleaved between
       // the main ones (a raw seriesKeys lookup would land on the wrong key).

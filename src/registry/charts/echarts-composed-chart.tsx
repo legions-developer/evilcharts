@@ -1258,7 +1258,8 @@ function buildLineSeries(ctx: OptionBuildContext): LineSeriesOption[] {
       cursor: line.isClickable ? "pointer" : "default",
       // By default ECharts fires mouse events only on the symbols — this makes
       // the whole polyline clickable, like the Recharts <Line>.
-      triggerLineEvent: line.isClickable,
+      // (`true` covers both; the deprecated `triggerLineEvent` did the same.)
+      triggerEvent: line.isClickable,
       showSymbol: restingVisible,
       symbol: "circle",
       symbolSize: restingVisible ? restingDot.size : activeDot.size,
@@ -1690,7 +1691,7 @@ export function EChartsComposedChart<TData extends Record<string, unknown>>({
     chart.on("click", (params) => {
       const { clickableKeys: clickable, seriesKeys: keys } = live.handlers;
       const p = params as { seriesId?: string; seriesIndex?: number };
-      // Symbol clicks carry seriesId; line-polygon clicks (triggerLineEvent)
+      // Symbol clicks carry seriesId; line-polygon clicks (triggerEvent)
       // only carry seriesIndex — recover the key by position. Main series (bars
       // then lines) come first in the series array, so the index maps directly.
       const id =
