@@ -36,7 +36,7 @@ export function EChartsAudienceAreaChart() {
             Monthly reach across every show and episode
           </span>
         </div>
-        <div className="flex shrink-0 flex-col items-end">
+        <div className="flex shrink-0 flex-col items-end gap-2">
           <span className="text-primary text-2xl font-semibold tracking-tight sm:text-4xl">
             {TOTAL.toLocaleString("en-US")}
           </span>
@@ -52,7 +52,7 @@ export function EChartsAudienceAreaChart() {
           className="h-full w-full"
           curveType="monotone"
           chartOptions={{
-            grid: { left: 0, right: 0, top: 16, bottom: 16, outerBoundsMode: "none" },
+            grid: { left: 0, right: 0, top: 16, bottom: 0, outerBoundsMode: "none" },
             yAxis: { type: "value", show: false, scale: true, boundaryGap: ["16%", "20%"] },
           }}
         >
@@ -65,10 +65,6 @@ export function EChartsAudienceAreaChart() {
           >
             <EChartsAreaChart.ActiveDot variant="ping" />
           </EChartsAreaChart.Area>
-          <EChartsAreaChart.XAxis
-            dataKey="month"
-            tickFormatter={(value) => value.substring(0, 3)}
-          />
         </EChartsAreaChart>
 
         <div className="text-muted-foreground pointer-events-none absolute inset-x-0 bottom-0 flex justify-between px-4 pb-3 text-[10px] sm:text-xs">
