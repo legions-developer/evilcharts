@@ -577,6 +577,28 @@ export const examples: Registry["items"] = [
     ],
   },
   {
+    name: "ex-expandable-variant-echarts-bar-chart",
+    registryDependencies: ["@evilcharts/echarts-bar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/echarts/ex-expandable-variant-echarts-bar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-blocks-variant-echarts-bar-chart",
+    registryDependencies: ["@evilcharts/echarts-bar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/echarts/ex-blocks-variant-echarts-bar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
     name: "ex-hatched-variant-echarts-bar-chart",
     registryDependencies: ["@evilcharts/echarts-bar-chart"],
     type: "registry:block",

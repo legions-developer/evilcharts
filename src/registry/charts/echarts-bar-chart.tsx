@@ -10,6 +10,15 @@ import {
   type TooltipVariant,
 } from "@/registry/ui/echarts-tooltip";
 import {
+  Brush,
+  buildBrushDataZoom,
+  syncBrushOverlay,
+  type BrushGeometry,
+  type BrushOverlayElements,
+  type BrushProps,
+  type BrushRange,
+} from "@/registry/ui/echarts-brush";
+import {
   DataZoomComponent,
   GridComponent,
   TooltipComponent,
@@ -39,15 +48,6 @@ import {
   type ChartConfig,
   type ResolvedColors,
 } from "@/registry/ui/echarts-chart";
-import {
-  Brush,
-  buildBrushDataZoom,
-  syncBrushOverlay,
-  type BrushGeometry,
-  type BrushOverlayElements,
-  type BrushProps,
-  type BrushRange,
-} from "@/registry/ui/echarts-brush";
 import { LegendOverlay, type LegendVariant } from "@/registry/ui/echarts-legend";
 import type { ComposeOption, ImagePatternObject } from "echarts/core";
 import { BarChart, type BarSeriesOption } from "echarts/charts";
@@ -105,6 +105,23 @@ const HOVER_BLUR = 0.3; // opacity of the non-hovered bars while hover-highlight
 const GLOW_BLUR = 18; // shadowBlur radius, in device-independent pixels
 const GLOW_OPACITY = 0.65; // per-datum shadowColor alpha, × the sampled series color
 
+// The `blocks` variant renders each bar as a stack of segments instead of a solid
+// column: a repeating tile paints a BLOCK_SIZE band then leaves a BLOCK_GAP of
+// transparency. The same tile, in a muted tone, fills the column's unused space
+// via ECharts' native `showBackground`, so the empty part of every bar reads as a
+// dim grid of the same blocks. Both tile from the renderer origin, so the bands
+// line up across every column.
+// The `expandable` variant draws every bar at full width but fills only a narrow
+// centre strip, so it reads as a thin line; hovering one grows its strip out to
+// the full width and back on leave. The bar geometry never changes — only the
+// horizontal extent of its fill — so nothing re-lays out mid-hover.
+const EXPAND_COLLAPSED = 0.12; // resting strip width, as a fraction of the bar
+const EXPAND_TAU = 70; // ease time-constant, in milliseconds (exponential approach)
+
+const BLOCK_SIZE = 8; // filled segment height, in pixels
+const BLOCK_GAP = 4; // transparent gap between segments, in pixels
+const BLOCK_TRACK_OPACITY = 0.22; // unfilled block tone, x the muted-foreground alpha
+
 // The `stripped` variant caps each bar with a small BRIGHT pill of CONSTANT pixel
 // height (Recharts draws a fixed ~2px strip on top of a dimmed body, identical on
 // tall and short bars). The cap is expressed PER DATUM as a fraction of that bar's
@@ -147,7 +164,9 @@ export type BarVariant =
   | "duotone"
   | "duotone-reverse"
   | "gradient"
-  | "stripped";
+  | "stripped"
+  | "blocks"
+  | "expandable";
 export type StackType = "default" | "stacked" | "percent";
 export type BarLayout = "vertical" | "horizontal";
 export type BarAnimationType =
@@ -526,13 +545,40 @@ function measureValuePxPerUnit(chart: EChartsInstance, isHorizontal: boolean): n
   }
 }
 
+// Measures the rendered width of one bar, so the `blocks` variant can make its
+// segments square (their width IS the bar width, and only layout knows it). The
+// category pitch comes from the axis; the bar occupies that minus the category
+// gap — a px number when the consumer set one, else ECharts' own "20%" default.
+function measureBarWidthPx(
+  chart: EChartsInstance,
+  isHorizontal: boolean,
+  barCategoryGap: number | undefined,
+): number | null {
+  const finder = isHorizontal ? { yAxisIndex: 0 } : { xAxisIndex: 0 };
+  try {
+    const p0 = chart.convertToPixel(finder, 0);
+    const p1 = chart.convertToPixel(finder, 1);
+    if (typeof p0 !== "number" || typeof p1 !== "number") return null;
+    const pitch = Math.abs(p1 - p0);
+    if (!Number.isFinite(pitch) || pitch <= 0) return null;
+    const width = barCategoryGap != null ? pitch - barCategoryGap : pitch * 0.8;
+    return width > 1 ? width : null;
+  } catch {
+    return null;
+  }
+}
+
 // Tiling texture fills tinted with the series' first color. Stripes are drawn
 // STRAIGHT (trivially seamless) and the pattern itself is rotated — zrender
 // applies pattern transforms the same way ECharts decals do. Baking a diagonal
 // into a square tile clips the stroke at the corners, which reads as periodic
 // gaps once tiled. Tiles render at devicePixelRatio and scale back down so the
 // texture stays crisp on retina canvases.
-function patternFill(kind: "hatched" | "buffer", color: string): ImagePatternObject | null {
+function patternFill(
+  kind: "hatched" | "buffer" | "blocks",
+  color: string,
+  blockSize = BLOCK_SIZE,
+): ImagePatternObject | null {
   if (typeof document === "undefined") return null;
   const dpr = Math.max(window.devicePixelRatio || 1, 1);
   const canvas = document.createElement("canvas");
@@ -551,6 +597,15 @@ function patternFill(kind: "hatched" | "buffer", color: string): ImagePatternObj
     scaleX: 1 / dpr,
     scaleY: 1 / dpr,
   });
+
+  if (kind === "blocks") {
+    // 1px-wide tile: it repeats horizontally into a full-width band, and
+    // vertically into the stack of blocks.
+    size(1, blockSize + BLOCK_GAP);
+    ctx.fillStyle = withAlpha(color, 1);
+    ctx.fillRect(0, 0, 1, blockSize);
+    return pattern();
+  }
 
   if (kind === "hatched") {
     // Recharts hatched: the color shown at 0.3 everywhere, punched to full along
@@ -571,12 +626,33 @@ function patternFill(kind: "hatched" | "buffer", color: string): ImagePatternObj
   return pattern(-Math.PI / 4);
 }
 
+// The `expandable` fill at a given openness: a horizontal gradient with HARD
+// stops, transparent outside the centre strip and the series paint inside it.
+// Animating `fraction` slides those stops outward from the middle, which is the
+// expand; a real width change would relayout the bar group instead.
+function expandableDatumPaint(slots: string[], fraction: number): echarts.graphic.LinearGradient {
+  const base = slots[0] ?? GRAY;
+  const half = Math.max(0, Math.min(1, fraction)) / 2;
+  const left = 0.5 - half;
+  const right = 0.5 + half;
+  const clear = withAlpha(base, 0);
+  return new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+    { offset: 0, color: clear },
+    { offset: left, color: clear },
+    { offset: left, color: base },
+    { offset: right, color: base },
+    { offset: right, color: clear },
+    { offset: 1, color: clear },
+  ]);
+}
+
 // Resolves a bar variant into an ECharts fill for its series. `base` is the
 // first color slot; `slots` the full vertical color run.
 function barFillPaint(
   variant: BarVariant,
   slots: string[],
   isHorizontal: boolean,
+  blockSize = BLOCK_SIZE,
 ): string | echarts.graphic.LinearGradient | ImagePatternObject {
   const base = slots[0] ?? GRAY;
   switch (variant) {
@@ -588,6 +664,12 @@ function barFillPaint(
       return duotoneSplitPaint(base, 1, 0.4, isHorizontal);
     case "hatched":
       return patternFill("hatched", base) ?? solidVerticalPaint(slots, 1);
+    case "blocks":
+      return patternFill("blocks", base, blockSize) ?? solidVerticalPaint(slots, 1);
+    case "expandable":
+      // Series-level fallback only; buildBarSeries gives every datum its own
+      // openness so a single hovered bar can expand on its own.
+      return expandableDatumPaint(slots, EXPAND_COLLAPSED);
     case "stripped":
       // Series-level fallback only; buildBarSeries overrides every stripped datum
       // with its own fixed-pixel cap fraction.
@@ -605,6 +687,9 @@ function barBorderRadius(
   variant: BarVariant,
   isHorizontal: boolean,
 ): number | number[] {
+  // Blocks draw their own square segments; a radius would clip the end one. An
+  // expandable bar is a thin line at rest, where a radius would swallow it.
+  if (variant === "blocks" || variant === "expandable") return 0;
   if (variant !== "stripped") return radius;
   // ECharts corner order: [top-left, top-right, bottom-right, bottom-left].
   return isHorizontal ? [0, radius, radius, 0] : [radius, radius, 0, 0];
@@ -687,6 +772,10 @@ type OptionBuildContext = {
   categories: string[];
   brushRange: BrushRange; // zoom window carried through rebuilds
   valuePxPerUnit: number | null; // measured value-axis pixels-per-unit (null pre-layout)
+  barWidthPx: number | null; // measured bar width — sizes the blocks variant's squares (null pre-layout)
+  // Openness per bar index for the expandable variant, plus which one the pointer
+  // is on — driven by the hover rAF, read at build.
+  expand: { key: string | null; hovered: number | null; progress: Map<number, number> };
 };
 
 // Grid insets plus the footer band reserved for the brush. ECharts 6 contains
@@ -1044,9 +1133,27 @@ function buildBarSeries(ctx: OptionBuildContext): BarSeriesOption[] {
     const dim = selectionOpacity(selectedDataKey, key);
     const resolvedRadius = bar.radius ?? ctx.barRadius;
     const borderRadius = barBorderRadius(resolvedRadius, bar.variant, isHorizontal);
-    const fill = barFillPaint(bar.variant, slots, isHorizontal);
+    // Square segments: the tile's height matches the measured bar width, so each
+    // block is 1:1. Falls back to BLOCK_SIZE on the first push, before layout.
+    const blockSize = ctx.barWidthPx ?? BLOCK_SIZE;
+    const fill = barFillPaint(bar.variant, slots, isHorizontal, blockSize);
     const barAnim = bar.animationType ?? animationType;
     const isStripped = bar.variant === "stripped";
+    const isExpandable = bar.variant === "expandable";
+    // Openness per datum, driven by the hover rAF. Bars not in the map are shut.
+    const expandOf = (i: number) =>
+      ctx.expand.key === key ? (ctx.expand.progress.get(i) ?? EXPAND_COLLAPSED) : EXPAND_COLLAPSED;
+    const expandHovered = ctx.expand.key === key ? ctx.expand.hovered : null;
+    // The unfilled part of a blocks bar: the same tile in a muted tone, drawn by
+    // ECharts' own bar background so it spans the column's full height.
+    const isBlocks = bar.variant === "blocks";
+    const blockTrack = isBlocks
+      ? patternFill(
+          "blocks",
+          withAlpha(resolved.tokens.mutedForeground, BLOCK_TRACK_OPACITY),
+          blockSize,
+        )
+      : null;
 
     const values = data.map((row, i) => {
       const value = Number(row[key]) || 0;
@@ -1087,12 +1194,13 @@ function buildBarSeries(ctx: OptionBuildContext): BarSeriesOption[] {
     // itemStyle applies untouched. Stripped and glow touch every datum; buffer only
     // the last one.
     const dataPoints =
-      isStripped || glowFor || (bufferStyle && lastIndex >= 0)
+      isStripped || isExpandable || glowFor || (bufferStyle && lastIndex >= 0)
         ? values.map((value, i) => {
             const isBuffer = !!bufferStyle && i === lastIndex;
-            if (!isBuffer && !glowFor && !isStripped) return value;
+            if (!isBuffer && !glowFor && !isStripped && !isExpandable) return value;
             return {
               value,
+              ...(isExpandable ? { label: { show: i === expandHovered } } : {}),
               itemStyle: {
                 // The stripped cap is per datum: its fixed pixel height becomes a
                 // fraction of THIS bar's own height, so the cap is a constant pixel
@@ -1106,6 +1214,9 @@ function buildBarSeries(ctx: OptionBuildContext): BarSeriesOption[] {
                         strippedCapFraction(value, ctx.valuePxPerUnit),
                       ),
                     }
+                  : {}),
+                ...(isExpandable && !isBuffer
+                  ? { color: expandableDatumPaint(slots, expandOf(i)) }
                   : {}),
                 ...(isBuffer && bufferStyle ? bufferStyle : {}),
                 ...(glowFor ? glowFor(i) : {}),
@@ -1125,6 +1236,18 @@ function buildBarSeries(ctx: OptionBuildContext): BarSeriesOption[] {
       cursor: bar.isClickable ? "pointer" : "default",
       // Selected series ride on top; when a selection is active the rest sink below.
       z: isSelected ? 3 : hasSelection ? 1 : 2,
+      // The hovered bar names its value above itself (Recharts twin parity).
+      label: isExpandable
+        ? {
+            show: false,
+            position: "top",
+            color: resolved.tokens.foreground,
+            fontFamily: "var(--font-mono, monospace)",
+            fontSize: 11,
+          }
+        : undefined,
+      showBackground: isBlocks,
+      backgroundStyle: blockTrack ? { color: blockTrack, borderRadius } : undefined,
       itemStyle: {
         color: fill,
         borderRadius,
@@ -1141,7 +1264,7 @@ function buildBarSeries(ctx: OptionBuildContext): BarSeriesOption[] {
       // hovering leaves the bar untouched.
       emphasis:
         bar.enableHoverHighlight && !hasSelection
-          ? { focus: "self", blurScope: "coordinateSystem" }
+          ? { focus: "self" as const, blurScope: "coordinateSystem" as const }
           : { disabled: true },
       blur:
         bar.enableHoverHighlight && !hasSelection
@@ -1169,6 +1292,13 @@ type LiveState = {
   hasRevealed: boolean; // the intro grow-in already played on this chart instance
   revealEndsAt: number; // performance.now() the entrance settles — gates the stripped-cap correction
   valuePxPerUnit: number | null; // measured value-axis pixels-per-unit — sizes the stripped cap
+  barWidthPx: number | null; // measured bar width — sizes the blocks variant's squares
+  // Openness per bar index for the expandable variant, plus which one the pointer
+  // is on. Per-index so a bar being left keeps easing shut while the next one
+  // opens — a single shared value made the outgoing bar snap.
+  expand: { key: string | null; hovered: number | null; progress: Map<number, number> };
+  expandRaf: number; // in-flight expand animation frame
+  animateExpand: (key: string | null, index: number | null) => void;
   loadingRows: number[] | null; // skeleton data, lazily rolled and re-rolled per shimmer sweep
   categories: string[]; // x labels of the last build, for the brush label pills
   dataLength: number; // row count, for the datazoom index math
@@ -1183,6 +1313,9 @@ type LiveState = {
     brushFormatLabel?: (value: string, index: number) => string;
     seriesKeys: string[];
     hasStripped: boolean; // any visible stripped bar → run the post-layout cap correction
+    hasBlocks: boolean; // any blocks bar → re-push once the bar width is measurable
+    expandableKey: string | null; // the expandable series, if any — drives the column hover
+    barCategoryGap?: number; // consumer's category gap, needed to derive the bar width
     isHorizontal: boolean; // layout, for measuring the value axis in the finished handler
   };
   // Update-style re-push for paths that bypass React entirely (theme flips,
@@ -1243,6 +1376,10 @@ export function EChartsBarChart<TData extends Record<string, unknown>>({
     hasRevealed: false,
     revealEndsAt: 0,
     valuePxPerUnit: null,
+    barWidthPx: null,
+    expand: { key: null, hovered: null, progress: new Map<number, number>() },
+    expandRaf: 0,
+    animateExpand: () => {},
     loadingRows: null,
     categories: [],
     dataLength: 0,
@@ -1256,6 +1393,8 @@ export function EChartsBarChart<TData extends Record<string, unknown>>({
       brushFormatLabel: undefined, // set per-render from the <Brush> child's formatLabel
       seriesKeys: [],
       hasStripped: false,
+      hasBlocks: false,
+      expandableKey: null,
       isHorizontal: false,
     },
     repush: () => {},
@@ -1335,6 +1474,9 @@ export function EChartsBarChart<TData extends Record<string, unknown>>({
     brushFormatLabel: brushSlot.formatLabel,
     seriesKeys,
     hasStripped: hasStrippedBars,
+    hasBlocks: bars.some((bar) => bar.variant === "blocks"),
+    expandableKey: bars.find((bar) => bar.variant === "expandable")?.dataKey ?? null,
+    barCategoryGap,
     isHorizontal,
   };
   live.dataLength = data.length;
@@ -1426,6 +1568,8 @@ export function EChartsBarChart<TData extends Record<string, unknown>>({
       categories,
       brushRange: live.brushRange,
       valuePxPerUnit: live.valuePxPerUnit,
+      barWidthPx: live.barWidthPx,
+      expand: live.expand,
     };
 
     const { grid, brushBottom } = buildChartLayout(ctx);
@@ -1501,6 +1645,33 @@ export function EChartsBarChart<TData extends Record<string, unknown>>({
     themeObserver.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ["class"],
+    });
+
+    // Expandable hover, driven by the pointer's COLUMN rather than the bar element.
+    // An expandable bar is a hairline at rest, so element hover would only catch a
+    // couple of pixels — and hovering the empty space above a bar (where the axis
+    // tooltip still responds) would highlight it without expanding it. Converting
+    // the pointer's x back to a category index makes the whole column the target,
+    // matching what the tooltip already does. Registered ONCE here rather than in
+    // the sync effect, which re-runs on every prop/theme change and would stack
+    // duplicate listeners; it calls through live.animateExpand, always the current one.
+    chart.getZr().on("mousemove", (event: { offsetX: number; offsetY: number }) => {
+      const { expandableKey } = live.handlers;
+      if (!expandableKey) return;
+      const point = [event.offsetX, event.offsetY];
+      if (!chart.containPixel({ gridIndex: 0 }, point)) {
+        live.animateExpand(expandableKey, null);
+        return;
+      }
+      // A grid finder returns [xValue, yValue]; on a category axis the x value IS
+      // the index. An xAxisIndex finder returns null for a 2D point.
+      const converted = chart.convertFromPixel({ gridIndex: 0 }, point);
+      const index = Array.isArray(converted) ? converted[0] : converted;
+      live.animateExpand(expandableKey, typeof index === "number" ? Math.round(index) : null);
+    });
+    chart.getZr().on("globalout", () => {
+      const { expandableKey } = live.handlers;
+      if (expandableKey) live.animateExpand(expandableKey, null);
     });
 
     chart.on("click", (params) => {
@@ -1614,16 +1785,34 @@ export function EChartsBarChart<TData extends Record<string, unknown>>({
       const measured = measureValuePxPerUnit(chart, isHorizontal);
       if (measured != null) live.valuePxPerUnit = measured;
 
-      const option = buildOption();
-      const merged = chartOptions ? { ...option, ...chartOptions } : option;
-      Object.assign(merged, {
-        animation: withEntrance,
-        animationDuration: BAR_GROW_DURATION,
-        animationDurationUpdate: 0,
-      });
-      // chartOptions is an untyped escape hatch — the spread erases the option's
-      // shape, so re-assert it. The only cast in the file.
-      chart.setOption(merged as EChartsOption, { notMerge: true });
+      const apply = () => {
+        const option = buildOption();
+        const merged = chartOptions ? { ...option, ...chartOptions } : option;
+        Object.assign(merged, {
+          animation: withEntrance,
+          animationDuration: BAR_GROW_DURATION,
+          animationDurationUpdate: 0,
+        });
+        // chartOptions is an untyped escape hatch — the spread erases the option's
+        // shape, so re-assert it. The only cast in the file.
+        chart.setOption(merged as EChartsOption, { notMerge: true });
+      };
+
+      apply();
+
+      // The `blocks` variant sizes its squares from the bar width, which only
+      // exists once a coordinate system has been laid out — so the first build
+      // uses the fallback. Measure now and, if it moved, rebuild IMMEDIATELY:
+      // still inside this task, before the browser paints, so the corrected
+      // block grid is the only thing ever shown. Doing this from the async
+      // `finished` handler instead made the bars visibly re-align a frame later.
+      if (live.handlers.hasBlocks) {
+        const width = measureBarWidthPx(chart, isHorizontal, barCategoryGap);
+        if (width != null && (live.barWidthPx == null || Math.abs(width - live.barWidthPx) > 0.5)) {
+          live.barWidthPx = width;
+          apply();
+        }
+      }
       // Mark when the entrance settles, so the stripped-cap correction holds off
       // until the grow finishes (0 = nothing animating, correct immediately).
       const maxStagger = data.length > 1 ? (data.length - 1) * BAR_STAGGER : 0;
@@ -1635,6 +1824,66 @@ export function EChartsBarChart<TData extends Record<string, unknown>>({
     // A stripped-cap correction that never disturbs the entrance or a brush drag:
     // rebuild only the stripped series with fresh per-datum cap fractions (the just
     // -measured live.valuePxPerUnit) and merge them silently.
+    // Drives the `expandable` hover: eases live.expand.progress toward its target
+    // and re-merges ONLY the expandable series each frame, so the strip grows out
+    // of the bar's middle. A series-scoped silent merge (same shape as
+    // patchStrippedCaps) — never a full notMerge push, which would fight the
+    // hover state it is animating.
+    live.animateExpand = (key: string | null, index: number | null) => {
+      const expandKeys = new Set(
+        bars.filter((bar) => bar.variant === "expandable").map((bar) => bar.dataKey),
+      );
+      if (!expandKeys.size) return;
+
+      const next = index != null && key != null ? index : null;
+      if (live.expand.hovered === next && (key == null || live.expand.key === key)) return;
+      if (key != null) live.expand.key = key;
+      live.expand.hovered = next;
+      // Seed the newly hovered bar so it has something to ease from.
+      if (next != null && !live.expand.progress.has(next)) {
+        live.expand.progress.set(next, EXPAND_COLLAPSED);
+      }
+      if (live.expandRaf) return; // a loop is already running; it picks up the new target
+
+      const patchOnce = () => {
+        const option = buildOption();
+        const series = Array.isArray(option.series)
+          ? option.series
+          : option.series
+            ? [option.series]
+            : [];
+        const patch = series.filter(
+          (s): s is BarSeriesOption => typeof s?.id === "string" && expandKeys.has(s.id),
+        );
+        if (patch.length) chart.setOption({ series: patch }, { silent: true, lazyUpdate: true });
+      };
+
+      let last = performance.now();
+      const step = () => {
+        const now = performance.now();
+        const dt = Math.min(64, now - last);
+        last = now;
+        // Exponential approach — every bar eases toward its own target, so the one
+        // being left keeps animating shut while the next one opens.
+        const k = 1 - Math.exp(-dt / EXPAND_TAU);
+        let moving = false;
+        for (const [i, value] of live.expand.progress) {
+          const target = i === live.expand.hovered ? 1 : EXPAND_COLLAPSED;
+          const eased = value + (target - value) * k;
+          if (Math.abs(target - eased) < 0.004) {
+            if (target === EXPAND_COLLAPSED) live.expand.progress.delete(i);
+            else live.expand.progress.set(i, target);
+          } else {
+            live.expand.progress.set(i, eased);
+            moving = true;
+          }
+        }
+        patchOnce();
+        live.expandRaf = moving ? requestAnimationFrame(step) : 0;
+      };
+      live.expandRaf = requestAnimationFrame(step);
+    };
+
     live.patchStrippedCaps = () => {
       const option = buildOption();
       const series = Array.isArray(option.series)
@@ -1684,6 +1933,7 @@ export function EChartsBarChart<TData extends Record<string, unknown>>({
     data.length,
     bars,
     isHorizontal,
+    barCategoryGap,
     syncBrushOverlayNow,
   ]);
 

@@ -140,7 +140,14 @@ Examples of the bar chart with different `variants`. Each `<Bar>` sets its own `
 <ComponentPreview className="mb-0" title="variant='duotone'" name="ex-duotone-variant-echarts-bar-chart"  />
 <ComponentPreview className="mb-0" title="variant='duotone-reverse'" name="ex-duotone-reverse-variant-echarts-bar-chart"  />
 <ComponentPreview className="mb-0" title="variant='gradient'" name="ex-gradient-variant-echarts-bar-chart"  />
-<ComponentPreview title="variant='stripped'" name="ex-stripped-variant-echarts-bar-chart"  />
+<ComponentPreview className="mb-0" title="variant='stripped'" name="ex-stripped-variant-echarts-bar-chart"  />
+<ComponentPreview className="mb-0" title="variant='blocks'" name="ex-blocks-variant-echarts-bar-chart"  />
+<ComponentPreview title="variant='expandable'" name="ex-expandable-variant-echarts-bar-chart"  />
+<Alert>
+  <AlertContent>
+    `variant="blocks"` renders each bar as a stack of segments rather than a solid column, and fills the rest of the column with the same segments in a muted tone — so every bar reads against a dim grid of its own blocks. `variant="expandable"` rests as a thin line and grows out from its own middle to the full bar width on hover, naming its value above itself.
+  </AlertContent>
+</Alert>
 
 ### Stack Types
 
@@ -231,8 +238,8 @@ A single bar series. Each `<Bar />` carries its own fill variant, radius, glow, 
   <ApiRow name="dataKey" type="string" required>
     The series key. Must exist on both the data rows and the chart `config`.
   </ApiRow>
-  <ApiRow name="variant" type='"default" | "hatched" | "duotone" | "duotone-reverse" | "gradient" | "stripped"' default='"default"'>
-    The bar's fill style, applied to this bar only. The `default` variant renders the full vertical color gradient for multi-color configs.
+  <ApiRow name="variant" type='"default" | "hatched" | "duotone" | "duotone-reverse" | "gradient" | "stripped" | "blocks" | "expandable"' default='"default"'>
+    The bar's fill style, applied to this bar only. The `default` variant renders the full vertical color gradient for multi-color configs; `blocks` renders the bar as a stack of segments over a muted grid of the same segments.
   </ApiRow>
   <ApiRow name="radius" type="number">
     The corner radius of this bar, in pixels. Falls back to the chart's `barRadius` when omitted.
