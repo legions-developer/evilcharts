@@ -32,7 +32,6 @@ import {
 } from "react";
 import { TooltipComponent, type TooltipComponentOption } from "echarts/components";
 import { SankeyChart, type SankeySeriesOption } from "echarts/charts";
-import { sampleGradient } from "@/registry/ui/echarts-dot";
 import { motion, useReducedMotion } from "motion/react";
 import { CanvasRenderer } from "echarts/renderers";
 import type { ComposeOption } from "echarts/core";
@@ -84,16 +83,6 @@ const NODE_DIM_OPACITY = 0.3; // node not connected to the current selection (st
 const LINK_FILL_OPACITY = 0.4; // resting link band (Recharts fillOpacity 0.4 — the translucent fill base, kept)
 const LINK_DIM_OPACITY = 0.05; // link not touching the current selection — the translucent band (fill analogue) recedes further (halved from 0.1)
 const LABEL_DIM_OPACITY = 0.3; // node label faded when its node is dimmed
-// Glow is a canvas shadow — the analogue of the Recharts twin's feGaussianBlur
-// filter. Two stacked passes build a smooth Gaussian-like falloff instead of one
-// tight ring: a tighter inner halo from the element itself, plus a wide faint
-// outer halo from a silent duplicate series drawn underneath. Both are cast in
-// the element's OWN color (a canvas shadow can't be a gradient), sampled from its
-// paint so it never reads as a foreign tint. Tuned to match the Recharts blur.
-const GLOW_BLUR = 12; // inner-glow radius for glowing nodes/links, in pixels
-const GLOW_BLUR_OUTER = 28; // wider, fainter outer-glow radius, in pixels
-const GLOW_ALPHA = 0.55; // inner-glow color alpha, × the element's own color alpha
-const GLOW_ALPHA_OUTER = 0.3; // outer-glow color alpha, × the element's own color alpha
 const INSIDE_PLATE_ALPHA = 0.55; // inside-label plate fill, × background alpha (twin's white/50 · black/60 wash)
 const INSIDE_RIM_WIDTH = 2; // colored rim around the inside-label plate, in pixels (twin's 1px inset edge)
 
@@ -204,7 +193,6 @@ export interface EChartsSankeyChartProps {
 export interface NodeProps {
   radius?: number; // corner radius of node rectangles in pixels
   isClickable?: boolean; // lets nodes be selected by clicking them
-  glow?: string[]; // node names that get a soft outer glow
   children?: ReactNode; // optional <NodeLabel> composition
 }
 
@@ -231,7 +219,6 @@ const NodeLabel: FC<NodeLabelProps> = () => null;
 export interface LinkProps {
   variant?: LinkVariant; // coloring strategy for the link bands
   verticalPadding?: number; // reserved for parity with the Recharts twin (see notes)
-  glow?: number[]; // link indices that get a soft outer glow
 }
 
 /**
@@ -259,7 +246,6 @@ const Tooltip: FC<TooltipProps> = () => null;
 type NodeSlot = {
   radius: number;
   isClickable: boolean;
-  glow: string[];
 };
 type NodeLabelSlot = {
   position?: NodeLabelPosition; // undefined → no labels, like the Recharts twin
@@ -269,7 +255,6 @@ type NodeLabelSlot = {
 type LinkSlot = {
   variant: LinkVariant;
   verticalPadding: number;
-  glow: number[];
 };
 type TooltipSlot = {
   present: boolean;
@@ -287,9 +272,9 @@ type CollectedConfig = {
 };
 
 function collectConfig(children: ReactNode): CollectedConfig {
-  let nodeConfig: NodeSlot = { radius: 0, isClickable: false, glow: [] };
+  let nodeConfig: NodeSlot = { radius: 0, isClickable: false };
   let nodeLabel: NodeLabelSlot | null = null;
-  let linkConfig: LinkSlot = { variant: "gradient", verticalPadding: 0, glow: [] };
+  let linkConfig: LinkSlot = { variant: "gradient", verticalPadding: 0 };
   let tooltip: TooltipSlot = {
     present: false,
     variant: "default",
@@ -306,7 +291,6 @@ function collectConfig(children: ReactNode): CollectedConfig {
       nodeConfig = {
         radius: props.radius ?? 0,
         isClickable: props.isClickable ?? false,
-        glow: props.glow ?? [],
       };
       Children.forEach(props.children, (labelChild) => {
         if (isValidElement(labelChild) && labelChild.type === NodeLabel) {
@@ -323,7 +307,6 @@ function collectConfig(children: ReactNode): CollectedConfig {
       linkConfig = {
         variant: props.variant ?? "gradient",
         verticalPadding: props.verticalPadding ?? 0,
-        glow: props.glow ?? [],
       };
     } else if (type === Tooltip) {
       const props = child.props as TooltipProps;
@@ -387,33 +370,6 @@ function edgeColor(
     case "solid":
     default:
       return foreground;
-  }
-}
-
-// `sampleGradient` — the concrete color a node's/link's gradient shows at position
-// t ∈ [0, 1] — now lives in @/registry/ui/echarts-dot and is imported at the top.
-// A canvas shadow can only be cast in a SOLID color, so the glow samples the
-// element's OWN paint at a representative point (its mid color) instead of a
-// foreign tint, keeping the glow in the node's own hue.
-
-// The solid glow color for a link band, following its <Link> variant: the source
-// or target node's mid color for the node-colored variants (and for `gradient`,
-// whose band is dominated by the source hue), the foreground token for `solid`.
-function edgeGlowColor(
-  variant: LinkVariant,
-  sourceSlots: string[],
-  targetSlots: string[],
-  foreground: string,
-): string {
-  switch (variant) {
-    case "target":
-      return sampleGradient(targetSlots, 0.5);
-    case "solid":
-      return foreground;
-    case "source":
-    case "gradient":
-    default:
-      return sampleGradient(sourceSlots, 0.5);
   }
 }
 
@@ -607,13 +563,6 @@ function buildSankeySeries(ctx: OptionBuildContext): SankeySeriesOption {
   const nodes: SankeyNodeItem[] = data.nodes.map((node) => {
     const slots = slotsByName[node.name] ?? [GRAY];
     const dimmed = connected ? !connected.has(node.name) : false;
-    const glowing = nodeConfig.glow.includes(node.name);
-
-    // Inner glow pass — cast in the node's own mid color (see sampleGradient).
-    // The wide outer pass is the silent __sankey-glow series drawn underneath.
-    const glowStyle = glowing
-      ? { shadowBlur: GLOW_BLUR, shadowColor: withAlpha(sampleGradient(slots, 0.5), GLOW_ALPHA) }
-      : {};
 
     return {
       name: node.name,
@@ -625,28 +574,25 @@ function buildSankeySeries(ctx: OptionBuildContext): SankeySeriesOption {
             borderWidth: INSIDE_RIM_WIDTH,
             borderRadius: nodeConfig.radius,
             opacity: dimmed ? NODE_DIM_OPACITY : 1,
-            ...glowStyle,
           }
         : {
             color: nodeGradient(slots),
             opacity: dimmed ? NODE_DIM_OPACITY : NODE_FILL_OPACITY,
             borderWidth: 0,
             borderRadius: nodeConfig.radius,
-            ...glowStyle,
           },
       // Fade a node's own label with it when the selection dims it.
       label: { opacity: dimmed ? LABEL_DIM_OPACITY : 1 },
     };
   });
 
-  const links: SankeyEdgeItem[] = data.links.map((link, index) => {
+  const links: SankeyEdgeItem[] = data.links.map((link) => {
     const source = data.nodes[link.source]?.name ?? String(link.source);
     const target = data.nodes[link.target]?.name ?? String(link.target);
     const sourceSlots = slotsByName[source] ?? [GRAY];
     const targetSlots = slotsByName[target] ?? [GRAY];
     // Connected = nothing selected, or this link touches the selected node.
     const isConnected = !hasSelection || source === selectedNode || target === selectedNode;
-    const glowing = linkConfig.glow.includes(index);
 
     return {
       source,
@@ -655,18 +601,6 @@ function buildSankeySeries(ctx: OptionBuildContext): SankeySeriesOption {
       lineStyle: {
         color: edgeColor(linkConfig.variant, sourceSlots, targetSlots, tokens.foreground),
         opacity: isConnected ? LINK_FILL_OPACITY : LINK_DIM_OPACITY,
-        // A link band is translucent, so it can't take a second opaque glow pass
-        // underneath without doubling its color — it gets the single inner glow,
-        // cast in the band's representative color (source hue for most variants).
-        ...(glowing
-          ? {
-              shadowBlur: GLOW_BLUR,
-              shadowColor: withAlpha(
-                edgeGlowColor(linkConfig.variant, sourceSlots, targetSlots, tokens.foreground),
-                GLOW_ALPHA,
-              ),
-            }
-          : {}),
       },
     };
   });
@@ -674,7 +608,7 @@ function buildSankeySeries(ctx: OptionBuildContext): SankeySeriesOption {
   return {
     id: "__sankey",
     type: "sankey",
-    z: 3, // above the __sankey-glow outer-halo series (z: 2)
+    z: 3,
     left: 8,
     // Outside labels hang to the right of the rightmost column — reserve room.
     right: outsideLabels ? 120 : 8,
@@ -749,89 +683,6 @@ function buildInsidePlateSeries(ctx: OptionBuildContext): SankeySeriesOption | n
 
   return {
     id: "__sankey-plate",
-    type: "sankey",
-    z: 2, // below the real __sankey series (z: 3), above the __sankey-glow halo
-    silent: true,
-    left: 8,
-    right: outsideLabels ? 120 : 8,
-    top: 12,
-    bottom: 12,
-    nodeWidth,
-    nodeGap: nodePadding,
-    layoutIterations: iterations,
-    nodeAlign: align === "left" ? "left" : "justify",
-    draggable: false,
-    emphasis: { disabled: true },
-    label: { show: false },
-    lineStyle: { curveness: linkCurvature },
-    data: nodes,
-    links,
-  };
-}
-
-// The wide, faint OUTER glow pass. A canvas shadow can't blur an element's own
-// gradient fill (the shadow is a single flat color), and one shadow pass reads as
-// a tight ring — so a soft, Recharts-like halo is built from TWO passes: the main
-// series casts the tight inner one, and this silent duplicate — identical layout,
-// so its nodes sit pixel-exact under the real ones — casts a wider, fainter outer
-// one. Only glowing nodes are visible here; every other node and ALL links are
-// transparent (opacity 0 casts no shadow and can't double the translucent bands).
-// Returns null when nothing glows, so the extra series is only paid for on demand.
-function buildGlowSeries(ctx: OptionBuildContext): SankeySeriesOption | null {
-  const {
-    data,
-    nodeConfig,
-    selectedNode,
-    nodeWidth,
-    nodePadding,
-    linkCurvature,
-    iterations,
-    align,
-    resolved,
-    outsideLabels,
-  } = ctx;
-  if (nodeConfig.glow.length === 0) return null;
-
-  const { series: slotsByName } = resolved;
-  const hasSelection = selectedNode !== null;
-  const connected = hasSelection ? connectedNodeSet(data, selectedNode) : null;
-
-  const nodes: SankeyNodeItem[] = data.nodes.map((node) => {
-    const glowing = nodeConfig.glow.includes(node.name);
-    const dimmed = connected ? !connected.has(node.name) : false;
-    const slots = slotsByName[node.name] ?? [GRAY];
-    // Non-glowing (or selection-dimmed) nodes contribute no halo.
-    const active = glowing && !dimmed;
-    return {
-      name: node.name,
-      itemStyle: {
-        color: nodeGradient(slots),
-        // The real node (opacity NODE_FILL_OPACITY) sits exactly on top, so this
-        // fill is hidden and only its shadow shows; 0 fully removes the pass for
-        // inactive nodes.
-        opacity: active ? NODE_FILL_OPACITY : 0,
-        borderWidth: 0,
-        borderRadius: nodeConfig.radius,
-        ...(active
-          ? {
-              shadowBlur: GLOW_BLUR_OUTER,
-              shadowColor: withAlpha(sampleGradient(slots, 0.5), GLOW_ALPHA_OUTER),
-            }
-          : {}),
-      },
-      label: { show: false },
-    };
-  });
-
-  const links: SankeyEdgeItem[] = data.links.map((link) => ({
-    source: data.nodes[link.source]?.name ?? String(link.source),
-    target: data.nodes[link.target]?.name ?? String(link.target),
-    value: link.value,
-    lineStyle: { opacity: 0 }, // never drawn — avoids doubling the real bands
-  }));
-
-  return {
-    id: "__sankey-glow",
     type: "sankey",
     z: 2, // below the real __sankey series (z: 3)
     silent: true,
@@ -1095,11 +946,9 @@ export function EChartsSankeyChart({
 
     if (isLoading) return buildLoadingOption(ctx);
 
-    // Draw order, bottom → top: the outer-halo pass (when any node glows), then
-    // the colored card under inside-label plates, then the real sankey on top.
+    // Draw order, bottom → top: the colored card under inside-label plates, then
+    // the real sankey on top.
     const series: SankeySeriesOption[] = [];
-    const glowSeries = buildGlowSeries(ctx);
-    if (glowSeries) series.push(glowSeries);
     const plateSeries = buildInsidePlateSeries(ctx);
     if (plateSeries) series.push(plateSeries);
     series.push(buildSankeySeries(ctx));

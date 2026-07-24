@@ -203,7 +203,6 @@ export function EvilSankeyChart({
 type NodeProps = {
   radius?: number; // corner radius of node rectangles in pixels
   isClickable?: boolean; // lets nodes be selected by clicking them
-  glow?: string[]; // node names that get a soft outer glow
   children?: ReactNode; // optional <NodeLabel /> composition
 };
 
@@ -229,7 +228,6 @@ const NodeLabel: FC<NodeLabelProps> = () => null;
 type LinkProps = {
   variant?: LinkVariant; // coloring strategy for the link bands
   verticalPadding?: number; // shrinks link width where it meets a node
-  glow?: number[]; // link indices that get a soft outer glow
 };
 
 /**
@@ -336,7 +334,6 @@ const SankeyNode = ({ x, y, width, height, payload, nodeConfig }: SankeyNodeRend
 
   const radius = nodeConfig?.radius ?? 0;
   const isClickable = nodeConfig?.isClickable ?? false;
-  const glow = nodeConfig?.glow ?? [];
   const label = resolveNodeLabel(nodeConfig?.children);
 
   const nodeName = payload.name;
@@ -344,7 +341,6 @@ const SankeyNode = ({ x, y, width, height, payload, nodeConfig }: SankeyNodeRend
   const nodeIcon = (payload as RechartsSankeyNode & { icon?: ReactNode }).icon;
 
   const isHighlighted = isNodeConnected(data, selectedNode, nodeName);
-  const isGlowing = glow.includes(nodeName);
   const hasConfigColor = nodeName in config;
   const configLabel = config[nodeName]?.label ?? nodeName;
   const dimmed = isClickable && !isHighlighted;
@@ -369,7 +365,6 @@ const SankeyNode = ({ x, y, width, height, payload, nodeConfig }: SankeyNodeRend
         ry={radius}
         fill={hasConfigColor ? `url(#${chartId}-sankey-colors-${nodeName})` : "currentColor"}
         fillOpacity={dimmed ? 0.15 : 0.9}
-        filter={isGlowing ? `url(#${chartId}-node-glow-${nodeName})` : undefined}
         className="transition-opacity duration-200"
         style={isClickable ? { cursor: "pointer" } : undefined}
         onClick={() => {
@@ -377,11 +372,6 @@ const SankeyNode = ({ x, y, width, height, payload, nodeConfig }: SankeyNodeRend
           selectNode(selectedNode === nodeName ? null : nodeName);
         }}
       />
-      {isGlowing && (
-        <defs>
-          <GlowFilter chartId={chartId} name={nodeName} type="node" />
-        </defs>
-      )}
       {label?.position === "inside" && (
         <>
           <rect
@@ -495,14 +485,12 @@ const SankeyLink = ({
 
   const variant = linkConfig?.variant ?? "gradient";
   const verticalPadding = linkConfig?.verticalPadding ?? 0;
-  const glow = linkConfig?.glow ?? [];
 
   const sourceName = payload.source.name;
   const targetName = payload.target.name;
 
   const isConnected =
     selectedNode === null || selectedNode === sourceName || selectedNode === targetName;
-  const isGlowing = glow.includes(index);
 
   const paddedLinkWidth = Math.max(1, linkWidth - verticalPadding);
   const halfWidth = paddedLinkWidth / 2;
@@ -526,7 +514,6 @@ const SankeyLink = ({
           />
         )}
         <LinkStrokeGradient chartId={chartId} index={index} />
-        {isGlowing && <GlowFilter chartId={chartId} name={String(index)} type="link" />}
       </defs>
       <path
         d={linkAreaPath}
@@ -537,7 +524,6 @@ const SankeyLink = ({
         }
         strokeWidth={1}
         strokeOpacity={1}
-        filter={isGlowing ? `url(#${chartId}-link-glow-${index})` : undefined}
         className="transition-opacity duration-200"
       />
     </Layer>
@@ -664,33 +650,6 @@ const LinkStrokeGradient = ({ chartId, index }: { chartId: string; index: number
       <stop offset="85%" stopColor="var(--primary)" stopOpacity={0.8} />
       <stop offset="100%" stopColor="var(--primary)" stopOpacity={0} />
     </linearGradient>
-  );
-};
-
-/** Soft outer-glow SVG filter applied to a glowing node or link. */
-const GlowFilter = ({
-  chartId,
-  name,
-  type,
-}: {
-  chartId: string;
-  name: string;
-  type: "node" | "link";
-}) => {
-  return (
-    <filter id={`${chartId}-${type}-glow-${name}`} x="-200%" y="-200%" width="400%" height="400%">
-      <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur" />
-      <feColorMatrix
-        in="blur"
-        type="matrix"
-        values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.6 0"
-        result="glow"
-      />
-      <feMerge>
-        <feMergeNode in="glow" />
-        <feMergeNode in="SourceGraphic" />
-      </feMerge>
-    </filter>
   );
 };
 

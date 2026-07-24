@@ -97,10 +97,9 @@ The one real difference is under the hood: ECharts renders to a `<canvas>`, so t
 <Alert>
   <AlertContent>
     Canvas rendering brings a few small departures from the Recharts twin: node
-    glow uses a canvas shadow instead of an SVG blur filter, node icons are not
-    rendered, and `verticalPadding` on `<Link>` has no ECharts equivalent (see the
-    API notes). All link variants — `gradient`, `solid`, `source`, and `target` —
-    are supported.
+    icons are not rendered, and `verticalPadding` on `<Link>` has no ECharts
+    equivalent (see the API notes). All link variants — `gradient`, `solid`,
+    `source`, and `target` — are supported.
   </AlertContent>
 </Alert>
 
@@ -194,15 +193,6 @@ Examples of the sankey chart in different configurations. Customize the `<Link>`
   </AlertContent>
 </Alert>
 
-### Glowing Nodes
-
-<ComponentPreview className="mb-0" title="<Node glow={['Solar', 'Wind']} />" name="ex-glowing-echarts-sankey-chart"  />
-<Alert>
-  <AlertContent>
-    Add a subtle glow to specific nodes with the `glow` prop on `<Node />` — pass an array of node names.
-  </AlertContent>
-</Alert>
-
 ## API Reference
 
 A root container plus a small set of composible parts. Render the root, then compose the parts you need as children. On canvas each part is declarative config the root compiles, but the API closely mirrors the Recharts twin.
@@ -276,9 +266,6 @@ Configures how the sankey nodes render. Compose a `<NodeLabel />` inside it to s
   <ApiRow name="isClickable" type="boolean" default="false">
     Lets nodes be clicked to select/deselect them. Selected nodes and their direct neighbors stay highlighted while the rest dim.
   </ApiRow>
-  <ApiRow name="glow" type="string[]" default="[]">
-    Node names that should glow. Renders as a soft canvas shadow around them.
-  </ApiRow>
   <ApiRow name="children" type="ReactNode">
     Optional `<NodeLabel />` composition.
   </ApiRow>
@@ -310,9 +297,6 @@ Configures how the sankey links render.
   </ApiRow>
   <ApiRow name="verticalPadding" type="number" default="0">
     Accepted for parity with the Recharts twin. ECharts sizes each link band to its value with no per-link inset, so this prop has no effect.
-  </ApiRow>
-  <ApiRow name="glow" type="number[]" default="[]">
-    Link indices that should glow. Renders as a soft canvas shadow around them.
   </ApiRow>
 </ApiTable>
 

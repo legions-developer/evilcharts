@@ -1,6 +1,6 @@
 ---
 title: Sankey Chart
-description: Sankey charts for flow data with nodes and links, plus gradient colors and glow effects
+description: Sankey charts for flow data with nodes and links, plus gradient colors
 image: /og/sankey-chart.png
 links:
   github: https://github.com/legions-developer/evilcharts/blob/main/src/registry/charts/recharts-sankey-chart.tsx
@@ -194,15 +194,6 @@ Customize the `<Link />` `variant`, the root `nodeWidth`, `nodePadding`, and mor
   </AlertContent>
 </Alert>
 
-### Glowing Nodes
-
-<ComponentPreview className="mb-0" title="<Node glow={['Solar', 'Wind']} />" name="ex-glowing-sankey-chart"  />
-<Alert> 
-  <AlertContent>
-    Pass an array of node names to the `glow` prop on `<Node />` to add a subtle glow to those nodes.
-  </AlertContent>
-</Alert>
-
 
 ## API Reference
 
@@ -277,9 +268,6 @@ values.
   <ApiRow name="isClickable" type="boolean" default="false">
     Lets nodes be clicked to select or deselect them. Selected nodes highlight while the rest, and their links, dim.
   </ApiRow>
-  <ApiRow name="glow" type="string[]" default="[]">
-    Node names to apply a glow effect to. Renders a smooth outer glow around them.
-  </ApiRow>
   <ApiRow name="children" type="ReactNode">
     Optional `<NodeLabel />` composition.
   </ApiRow>
@@ -311,9 +299,6 @@ Configures how links render.
   </ApiRow>
   <ApiRow name="verticalPadding" type="number" default="0">
     Vertical padding where links connect to nodes in pixels. Useful when using node labels.
-  </ApiRow>
-  <ApiRow name="glow" type="number[]" default="[]">
-    Link indices to apply a glow effect to. Renders a smooth outer glow around them.
   </ApiRow>
 </ApiTable>
 

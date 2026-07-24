@@ -1,6 +1,6 @@
 ---
 title: Radial Chart
-description: Beautiful radial bar charts with full and semi-circle variants, gradient colors, and glow effects
+description: Beautiful radial bar charts with full and semi-circle variants and gradient colors
 image: /og/radial-chart.png
 links:
   github: https://github.com/legions-developer/evilcharts/blob/main/src/registry/charts/recharts-radial-chart.tsx
@@ -81,7 +81,7 @@ links:
 
 ## Usage
 
-The radial chart is composable. `<EvilRadialChart>` is the container, and every part hangs off it as a compound member — `<EvilRadialChart.Legend>`, `<EvilRadialChart.Tooltip>`, and a `<EvilRadialChart.RadialBar>` — so a single import gives you the whole chart. `glowingBars` and `isClickable` live on `<EvilRadialChart.RadialBar>`, so styling and interactivity stay with the series.
+The radial chart is composable. `<EvilRadialChart>` is the container, and every part hangs off it as a compound member — `<EvilRadialChart.Legend>`, `<EvilRadialChart.Tooltip>`, and a `<EvilRadialChart.RadialBar>` — so a single import gives you the whole chart. `isClickable` lives on `<EvilRadialChart.RadialBar>`, so styling and interactivity stay with the series.
 
 ```tsx
 import { EvilRadialChart } from "@/components/evilcharts/charts/recharts-radial-chart";
@@ -115,7 +115,7 @@ const chartConfig = {
 <EvilRadialChart data={data} nameKey="browser" config={chartConfig} variant="full">
   <EvilRadialChart.Legend isClickable />
   <EvilRadialChart.Tooltip />
-  <EvilRadialChart.RadialBar dataKey="visitors" isClickable glowingBars={["chrome"]} />
+  <EvilRadialChart.RadialBar dataKey="visitors" isClickable />
 </EvilRadialChart>
 ```
 
@@ -167,16 +167,6 @@ Radial charts in different configurations. Customize `variant`, `innerRadius`, `
 ### Gradient Colors
 
 <ComponentPreview title="gradient colors" name="ex-gradient-colors-radial-chart"  />
-
-### Glowing Bars
-
-<ComponentPreview className="mb-0" title="glowingBars={['chrome', 'safari']}" name="ex-glowing-radial-chart"  />
-<Alert> 
-  <AlertContent>
-    Use the `glowingBars` prop on `<RadialBar>` to add a subtle glow. Pass an array of bar names (values from your `nameKey` field) to choose which bars glow.
-  </AlertContent>
-</Alert>
-
 
 ## API Reference
 
@@ -230,7 +220,7 @@ The root container. It owns the data, shared selection state, loading skeleton, 
 
 <ApiHeading>RadialBar</ApiHeading>
 
-The radial bar series — each data row becomes one bar. It scopes its own glow filters, so effects never collide with other charts on the page.
+The radial bar series — each data row becomes one bar.
 
 <ApiTable>
   <ApiRow name="dataKey" type="string" required>
@@ -247,9 +237,6 @@ The radial bar series — each data row becomes one bar. It scopes its own glow 
   </ApiRow>
   <ApiRow name="isClickable" type="boolean" default="false">
     Lets users click bars to select/deselect them. Unselected bars dim while a selection is active.
-  </ApiRow>
-  <ApiRow name="glowingBars" type="string[]" default="[]">
-    Bar names (values from your `nameKey` field) that get a smooth outer glow.
   </ApiRow>
   <ApiRow name="radialBarProps" type='Omit<ComponentProps<typeof RadialBar>, "dataKey">'>
     Props forwarded to the underlying Recharts RadialBar. See the <Link href="https://recharts.github.io/en-US/api/RadialBar/" _blank>Recharts RadialBar docs</Link> for options.

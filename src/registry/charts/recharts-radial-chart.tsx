@@ -12,24 +12,28 @@ import {
   type ReactNode,
 } from "react";
 import {
-  RadialBar as RechartsRadialBar,
-  RadialBarChart as RechartsRadialBarChart,
-  Sector,
-  type SectorProps,
-} from "recharts";
-import {
   ChartTooltip,
   ChartTooltipContent,
   type TooltipRoundness,
   type TooltipVariant,
 } from "@/registry/ui/recharts-tooltip";
 import {
+  RadialBar as RechartsRadialBar,
+  RadialBarChart as RechartsRadialBarChart,
+  Sector,
+  type SectorProps,
+} from "recharts";
+import {
   type ChartConfig,
   ChartContainer,
   getColorsCount,
   LoadingIndicator,
 } from "@/registry/ui/recharts-chart";
-import { ChartLegend, ChartLegendContent, type ChartLegendVariant } from "@/registry/ui/recharts-legend";
+import {
+  ChartLegend,
+  ChartLegendContent,
+  type ChartLegendVariant,
+} from "@/registry/ui/recharts-legend";
 import { ChartBackground, type BackgroundVariant } from "@/registry/ui/recharts-background";
 import { TypedDataKey } from "recharts/types/util/typedDataKey";
 
@@ -39,8 +43,6 @@ const DEFAULT_OUTER_RADIUS = "100%";
 const DEFAULT_CORNER_RADIUS = 5;
 const DEFAULT_BAR_SIZE = 14;
 const LOADING_BARS = 5;
-// Stable empty-array reference so the `glowingBars` default doesn't change every render
-const EMPTY_GLOWING_BARS: string[] = [];
 const LOADING_ANIMATION_DURATION = 1500; // in milliseconds — interval between skeleton data changes
 
 type RadialBarChartProps = ComponentProps<typeof RechartsRadialBarChart>;
@@ -199,15 +201,12 @@ type RadialBarProps = {
   barSize?: number; // thickness of each radial bar
   showBackground?: boolean; // renders the unfilled track behind each bar
   isClickable?: boolean; // lets bars be selected by clicking them
-  glowingBars?: string[]; // names of bars rendered with a soft glow
   radialBarProps?: Omit<RadialBarRechartsProps, "dataKey">; // escape hatch for raw Recharts RadialBar props
 };
 
 /**
- * The radial bar series. Each data row becomes one bar. The series generates
- * its own glow filter definitions under the chart's unique id, so glow effects
- * never collide with other charts on the page. Pass `glowingBars` to highlight
- * specific bars and `isClickable` to make bars selectable.
+ * The radial bar series. Each data row becomes one bar. Pass `isClickable` to
+ * make bars selectable.
  */
 function RadialBar({
   dataKey,
@@ -215,51 +214,43 @@ function RadialBar({
   barSize = DEFAULT_BAR_SIZE,
   showBackground = true,
   isClickable = false,
-  glowingBars = EMPTY_GLOWING_BARS,
   radialBarProps,
 }: RadialBarProps) {
-  const { nameKey, chartId, isLoading, selectedBar, selectBar } = useRadialChart();
+  const { nameKey, isLoading, selectedBar, selectBar } = useRadialChart();
 
   // The root renders the skeleton bar while loading, so the real bar steps aside
   if (isLoading) return null;
 
   return (
-    <>
-      <RechartsRadialBar
-        dataKey={dataKey as TypedDataKey<Record<string, unknown>>}
-        cornerRadius={cornerRadius}
-        barSize={barSize}
-        background={showBackground}
-        className="drop-shadow-sm"
-        style={isClickable ? { cursor: "pointer" } : undefined}
-        onClick={(payload, index) => {
-          if (!isClickable) return;
-          const entry = payload as Record<string, unknown>;
-          const barName = (entry?.[nameKey] as string | undefined) ?? String(index);
-          const value = Number(entry?.[dataKey] ?? 0);
-          // Clicking the selected bar clears the selection, otherwise selects it
-          selectBar(selectedBar === barName ? null : barName, value);
-        }}
-        shape={(props: SectorProps) => {
-          const barName = (props as unknown as Record<string, unknown>)[nameKey] as string;
-          const isGlowing = glowingBars.includes(barName);
-          const isSelected = selectedBar === null || selectedBar === barName;
+    <RechartsRadialBar
+      dataKey={dataKey as TypedDataKey<Record<string, unknown>>}
+      cornerRadius={cornerRadius}
+      barSize={barSize}
+      background={showBackground}
+      className="drop-shadow-sm"
+      style={isClickable ? { cursor: "pointer" } : undefined}
+      onClick={(payload, index) => {
+        if (!isClickable) return;
+        const entry = payload as Record<string, unknown>;
+        const barName = (entry?.[nameKey] as string | undefined) ?? String(index);
+        const value = Number(entry?.[dataKey] ?? 0);
+        // Clicking the selected bar clears the selection, otherwise selects it
+        selectBar(selectedBar === barName ? null : barName, value);
+      }}
+      shape={(props: SectorProps) => {
+        const barName = (props as unknown as Record<string, unknown>)[nameKey] as string;
+        const isSelected = selectedBar === null || selectedBar === barName;
 
-          return (
-            <Sector
-              {...props}
-              filter={isGlowing ? `url(#${chartId}-radial-glow-${barName})` : undefined}
-              opacity={isClickable && !isSelected ? 0.15 : 1}
-              className="transition-opacity duration-200"
-            />
-          );
-        }}
-        {...radialBarProps}
-      />
-      <defs>
-        {glowingBars.length > 0 && <GlowFilterStyle chartId={chartId} glowingBars={glowingBars} />}
-      </defs>
-    </>
+        return (
+          <Sector
+            {...props}
+            opacity={isClickable && !isSelected ? 0.15 : 1}
+            className="transition-opacity duration-200"
+          />
+        );
+      }}
+      {...radialBarProps}
+    />
   );
 }
 
@@ -383,36 +374,6 @@ const ColorGradientStyle = ({ config, chartId }: { config: ChartConfig; chartId:
           </linearGradient>
         );
       })}
-    </>
-  );
-};
-
-/** Soft outer-glow SVG filter, one per glowing bar. */
-const GlowFilterStyle = ({ chartId, glowingBars }: { chartId: string; glowingBars: string[] }) => {
-  return (
-    <>
-      {glowingBars.map((barName) => (
-        <filter
-          key={`${chartId}-radial-glow-${barName}`}
-          id={`${chartId}-radial-glow-${barName}`}
-          x="-100%"
-          y="-100%"
-          width="300%"
-          height="300%"
-        >
-          <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur" />
-          <feColorMatrix
-            in="blur"
-            type="matrix"
-            values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.6 0"
-            result="glow"
-          />
-          <feMerge>
-            <feMergeNode in="glow" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-      ))}
     </>
   );
 };

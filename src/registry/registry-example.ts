@@ -1075,17 +1075,6 @@ export const examples: Registry["items"] = [
       },
     ],
   },
-  {
-    name: "ex-glowing-echarts-radial-chart",
-    registryDependencies: ["@evilcharts/echarts-radial-chart"],
-    type: "registry:block",
-    files: [
-      {
-        path: "examples/echarts/ex-glowing-echarts-radial-chart.tsx",
-        type: "registry:block",
-      },
-    ],
-  },
   // ECharts Sankey Chart (self-contained ECharts provider examples)
   {
     name: "ex-echarts-sankey-chart",
@@ -1138,17 +1127,6 @@ export const examples: Registry["items"] = [
     files: [
       {
         path: "examples/echarts/ex-source-link-variant-echarts-sankey-chart.tsx",
-        type: "registry:block",
-      },
-    ],
-  },
-  {
-    name: "ex-glowing-echarts-sankey-chart",
-    registryDependencies: ["@evilcharts/echarts-sankey-chart"],
-    type: "registry:block",
-    files: [
-      {
-        path: "examples/echarts/ex-glowing-echarts-sankey-chart.tsx",
         type: "registry:block",
       },
     ],
@@ -2204,18 +2182,6 @@ export const examples: Registry["items"] = [
       },
     ],
   },
-  // Radial Chart Glowing
-  {
-    name: "ex-glowing-radial-chart",
-    registryDependencies: ["@evilcharts/recharts-radial-chart"],
-    type: "registry:block",
-    files: [
-      {
-        path: "examples/recharts/ex-glowing-radial-chart.tsx",
-        type: "registry:block",
-      },
-    ],
-  },
   // ========================================
   // RADAR CHART EXAMPLES
   // ========================================
@@ -2349,18 +2315,6 @@ export const examples: Registry["items"] = [
     files: [
       {
         path: "examples/recharts/ex-source-link-variant-sankey-chart.tsx",
-        type: "registry:block",
-      },
-    ],
-  },
-  // Sankey Chart Glowing
-  {
-    name: "ex-glowing-sankey-chart",
-    registryDependencies: ["@evilcharts/recharts-sankey-chart"],
-    type: "registry:block",
-    files: [
-      {
-        path: "examples/recharts/ex-glowing-sankey-chart.tsx",
         type: "registry:block",
       },
     ],

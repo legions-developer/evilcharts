@@ -1,6 +1,6 @@
 ---
 title: Radial Chart
-description: Radial bar charts with full and semi-circle variants, gradient colors, and glow, powered by Apache ECharts
+description: Radial bar charts with full and semi-circle variants and gradient colors, powered by Apache ECharts
 image: /og/radial-chart.png
 links:
   github: https://github.com/legions-developer/evilcharts/blob/main/src/registry/charts/echarts-radial-chart.tsx
@@ -46,7 +46,7 @@ links:
 
 ## Usage
 
-The ECharts radial chart is composible, sharing the Recharts twin's API shape. `<EChartsRadialChart>` is the container, and every part hangs off it as a compound member — `<EChartsRadialChart.Legend>`, `<EChartsRadialChart.Tooltip>`, and a `<EChartsRadialChart.RadialBar>` — so a single import gives you the whole chart. `<RadialBar>` carries its own `glowingBars` and `isClickable`, so styling and interactivity live with the series.
+The ECharts radial chart is composible, sharing the Recharts twin's API shape. `<EChartsRadialChart>` is the container, and every part hangs off it as a compound member — `<EChartsRadialChart.Legend>`, `<EChartsRadialChart.Tooltip>`, and a `<EChartsRadialChart.RadialBar>` — so a single import gives you the whole chart. `<RadialBar>` carries its own `isClickable`, so styling and interactivity live with the series.
 
 ```tsx
 import { EChartsRadialChart, type ChartConfig } from "@/components/evilcharts/charts/echarts-radial-chart";
@@ -79,7 +79,7 @@ const chartConfig = {
 <EChartsRadialChart data={data} nameKey="browser" config={chartConfig} variant="full">
   <EChartsRadialChart.Legend isClickable />
   <EChartsRadialChart.Tooltip />
-  <EChartsRadialChart.RadialBar dataKey="visitors" isClickable glowingBars={["chrome"]} />
+  <EChartsRadialChart.RadialBar dataKey="visitors" isClickable />
 </EChartsRadialChart>
 ```
 
@@ -89,7 +89,7 @@ The `config` is the same contract as every EvilCharts chart — each key matches
 
 <Alert>
   <AlertContent>
-    Canvas rendering brings a few small departures from the Recharts twin: multi-color bars use a diagonal canvas gradient (visually equivalent), the glow is a layered canvas glow rather than an SVG blur filter, and corner rounding becomes a rounded cap on each ring's ends.
+    Canvas rendering brings a few small departures from the Recharts twin: multi-color bars use a diagonal canvas gradient (visually equivalent), and corner rounding becomes a rounded cap on each ring's ends.
   </AlertContent>
 </Alert>
 
@@ -141,15 +141,6 @@ Radial chart examples with different configurations. Customize `variant`, `inner
 ### Gradient Colors
 
 <ComponentPreview title="gradient colors" name="ex-gradient-colors-echarts-radial-chart"  />
-
-### Glowing Bars
-
-<ComponentPreview className="mb-0" title="glowingBars={['chrome', 'safari']}" name="ex-glowing-echarts-radial-chart"  />
-<Alert>
-  <AlertContent>
-    Add a glow to specific bars with the `glowingBars` prop on `<RadialBar>`. Pass an array of bar names (values from your `nameKey` field) to choose which bars glow.
-  </AlertContent>
-</Alert>
 
 ## API Reference
 
@@ -220,9 +211,6 @@ The radial bar series. Each data row becomes one concentric ring. Its presence r
   </ApiRow>
   <ApiRow name="isClickable" type="boolean" default="false">
     Lets bars be clicked to select/deselect them. Unselected bars dim while a selection is active.
-  </ApiRow>
-  <ApiRow name="glowingBars" type="string[]" default="[]">
-    Bar names (values from your `nameKey` field) that get a glowing effect. Creates a soft, color-following glow around those bars.
   </ApiRow>
 </ApiTable>
 
