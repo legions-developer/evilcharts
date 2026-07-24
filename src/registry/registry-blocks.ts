@@ -256,4 +256,33 @@ export const blocks: Registry["items"] = [
       },
     ],
   },
+  {
+    name: "allocation-echarts-sankey-chart",
+    description: "Fund allocation flow with labelled nodes and a stat row",
+    dependencies: ["echarts", "motion"],
+    registryDependencies: ["@evilcharts/echarts-sankey-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "blocks/echarts/b-allocation-echarts-sankey-chart.tsx",
+        type: "registry:block",
+        target: TARGET_BASE_PATH + "/allocation-echarts-sankey-chart.tsx",
+      },
+    ],
+  },
+  {
+    name: "pipeline-echarts-sankey-chart",
+    description:
+      "Revenue sources converging through a hub and fanning back out, with a centered total",
+    dependencies: ["echarts", "motion"],
+    registryDependencies: ["@evilcharts/echarts-sankey-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "blocks/echarts/b-pipeline-echarts-sankey-chart.tsx",
+        type: "registry:block",
+        target: TARGET_BASE_PATH + "/pipeline-echarts-sankey-chart.tsx",
+      },
+    ],
+  },
 ];

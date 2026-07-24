@@ -64,7 +64,18 @@ type SankeyEdgeItem = NonNullable<SankeySeriesOption["links"]>[number];
 // Constants
 // ─────────────────────────────────────────────────────────────────────────────
 
-const REVEAL_DURATION = 1000; // intro draw-in length, in milliseconds
+// Intro reveal — the diagram assembles itself column by column. Each node grows
+// out of its own vertical centre, then its outgoing bands draw toward the next
+// column, which pulls the eye along the flow. (Echarts' native sankey entrance is
+// a single clip rect sweeping across the whole diagram; it ignores the graph, so
+// bands appear before the nodes they leave. This one is driven frame by frame
+// instead — see the intro rAF effect.) Times are in milliseconds.
+const INTRO_COLUMN_STAGGER = 130; // delay between one column and the next
+const INTRO_NODE_GROW = 340; // a single node opening from its centre
+const INTRO_LINK_DELAY = 90; // head start a column's nodes get over their bands
+const INTRO_LINK_DRAW = 520; // a band drawing from its source to its target
+const INTRO_FEATHER = 0.05; // softening on the growing/drawing edge, in gradient offset
+const INTRO_NODE_SCALE_FROM = 0.8; // a node opens from this fraction of its height, not from nothing
 const LOADING_ANIMATION_DURATION = 2000; // shimmer loop, in milliseconds
 const DEFAULT_NODE_WIDTH = 10;
 const DEFAULT_NODE_PADDING = 10;
@@ -84,7 +95,7 @@ const LINK_FILL_OPACITY = 0.4; // resting link band (Recharts fillOpacity 0.4 �
 const LINK_DIM_OPACITY = 0.05; // link not touching the current selection — the translucent band (fill analogue) recedes further (halved from 0.1)
 const LABEL_DIM_OPACITY = 0.3; // node label faded when its node is dimmed
 const INSIDE_PLATE_ALPHA = 0.55; // inside-label plate fill, × background alpha (twin's white/50 · black/60 wash)
-const INSIDE_RIM_WIDTH = 2; // colored rim around the inside-label plate, in pixels (twin's 1px inset edge)
+const INSIDE_RIM_WIDTH = 1; // colored rim around the inside-label plate, in pixels (matches the twin's 1px inset edge)
 
 // The loading skeleton is a fixed gray sankey swept by a shimmer band. Unlike the
 // area chart's clip window (fully transparent outside the sweep), the sankey keeps
@@ -131,9 +142,9 @@ export type LinkVariant = "gradient" | "solid" | "source" | "target";
 export type NodeLabelPosition = "inside" | "outside";
 // TooltipVariant and TooltipRoundness now live in @/registry/ui/echarts-tooltip and
 // are imported + re-exported at the top of this file.
-// Sankey has no directional draw-in — only "default" (echarts' native reveal) and
-// "none" (off). Kept as a small union for copy-paste parity with the other
-// EvilCharts entrance off-switches rather than a directional alias.
+// Sankey has no directional draw-in — its entrance follows the graph, not an
+// axis: "default" plays the column cascade, "none" turns it off. Kept as a small
+// union for copy-paste parity with the other EvilCharts entrance off-switches.
 export type SankeyAnimationType = "none" | "default";
 
 // ChartConfig (and its AtLeastOneThemeColor constraint) now lives in the shared
@@ -374,6 +385,166 @@ function edgeColor(
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Intro reveal — timing and paint
+//
+// The entrance is a windowed alpha on the SAME paint the element already uses:
+// a node's fill runs vertically, so a window opening from offset 0.5 makes it
+// grow from its centre; a link's gradient runs horizontally across its own
+// bounding box — which spans exactly source edge → target edge — so a window
+// sweeping 0 → 1 makes the band draw out of its source node. Nothing about the
+// layout moves, so no frame re-runs the sankey solver on different geometry.
+// ─────────────────────────────────────────────────────────────────────────────
+
+type Paint = string | echarts.graphic.LinearGradient;
+type IntroState = {
+  elapsed: number; // milliseconds since the intro started
+  depths: Record<string, number>; // node name → column index
+};
+
+// Column index per node: the longest path from any source, which is what puts a
+// node in a later column than every node feeding it. Edges are relaxed until the
+// pass stops changing anything; the node-count cap keeps a malformed (cyclic)
+// graph from spinning forever.
+function computeNodeDepths(data: SankeyData): Record<string, number> {
+  const nameOf = (ref: number) => data.nodes[ref]?.name ?? String(ref);
+  const depths: Record<string, number> = {};
+  for (const node of data.nodes) depths[node.name] = 0;
+
+  for (let pass = 0; pass < data.nodes.length; pass++) {
+    let changed = false;
+    for (const link of data.links) {
+      const source = nameOf(link.source);
+      const target = nameOf(link.target);
+      if (depths[target] === undefined || depths[source] === undefined) continue;
+      if (depths[target] < depths[source] + 1) {
+        depths[target] = depths[source] + 1;
+        changed = true;
+      }
+    }
+    if (!changed) break;
+  }
+  return depths;
+}
+
+// How long the whole cascade runs: whichever finishes last, the finalmost column
+// of nodes or the bands leaving the column before it.
+function introDuration(depths: Record<string, number>): number {
+  const maxDepth = Math.max(0, ...Object.values(depths));
+  return Math.max(
+    maxDepth * INTRO_COLUMN_STAGGER + INTRO_NODE_GROW,
+    Math.max(0, maxDepth - 1) * INTRO_COLUMN_STAGGER + INTRO_LINK_DELAY + INTRO_LINK_DRAW,
+  );
+}
+
+const clamp01 = (value: number) => (value < 0 ? 0 : value > 1 ? 1 : value);
+const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
+
+// 0 → 1 for one node's grow, and for one link's draw. Both key off the source
+// node's column, so a band never starts before the node it leaves.
+function nodePhase(intro: IntroState, name: string): number {
+  const start = (intro.depths[name] ?? 0) * INTRO_COLUMN_STAGGER;
+  return easeOut(clamp01((intro.elapsed - start) / INTRO_NODE_GROW));
+}
+function linkPhase(intro: IntroState, sourceName: string): number {
+  const start = (intro.depths[sourceName] ?? 0) * INTRO_COLUMN_STAGGER + INTRO_LINK_DELAY;
+  return easeOut(clamp01((intro.elapsed - start) / INTRO_LINK_DRAW));
+}
+
+// The axis a paint runs along — "y" for a node's vertical gradient, "x" for a
+// link's horizontal one, null for a flat color (which composes with either).
+function paintAxis(paint: Paint): "x" | "y" | null {
+  if (typeof paint === "string") return null;
+  const horizontal = Math.abs((paint.x2 ?? 0) - (paint.x ?? 0));
+  const vertical = Math.abs((paint.y2 ?? 0) - (paint.y ?? 0));
+  return horizontal >= vertical ? "x" : "y";
+}
+
+function paintStops(paint: Paint): { offset: number; color: string }[] {
+  if (typeof paint === "string") {
+    return [
+      { offset: 0, color: paint },
+      { offset: 1, color: paint },
+    ];
+  }
+  const stops = paint.colorStops ?? [];
+  if (stops.length === 0) return [{ offset: 0, color: GRAY }];
+  return stops.map((stop) => ({ offset: stop.offset, color: stop.color }));
+}
+
+// The paint's color at an arbitrary offset, so a window edge inserted between two
+// stops keeps the hue it interrupts.
+function sampleStops(stops: { offset: number; color: string }[], at: number): string {
+  const first = stops[0];
+  const last = stops[stops.length - 1];
+  if (!first) return GRAY;
+  if (at <= first.offset) return first.color;
+  if (at >= last.offset) return last.color;
+  for (let i = 1; i < stops.length; i++) {
+    const from = stops[i - 1];
+    const to = stops[i];
+    if (at > to.offset) continue;
+    const span = to.offset - from.offset;
+    if (span <= 1e-6) return to.color;
+    return echarts.color.lerp((at - from.offset) / span, [from.color, to.color]) || from.color;
+  }
+  return last.color;
+}
+
+// Multiply a paint's alpha by a trapezoid window along `axis`: transparent before
+// `edges[0]`, opaque between `edges[1]` and `edges[2]`, transparent again after
+// `edges[3]`. Returns null when the paint runs along the OTHER axis with real
+// color variation — two axes can't be composed into one canvas gradient, so the
+// caller falls back to a plain fade for that (rare) case.
+function windowedPaint(
+  paint: Paint,
+  axis: "x" | "y",
+  edges: [number, number, number, number],
+): Paint | null {
+  const own = paintAxis(paint);
+  if (own !== null && own !== axis) return null;
+
+  const stops = paintStops(paint);
+  const alphaAt = (offset: number) => {
+    if (offset <= edges[0] || offset >= edges[3]) return 0;
+    if (offset >= edges[1] && offset <= edges[2]) return 1;
+    if (offset < edges[1]) return (offset - edges[0]) / Math.max(1e-6, edges[1] - edges[0]);
+    return (edges[3] - offset) / Math.max(1e-6, edges[3] - edges[2]);
+  };
+
+  const offsets = [...new Set([0, 1, ...stops.map((stop) => stop.offset), ...edges])]
+    .filter((offset) => offset >= 0 && offset <= 1)
+    .sort((a, b) => a - b);
+  const windowed = offsets.map((offset) => ({
+    offset,
+    color: withAlpha(sampleStops(stops, offset), alphaAt(offset)),
+  }));
+
+  return axis === "x"
+    ? new echarts.graphic.LinearGradient(0, 0, 1, 0, windowed)
+    : new echarts.graphic.LinearGradient(0, 0, 0, 1, windowed);
+}
+
+// A node scaling up about its own centre: it starts at INTRO_NODE_SCALE_FROM of
+// full height and opens to 1 — a short pop rather than a wipe from nothing. The
+// fade-in rides the same window (applied by the caller as itemStyle.opacity), so
+// the box scales and lightens together.
+function growPaint(paint: Paint, phase: number): Paint | null {
+  const half = (INTRO_NODE_SCALE_FROM + (1 - INTRO_NODE_SCALE_FROM) * phase) / 2;
+  return windowedPaint(paint, "y", [
+    0.5 - half - INTRO_FEATHER,
+    0.5 - half,
+    0.5 + half,
+    0.5 + half + INTRO_FEATHER,
+  ]);
+}
+
+// A band drawing from its source edge toward its target edge.
+function drawPaint(paint: Paint, phase: number): Paint | null {
+  const head = phase * (1 + INTRO_FEATHER);
+  return windowedPaint(paint, "x", [-2, -1, head - INTRO_FEATHER, head]);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Selection helpers — a node click highlights the node plus its direct neighbors
 // and dims the rest, exactly like the Recharts twin's `isNodeConnected`.
 // ─────────────────────────────────────────────────────────────────────────────
@@ -482,6 +653,7 @@ type OptionBuildContext = {
   resolved: ResolvedColors;
   nodeValues: Record<string, number>;
   outsideLabels: boolean; // reserves right padding for outside labels
+  intro: IntroState | null; // mid-entrance cascade, null once the diagram is fully drawn
 };
 
 // The node label config, shared by every node. Two-line rich text when values are
@@ -539,6 +711,7 @@ function buildNodeLabel(ctx: OptionBuildContext): SankeySeriesOption["label"] {
 
 function buildSankeySeries(ctx: OptionBuildContext): SankeySeriesOption {
   const {
+    config,
     data,
     nodeConfig,
     linkConfig,
@@ -550,6 +723,7 @@ function buildSankeySeries(ctx: OptionBuildContext): SankeySeriesOption {
     align,
     resolved,
     outsideLabels,
+    intro,
   } = ctx;
   const { tokens, series: slotsByName } = resolved;
   const hasSelection = selectedNode !== null;
@@ -560,29 +734,51 @@ function buildSankeySeries(ctx: OptionBuildContext): SankeySeriesOption {
   // through the plate). Mirrors the twin's full-rect inset plate + 1px colored edge.
   const insideLabels = ctx.nodeLabel?.position === "inside";
 
+  // Nodes with no incoming link start the diagram, so an outside label reads on
+  // their LEFT; anything downstream keeps its label on the right. Without the split
+  // every label sits to the right of its node, which drops the first column's text
+  // straight onto its own outgoing bands.
+  const targetNames = new Set(
+    data.links.map((link) => data.nodes[link.target]?.name ?? String(link.target)),
+  );
+
   const nodes: SankeyNodeItem[] = data.nodes.map((node) => {
     const slots = slotsByName[node.name] ?? [GRAY];
     const dimmed = connected ? !connected.has(node.name) : false;
+    // Mid-intro the box scales up about its centre and fades in together; the
+    // label just fades with it (rich text has no partial reveal).
+    const phase = intro ? nodePhase(intro, node.name) : 1;
+    const fill = nodeGradient(slots);
+    const grown = phase < 1 ? growPaint(fill, phase) : fill;
+    const nodeAlpha = (dimmed ? NODE_DIM_OPACITY : NODE_FILL_OPACITY) * phase;
 
     return {
       name: node.name,
       itemStyle: insideLabels
         ? {
             // Dark card: plate fill spans the full rect, color rides the rim only.
-            color: withAlpha(tokens.background, INSIDE_PLATE_ALPHA),
-            borderColor: nodeGradient(slots),
+            color: withAlpha(tokens.background, INSIDE_PLATE_ALPHA * phase),
+            borderColor: grown ?? fill,
             borderWidth: INSIDE_RIM_WIDTH,
             borderRadius: nodeConfig.radius,
-            opacity: dimmed ? NODE_DIM_OPACITY : 1,
+            opacity: (dimmed ? NODE_DIM_OPACITY : 1) * phase,
           }
         : {
-            color: nodeGradient(slots),
-            opacity: dimmed ? NODE_DIM_OPACITY : NODE_FILL_OPACITY,
+            color: grown ?? fill,
+            opacity: nodeAlpha,
             borderWidth: 0,
             borderRadius: nodeConfig.radius,
           },
-      // Fade a node's own label with it when the selection dims it.
-      label: { opacity: dimmed ? LABEL_DIM_OPACITY : 1 },
+      // Fade a node's own label with it when the selection dims it. An empty
+      // config label opts a node out entirely — a pass-through hub carries its
+      // total in the surrounding layout, not on the node.
+      label: {
+        ...(config[node.name]?.label === "" ? { show: false } : {}),
+        opacity: (dimmed ? LABEL_DIM_OPACITY : 1) * phase,
+        ...(outsideLabels && !targetNames.has(node.name)
+          ? { position: "left" as const, align: "right" as const }
+          : {}),
+      },
     };
   });
 
@@ -593,14 +789,19 @@ function buildSankeySeries(ctx: OptionBuildContext): SankeySeriesOption {
     const targetSlots = slotsByName[target] ?? [GRAY];
     // Connected = nothing selected, or this link touches the selected node.
     const isConnected = !hasSelection || source === selectedNode || target === selectedNode;
+    // Mid-intro the band is windowed along its own bounding box, so it draws out
+    // of the source node rather than fading in place.
+    const phase = intro ? linkPhase(intro, source) : 1;
+    const band = edgeColor(linkConfig.variant, sourceSlots, targetSlots, tokens.foreground);
+    const drawn = phase < 1 ? drawPaint(band, phase) : band;
 
     return {
       source,
       target,
       value: link.value,
       lineStyle: {
-        color: edgeColor(linkConfig.variant, sourceSlots, targetSlots, tokens.foreground),
-        opacity: isConnected ? LINK_FILL_OPACITY : LINK_DIM_OPACITY,
+        color: drawn ?? band,
+        opacity: (isConnected ? LINK_FILL_OPACITY : LINK_DIM_OPACITY) * (drawn ? 1 : phase),
       },
     };
   });
@@ -609,8 +810,8 @@ function buildSankeySeries(ctx: OptionBuildContext): SankeySeriesOption {
     id: "__sankey",
     type: "sankey",
     z: 3,
-    left: 8,
-    // Outside labels hang to the right of the rightmost column — reserve room.
+    // Outside labels hang past the outermost columns on BOTH sides — reserve room.
+    left: outsideLabels ? 120 : 8,
     right: outsideLabels ? 120 : 8,
     top: 12,
     bottom: 12,
@@ -650,6 +851,7 @@ function buildInsidePlateSeries(ctx: OptionBuildContext): SankeySeriesOption | n
     align,
     resolved,
     outsideLabels,
+    intro,
   } = ctx;
   if (nodeLabel?.position !== "inside") return null;
 
@@ -660,11 +862,16 @@ function buildInsidePlateSeries(ctx: OptionBuildContext): SankeySeriesOption | n
   const nodes: SankeyNodeItem[] = data.nodes.map((node) => {
     const slots = slotsByName[node.name] ?? [GRAY];
     const dimmed = connected ? !connected.has(node.name) : false;
+    // Grows in step with the real node above it — the card and its plate are one
+    // element to the eye, so they must open together.
+    const phase = intro ? nodePhase(intro, node.name) : 1;
+    const fill = nodeGradient(slots);
+    const grown = phase < 1 ? growPaint(fill, phase) : fill;
     return {
       name: node.name,
       itemStyle: {
-        color: nodeGradient(slots),
-        opacity: dimmed ? NODE_DIM_OPACITY : NODE_FILL_OPACITY,
+        color: grown ?? fill,
+        opacity: (dimmed ? NODE_DIM_OPACITY : NODE_FILL_OPACITY) * phase,
         borderWidth: 0,
         borderRadius: nodeConfig.radius,
       },
@@ -686,7 +893,7 @@ function buildInsidePlateSeries(ctx: OptionBuildContext): SankeySeriesOption | n
     type: "sankey",
     z: 2, // below the real __sankey series (z: 3)
     silent: true,
-    left: 8,
+    left: outsideLabels ? 120 : 8,
     right: outsideLabels ? 120 : 8,
     top: 12,
     bottom: 12,
@@ -819,7 +1026,8 @@ function buildLoadingOption(ctx: OptionBuildContext): EChartsOption {
 
 type LiveState = {
   resolved: ResolvedColors | null; // colors read off the live DOM — feeds builds and the shimmer
-  hasRevealed: boolean; // the intro draw-in already played on this chart instance
+  hasRevealed: boolean; // the intro cascade already played on this chart instance
+  intro: IntroState | null; // current cascade frame, read by every build while it runs
   // Latest callbacks/flags for the imperative ECharts click handler.
   handlers: {
     onSelectionChange?: (selection: { dataKey: string; value: number } | null) => void;
@@ -875,6 +1083,7 @@ export function EChartsSankeyChart({
   const live = useRef<LiveState>({
     resolved: null,
     hasRevealed: false,
+    intro: null,
     handlers: {
       onSelectionChange,
       isNodeClickable: false,
@@ -942,6 +1151,7 @@ export function EChartsSankeyChart({
       resolved,
       nodeValues,
       outsideLabels,
+      intro: live.intro,
     };
 
     if (isLoading) return buildLoadingOption(ctx);
@@ -1041,42 +1251,76 @@ export function EChartsSankeyChart({
     // them here, right before the push, rather than round-tripping through state.
     live.resolved = resolveColors(container, config, nodeNames);
 
-    const push = (withEntrance: boolean) => {
+    // ECharts' own animation stays off throughout: the entrance is painted by the
+    // option itself (windowed gradients, below), so there is nothing left for the
+    // native tweener to do — and its sankey entrance is the clip sweep this
+    // replaces. Intro frames merge rather than replace, so the chart keeps its
+    // views instead of rebuilding them 60 times a second.
+    const push = (mergeOnly: boolean) => {
       const option = buildOption();
       const merged = chartOptions ? { ...option, ...chartOptions } : option;
-      Object.assign(merged, {
-        animation: withEntrance,
-        animationDuration: REVEAL_DURATION,
-        animationDurationUpdate: 0,
-      });
+      Object.assign(merged, { animation: false, animationDurationUpdate: 0 });
       // chartOptions is an untyped escape hatch — the spread erases the option's
       // shape, so re-assert it. The only cast in the file.
-      chart.setOption(merged as EChartsOption, { notMerge: true });
+      chart.setOption(
+        merged as EChartsOption,
+        mergeOnly ? { lazyUpdate: true, silent: true } : { notMerge: true },
+      );
     };
 
-    // Intro reveal — ECharts' native draw-in, enabled only for the first real
-    // render. Every later push (selection, theme) applies instantly, since
-    // notMerge would otherwise replay the entrance on each of them. A loading
-    // cycle re-arms it: the Recharts twin remounts its diagram after loading and
-    // replays the intro, so data → loading → data draws in again here too.
+    // Intro cascade, played once per chart instance: columns of nodes grow out of
+    // their centres left to right, each column's bands drawing toward the next as
+    // soon as its nodes are up. Every later push (selection, theme) lands with
+    // `intro` null, so it applies instantly instead of replaying. A loading cycle
+    // re-arms it: the Recharts twin remounts its diagram after loading and replays
+    // the intro, so data → loading → data draws in again here too.
     if (isLoading) live.hasRevealed = false;
     const shouldReveal = !live.hasRevealed && !isLoading;
     if (shouldReveal) live.hasRevealed = true;
     const revealEnabled =
       animation && shouldReveal && animationType !== "none" && !shouldReduceMotion;
-    push(revealEnabled);
+
+    let raf = 0;
+    if (revealEnabled) {
+      const depths = computeNodeDepths(data);
+      const duration = introDuration(depths);
+      live.intro = { elapsed: 0, depths };
+      push(false);
+
+      const start = performance.now();
+      const tick = (now: number) => {
+        const elapsed = now - start;
+        const done = elapsed >= duration;
+        live.intro = done ? null : { elapsed, depths };
+        push(true);
+        if (!done) raf = requestAnimationFrame(tick);
+      };
+      raf = requestAnimationFrame(tick);
+    } else {
+      live.intro = null;
+      push(false);
+    }
 
     // Theme flips and resizes re-enter here without touching React: re-read the
     // tokens (the .dark class changed, or the renderer resized) and push an
-    // update-style option.
+    // update-style option. Mid-intro that push carries the current cascade frame,
+    // so a theme flip retints the entrance instead of interrupting it.
     live.repush = () => {
       live.resolved = resolveColors(container, config, nodeNames);
       push(false);
+    };
+
+    // Anything that re-runs this effect (a selection, a prop change) ends an
+    // in-flight cascade — the next push draws the finished diagram.
+    return () => {
+      cancelAnimationFrame(raf);
+      live.intro = null;
     };
   }, [
     live,
     buildOption,
     chartOptions,
+    data,
     isLoading,
     animation,
     animationType,

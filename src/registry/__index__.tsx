@@ -4777,4 +4777,40 @@ export const Index: Record<string, any> = {
     categories: undefined,
     meta: undefined,
   },
+  "allocation-echarts-sankey-chart": {
+    name: "allocation-echarts-sankey-chart",
+    description: "Fund allocation flow with labelled nodes and a stat row",
+    type: "registry:block",
+    registryDependencies: ["@evilcharts/echarts-sankey-chart"],
+    files: [{
+      path: "@/registry/blocks/echarts/b-allocation-echarts-sankey-chart.tsx",
+      type: "registry:block",
+      target: "components/evilcharts/blocks/allocation-echarts-sankey-chart.tsx"
+    }],
+    component: React.lazy(async () => {
+      const mod = await import("@/registry/blocks/echarts/b-allocation-echarts-sankey-chart.tsx")
+      const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
+      return { default: mod.default || mod[exportName] }
+    }),
+    categories: undefined,
+    meta: undefined,
+  },
+  "pipeline-echarts-sankey-chart": {
+    name: "pipeline-echarts-sankey-chart",
+    description: "Revenue sources converging through a hub and fanning back out, with a centered total",
+    type: "registry:block",
+    registryDependencies: ["@evilcharts/echarts-sankey-chart"],
+    files: [{
+      path: "@/registry/blocks/echarts/b-pipeline-echarts-sankey-chart.tsx",
+      type: "registry:block",
+      target: "components/evilcharts/blocks/pipeline-echarts-sankey-chart.tsx"
+    }],
+    component: React.lazy(async () => {
+      const mod = await import("@/registry/blocks/echarts/b-pipeline-echarts-sankey-chart.tsx")
+      const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
+      return { default: mod.default || mod[exportName] }
+    }),
+    categories: undefined,
+    meta: undefined,
+  },
   }
