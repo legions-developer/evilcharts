@@ -4525,6 +4525,24 @@ export const Index: Record<string, any> = {
     categories: undefined,
     meta: undefined,
   },
+  "audience-echarts-area-chart": {
+    name: "audience-echarts-area-chart",
+    description: "Audience growth card with a multi-stop gradient line and faded wash",
+    type: "registry:block",
+    registryDependencies: ["@evilcharts/echarts-area-chart"],
+    files: [{
+      path: "@/registry/blocks/echarts/b-audience-echarts-area-chart.tsx",
+      type: "registry:block",
+      target: "components/evilcharts/blocks/audience-echarts-area-chart.tsx"
+    }],
+    component: React.lazy(async () => {
+      const mod = await import("@/registry/blocks/echarts/b-audience-echarts-area-chart.tsx")
+      const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
+      return { default: mod.default || mod[exportName] }
+    }),
+    categories: undefined,
+    meta: undefined,
+  },
   "market-share-echarts-pie-chart": {
     name: "market-share-echarts-pie-chart",
     description: "Grayscale donut with a center total and a two-column value legend",
@@ -4555,6 +4573,60 @@ export const Index: Record<string, any> = {
     }],
     component: React.lazy(async () => {
       const mod = await import("@/registry/blocks/echarts/b-progress-rings-echarts-pie-chart.tsx")
+      const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
+      return { default: mod.default || mod[exportName] }
+    }),
+    categories: undefined,
+    meta: undefined,
+  },
+  "budget-echarts-radial-chart": {
+    name: "budget-echarts-radial-chart",
+    description: "Budget breakdown card with four gauges and a value list, on the radial chart",
+    type: "registry:block",
+    registryDependencies: ["@evilcharts/echarts-radial-chart"],
+    files: [{
+      path: "@/registry/blocks/echarts/b-budget-echarts-radial-chart.tsx",
+      type: "registry:block",
+      target: "components/evilcharts/blocks/budget-echarts-radial-chart.tsx"
+    }],
+    component: React.lazy(async () => {
+      const mod = await import("@/registry/blocks/echarts/b-budget-echarts-radial-chart.tsx")
+      const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
+      return { default: mod.default || mod[exportName] }
+    }),
+    categories: undefined,
+    meta: undefined,
+  },
+  "revenue-mix-echarts-pie-chart": {
+    name: "revenue-mix-echarts-pie-chart",
+    description: "Gapped donut with a center total and a side legend of amounts",
+    type: "registry:block",
+    registryDependencies: ["@evilcharts/echarts-pie-chart"],
+    files: [{
+      path: "@/registry/blocks/echarts/b-revenue-mix-echarts-pie-chart.tsx",
+      type: "registry:block",
+      target: "components/evilcharts/blocks/revenue-mix-echarts-pie-chart.tsx"
+    }],
+    component: React.lazy(async () => {
+      const mod = await import("@/registry/blocks/echarts/b-revenue-mix-echarts-pie-chart.tsx")
+      const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
+      return { default: mod.default || mod[exportName] }
+    }),
+    categories: undefined,
+    meta: undefined,
+  },
+  "reliability-score-echarts-pie-chart": {
+    name: "reliability-score-echarts-pie-chart",
+    description: "Banded score arc with a range scale, built from pie sectors",
+    type: "registry:block",
+    registryDependencies: ["@evilcharts/echarts-pie-chart"],
+    files: [{
+      path: "@/registry/blocks/echarts/b-reliability-score-echarts-pie-chart.tsx",
+      type: "registry:block",
+      target: "components/evilcharts/blocks/reliability-score-echarts-pie-chart.tsx"
+    }],
+    component: React.lazy(async () => {
+      const mod = await import("@/registry/blocks/echarts/b-reliability-score-echarts-pie-chart.tsx")
       const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
       return { default: mod.default || mod[exportName] }
     }),

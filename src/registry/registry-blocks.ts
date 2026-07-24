@@ -102,6 +102,20 @@ export const blocks: Registry["items"] = [
     ],
   },
   {
+    name: "audience-echarts-area-chart",
+    description: "Audience growth card with a multi-stop gradient line and faded wash",
+    dependencies: ["echarts", "motion"],
+    registryDependencies: ["@evilcharts/echarts-area-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "blocks/echarts/b-audience-echarts-area-chart.tsx",
+        type: "registry:block",
+        target: TARGET_BASE_PATH + "/audience-echarts-area-chart.tsx",
+      },
+    ],
+  },
+  {
     name: "market-share-echarts-pie-chart",
     description: "Grayscale donut with a center total and a two-column value legend",
     dependencies: ["echarts", "motion"],
@@ -126,6 +140,48 @@ export const blocks: Registry["items"] = [
         path: "blocks/echarts/b-progress-rings-echarts-pie-chart.tsx",
         type: "registry:block",
         target: TARGET_BASE_PATH + "/progress-rings-echarts-pie-chart.tsx",
+      },
+    ],
+  },
+  {
+    name: "budget-echarts-radial-chart",
+    description: "Budget breakdown card with four gauges and a value list, on the radial chart",
+    dependencies: ["echarts", "motion"],
+    registryDependencies: ["@evilcharts/echarts-radial-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "blocks/echarts/b-budget-echarts-radial-chart.tsx",
+        type: "registry:block",
+        target: TARGET_BASE_PATH + "/budget-echarts-radial-chart.tsx",
+      },
+    ],
+  },
+  {
+    name: "revenue-mix-echarts-pie-chart",
+    description: "Gapped donut with a center total and a side legend of amounts",
+    dependencies: ["echarts", "motion"],
+    registryDependencies: ["@evilcharts/echarts-pie-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "blocks/echarts/b-revenue-mix-echarts-pie-chart.tsx",
+        type: "registry:block",
+        target: TARGET_BASE_PATH + "/revenue-mix-echarts-pie-chart.tsx",
+      },
+    ],
+  },
+  {
+    name: "reliability-score-echarts-pie-chart",
+    description: "Banded score arc with a range scale, built from pie sectors",
+    dependencies: ["echarts", "motion"],
+    registryDependencies: ["@evilcharts/echarts-pie-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "blocks/echarts/b-reliability-score-echarts-pie-chart.tsx",
+        type: "registry:block",
+        target: TARGET_BASE_PATH + "/reliability-score-echarts-pie-chart.tsx",
       },
     ],
   },
