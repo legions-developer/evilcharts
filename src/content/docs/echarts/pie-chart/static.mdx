@@ -212,6 +212,9 @@ The root container. It owns the data, shared selection state, loading skeleton, 
   <ApiRow name="defaultSelectedSector" type="string | null" default="null">
     The sector selected on first render.
   </ApiRow>
+  <ApiRow name="selectedSector" type="string | null">
+    Controlled selection. When provided it overrides the internal state, so a parent can drive which sector is selected — pair it with `onSelectionChange` to keep your own UI (a custom legend, stat cards) and the chart in sync.
+  </ApiRow>
   <ApiRow name="onSelectionChange" type="(selection: { dataKey: string; value: number } | null) => void">
     Fires when a sector is selected or deselected via a clickable `<Pie />` sector or `<Legend />` entry. Receives an object with `dataKey` (sector name) and `value` (sector value), or `null` when deselected.
   </ApiRow>

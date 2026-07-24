@@ -171,6 +171,7 @@ export interface EChartsPieChartProps<TData extends Record<string, unknown>> {
   // ECharts area chart's `animation` prop. OS reduce-motion also disables it.
   animation?: boolean;
   defaultSelectedSector?: string | null; // sector selected on first render
+  selectedSector?: string | null; // controlled selection — overrides internal state when set
   onSelectionChange?: (selection: { dataKey: string; value: number } | null) => void; // fires when the selected sector changes
   isLoading?: boolean; // shows the animated loading skeleton
   chartOptions?: Record<string, unknown>; // escape hatch merged over the built ECharts option
@@ -873,6 +874,7 @@ export function EChartsPieChart<TData extends Record<string, unknown>>({
   className,
   animation = true,
   defaultSelectedSector = null,
+  selectedSector: selectedSectorProp,
   onSelectionChange,
   isLoading = false,
   chartOptions,
@@ -902,7 +904,11 @@ export function EChartsPieChart<TData extends Record<string, unknown>>({
 
   const shouldReduceMotion = useReducedMotion();
 
-  const [selectedSector, setSelectedSector] = useState<string | null>(defaultSelectedSector);
+  // Selection is controlled when the `selectedSector` prop is provided; otherwise
+  // the internal state (seeded by defaultSelectedSector) drives it.
+  const [internalSelectedSector, setSelectedSector] = useState<string | null>(defaultSelectedSector);
+  const selectedSector =
+    selectedSectorProp !== undefined ? selectedSectorProp : internalSelectedSector;
 
   // ── Declarative config, collected from children by reference ─────────────────
   const collected = useMemo(() => collectConfig(children), [children]);
