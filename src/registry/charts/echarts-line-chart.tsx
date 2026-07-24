@@ -114,18 +114,28 @@ const LOADING_DEFAULT_POINTS = 14;
 // echoing the Recharts twin's 4px dash / 3px gap forecast tail.
 const BUFFER_DASH: [number, number] = [4, 3];
 
-// <Line glowing> glow. Canvas has no SVG blur filter, so the glow is a stack of
-// SILENT, symbol-free copies of the line laid UNDER the real one: same gradient
-// paint, growing width, shrinking low opacity. Wide low-alpha gradient strokes
-// pool into a soft halo that follows the series' own color along its whole
-// length — the way the Recharts twin's feGaussianBlur wraps the entire line. A
-// single shadowColor tint (the old approach) flattened a multi-stop gradient to
-// one hue and barely reached past the dots. Widest & faintest last; `symbolPad`
-// grows the glow disc under each visible dot so haloed markers bloom too.
-const GLOW_LAYERS: { width: number; opacity: number; symbolPad: number }[] = [
-  { width: 4, opacity: 0.3, symbolPad: 2 },
-  { width: 9, opacity: 0.15, symbolPad: 7 },
-  { width: 16, opacity: 0.07, symbolPad: 14 },
+// <Line glowing> glow. Canvas has no SVG blur filter over a whole shape, so the
+// glow is built from SILENT, stacked copies of the line laid UNDER the real one.
+//
+// The layers are all the SAME NARROW WIDTH on purpose. A wide translucent stroke
+// has a HARD edge, so widening each copy (the obvious approach) paints concentric
+// contour rings, not a glow — no number of layers hides it, because every layer
+// contributes another visible boundary. Here each copy stays hidden beneath the
+// real line and the visible halo comes entirely from its canvas `shadowBlur`,
+// which is a true gaussian: edgeless by construction, and summing several at
+// different radii stays perfectly smooth.
+//
+// The trade: a canvas shadow is a single flat color, so the halo is cast in the
+// gradient's mid tone (`sampleGradient(slots, 0.5)`) rather than tracking the
+// stroke's color along its length. The stroke copies themselves still carry the
+// real gradient, so the bright core reads correctly; only the soft bloom is one
+// hue. Smooth beats hue-accurate here. `symbolPad` grows the glow disc under each
+// visible dot so haloed markers bloom too.
+const GLOW_LAYERS: { width: number; opacity: number; blur: number; symbolPad: number }[] = [
+  { width: 2, opacity: 0.9, blur: 5, symbolPad: 2 },
+  { width: 2, opacity: 0.6, blur: 12, symbolPad: 6 },
+  { width: 2, opacity: 0.38, blur: 24, symbolPad: 11 },
+  { width: 2, opacity: 0.22, blur: 42, symbolPad: 16 },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -503,6 +513,13 @@ function buildGlowSeries(params: {
         color: paint,
         width: layer.width,
         opacity: glowOpacity,
+        // Feathers this layer's edge so the stack reads as one smooth falloff
+        // rather than concentric bands (see GLOW_LAYERS).
+        shadowBlur: layer.blur,
+        // Full-alpha shadow color: the element's own `opacity` above already
+        // scales its shadow, so pre-dimming here squares the alpha and washes
+        // the halo out.
+        shadowColor: sampleGradient(slots, 0.5),
         cap: "round",
         join: "round",
       },

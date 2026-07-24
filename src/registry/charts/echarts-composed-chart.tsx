@@ -10,6 +10,15 @@ import {
   type TooltipVariant,
 } from "@/registry/ui/echarts-tooltip";
 import {
+  Brush,
+  buildBrushDataZoom,
+  syncBrushOverlay,
+  type BrushGeometry,
+  type BrushOverlayElements,
+  type BrushProps,
+  type BrushRange,
+} from "@/registry/ui/echarts-brush";
+import {
   DataZoomComponent,
   GridComponent,
   TooltipComponent,
@@ -40,15 +49,6 @@ import {
   type FC,
   type ReactNode,
 } from "react";
-import {
-  Brush,
-  buildBrushDataZoom,
-  syncBrushOverlay,
-  type BrushGeometry,
-  type BrushOverlayElements,
-  type BrushProps,
-  type BrushRange,
-} from "@/registry/ui/echarts-brush";
 import { dotItemStyle, dotStyle, sampleGradient, type DotVariant } from "@/registry/ui/echarts-dot";
 import { BarChart, LineChart, type BarSeriesOption, type LineSeriesOption } from "echarts/charts";
 import { LegendOverlay, type LegendVariant } from "@/registry/ui/echarts-legend";
@@ -161,15 +161,20 @@ const BRUSH_FILLER_OPACITY = 0; // selected-range wash — evil-brush draws none
 // wrong tint.
 const BAR_GLOW_BLUR = 16; // bar glow radius, canvas shadowBlur
 const BAR_GLOW_OPACITY = 0.6; // bar glow strength, × series color alpha
-// Lines: a single shadowColor can't follow a horizontal color gradient — it reads
-// as one flat tint hugging the dots. Instead we stack a few SILENT overlay copies
-// of the stroke UNDER the real line, painted with the SAME gradient, widening and
-// fading outward. Wide low-alpha gradient strokes read as a soft colored blur that
-// tracks the series color along its whole length, matching the SVG blur.
-const LINE_GLOW_LAYERS: { width: number; opacity: number }[] = [
-  { width: 6, opacity: 0.3 }, // × series color alpha
-  { width: 12, opacity: 0.15 },
-  { width: 20, opacity: 0.07 },
+// Lines: SILENT copies of the stroke stacked UNDER the real line, all at the SAME
+// NARROW WIDTH so they stay hidden beneath it — the visible halo is entirely each
+// copy's canvas `shadowBlur`. Widening the copies instead (the obvious approach)
+// paints concentric contour rings, because a translucent stroke has a hard edge
+// and every extra layer adds another visible boundary; a shadow is a true gaussian
+// and several at different radii sum to a smooth falloff. The copies keep the
+// series gradient so the bright core tracks the line's color; the shadow itself is
+// one flat tone (a canvas shadow cannot be a gradient), which only tints the soft
+// outer bloom. Matches the line chart's GLOW_LAYERS.
+const LINE_GLOW_LAYERS: { width: number; opacity: number; blur: number }[] = [
+  { width: 2, opacity: 0.9, blur: 5 }, // × series color alpha
+  { width: 2, opacity: 0.6, blur: 12 },
+  { width: 2, opacity: 0.38, blur: 24 },
+  { width: 2, opacity: 0.22, blur: 42 },
 ];
 // The dim applied to unselected series once one series is selected. Line strokes
 // and dots drop to SELECTION_DIM (0.3, matching the Recharts twin); bar FILLS
@@ -1334,6 +1339,10 @@ function buildLineGlowSeries(ctx: OptionBuildContext): LineSeriesOption[] {
           color: paint,
           width: layer.width,
           opacity: layer.opacity * dim,
+          // The halo itself. Full-alpha color: the element opacity above already
+          // scales its shadow, so pre-dimming here would square the alpha.
+          shadowBlur: layer.blur,
+          shadowColor: sampleGradient(slots, 0.5),
           cap: "round" as const,
           join: "round" as const,
         },
