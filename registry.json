@@ -1787,19 +1787,6 @@
       ]
     },
     {
-      "name": "ex-glowing-echarts-radial-chart",
-      "registryDependencies": [
-        "@evilcharts/echarts-radial-chart"
-      ],
-      "type": "registry:block",
-      "files": [
-        {
-          "path": "src/registry/examples/echarts/ex-glowing-echarts-radial-chart.tsx",
-          "type": "registry:block"
-        }
-      ]
-    },
-    {
       "name": "ex-echarts-sankey-chart",
       "registryDependencies": [
         "@evilcharts/echarts-sankey-chart"
@@ -1860,19 +1847,6 @@
       "files": [
         {
           "path": "src/registry/examples/echarts/ex-source-link-variant-echarts-sankey-chart.tsx",
-          "type": "registry:block"
-        }
-      ]
-    },
-    {
-      "name": "ex-glowing-echarts-sankey-chart",
-      "registryDependencies": [
-        "@evilcharts/echarts-sankey-chart"
-      ],
-      "type": "registry:block",
-      "files": [
-        {
-          "path": "src/registry/examples/echarts/ex-glowing-echarts-sankey-chart.tsx",
           "type": "registry:block"
         }
       ]
@@ -3048,19 +3022,6 @@
       ]
     },
     {
-      "name": "ex-glowing-radial-chart",
-      "registryDependencies": [
-        "@evilcharts/recharts-radial-chart"
-      ],
-      "type": "registry:block",
-      "files": [
-        {
-          "path": "src/registry/examples/recharts/ex-glowing-radial-chart.tsx",
-          "type": "registry:block"
-        }
-      ]
-    },
-    {
       "name": "ex-radar-chart",
       "registryDependencies": [
         "@evilcharts/recharts-radar-chart"
@@ -3199,19 +3160,6 @@
       "files": [
         {
           "path": "src/registry/examples/recharts/ex-source-link-variant-sankey-chart.tsx",
-          "type": "registry:block"
-        }
-      ]
-    },
-    {
-      "name": "ex-glowing-sankey-chart",
-      "registryDependencies": [
-        "@evilcharts/recharts-sankey-chart"
-      ],
-      "type": "registry:block",
-      "files": [
-        {
-          "path": "src/registry/examples/recharts/ex-glowing-sankey-chart.tsx",
           "type": "registry:block"
         }
       ]
@@ -3547,6 +3495,25 @@
           "path": "src/registry/blocks/echarts/b-market-share-echarts-pie-chart.tsx",
           "type": "registry:block",
           "target": "components/evilcharts/blocks/market-share-echarts-pie-chart.tsx"
+        }
+      ]
+    },
+    {
+      "name": "progress-rings-echarts-pie-chart",
+      "description": "Dotted progress rings with a centered stat, built from per-dot pie sectors",
+      "dependencies": [
+        "echarts",
+        "motion"
+      ],
+      "registryDependencies": [
+        "@evilcharts/echarts-pie-chart"
+      ],
+      "type": "registry:block",
+      "files": [
+        {
+          "path": "src/registry/blocks/echarts/b-progress-rings-echarts-pie-chart.tsx",
+          "type": "registry:block",
+          "target": "components/evilcharts/blocks/progress-rings-echarts-pie-chart.tsx"
         }
       ]
     }

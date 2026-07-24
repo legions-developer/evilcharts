@@ -115,4 +115,18 @@ export const blocks: Registry["items"] = [
       },
     ],
   },
+  {
+    name: "progress-rings-echarts-pie-chart",
+    description: "Dotted progress rings with a centered stat, built from per-dot pie sectors",
+    dependencies: ["echarts", "motion"],
+    registryDependencies: ["@evilcharts/echarts-pie-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "blocks/echarts/b-progress-rings-echarts-pie-chart.tsx",
+        type: "registry:block",
+        target: TARGET_BASE_PATH + "/progress-rings-echarts-pie-chart.tsx",
+      },
+    ],
+  },
 ];

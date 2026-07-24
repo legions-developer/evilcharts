@@ -2239,24 +2239,6 @@ export const Index: Record<string, any> = {
     categories: undefined,
     meta: undefined,
   },
-  "ex-glowing-echarts-radial-chart": {
-    name: "ex-glowing-echarts-radial-chart",
-    description: "",
-    type: "registry:block",
-    registryDependencies: ["@evilcharts/echarts-radial-chart"],
-    files: [{
-      path: "@/registry/examples/echarts/ex-glowing-echarts-radial-chart.tsx",
-      type: "registry:block",
-      target: ""
-    }],
-    component: React.lazy(async () => {
-      const mod = await import("@/registry/examples/echarts/ex-glowing-echarts-radial-chart.tsx")
-      const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
-      return { default: mod.default || mod[exportName] }
-    }),
-    categories: undefined,
-    meta: undefined,
-  },
   "ex-echarts-sankey-chart": {
     name: "ex-echarts-sankey-chart",
     description: "",
@@ -2341,24 +2323,6 @@ export const Index: Record<string, any> = {
     }],
     component: React.lazy(async () => {
       const mod = await import("@/registry/examples/echarts/ex-source-link-variant-echarts-sankey-chart.tsx")
-      const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
-      return { default: mod.default || mod[exportName] }
-    }),
-    categories: undefined,
-    meta: undefined,
-  },
-  "ex-glowing-echarts-sankey-chart": {
-    name: "ex-glowing-echarts-sankey-chart",
-    description: "",
-    type: "registry:block",
-    registryDependencies: ["@evilcharts/echarts-sankey-chart"],
-    files: [{
-      path: "@/registry/examples/echarts/ex-glowing-echarts-sankey-chart.tsx",
-      type: "registry:block",
-      target: ""
-    }],
-    component: React.lazy(async () => {
-      const mod = await import("@/registry/examples/echarts/ex-glowing-echarts-sankey-chart.tsx")
       const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
       return { default: mod.default || mod[exportName] }
     }),
@@ -3985,24 +3949,6 @@ export const Index: Record<string, any> = {
     categories: undefined,
     meta: undefined,
   },
-  "ex-glowing-radial-chart": {
-    name: "ex-glowing-radial-chart",
-    description: "",
-    type: "registry:block",
-    registryDependencies: ["@evilcharts/recharts-radial-chart"],
-    files: [{
-      path: "@/registry/examples/recharts/ex-glowing-radial-chart.tsx",
-      type: "registry:block",
-      target: ""
-    }],
-    component: React.lazy(async () => {
-      const mod = await import("@/registry/examples/recharts/ex-glowing-radial-chart.tsx")
-      const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
-      return { default: mod.default || mod[exportName] }
-    }),
-    categories: undefined,
-    meta: undefined,
-  },
   "ex-radar-chart": {
     name: "ex-radar-chart",
     description: "",
@@ -4195,24 +4141,6 @@ export const Index: Record<string, any> = {
     }],
     component: React.lazy(async () => {
       const mod = await import("@/registry/examples/recharts/ex-source-link-variant-sankey-chart.tsx")
-      const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
-      return { default: mod.default || mod[exportName] }
-    }),
-    categories: undefined,
-    meta: undefined,
-  },
-  "ex-glowing-sankey-chart": {
-    name: "ex-glowing-sankey-chart",
-    description: "",
-    type: "registry:block",
-    registryDependencies: ["@evilcharts/recharts-sankey-chart"],
-    files: [{
-      path: "@/registry/examples/recharts/ex-glowing-sankey-chart.tsx",
-      type: "registry:block",
-      target: ""
-    }],
-    component: React.lazy(async () => {
-      const mod = await import("@/registry/examples/recharts/ex-glowing-sankey-chart.tsx")
       const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
       return { default: mod.default || mod[exportName] }
     }),
@@ -4609,6 +4537,24 @@ export const Index: Record<string, any> = {
     }],
     component: React.lazy(async () => {
       const mod = await import("@/registry/blocks/echarts/b-market-share-echarts-pie-chart.tsx")
+      const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
+      return { default: mod.default || mod[exportName] }
+    }),
+    categories: undefined,
+    meta: undefined,
+  },
+  "progress-rings-echarts-pie-chart": {
+    name: "progress-rings-echarts-pie-chart",
+    description: "Dotted progress rings with a centered stat, built from per-dot pie sectors",
+    type: "registry:block",
+    registryDependencies: ["@evilcharts/echarts-pie-chart"],
+    files: [{
+      path: "@/registry/blocks/echarts/b-progress-rings-echarts-pie-chart.tsx",
+      type: "registry:block",
+      target: "components/evilcharts/blocks/progress-rings-echarts-pie-chart.tsx"
+    }],
+    component: React.lazy(async () => {
+      const mod = await import("@/registry/blocks/echarts/b-progress-rings-echarts-pie-chart.tsx")
       const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
       return { default: mod.default || mod[exportName] }
     }),
