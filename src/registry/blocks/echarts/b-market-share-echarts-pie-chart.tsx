@@ -5,15 +5,15 @@ import { cn } from "@/lib/utils";
 import { useState } from "react";
 
 const SERIES = [
-  { key: "quicksync", label: "QuickSync", value: 26, swatch: "bg-[#0a0a0a] dark:bg-[#ffffff]" },
-  { key: "datapulse", label: "DataPulse", value: 22, swatch: "bg-[#262626] dark:bg-[#dedede]" },
-  { key: "cloudnest", label: "CloudNest", value: 12, swatch: "bg-[#3d3d3d] dark:bg-[#bebebe]" },
-  { key: "taskflow", label: "TaskFlow", value: 22, swatch: "bg-[#545454] dark:bg-[#a0a0a0]" },
-  { key: "insighthub", label: "InsightHub", value: 7, swatch: "bg-[#6b6b6b] dark:bg-[#868686]" },
+  { key: "skyline", label: "Skyline", value: 27, swatch: "bg-[#0a0a0a] dark:bg-[#ffffff]" },
+  { key: "datawell", label: "Datawell", value: 21, swatch: "bg-[#262626] dark:bg-[#dedede]" },
+  { key: "cloudpeak", label: "Cloudpeak", value: 13, swatch: "bg-[#3d3d3d] dark:bg-[#bebebe]" },
+  { key: "taskbridge", label: "Taskbridge", value: 21, swatch: "bg-[#545454] dark:bg-[#a0a0a0]" },
+  { key: "insightloop", label: "Insightloop", value: 6, swatch: "bg-[#6b6b6b] dark:bg-[#868686]" },
   {
-    key: "streamlinepro",
-    label: "StreamlinePro",
-    value: 11,
+    key: "streamforge",
+    label: "Streamforge",
+    value: 12,
     swatch: "bg-[#7d7d7d] dark:bg-[#6f6f6f]",
   },
 ] as const;
@@ -25,12 +25,12 @@ const chartData = [...SERIES].reverse().map(({ key, value }) => ({
 }));
 
 const chartConfig = {
-  quicksync: { label: "QuickSync", colors: { light: ["#0a0a0a"], dark: ["#ffffff"] } },
-  datapulse: { label: "DataPulse", colors: { light: ["#262626"], dark: ["#dedede"] } },
-  cloudnest: { label: "CloudNest", colors: { light: ["#3d3d3d"], dark: ["#bebebe"] } },
-  taskflow: { label: "TaskFlow", colors: { light: ["#545454"], dark: ["#a0a0a0"] } },
-  insighthub: { label: "InsightHub", colors: { light: ["#6b6b6b"], dark: ["#868686"] } },
-  streamlinepro: { label: "StreamlinePro", colors: { light: ["#7d7d7d"], dark: ["#6f6f6f"] } },
+  skyline: { label: "Skyline", colors: { light: ["#0a0a0a"], dark: ["#ffffff"] } },
+  datawell: { label: "Datawell", colors: { light: ["#262626"], dark: ["#dedede"] } },
+  cloudpeak: { label: "Cloudpeak", colors: { light: ["#3d3d3d"], dark: ["#bebebe"] } },
+  taskbridge: { label: "Taskbridge", colors: { light: ["#545454"], dark: ["#a0a0a0"] } },
+  insightloop: { label: "Insightloop", colors: { light: ["#6b6b6b"], dark: ["#868686"] } },
+  streamforge: { label: "Streamforge", colors: { light: ["#7d7d7d"], dark: ["#6f6f6f"] } },
 } satisfies ChartConfig;
 
 const TOTAL = SERIES.reduce((sum, { value }) => sum + value, 0);

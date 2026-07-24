@@ -10,7 +10,7 @@ const STATS = [
   { id: "forecast", value: 67, caption: "Inaccurate forecasts disrupt planning." },
 ] as const;
 
-const FILLED = { light: ["#059669"], dark: ["#a7f3d0"] };
+const FILLED = { light: ["#E43861"], dark: ["#E43861"] };
 const TRACK = { light: ["#d4d4d4"], dark: ["#3f3f3f"] };
 const GAP = { light: ["transparent"], dark: ["transparent"] };
 
@@ -32,7 +32,7 @@ export function EChartsProgressRingsPieChart() {
     <div className="flex h-full w-full flex-col p-4">
       <div className="flex items-start justify-between gap-4">
         <div className="flex flex-col gap-0.5">
-          <span className="text-muted-foreground text-[10px] font-medium tracking-[0.14em] uppercase sm:text-[11px]">
+          <span className="text-muted-foreground text-[10px] tracking-wide uppercase">
             User research
           </span>
           <span className="text-primary text-base leading-tight font-medium tracking-tight sm:text-xl">
