@@ -225,6 +225,7 @@ export interface XAxisProps {
   // letting examples share `(value) => value.substring(0, 3)` with the Recharts twin.
   tickFormatter?: (value: string, index: number) => string; // formats x tick labels
   label?: string; // axis title, centered below the tick labels
+  hideDots?: boolean; // hides the tick dots beside this axis's labels
 }
 
 /** Presence shows the x-axis category labels. Renders nothing. */
@@ -234,6 +235,7 @@ export interface YAxisProps {
   dataKey?: string; // reserved for parity with the Recharts twin
   tickFormatter?: (value: number, index: number) => string; // formats y tick labels
   label?: string; // axis title, rotated alongside the tick labels
+  hideDots?: boolean; // hides the tick dots beside this axis's labels
 }
 
 /** Presence shows the y value axis. Renders nothing. */
@@ -287,12 +289,14 @@ type XAxisSlot = {
   dataKey?: string;
   tickFormatter?: (value: string, index: number) => string;
   label?: string;
+  hideDots: boolean;
 };
 type YAxisSlot = {
   present: boolean;
   dataKey?: string;
   tickFormatter?: (value: number, index: number) => string;
   label?: string;
+  hideDots: boolean;
 };
 type TooltipSlot = {
   present: boolean;
@@ -327,8 +331,8 @@ type CollectedConfig = {
 
 function collectConfig(children: ReactNode): CollectedConfig {
   const areas: AreaSeriesConfig[] = [];
-  let xAxis: XAxisSlot = { present: false };
-  let yAxis: YAxisSlot = { present: false };
+  let xAxis: XAxisSlot = { present: false, hideDots: false };
+  let yAxis: YAxisSlot = { present: false, hideDots: false };
   let showGrid = false;
   let tooltip: TooltipSlot = {
     present: false,
@@ -382,6 +386,7 @@ function collectConfig(children: ReactNode): CollectedConfig {
         dataKey: props.dataKey,
         tickFormatter: props.tickFormatter,
         label: props.label,
+        hideDots: props.hideDots ?? false,
       };
     } else if (type === YAxis) {
       const props = child.props as YAxisProps;
@@ -390,6 +395,7 @@ function collectConfig(children: ReactNode): CollectedConfig {
         dataKey: props.dataKey,
         tickFormatter: props.tickFormatter,
         label: props.label,
+        hideDots: props.hideDots ?? false,
       };
     } else if (type === Grid) {
       showGrid = true;
@@ -814,7 +820,11 @@ function buildMainAxes(ctx: OptionBuildContext): { xAxis: XAxisOption; yAxis: YA
     // Tick DOTS: a near-zero-length tick whose round caps form a true circle,
     // in the gridline gray (flattened opaque so the caps don't stack).
     axisTick: {
-      show: !isLoading && xAxisSlot.present,
+      show: !isLoading && xAxisSlot.present && !xAxisSlot.hideDots,
+      // Ticks default to the BOUNDARY between categories, which on a boundaryGap
+      // axis drops the dot in the gap instead of under its label. A no-op here
+      // (boundaryGap is false), kept for parity with the bar/composed charts.
+      alignWithLabel: true,
       length: 0.5,
       lineStyle: { color: tickDotColor, width: 3, cap: "round" },
     },
@@ -843,9 +853,11 @@ function buildMainAxes(ctx: OptionBuildContext): { xAxis: XAxisOption; yAxis: YA
     nameGap: 38,
     nameTextStyle: { color: axisLabelColor, fontSize: 10 },
     axisLine: { show: false },
-    // Same tick dots as the x-axis, beside each value label.
+    // Same tick dots as the x-axis, beside each value label. No alignWithLabel
+    // here: ECharts types it on the CATEGORY axis only, and a value axis already
+    // puts its ticks on the labels.
     axisTick: {
-      show: yAxisSlot.present && !isLoading,
+      show: yAxisSlot.present && !isLoading && !yAxisSlot.hideDots,
       length: 0.5,
       lineStyle: { color: tickDotColor, width: 3, cap: "round" },
     },
