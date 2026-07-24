@@ -1706,8 +1706,22 @@ export function EChartsLineChart<TData extends Record<string, unknown>>({
             },
           ]),
         },
-        { lazyUpdate: true, silent: true },
+        // NOT lazy: the highlight dispatched just below re-draws the active dot
+        // the setOption wipes, so the option must be committed first — a queued
+        // (lazy) update would land after the dispatch and erase the dot again.
+        { silent: true },
       );
+      // The per-frame setOption above cancels the axis tooltip's transient hover
+      // symbol, so the <ActiveDot> never lands at the cursor. Re-assert it:
+      // highlighting a real series at the cursor index draws its emphasis symbol
+      // (the active dot) even with showSymbol:false; downplay clears it on exit.
+      for (const key of keys) {
+        chart.dispatchAction(
+          on
+            ? { type: "highlight", seriesId: key, dataIndex: idx as number }
+            : { type: "downplay", seriesId: key },
+        );
+      }
     };
     const clearReveal = () => {
       if (live.revealIndex === null) return;

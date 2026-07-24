@@ -73,4 +73,18 @@ export const blocks: Registry["items"] = [
       },
     ],
   },
+  {
+    name: "portfolio-echarts-area-chart",
+    description: "Portfolio comparison card with hover-reveal, on the ECharts area chart",
+    dependencies: ["echarts", "motion"],
+    registryDependencies: ["@evilcharts/echarts-area-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "blocks/echarts/b-portfolio-echarts-area-chart.tsx",
+        type: "registry:block",
+        target: TARGET_BASE_PATH + "/portfolio-echarts-area-chart.tsx",
+      },
+    ],
+  },
 ];

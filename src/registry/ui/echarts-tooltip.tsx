@@ -24,7 +24,7 @@ export const roundnessClass: Record<TooltipRoundness, string> = {
 
 export const tooltipVariantClass: Record<TooltipVariant, string> = {
   default: "bg-background",
-  "frosted-glass": "bg-background/70 backdrop-blur-sm",
+  "frosted-glass": "bg-background/50 backdrop-blur-md",
 };
 
 // The standard series indicator swatch — a rounded square filled with the

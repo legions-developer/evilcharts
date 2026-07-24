@@ -4309,4 +4309,22 @@ export const Index: Record<string, any> = {
     categories: undefined,
     meta: undefined,
   },
+  "portfolio-echarts-area-chart": {
+    name: "portfolio-echarts-area-chart",
+    description: "Portfolio comparison card with hover-reveal, on the ECharts area chart",
+    type: "registry:block",
+    registryDependencies: ["@evilcharts/echarts-area-chart"],
+    files: [{
+      path: "@/registry/blocks/echarts/b-portfolio-echarts-area-chart.tsx",
+      type: "registry:block",
+      target: "components/evilcharts/blocks/portfolio-echarts-area-chart.tsx"
+    }],
+    component: React.lazy(async () => {
+      const mod = await import("@/registry/blocks/echarts/b-portfolio-echarts-area-chart.tsx")
+      const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
+      return { default: mod.default || mod[exportName] }
+    }),
+    categories: undefined,
+    meta: undefined,
+  },
   }
