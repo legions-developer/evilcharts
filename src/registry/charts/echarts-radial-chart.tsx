@@ -51,8 +51,8 @@ export type { ChartConfig, LegendVariant, TooltipPosition, TooltipRoundness, Too
 // `PolarComponent` bundles the polar coordinate system together with its
 // `angleAxis` + `radiusAxis` (concentric rings are a polar `bar` series whose
 // value drives the sweep angle). No GraphicComponent: unlike the area chart's
-// brush, nothing here draws raw zrender overlays — the glow is a canvas shadow,
-// selection is per-datum opacity, and the skeleton shimmer is a swept gradient.
+// brush, nothing here draws raw zrender overlays — selection is per-datum
+// opacity, and the skeleton shimmer is a swept gradient.
 echarts.use([BarChart, PolarComponent, TooltipComponent, CanvasRenderer]);
 
 type EChartsInstance = ReturnType<typeof echarts.init>;
@@ -73,13 +73,10 @@ type AngleAxisOption = ArrayItem<NonNullable<EChartsOption["angleAxis"]>>;
 type RadiusAxisOption = ArrayItem<NonNullable<EChartsOption["radiusAxis"]>>;
 
 // Per-datum bar paint — structurally assignable to the per-datum itemStyle. A
-// gradient `color` reproduces each bar's diagonal fill; `shadowBlur`/`shadowColor`
-// are the canvas analogue of the Recharts glow filter.
+// gradient `color` reproduces each bar's diagonal fill.
 type BarItemStyle = {
   color?: string | echarts.graphic.LinearGradient;
   opacity?: number;
-  shadowBlur?: number;
-  shadowColor?: string;
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -106,17 +103,6 @@ const REVEAL_DURATION = 1000; // intro sweep-in length, in milliseconds
 // already 10%-white stays subtle. Tune here, not in the builder.
 // ─────────────────────────────────────────────────────────────────────────────
 const TRACK_OPACITY = 0.15; // unfilled background ring, × muted-foreground alpha
-// Glow — stacked silent copies of a glowing ring, each painted with the SAME
-// gradient as the bar (so a multi-stop ring's glow varies along the arc exactly
-// like its fill — a single shadowColor tint can't), at increasing radial width
-// and decreasing opacity, with a light shadowBlur to feather each layer's edge.
-// Wide, low-alpha, blurred gradient copies read as a soft colored halo — the
-// canvas analogue of the Recharts twin's Gaussian-blur SVG filter.
-const GLOW_LAYERS = [
-  { widthAdd: 18, opacity: 0.08, blur: 14 }, // outermost — widest, faintest
-  { widthAdd: 10, opacity: 0.16, blur: 9 },
-  { widthAdd: 4, opacity: 0.3, blur: 5 }, // innermost — hugs the bar, brightest
-] as const;
 const SELECTED_DIM_OPACITY = 0.15; // unselected bars while a selection is active
 // The skeleton track stays faintly visible; a bright band is CLIPPED to a small
 // sweeping window (only the arc slice inside it exists) and swept diagonally
@@ -130,7 +116,9 @@ const LOADING_SHIMMER_FEATHER = 0.2; // eased edge softening of the clip window
 // feeds the tooltip.
 const MAIN_SERIES_ID = "radial-bars";
 const TRACK_SERIES_ID = "__track";
-const GLOW_SERIES_ID = "__glow";
+// The track rides a second, identical polar so it never shares a bar band with
+// the data rings — see buildTrackSeries for why that matters.
+const TRACK_POLAR_INDEX = 1;
 const LOADING_SERIES_ID = "__loading";
 const LOADING_TRACK_ID = "__loading-track";
 
@@ -174,13 +162,12 @@ export interface RadialBarProps {
   barSize?: number; // thickness of each radial bar in pixels
   showBackground?: boolean; // renders the unfilled track behind each bar
   isClickable?: boolean; // lets bars be selected by clicking them
-  glowingBars?: string[]; // names of bars rendered with a soft glow
 }
 
 /**
  * The radial bar series. Each data row becomes one concentric ring. Pass
- * `glowingBars` to highlight specific bars and `isClickable` to make bars
- * selectable. Renders nothing — the root reads these props to build the series.
+ * `isClickable` to make bars selectable. Renders nothing — the root reads these
+ * props to build the series.
  */
 const RadialBar: FC<RadialBarProps> = () => null;
 
@@ -216,7 +203,6 @@ type RadialBarSlot = {
   barSize: number;
   showBackground: boolean;
   isClickable: boolean;
-  glowingBars: string[];
 };
 type TooltipSlot = {
   present: boolean;
@@ -249,7 +235,6 @@ function collectConfig(children: ReactNode): CollectedConfig {
     barSize: DEFAULT_BAR_SIZE,
     showBackground: true,
     isClickable: false,
-    glowingBars: [],
   };
   let tooltip: TooltipSlot = {
     present: false,
@@ -278,7 +263,6 @@ function collectConfig(children: ReactNode): CollectedConfig {
         barSize: props.barSize ?? DEFAULT_BAR_SIZE,
         showBackground: props.showBackground ?? true,
         isClickable: props.isClickable ?? false,
-        glowingBars: props.glowingBars ?? [],
       };
     } else if (type === Tooltip) {
       const props = child.props as TooltipProps;
@@ -633,21 +617,24 @@ type OptionBuildContext = {
   resolved: ResolvedColors;
 };
 
-// The polar coordinate system: concentric rings live between innerRadius and
-// outerRadius, centered per the arc variant.
-function buildPolar(ctx: OptionBuildContext): PolarOption {
+// The polar coordinate systems: concentric rings live between innerRadius and
+// outerRadius, centered per the arc variant. TWO identical systems are emitted —
+// index 0 carries the data rings, index 1 the background track, so neither can
+// eat into the other's bar band (see buildTrackSeries).
+function buildPolar(ctx: OptionBuildContext): PolarOption[] {
   const geom = getVariantGeometry(ctx.variant);
-  return {
+  const polar: PolarOption = {
     center: geom.center,
     radius: [ctx.innerRadius, ctx.outerRadius] as (number | string)[],
   };
+  return [polar, { ...polar }];
 }
 
 // The VALUE axis: a bar's length is its arc sweep, so the value maps to the
 // angle. Fully hidden — the Recharts twin shows no angular ticks or gridlines.
-function buildAngleAxis(ctx: OptionBuildContext): AngleAxisOption {
+function buildAngleAxis(ctx: OptionBuildContext): AngleAxisOption[] {
   const geom = getVariantGeometry(ctx.variant);
-  return {
+  const axis: AngleAxisOption = {
     type: "value",
     min: 0,
     max: ctx.angleMax,
@@ -660,12 +647,17 @@ function buildAngleAxis(ctx: OptionBuildContext): AngleAxisOption {
     axisLabel: { show: false },
     splitLine: { show: false },
   };
+  // One per polar — an axis binds to its system through `polarIndex`.
+  return [
+    { ...axis, polarIndex: 0 },
+    { ...axis, polarIndex: TRACK_POLAR_INDEX },
+  ];
 }
 
 // The CATEGORY axis: one band per ring. Category index 0 sits innermost, which
 // matches the Recharts twin (first data row = innermost ring). Fully hidden.
-function buildRadiusAxis(ctx: OptionBuildContext): RadiusAxisOption {
-  return {
+function buildRadiusAxis(ctx: OptionBuildContext): RadiusAxisOption[] {
+  const axis: RadiusAxisOption = {
     type: "category",
     data: ctx.categories,
     show: false,
@@ -674,19 +666,29 @@ function buildRadiusAxis(ctx: OptionBuildContext): RadiusAxisOption {
     axisLabel: { show: false },
     splitLine: { show: false },
   };
+  // Identical bands on both polars, so a ring and its track land on the same radius.
+  return [
+    { ...axis, polarIndex: 0 },
+    { ...axis, polarIndex: TRACK_POLAR_INDEX },
+  ];
 }
 
 // The unfilled track behind each bar — a full-range ring drawn only when
 // `showBackground` is set. ECharts' native `showBackground` always spans a full
-// 360° ring even in the `semi` variant, so the track is a real (silent) bar
-// series at the axis max instead: it fills exactly the arc range of the chart.
+// 360° ring even in the `semi` variant (createBackgroundShape hardcodes
+// startAngle 0 / endAngle 2π for tangential polar bars), so the track is a real
+// (silent) bar series at the axis max instead: it fills exactly the arc range.
 //
-// `barGap: "-100%"` is load-bearing: the track and the data ring are two bar
-// series sharing one radiusAxis, and ECharts otherwise lays grouped bar series
-// out side-by-side — each in its own radial sub-band, so the gray track ends up
-// at a different radius than the colored bar. Overlapping the group (same
-// barWidth, same barGap) makes the two share one center/radius/thickness by
-// construction, so the track EXACTLY underlays its bar in every variant.
+// `polarIndex: 1` is load-bearing. Bar series on ONE polar share the radiusAxis
+// band, and ECharts hands out that band per stack id, first come first served:
+// `barWidth = min(remainedWidth, barWidth)` (layout/barPolar.js). Two series
+// each asking for the same barSize therefore split the band — the ring claims
+// its full width and the track is clamped to the leftover, rendering thinner
+// and hugging the ring's inner edge instead of underlaying it. `barGap: "-100%"`
+// does NOT fix this: it only overlaps their offsets, never their widths. Giving
+// the track its own (identical) polar means each series is alone in its band, so
+// both get the requested width and the same centered offset — concentric by
+// construction, in every variant and at any barSize.
 function buildTrackSeries(ctx: OptionBuildContext, loading: boolean): BarSeriesOption {
   const { radialBar } = ctx;
   const trackColor = withAlpha(ctx.resolved.tokens.mutedForeground, TRACK_OPACITY);
@@ -694,10 +696,9 @@ function buildTrackSeries(ctx: OptionBuildContext, loading: boolean): BarSeriesO
     id: loading ? LOADING_TRACK_ID : TRACK_SERIES_ID,
     type: "bar",
     coordinateSystem: "polar",
-    polarIndex: 0,
+    polarIndex: TRACK_POLAR_INDEX,
     data: ctx.categories.map(() => ctx.angleMax),
     barWidth: radialBar.barSize,
-    barGap: "-100%",
     roundCap: radialBar.cornerRadius > 0,
     silent: true,
     // Static: the track is present from the first frame, only the data rings
@@ -709,53 +710,7 @@ function buildTrackSeries(ctx: OptionBuildContext, loading: boolean): BarSeriesO
   };
 }
 
-// Glow layers for the `glowingBars`. Each layer is a silent, wider, low-opacity
-// gradient copy of the glowing rings, overlapping the bar via `barGap: "-100%"`
-// (same centering guarantee as the track) and sitting above the track but below
-// the crisp bar. Non-glowing rings contribute a zero-length (invisible) datum so
-// one layer series covers every glowing ring at once. Returns [] when nothing
-// glows, so the common case adds no series.
-function buildGlowSeries(ctx: OptionBuildContext): BarSeriesOption[] {
-  const { categories, values, radialBar, resolved } = ctx;
-  const glowing = new Set(radialBar.glowingBars);
-  if (glowing.size === 0) return [];
-
-  return GLOW_LAYERS.map((layer, li) => {
-    const data = categories.map((name, i) => {
-      if (!glowing.has(name)) {
-        // Not glowing → no arc on this layer.
-        return { value: 0, itemStyle: { color: "transparent" } as BarItemStyle };
-      }
-      const slots = resolved.series[name] ?? [FALLBACK_COLOR];
-      const base = slots[0] ?? FALLBACK_COLOR;
-      const itemStyle: BarItemStyle = {
-        color: barPaint(slots),
-        opacity: layer.opacity,
-        shadowBlur: layer.blur,
-        shadowColor: base,
-      };
-      return { value: values[i] ?? 0, itemStyle };
-    });
-
-    return {
-      id: `${GLOW_SERIES_ID}-${li}`,
-      type: "bar",
-      coordinateSystem: "polar",
-      polarIndex: 0,
-      data,
-      barWidth: radialBar.barSize + layer.widthAdd,
-      barGap: "-100%",
-      roundCap: radialBar.cornerRadius > 0,
-      silent: true,
-      emphasis: { disabled: true },
-      tooltip: { show: false },
-      z: 2, // above the track (z 1), below the crisp bar (z 3)
-    };
-  });
-}
-
-// The data rings. Each datum carries its own diagonal color fill and selection
-// dim; the glow for `glowingBars` is drawn by buildGlowSeries as underlays.
+// The data rings. Each datum carries its own diagonal color fill and selection dim.
 function buildBarSeries(ctx: OptionBuildContext): BarSeriesOption[] {
   const { categories, values, radialBar, selectedBar, hasSelection, resolved } = ctx;
 
@@ -765,8 +720,6 @@ function buildBarSeries(ctx: OptionBuildContext): BarSeriesOption[] {
     // Selection only dims when the bar is actually clickable (Recharts twin).
     const dimmed = radialBar.isClickable && hasSelection && !isSelected;
 
-    // The glow is drawn by separate underlay series (buildGlowSeries), so the
-    // crisp bar itself carries no shadow — just its gradient fill and dim.
     const itemStyle: BarItemStyle = {
       color: barPaint(slots),
       opacity: dimmed ? SELECTED_DIM_OPACITY : 1,
@@ -779,27 +732,20 @@ function buildBarSeries(ctx: OptionBuildContext): BarSeriesOption[] {
     id: MAIN_SERIES_ID,
     type: "bar",
     coordinateSystem: "polar",
+    // Sole series on polar 0 — the track rides its own polar (see buildTrackSeries).
     polarIndex: 0,
     data,
     barWidth: radialBar.barSize,
-    // Overlap the track + glow layers (see buildTrackSeries) so every series
-    // shares one center/radius/thickness instead of being grouped side-by-side.
-    barGap: "-100%",
     roundCap: radialBar.cornerRadius > 0,
     cursor: radialBar.isClickable ? "pointer" : "default",
     // The radial twin has no hover-highlight, so bars don't emphasise on hover.
     emphasis: { disabled: true },
-    z: 3, // above the glow underlays (z 2) and the track (z 1)
+    z: 3, // above the track (z 1)
   };
 
   // Main first (index 0) so `showTip` can target it by a stable index; z keeps it
-  // above the track/glow regardless of array order. Glow underlays and the track
-  // follow — all share the overlapped bar group.
-  return [
-    main,
-    ...buildGlowSeries(ctx),
-    ...(radialBar.showBackground ? [buildTrackSeries(ctx, false)] : []),
-  ];
+  // above the track regardless of array order.
+  return [main, ...(radialBar.showBackground ? [buildTrackSeries(ctx, false)] : [])];
 }
 
 // Tooltip HTML builder, closed over the build context. `trigger: "item"` — each
@@ -881,8 +827,6 @@ function buildLoadingOption(ctx: OptionBuildContext): EChartsOption {
         polarIndex: 0,
         data: ctx.loadingData(),
         barWidth: loadingCtx.radialBar.barSize,
-        // Overlap the loading track so the shimmer rings ride exactly on it.
-        barGap: "-100%",
         roundCap: loadingCtx.radialBar.cornerRadius > 0,
         silent: true,
         emphasis: { disabled: true },
