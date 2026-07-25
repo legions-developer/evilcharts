@@ -61,8 +61,8 @@ const CITIES = [
 
 export function EChartsPayoutsLineChart() {
   return (
-    <div className="flex h-full w-full flex-col px-4 pt-4 pb-2">
-      <div className="min-h-0 w-full flex-1">
+    <div className="flex h-full w-full flex-col px-3 pt-2 pb-1 sm:px-4 sm:pt-4 sm:pb-2">
+      <div className="min-h-24 w-full flex-1 sm:min-h-0">
         <EChartsLineChart
           data={chartData}
           config={chartConfig}
@@ -82,17 +82,17 @@ export function EChartsPayoutsLineChart() {
         </EChartsLineChart>
       </div>
 
-      <div className="mt-3 grid shrink-0 grid-cols-2 gap-4">
+      <div className="mt-2 grid shrink-0 grid-cols-2 gap-3 sm:mt-3 sm:gap-4">
         {STATS.map(({ key, label, value, delta, sub, swatch }) => (
           <div key={key} className="flex flex-col gap-0.5">
-            <span className="text-primary flex items-center gap-1.5 text-[11px] font-medium">
+            <span className="text-primary flex items-center gap-1.5 text-[10px] leading-3.5 font-medium sm:text-[11px] sm:leading-normal">
               <span className={cn("size-2 shrink-0 rounded-[3px]", swatch)} />
               {label}
             </span>
-            <span className="text-primary text-xl font-semibold tracking-tight sm:text-2xl">
+            <span className="text-primary text-xl leading-6 font-semibold tracking-tight sm:text-2xl sm:leading-8">
               {value}
             </span>
-            <span className="flex items-center gap-1.5 text-[11px]">
+            <span className="flex items-center gap-1.5 text-[10px] leading-3.5 sm:text-[11px] sm:leading-normal">
               <span className="font-medium text-emerald-500">{delta}</span>
               <span className="text-muted-foreground">{sub}</span>
             </span>
@@ -100,12 +100,12 @@ export function EChartsPayoutsLineChart() {
         ))}
       </div>
 
-      <div className="mt-3 shrink-0">
+      <div className="mt-2 shrink-0 sm:mt-3">
         {CITIES.map(({ city, amount }, i) => (
           <div
             key={city}
             className={cn(
-              "border-border flex items-center justify-between py-1.5 text-xs sm:text-sm",
+              "border-border flex items-center justify-between py-1 text-xs sm:py-1.5 sm:text-sm",
               i > 0 && "border-t",
             )}
           >

@@ -164,19 +164,19 @@ const share = (value: number, goal: number) => Math.round((value / goal) * 100);
 
 export function EChartsRideRadialChart() {
   return (
-    <div className="flex h-full w-full flex-col gap-4 p-4 sm:flex-row sm:gap-5">
-      <div className="flex min-h-0 flex-1 flex-col gap-4">
-        <div className="flex shrink-0 flex-col items-center gap-2">
-          <BikeIcon className="size-6 text-[#7c3aed] sm:size-7 dark:text-[#a78bfa]" />
+    <div className="flex h-full w-full flex-col gap-2 p-2 sm:flex-row sm:gap-5 sm:p-4">
+      <div className="flex min-h-0 flex-1 flex-col gap-2 sm:gap-4">
+        <div className="flex shrink-0 flex-col items-center gap-1 sm:gap-2">
+          <BikeIcon className="size-4 text-[#7c3aed] sm:size-7 dark:text-[#a78bfa]" />
 
           <div className="flex items-baseline gap-1.5">
-            <span className="text-primary text-3xl leading-none font-semibold tracking-tight tabular-nums sm:text-4xl">
+            <span className="text-primary text-2xl leading-none font-semibold tracking-tight tabular-nums sm:text-4xl">
               {RIDE.distance}
             </span>
             <span className="text-muted-foreground text-sm font-medium">{RIDE.unit} ridden</span>
           </div>
 
-          <div className="bg-muted h-2.5 w-full overflow-hidden rounded-full">
+          <div className="bg-muted h-2 w-full overflow-hidden rounded-full sm:h-2.5">
             <div
               className="h-full rounded-full bg-[#7c3aed] dark:bg-[#a78bfa]"
               style={{ width: `${share(RIDE.distance, RIDE.goal)}%` }}
@@ -184,10 +184,13 @@ export function EChartsRideRadialChart() {
           </div>
         </div>
 
-        <div className="grid min-h-0 flex-1 grid-cols-3 gap-2 border-t pt-3">
+        <div className="grid min-h-0 flex-1 grid-cols-3 gap-2 border-t pt-1.5 sm:pt-3">
           {METRICS.map(({ name, value, goal, unit, icon: Icon, tint }) => (
-            <div key={name} className="flex min-h-0 flex-col items-center justify-center gap-2">
-              <div className="relative aspect-square w-full max-w-[104px]">
+            <div
+              key={name}
+              className="flex min-h-0 flex-col items-center justify-center gap-1 sm:gap-2"
+            >
+              <div className="relative min-h-0 w-full max-w-[104px] flex-1 sm:aspect-square sm:min-h-auto sm:flex-initial">
                 <EChartsRadialChart
                   data={[{ name, value: share(value, goal) }]}
                   config={chartConfig}
@@ -211,7 +214,7 @@ export function EChartsRideRadialChart() {
               </div>
 
               <div className="flex shrink-0 items-baseline gap-1">
-                <span className="text-primary text-sm font-semibold tabular-nums sm:text-base">
+                <span className="text-primary text-xs font-semibold tabular-nums sm:text-base">
                   {value}
                 </span>
                 <span className="text-muted-foreground text-[11px]">{unit}</span>
@@ -221,16 +224,16 @@ export function EChartsRideRadialChart() {
         </div>
       </div>
 
-      <div className="flex shrink-0 gap-3 border-t pt-3 sm:w-[34%] sm:max-w-60 sm:border-t-0 sm:border-l sm:pt-0 sm:pl-5">
+      <div className="flex shrink-0 gap-3 border-t pt-2 sm:w-[34%] sm:max-w-60 sm:border-t-0 sm:border-l sm:pt-0 sm:pl-5">
         {SPLITS.map(({ name, label, value, unit, icon: Icon, tint }, index) => (
           <div
             key={name}
             className={cn(
-              "flex flex-1 flex-col justify-between gap-3",
+              "flex flex-1 flex-col justify-between gap-1.5 sm:gap-3",
               index > 0 && "border-l pl-3",
             )}
           >
-            <Icon className={cn("size-5 shrink-0 sm:size-6", tint)} />
+            <Icon className={cn("size-4 shrink-0 sm:size-6", tint)} />
 
             <div className="flex flex-col gap-0.5">
               <span className="text-muted-foreground text-[10px] tracking-wider uppercase">

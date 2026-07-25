@@ -1,6 +1,7 @@
 "use client";
 
 import { EChartsRadialChart, type ChartConfig } from "@/registry/charts/echarts-radial-chart";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
 const TOTAL = 1000;
@@ -52,11 +53,27 @@ const chartData = [...TIERS]
 
 const count = (value: number) => value.toLocaleString("en-US");
 
+function useCompactRings() {
+  const [compact, setCompact] = useState(false);
+
+  useEffect(() => {
+    const query = window.matchMedia("(max-width: 639px)");
+    const sync = () => setCompact(query.matches);
+    sync();
+    query.addEventListener("change", sync);
+    return () => query.removeEventListener("change", sync);
+  }, []);
+
+  return compact;
+}
+
 export function EChartsCacheTiersRadialChart() {
+  const compact = useCompactRings();
+
   return (
-    <div className="flex h-full w-full flex-col gap-3 p-4">
-      <div className="flex min-h-0 flex-1 flex-col gap-4 sm:flex-row">
-        <div className="relative -mb-10 min-h-0 flex-1">
+    <div className="flex h-full w-full flex-col gap-2 p-3 sm:gap-3 sm:p-4">
+      <div className="flex min-h-0 flex-1 gap-3 sm:gap-4">
+        <div className="relative min-h-0 flex-1 sm:-mb-10">
           <EChartsRadialChart
             data={chartData}
             config={chartConfig}
@@ -67,7 +84,11 @@ export function EChartsCacheTiersRadialChart() {
             outerRadius="96%"
             className="h-full w-full"
           >
-            <EChartsRadialChart.RadialBar dataKey="share" barSize={13} cornerRadius={7} />
+            <EChartsRadialChart.RadialBar
+              dataKey="share"
+              barSize={compact ? 7 : 13}
+              cornerRadius={compact ? 4 : 7}
+            />
           </EChartsRadialChart>
         </div>
 
@@ -83,7 +104,7 @@ export function EChartsCacheTiersRadialChart() {
         </div>
       </div>
 
-      <div className="grid shrink-0 grid-cols-2 gap-x-4 gap-y-3 border-t pt-3 sm:grid-cols-4">
+      <div className="grid shrink-0 grid-cols-2 gap-x-4 gap-y-2 border-t pt-2 sm:grid-cols-4 sm:gap-y-3 sm:pt-3">
         {TIERS.map(({ name, label, count: hits, swatch }) => (
           <div key={name} className="flex flex-col gap-1">
             <div className="flex items-center gap-1.5">
