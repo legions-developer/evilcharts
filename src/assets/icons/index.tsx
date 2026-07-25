@@ -1193,6 +1193,57 @@ export function DotsIcon({
   );
 }
 
+export function BrushIcon({
+  fill = "currentColor",
+  secondaryfill,
+  width = "1em",
+  height = "1em",
+  ...props
+}: IconProps) {
+  secondaryfill = secondaryfill || fill;
+
+  return (
+    <svg
+      height={height}
+      width={width}
+      viewBox="0 0 18 18"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <g fill={fill}>
+        <rect
+          height="10"
+          width="3.5"
+          fill={secondaryfill}
+          fillOpacity="0.4"
+          rx="1.25"
+          x="1"
+          y="4"
+        />
+        <rect
+          height="10"
+          width="3.5"
+          fill={secondaryfill}
+          fillOpacity="0.4"
+          rx="1.25"
+          x="13.5"
+          y="4"
+        />
+        <rect
+          height="10"
+          width="6"
+          fill="none"
+          rx="1.5"
+          stroke={fill}
+          strokeWidth="2"
+          x="6"
+          y="4"
+        />
+      </g>
+    </svg>
+  );
+}
+
 export function ChartLegendIcon({
   fill = "currentColor",
   secondaryfill,
