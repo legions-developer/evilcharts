@@ -31,12 +31,63 @@ links:
       <Step>
         <StepTitle>Copy and paste the following code snippets into your project.</StepTitle>
         <StepDescription>
-          Create the folder `evilcharts` with a `charts` subfolder in your `components` directory, then copy the code below into a new `echarts-composed-chart.tsx` file there. Unlike the Recharts twin, this component is self-contained — it ships everything ECharts needs in one file, so there are no extra `ui` sub-components to add.
+          Create the folder `evilcharts` with a `charts` subfolder in your `components` directory, then copy the code below into a new `echarts-composed-chart.tsx` file there.
         </StepDescription>
         <StepContent>
           <ComponentSource
             name="echarts-composed-chart"
             title="components/evilcharts/charts/echarts-composed-chart.tsx"
+          />
+        </StepContent>
+      </Step>
+      <Step>
+        <StepTitle>Add the shared chart module.</StepTitle>
+        <StepDescription>
+          Create a `ui` folder inside `evilcharts` and paste this one in first — it resolves your config's colors from the page's CSS variables, and every sub-component below imports from it.
+        </StepDescription>
+        <StepContent>
+          <ComponentSource
+            name="echarts-chart"
+            title="components/evilcharts/ui/echarts-chart.tsx"
+          />
+        </StepContent>
+      </Step>
+      <Step>
+        <StepTitle>Add the sub-components.</StepTitle>
+        <StepDescription>
+          Create `echarts-tooltip.tsx` in the same `ui` folder and paste the tooltip surface and its variants there.
+        </StepDescription>
+        <StepContent>
+          <ComponentSource
+            name="echarts-tooltip"
+            title="components/evilcharts/ui/echarts-tooltip.tsx"
+          />
+        </StepContent>
+        <StepDescription>
+          Next, create `echarts-legend.tsx` in the same `ui` folder and paste the legend overlay there.
+        </StepDescription>
+        <StepContent>
+          <ComponentSource
+            name="echarts-legend"
+            title="components/evilcharts/ui/echarts-legend.tsx"
+          />
+        </StepContent>
+        <StepDescription>
+          Next, create `echarts-dot.tsx` in the same `ui` folder and paste the dot styles the series markers draw with there.
+        </StepDescription>
+        <StepContent>
+          <ComponentSource
+            name="echarts-dot"
+            title="components/evilcharts/ui/echarts-dot.tsx"
+          />
+        </StepContent>
+        <StepDescription>
+          Finally, create `echarts-brush.tsx` in the same `ui` folder and paste the zoom brush there.
+        </StepDescription>
+        <StepContent>
+          <ComponentSource
+            name="echarts-brush"
+            title="components/evilcharts/ui/echarts-brush.tsx"
           />
         </StepContent>
       </Step>

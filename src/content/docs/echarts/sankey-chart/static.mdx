@@ -31,12 +31,36 @@ links:
       <Step>
         <StepTitle>Copy and paste the following code snippets into your project.</StepTitle>
         <StepDescription>
-          First create the folder `evilcharts` and a subfolder `charts` in your `components` directory, then paste the sankey-chart code into a new `echarts-sankey-chart.tsx` file there. Unlike the Recharts twin, this component is self-contained — everything ECharts needs ships in one file, so there are no extra `ui` sub-components to add.
+          First create the folder `evilcharts` and a subfolder `charts` in your `components` directory, then paste the sankey-chart code into a new `echarts-sankey-chart.tsx` file there.
         </StepDescription>
         <StepContent>
           <ComponentSource
             name="echarts-sankey-chart"
             title="components/evilcharts/charts/echarts-sankey-chart.tsx"
+          />
+        </StepContent>
+      </Step>
+      <Step>
+        <StepTitle>Add the shared chart module.</StepTitle>
+        <StepDescription>
+          Create a `ui` folder inside `evilcharts` and paste this one in first — it resolves your config's colors from the page's CSS variables, and every sub-component below imports from it.
+        </StepDescription>
+        <StepContent>
+          <ComponentSource
+            name="echarts-chart"
+            title="components/evilcharts/ui/echarts-chart.tsx"
+          />
+        </StepContent>
+      </Step>
+      <Step>
+        <StepTitle>Add the sub-component.</StepTitle>
+        <StepDescription>
+          Create `echarts-tooltip.tsx` in the same `ui` folder and paste the tooltip surface and its variants there.
+        </StepDescription>
+        <StepContent>
+          <ComponentSource
+            name="echarts-tooltip"
+            title="components/evilcharts/ui/echarts-tooltip.tsx"
           />
         </StepContent>
       </Step>

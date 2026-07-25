@@ -36,7 +36,7 @@ The ECharts provider renders to canvas through Apache ECharts — same config co
     <StepTitle>Add EvilCharts ECharts Components</StepTitle>
     <StepContent>
       <StepDescription>
-        Add components with the CLI. ECharts components are prefixed with `echarts-` — replace `{chart-name}` with a chart type (e.g., `area-chart`, `bar-chart`, `line-chart`, `pie-chart`). Each is self-contained: installing one never pulls in Recharts.
+        Add components with the CLI. ECharts components are prefixed with `echarts-` — replace `{chart-name}` with a chart type (e.g., `area-chart`, `bar-chart`, `line-chart`, `pie-chart`). Installing one pulls that chart plus the shared `ui` modules it imports, and nothing from Recharts.
       </StepDescription>
       <CliBlock commands={["@evilcharts/echarts-{chart-name}"]} />
     </StepContent>

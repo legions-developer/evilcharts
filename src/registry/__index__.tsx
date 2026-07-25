@@ -335,7 +335,7 @@ export const Index: Record<string, any> = {
     name: "echarts-sankey-chart",
     description: "Sankey chart component rendered with Apache ECharts",
     type: "registry:component",
-    registryDependencies: ["@evilcharts/echarts-chart","@evilcharts/echarts-tooltip","@evilcharts/echarts-dot"],
+    registryDependencies: ["@evilcharts/echarts-chart","@evilcharts/echarts-tooltip"],
     files: [{
       path: "@/registry/charts/echarts-sankey-chart.tsx",
       type: "registry:component",

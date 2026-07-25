@@ -143,11 +143,7 @@ export const charts: Registry["items"] = [
   {
     name: "echarts-sankey-chart",
     description: "Sankey chart component rendered with Apache ECharts",
-    registryDependencies: [
-      "@evilcharts/echarts-chart",
-      "@evilcharts/echarts-tooltip",
-      "@evilcharts/echarts-dot",
-    ],
+    registryDependencies: ["@evilcharts/echarts-chart", "@evilcharts/echarts-tooltip"],
     dependencies: ["echarts", "motion"],
     type: "registry:component",
     files: [
