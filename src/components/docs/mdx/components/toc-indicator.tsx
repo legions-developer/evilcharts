@@ -5,16 +5,12 @@ import { cn } from "@/lib/utils";
 import * as React from "react";
 
 const STARTING_MARGIN = 8;
-const ITEM_HEIGHT = 26.28;
-const ITEM_GAP = 8;
 const DEPTH_INDENT = 10;
-const INITIAL_OFFSET = 8;
 const DEPTH_BEND_LENGTH = 8;
-const CENTER_OFFSET = 6.5;
 
 const SPRING_CONFIG = { stiffness: 180, damping: 20 };
 
-const GRADIENT_HEIGHT = ITEM_HEIGHT * 2.5;
+const GRADIENT_HEIGHT = 66;
 
 interface TocItem {
   title?: React.ReactNode;
@@ -22,10 +18,20 @@ interface TocItem {
   depth: number;
 }
 
+// Every row's real geometry, relative to the indicator's own box. Measured rather
+// than derived from a constant row height: a heading long enough to wrap makes the
+// list taller than any fixed step, and the path — and with it the active marker —
+// would drift a full line further out of place with each wrapped entry above it.
+export interface RowMetrics {
+  top: number;
+  height: number;
+}
+
 interface TocIndicatorProps {
   toc: TocItem[];
   activeIndex: number;
   className?: string;
+  rows: RowMetrics[];
 }
 
 interface PathData {
@@ -38,40 +44,39 @@ function getXForDepth(depth: number, minDepth: number): number {
   return STARTING_MARGIN + (depth - minDepth) * DEPTH_INDENT;
 }
 
-function getRowBottomY(index: number, isLast: boolean): number {
-  const baseY = INITIAL_OFFSET + ITEM_HEIGHT * (index + 1) - ITEM_GAP;
-  return isLast ? baseY - 8 : baseY;
-}
-
 function getDiagonalDistance(deltaX: number): number {
   return Math.sqrt(deltaX ** 2 + DEPTH_BEND_LENGTH ** 2);
 }
 
-function getItemCenterY(index: number): number {
-  return INITIAL_OFFSET + ITEM_HEIGHT * index + ITEM_HEIGHT / 2 - ITEM_GAP;
-}
-
-function generatePathData(toc: TocItem[]): PathData {
-  if (toc.length === 0) return { path: "", totalLength: 0, itemCenterDistances: [] };
+function generatePathData(toc: TocItem[], rows: RowMetrics[]): PathData {
+  // Before the first measurement there is nothing to draw against; the layout
+  // effect fills rows in before paint, so this never shows as a flash.
+  if (toc.length === 0 || rows.length !== toc.length) {
+    return { path: "", totalLength: 0, itemCenterDistances: [] };
+  }
 
   const minDepth = Math.min(...toc.map((item) => item.depth));
   const pathParts: string[] = [];
   const itemCenterDistances: number[] = [];
 
   let currentX = getXForDepth(toc[0].depth, minDepth);
-  let currentY = INITIAL_OFFSET - STARTING_MARGIN;
+  let currentY = rows[0].top - STARTING_MARGIN;
   let accumulatedLength = 0;
 
   pathParts.push(`M ${currentX} ${currentY}`);
 
   for (let i = 0; i < toc.length; i++) {
     const isLastItem = i === toc.length - 1;
-    const rowBottomY = getRowBottomY(i, isLastItem);
+    const row = rows[i];
+    const itemCenterY = row.top + row.height / 2;
+    // The line runs to the bottom of each row so the bend into the next depth
+    // happens in the gap, but stops at the centre of the last one — that is where
+    // the end marker belongs, whether that row is one line or three.
+    const rowBottomY = isLastItem ? itemCenterY : row.top + row.height;
     const nextItem = toc[i + 1];
 
-    const itemCenterY = getItemCenterY(i);
     const distanceToCenter = itemCenterY - currentY;
-    itemCenterDistances.push(accumulatedLength + distanceToCenter + CENTER_OFFSET);
+    itemCenterDistances.push(accumulatedLength + distanceToCenter);
 
     const verticalLength = rowBottomY - currentY;
     accumulatedLength += verticalLength;
@@ -94,8 +99,58 @@ function generatePathData(toc: TocItem[]): PathData {
   return { path: pathParts.join(" "), totalLength: accumulatedLength, itemCenterDistances };
 }
 
-function usePathData(toc: TocItem[]) {
-  return React.useMemo(() => generatePathData(toc), [toc]);
+function sameRows(a: RowMetrics[], b: RowMetrics[]): boolean {
+  return (
+    a.length === b.length &&
+    a.every(
+      (row, i) => Math.abs(row.top - b[i].top) < 0.5 && Math.abs(row.height - b[i].height) < 0.5,
+    )
+  );
+}
+
+/**
+ * Each row measured against the wrapper the indicator is stretched over, so both
+ * share one coordinate system. Called from the PARENT rather than from inside the
+ * indicator: the indicator renders before the list, and a sibling's ref is not yet
+ * attached when an earlier sibling's layout effect runs — measuring there reads null
+ * once and, with only stable refs in its deps, never gets a second chance.
+ *
+ * Re-measures on anything that can rewrap a heading: the sidebar resizing, a font
+ * landing late, the toc itself changing.
+ */
+export function useRowMetrics(
+  originRef: React.RefObject<HTMLDivElement | null>,
+  listRef: React.RefObject<HTMLDivElement | null>,
+  count: number,
+) {
+  const [rows, setRows] = React.useState<RowMetrics[]>([]);
+
+  React.useLayoutEffect(() => {
+    const origin = originRef.current;
+    const list = listRef.current;
+    if (!origin || !list) return;
+
+    const measure = () => {
+      const originY = origin.getBoundingClientRect().top;
+      const next = Array.from(list.children).map((child) => {
+        const rect = child.getBoundingClientRect();
+        return { top: rect.top - originY, height: rect.height };
+      });
+      // Bail when nothing moved: the observer fires on our own re-render too, and
+      // an unconditional setState would loop.
+      setRows((prev) => (sameRows(prev, next) ? prev : next));
+    };
+
+    measure();
+
+    const observer = new ResizeObserver(measure);
+    observer.observe(list);
+    for (const child of Array.from(list.children)) observer.observe(child);
+
+    return () => observer.disconnect();
+  }, [originRef, listRef, count]);
+
+  return rows;
 }
 
 function getActiveDistance(activeIndex: number, itemCenterDistances: number[]): number {
@@ -103,8 +158,11 @@ function getActiveDistance(activeIndex: number, itemCenterDistances: number[]): 
   return isValidIndex ? itemCenterDistances[activeIndex] : 0;
 }
 
-export function TocIndicator({ toc, activeIndex, className }: TocIndicatorProps) {
-  const { path, totalLength, itemCenterDistances } = usePathData(toc);
+export function TocIndicator({ toc, activeIndex, className, rows }: TocIndicatorProps) {
+  const { path, totalLength, itemCenterDistances } = React.useMemo(
+    () => generatePathData(toc, rows),
+    [toc, rows],
+  );
 
   const activeDistance = getActiveDistance(activeIndex, itemCenterDistances);
   const isActive = activeDistance > 0;
@@ -129,7 +187,7 @@ export function TocIndicator({ toc, activeIndex, className }: TocIndicatorProps)
   );
 
   // Calculate gradient Y positions (gradient moves with progress but has fixed height)
-  const startY = INITIAL_OFFSET - STARTING_MARGIN;
+  const startY = rows.length > 0 ? rows[0].top - STARTING_MARGIN : 0;
   const gradientY2 = useTransform(animatedDistance, (v) => startY + v);
   const gradientY1 = useTransform(gradientY2, (y2) => Math.max(0, y2 - GRADIENT_HEIGHT));
 
@@ -224,6 +282,9 @@ export function TocIndicator({ toc, activeIndex, className }: TocIndicatorProps)
           </svg>
         </motion.div>
       </div>
+      {/* No vertical nudge: offset-anchor already rides the box's centre along the
+          path, and the path now hits each row's true centre — the old -3 was there to
+          cancel a fudge factor in the hand-rolled row geometry. */}
       <motion.div
         className="bg-primary absolute top-0 left-0 size-[6px] rounded-[1px]"
         style={{
@@ -231,7 +292,6 @@ export function TocIndicator({ toc, activeIndex, className }: TocIndicatorProps)
           offsetRotate: "0deg",
           rotate: "45deg",
           marginLeft: 0.2,
-          marginTop: -3,
           offsetDistance: offsetDistancePercent,
           opacity: isActive ? 1 : 0,
         }}

@@ -8,10 +8,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { TocIndicator, useRowMetrics } from "./toc-indicator";
 import { Menu02Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Button } from "@/components/ui/button";
-import { TocIndicator } from "./toc-indicator";
 import { cn } from "@/lib/utils";
 import * as React from "react";
 
@@ -64,6 +64,9 @@ export function DocsTableOfContents({
   className?: string;
 }) {
   const [open, setOpen] = React.useState(false);
+  const wrapperRef = React.useRef<HTMLDivElement>(null);
+  const listRef = React.useRef<HTMLDivElement>(null);
+  const rows = useRowMetrics(wrapperRef, listRef, toc.length);
   const itemIds = React.useMemo(() => toc.map((item) => item.url.replace("#", "")), [toc]);
   const activeHeading = useActiveItem(itemIds);
   const activeIndex = activeHeading ? itemIds.indexOf(activeHeading) : -1;
@@ -105,9 +108,9 @@ export function DocsTableOfContents({
         <HugeiconsIcon size="14" className="text-muted-foreground" icon={Menu02Icon} />
         <p className="text-muted-foreground/75 bg-background sticky top-0 text-xs">On This Page</p>
       </div>
-      <div className="relative flex flex-row">
-        <TocIndicator toc={toc} activeIndex={activeIndex} />
-        <div className="flex h-fit flex-col gap-2 pt-2">
+      <div ref={wrapperRef} className="relative flex flex-row">
+        <TocIndicator toc={toc} activeIndex={activeIndex} rows={rows} />
+        <div ref={listRef} className="flex h-fit flex-col gap-2 pt-2">
           {toc.map((item) => (
             <a
               key={item.url}
