@@ -1,5 +1,6 @@
 import {
   BackgroundIcon,
+  BrushIcon,
   ChartConfigIcon,
   ChartLegendIcon,
   DotsIcon,
@@ -64,6 +65,11 @@ export function getChartComponentOptions(provider: Provider): SidebarOption[] {
       name: "Dots",
       url: `/docs/${provider}/ui/dots`,
       icon: <DotsIcon />,
+    },
+    {
+      name: "Brush",
+      url: `/docs/${provider}/ui/brush`,
+      icon: <BrushIcon />,
     },
   ];
 }

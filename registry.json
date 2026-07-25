@@ -551,6 +551,19 @@
       ]
     },
     {
+      "name": "ex-brush-echarts-area-chart",
+      "registryDependencies": [
+        "@evilcharts/echarts-area-chart"
+      ],
+      "type": "registry:block",
+      "files": [
+        {
+          "path": "src/registry/examples/echarts/ex-brush-echarts-area-chart.tsx",
+          "type": "registry:block"
+        }
+      ]
+    },
+    {
       "name": "ex-buffer-echarts-area-chart",
       "registryDependencies": [
         "@evilcharts/echarts-area-chart"
@@ -1937,6 +1950,19 @@
       "files": [
         {
           "path": "src/registry/examples/recharts/ex-area-chart.tsx",
+          "type": "registry:block"
+        }
+      ]
+    },
+    {
+      "name": "ex-brush-area-chart",
+      "registryDependencies": [
+        "@evilcharts/recharts-area-chart"
+      ],
+      "type": "registry:block",
+      "files": [
+        {
+          "path": "src/registry/examples/recharts/ex-brush-area-chart.tsx",
           "type": "registry:block"
         }
       ]

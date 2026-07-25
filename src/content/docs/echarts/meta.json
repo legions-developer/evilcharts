@@ -13,6 +13,7 @@
     "sankey-chart",
     "ui/tooltip",
     "ui/legend",
-    "ui/dots"
+    "ui/dots",
+    "ui/brush"
   ]
 }

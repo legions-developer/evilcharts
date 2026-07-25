@@ -25,6 +25,17 @@ export const examples: Registry["items"] = [
     ],
   },
   {
+    name: "ex-brush-echarts-area-chart",
+    registryDependencies: ["@evilcharts/echarts-area-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/echarts/ex-brush-echarts-area-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
     name: "ex-buffer-echarts-area-chart",
     registryDependencies: ["@evilcharts/echarts-area-chart"],
     type: "registry:block",
@@ -1205,6 +1216,17 @@ export const examples: Registry["items"] = [
     files: [
       {
         path: "examples/recharts/ex-area-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-brush-area-chart",
+    registryDependencies: ["@evilcharts/recharts-area-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/recharts/ex-brush-area-chart.tsx",
         type: "registry:block",
       },
     ],

@@ -1,0 +1,91 @@
+---
+title: Brush
+description: A zoom brush that filters the chart down to a draggable range of the data.
+image: /og/og-image.png
+---
+
+## Usage
+
+Add `<EvilAreaChart.Brush />` as a child of the chart root. Its presence renders the brush footer — a miniature of the **full** dataset with a draggable selection window over it. Narrowing that window filters the main chart to the selected range; the miniature always keeps showing everything, so you never lose your place.
+
+Set `xDataKey` on the root so the handles can label themselves with the value under each edge.
+
+```tsx
+import { EvilAreaChart } from "@/components/evilcharts/charts/recharts-area-chart";
+
+<EvilAreaChart data={data} config={chartConfig} xDataKey="date">
+  <EvilAreaChart.XAxis dataKey="date" />
+  <EvilAreaChart.Brush formatLabel={(value) => String(value)} />
+  <EvilAreaChart.Area dataKey="desktop" variant="gradient" />
+</EvilAreaChart>;
+```
+
+## Example
+
+<ComponentPreview className="mb-0" title="<EvilAreaChart.Brush />" name="ex-brush-area-chart" />
+
+<Alert>
+  <AlertContent>
+    Drag either handle to resize the range, or drag the selected region itself to pan without
+    changing its width. Handle labels fade in while the pointer is over the brush. Dragging is
+    pointer-based, so mouse, touch, and pen all work.
+  </AlertContent>
+</Alert>
+
+## Supported Charts
+
+The brush is available on the cartesian charts — `EvilAreaChart`, `EvilLineChart`, `EvilBarChart`, and `EvilComposedChart`. Attach it exactly the same way on each:
+
+```tsx
+<EvilLineChart.Brush />
+<EvilBarChart.Brush />
+<EvilComposedChart.Brush />
+```
+
+The miniature mirrors the chart it belongs to. Area and composed charts draw filled areas, line charts draw strokes only, and bar charts draw rounded bars — and it inherits the parent chart's `curveType`, stacking, bar radius, and series colors, so the footer always reads as the same chart in small.
+
+The brush is hidden while the chart is in its loading state, and it never renders for the non-cartesian charts (pie, radar, radial, sankey), which have no continuous axis to zoom.
+
+## Reacting to the Range
+
+Filtering the chart is automatic — the root already slices its data to the selection. Pass `onChange` when something *outside* the chart needs to follow along, such as a heading that reports the visible window:
+
+```tsx
+const [range, setRange] = useState({ startIndex: 0, endIndex: data.length - 1 });
+
+<EvilAreaChart data={data} config={chartConfig} xDataKey="date">
+  <EvilAreaChart.Brush onChange={setRange} />
+  <EvilAreaChart.Area dataKey="desktop" variant="gradient" />
+</EvilAreaChart>;
+
+// data[range.startIndex].date → data[range.endIndex].date
+```
+
+`onChange` fires with data **indices**, not values, so look the labels up on your own rows.
+
+## API Reference
+
+<ApiHeading>Brush</ApiHeading>
+
+Composed as a child of the chart root. It renders nothing itself — its presence turns the brush footer on, and its props configure it.
+
+<ApiTable>
+  <ApiRow name="height" type="number" default="56">
+    Height of the brush preview strip in pixels.
+  </ApiRow>
+  <ApiRow name="formatLabel" type="(value: unknown, index: number) => string">
+    Formats the range-handle labels from the `xDataKey` value under each edge. Defaults to the raw
+    value.
+  </ApiRow>
+  <ApiRow name="onChange" type="(range: { startIndex: number; endIndex: number }) => void">
+    Fires as the selection moves, with the inclusive data indices of the visible range.
+  </ApiRow>
+</ApiTable>
+
+<ApiHeading>Root</ApiHeading>
+
+<ApiTable>
+  <ApiRow name="xDataKey" type="string">
+    The data key the handle labels read from. Without it the handles fall back to raw indices.
+  </ApiRow>
+</ApiTable>
