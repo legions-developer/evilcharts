@@ -1,7 +1,6 @@
 {
   "title": "Recharts",
   "pages": [
-    "index",
     "installation",
     "components",
     "area-chart",

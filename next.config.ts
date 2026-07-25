@@ -41,11 +41,13 @@ const nextConfig: NextConfig = {
         permanent: false,
       },
 
-      // ECharts has no provider index page — the intro is shared at /docs — so
-      // the bare provider URL lands on its components overview.
+      // Neither provider has an index page — the intro is shared at /docs — so a
+      // bare provider URL lands on that engine's components overview. /docs/recharts
+      // was a real page until the Recharts-only pitch folded into the shared intro,
+      // so this rule is also what keeps anything still linking to it out of a 404.
       {
-        source: "/docs/echarts",
-        destination: "/docs/echarts/components",
+        source: `/docs/:provider(${PROVIDERS})`,
+        destination: "/docs/:provider/components",
         permanent: false,
       },
 

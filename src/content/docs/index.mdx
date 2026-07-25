@@ -1,10 +1,10 @@
 ---
 title: Introduction
-description: Open-source, beautifully handcrafted chart components built with shadcn and Recharts.
+description: Open-source, beautifully handcrafted chart components built with shadcn — on Recharts or Apache ECharts.
 image: /og/og-image.png
 ---
 
-Wait... it's not another chart library. I couldn't find chart components with smooth animations and dynamic data, so I built my own — with <Link href="https://recharts.github.io/" _blank={true}>Recharts</Link> and <Link href="https://shadcn.com/ui" _blank={true}>Shadcn</Link>.
+Wait... it's not another chart library. I couldn't find chart components with smooth animations and dynamic data, so I built my own — with <Link href="https://recharts.github.io/" _blank={true}>Recharts</Link>, <Link href="https://echarts.apache.org/" _blank={true}>Apache ECharts</Link> and <Link href="https://shadcn.com/ui" _blank={true}>Shadcn</Link>.
 
 ## The Problem
 
@@ -22,6 +22,39 @@ So I'm building a beautiful chart component site — open source, open code, all
 - Design-first, animated, unique designs
 - Handcrafted with SVGs and <Link href="https://motion.dev" _blank={true}>Motion</Link> to stand out
 
-## Built on Recharts
+## Two engines, same charts
 
-I wanted a solid headless chart library. After trying tons of them, Recharts won — powerful features, easy to use anywhere.
+Every chart here ships twice — once on Recharts, once on Apache ECharts — behind the same compound API. Same parts, same config object, same gradients, patterns and reveal animations. Switching engines is a rename, not a rewrite:
+
+```tsx
+<EvilAreaChart data={data} config={config}>   {/* Recharts */}
+<EChartsAreaChart data={data} config={config}> {/* ECharts  */}
+```
+
+You install one engine per chart — `@evilcharts/recharts-area-chart` **or** `@evilcharts/echarts-area-chart`, never both — so you only ever ship the one you picked.
+
+### Recharts
+
+**SVG, and all of it is in the DOM.** Recharts renders through React to SVG, so every gradient, pattern, dot and glow is a real element.
+
+- **Themeable without JavaScript.** Series colors compile to per-chart CSS variables, so light and dark swap with a class — no re-render, no flash.
+- **Inspectable.** Open devtools and the whole chart is right there, stylable with the CSS you already use.
+- **Composable.** Charts are built from parts, not props. Drop in a `<Grid />`, a `<Legend />`, or a second `<Area />`.
+
+Reach for it by default: product dashboards, marketing pages, anything where the chart is design surface first and data volume second.
+
+### ECharts
+
+**Canvas, built for scale.** The ECharts provider draws the same components onto a single canvas, so the point count stops being a DOM problem.
+
+- **Dense data stays smooth.** Thousands of points are pixels, not thousands of nodes.
+- **Built for live data.** Frequent updates and zooming don't fight the browser's layout engine.
+- **Same look.** The variants, glows and entrance animations are ported, not approximated — canvas gradients and pattern tiles doing what the SVG defs do.
+
+Reach for it when the data outgrows the DOM: long time series, high-frequency updates, dashboards that keep drawing while people interact with them.
+
+### Which one?
+
+Start with Recharts. Move a chart to ECharts when that specific chart gets heavy — it's a per-chart choice, not a project-wide one, so a single dashboard can mix both.
+
+Install one from the sidebar — <Link href="/docs/recharts/installation">Recharts</Link> or <Link href="/docs/echarts/installation">ECharts</Link> — and the labels, colors and icons are the same object either way: see <Link href="/docs/chart-config">Chart Config</Link>.

@@ -1,12 +1,12 @@
-import { absoluteUrl } from "@/lib/utils";
-import { source } from "@/lib/source";
-import { processMdxForLLMs } from "@/lib/llm";
 import {
   DEFAULT_PROVIDER,
   PROVIDERS,
   PROVIDER_META,
   type Provider,
 } from "@/globals/constants/providers";
+import { processMdxForLLMs } from "@/lib/llm";
+import { absoluteUrl } from "@/lib/utils";
+import { source } from "@/lib/source";
 
 // Pages that belong to no provider: the intro, and the config contract both engines share.
 const SHARED_DOCS = new Set(["/docs", "/docs/chart-config"]);
@@ -24,10 +24,10 @@ const AGENT_PROVIDER = AVAILABLE_PROVIDERS[0] ?? DEFAULT_PROVIDER;
 
 type Page = ReturnType<typeof source.getPages>[number];
 
-// Matches the provider's landing page (/docs/recharts) as well as everything beneath
-// it. The landing page has no trailing slash, so a prefix test alone would drop it.
+// Neither provider has a landing page — /docs/<provider> only ever redirects to that
+// engine's components overview — so everything real sits beneath the prefix.
 function isProviderPage(url: string, provider: Provider) {
-  return url === `/docs/${provider}` || url.startsWith(`/docs/${provider}/`);
+  return url.startsWith(`/docs/${provider}/`);
 }
 
 // Derived rather than enumerated: an added chart or provider shows up on its own.
@@ -39,7 +39,7 @@ function providerPages(pages: Page[], provider: Provider) {
 
   return {
     guides: inProvider.filter((page) =>
-      [`/docs/${provider}`, `${prefix}installation`, `${prefix}components`].includes(page.url),
+      [`${prefix}installation`, `${prefix}components`].includes(page.url),
     ),
     charts: inProvider.filter((page) => /\/[a-z]+-chart\//.test(page.url)),
     ui: inProvider.filter((page) => page.url.startsWith(`${prefix}ui/`)),
@@ -189,7 +189,8 @@ export function getAgentSkillsIndex() {
       {
         name: "evilcharts",
         type: "skill-md",
-        description: "Add and customize EvilCharts chart components in shadcn/ui and Recharts projects.",
+        description:
+          "Add and customize EvilCharts chart components in shadcn/ui and Recharts projects.",
         url: "/.well-known/agent-skills/evilcharts/SKILL.md",
       },
     ],

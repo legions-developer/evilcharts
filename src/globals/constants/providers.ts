@@ -49,9 +49,9 @@ export const PROVIDER_META: Record<Provider, ProviderMeta> = {
 export const PROVIDER_STORAGE_KEY = "evilcharts-provider";
 
 export function providerHref(provider: Provider) {
-  // The shared intro lives at /docs for both engines. Recharts still has its own
-  // index page; ECharts does not — its landing is the components overview.
-  return provider === "echarts" ? "/docs/echarts/components" : `/docs/${provider}`;
+  // The shared intro lives at /docs and covers both engines, so neither provider
+  // carries an index page — switching lands on that engine's components overview.
+  return `/docs/${provider}/components`;
 }
 
 /**
