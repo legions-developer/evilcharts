@@ -139,7 +139,7 @@ export function ProviderSwitcher({
                         {meta.name}
                         {!meta.available && (
                           <span className="border-border text-muted-foreground rounded-sm border px-1 py-px text-[9px] tracking-wide uppercase">
-                            Soon
+                            New
                           </span>
                         )}
                       </span>
