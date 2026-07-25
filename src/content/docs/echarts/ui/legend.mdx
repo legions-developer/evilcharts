@@ -1,0 +1,71 @@
+---
+title: Legend
+description: Legends that identify each data series in an ECharts chart.
+image: /og/legend.png
+---
+
+## Usage
+
+Compose the legend as a child of the chart root. Pass `variant` to control the
+indicator style, and `isClickable` to let each entry toggle selection of its
+series.
+
+```tsx
+<EChartsLineChart data={data} config={chartConfig} xDataKey="month">
+  <EChartsLineChart.Legend variant="circle" isClickable />
+  <EChartsLineChart.Line dataKey="desktop" />
+  <EChartsLineChart.Line dataKey="mobile" />
+</EChartsLineChart>
+```
+
+## Variants
+
+Control the legend indicator style with the `variant` prop on
+`<EChartsLineChart.Legend />`.
+
+### Square
+
+<ComponentPreview title="variant='square'" name="ex-legend-square-echarts-line-chart" />
+
+### Circle
+
+<ComponentPreview title="variant='circle'" name="ex-legend-circle-echarts-line-chart" />
+
+### Circle Outline
+
+<ComponentPreview title="variant='circle-outline'" name="ex-legend-circle-outline-echarts-line-chart" />
+
+### Rounded Square (Default)
+
+<ComponentPreview title="variant='rounded-square'" name="ex-legend-rounded-square-echarts-line-chart" />
+
+### Rounded Square Outline
+
+<ComponentPreview title="variant='rounded-square-outline'" name="ex-legend-rounded-square-outline-echarts-line-chart" />
+
+### Vertical Bar
+
+<ComponentPreview title="variant='vertical-bar'" name="ex-legend-vertical-bar-echarts-line-chart" />
+
+### Horizontal Bar
+
+<ComponentPreview title="variant='horizontal-bar'" name="ex-legend-horizontal-bar-echarts-line-chart" />
+
+## API Reference
+
+Props for the `<EChartsLineChart.Legend />` part.
+
+<ApiTable>
+  <ApiRow name="variant" type='"square" | "circle" | "circle-outline" | "rounded-square" | "rounded-square-outline" | "vertical-bar" | "horizontal-bar"' default='"rounded-square"'>
+    Style of the legend indicator icon.
+  </ApiRow>
+  <ApiRow name="align" type='"left" | "center" | "right"' default='"right"'>
+    Horizontal placement of the legend items.
+  </ApiRow>
+  <ApiRow name="verticalAlign" type='"top" | "middle" | "bottom"' default='"top"'>
+    Vertical placement of the legend items.
+  </ApiRow>
+  <ApiRow name="isClickable" type="boolean" default="false">
+    When enabled, clicking an entry toggles selection of its series.
+  </ApiRow>
+</ApiTable>

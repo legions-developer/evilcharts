@@ -1,0 +1,282 @@
+---
+title: Radial Chart
+description: Beautiful radial bar charts with full and semi-circle variants and gradient colors
+image: /og/radial-chart.png
+links:
+  github: https://github.com/legions-developer/evilcharts/blob/main/src/registry/charts/recharts-radial-chart.tsx
+  doc: https://recharts.github.io/en-US/examples/SimpleRadialBarChart
+  api: https://recharts.github.io/en-US/api/RadialBarChart
+---
+
+<ComponentPreview title="Basic Chart" name="ex-radial-chart"  />
+
+## Installation
+
+<CodeTabs>
+  <TabsList variant="underline">
+    <TabsTab value="cli">CLI</TabsTab>
+    <TabsTab value="manual">Manual</TabsTab>
+  </TabsList>
+  <TabsPanel value="cli">
+    <CliBlock commands={["@evilcharts/recharts-radial-chart"]} />
+  </TabsPanel>
+  <TabsPanel value="manual">
+    <Steps>
+      <Step>
+        <StepTitle>Install the following dependencies:</StepTitle>
+        <StepContent>
+          <CommandBlock commands={["recharts"]} />
+        </StepContent>
+      </Step>
+      <Step>
+        <StepTitle>Copy and paste the following code snippets into your project.</StepTitle>
+         <StepDescription>
+          Create an `evilcharts` folder with a `charts` subfolder inside `components`, then paste the base radial-chart code into a new file there.
+        </StepDescription>
+        <StepContent>
+          <ComponentSource
+            name="recharts-radial-chart"
+            title="components/evilcharts/charts/recharts-radial-chart.tsx"
+          />
+        </StepContent>
+      </Step>
+       <Step>
+        <StepTitle>Add the chart component.</StepTitle>
+        <StepDescription>
+          The chart needs these components to render. Create a `ui` folder inside `evilcharts` and paste the code there.
+
+          Below is the main chart component.
+        </StepDescription>
+        <StepContent>
+          <ComponentSource
+            name="recharts-chart"
+            title="components/evilcharts/ui/recharts-chart.tsx"
+          />
+        </StepContent>
+      </Step>
+       <Step>
+        <StepTitle>Add the sub-components.</StepTitle>
+        <StepDescription>
+          Create `tooltip.tsx` inside `evilcharts/ui` and paste the code there.
+        </StepDescription>
+        <StepContent>
+          <ComponentSource
+            name="recharts-tooltip"
+            title="components/evilcharts/ui/recharts-tooltip.tsx"
+          />
+        </StepContent>
+        <StepDescription>
+          Then create `legend.tsx` in the same folder and paste the code there.
+        </StepDescription>
+        <StepContent>
+          <ComponentSource
+            name="recharts-legend"
+            title="components/evilcharts/ui/recharts-legend.tsx"
+          />
+        </StepContent>
+      </Step>
+    </Steps>
+  </TabsPanel>
+</CodeTabs>
+
+## Usage
+
+The radial chart is composable. `<EvilRadialChart>` is the container, and every part hangs off it as a compound member — `<EvilRadialChart.Legend>`, `<EvilRadialChart.Tooltip>`, and a `<EvilRadialChart.RadialBar>` — so a single import gives you the whole chart. `isClickable` lives on `<EvilRadialChart.RadialBar>`, so styling and interactivity stay with the series.
+
+```tsx
+import { EvilRadialChart } from "@/components/evilcharts/charts/recharts-radial-chart";
+import { type ChartConfig } from "@/components/evilcharts/ui/recharts-chart";
+```
+
+```tsx
+const data = [
+  { browser: "chrome", visitors: 275 },
+  { browser: "safari", visitors: 200 },
+  { browser: "firefox", visitors: 187 },
+];
+
+const chartConfig = {
+  chrome: {
+    label: "Chrome",
+    colors: { light: ["#3b82f6"], dark: ["#60a5fa"] },
+  },
+  safari: {
+    label: "Safari",
+    colors: { light: ["#10b981"], dark: ["#34d399"] },
+  },
+  firefox: {
+    label: "Firefox",
+    colors: { light: ["#f59e0b"], dark: ["#fbbf24"] },
+  },
+} satisfies ChartConfig;
+```
+
+```tsx
+<EvilRadialChart data={data} nameKey="browser" config={chartConfig} variant="full">
+  <EvilRadialChart.Legend isClickable />
+  <EvilRadialChart.Tooltip />
+  <EvilRadialChart.RadialBar dataKey="visitors" isClickable />
+</EvilRadialChart>
+```
+
+### Interactive Selection
+
+Add `isClickable` to `<EvilRadialChart.RadialBar>` (and `<EvilRadialChart.Legend>`) to make bars selectable, then handle selection with the `onSelectionChange` callback on `<EvilRadialChart>`:
+
+```tsx
+<EvilRadialChart
+  data={data}
+  nameKey="browser"
+  config={chartConfig}
+  onSelectionChange={(selection) => {
+    if (selection) {
+      console.log("Selected:", selection.dataKey, "Value:", selection.value);
+    } else {
+      console.log("Deselected");
+    }
+  }}
+>
+  <EvilRadialChart.Legend isClickable />
+  <EvilRadialChart.Tooltip />
+  <EvilRadialChart.RadialBar dataKey="visitors" isClickable />
+</EvilRadialChart>
+```
+
+### Loading State
+
+<ComponentPreview className="mb-0" title="isLoading='true'" name="ex-loading-state-radial-chart"  />
+<Alert > 
+  <AlertContent >
+    Pass the `isLoading` prop to show a placeholder animation while your data loads.
+  </AlertContent>
+</Alert>
+
+## Examples
+
+Radial charts in different configurations. Customize `variant`, `innerRadius`, `outerRadius`, and more.
+
+### Semi-Circle Variant
+
+<ComponentPreview className="mb-0" title="variant='semi'" name="ex-semi-variant-radial-chart"  />
+<Alert> 
+  <AlertContent>
+    Set `variant="semi"` for a half-circle chart — compact, and ideal for progress or gauges.
+  </AlertContent>
+</Alert>
+
+### Gradient Colors
+
+<ComponentPreview title="gradient colors" name="ex-gradient-colors-radial-chart"  />
+
+## API Reference
+
+The props below are grouped by the part they belong to.
+
+<ApiHeading>EvilRadialChart</ApiHeading>
+
+The root container. It owns the data, shared selection state, loading skeleton, and arc shape. Everything visual is composed as its children.
+
+<ApiTable>
+  <ApiRow name="data" type="TData[]" required>
+    Array of objects, one per radial bar (`TData extends Record<string, unknown>`).
+  </ApiRow>
+  <ApiRow name="config" type="ChartConfig" required>
+    Defines the chart's bars. Each key matches a value from your `nameKey` field, with its colors.
+  </ApiRow>
+  <ApiRow name="nameKey" type="keyof TData & string" required>
+    Data key for bar names — string values used for labels and the legend.
+  </ApiRow>
+  <ApiRow name="children" type="ReactNode" required>
+    The composed chart parts — `<Legend />`, `<Tooltip />`, and a `<RadialBar />`.
+  </ApiRow>
+  <ApiRow name="className" type="string">
+    Extra CSS classes for the chart container.
+  </ApiRow>
+  <ApiRow name="variant" type='"full" | "semi"' default='"full"'>
+    Arc shape. `"full"` is a full circle (360°); `"semi"` is a half circle (180°).
+  </ApiRow>
+  <ApiRow name="max" type="number">
+    Value a full sweep represents. Without it the scale is derived from the data, so the largest bar always fills the arc — set it (e.g. `100`) for gauges, where a single value has to read against a fixed total.
+  </ApiRow>
+  <ApiRow name="innerRadius" type="number | string" default='"30%"'>
+    Inner radius of the bars — a number (pixels) or percentage string.
+  </ApiRow>
+  <ApiRow name="outerRadius" type="number | string" default='"100%"'>
+    Outer radius of the bars — a number (pixels) or percentage string.
+  </ApiRow>
+  <ApiRow name="defaultSelectedDataKey" type="string | null" default="null">
+    Bar name selected by default.
+  </ApiRow>
+  <ApiRow name="onSelectionChange" type="(selection: { dataKey: string; value: number } | null) => void">
+    Fires when a bar is selected or deselected by clicking a clickable `<RadialBar />` or `<Legend />` entry. Receives `dataKey` (bar name) and `value` (bar value), or `null` when deselected.
+  </ApiRow>
+  <ApiRow name="isLoading" type="boolean" default="false">
+    Shows a placeholder animation while data loads.
+  </ApiRow>
+  <ApiRow name="backgroundVariant" type="BackgroundVariant">
+    Background pattern shown behind the chart.
+  </ApiRow>
+  <ApiRow name="chartProps" type="ComponentProps<typeof RadialBarChart>">
+    Props forwarded to the underlying Recharts RadialBarChart. See the <Link href="https://recharts.github.io/en-US/api/RadialBarChart/" _blank>Recharts RadialBarChart docs</Link> for options.
+  </ApiRow>
+</ApiTable>
+
+<ApiHeading>RadialBar</ApiHeading>
+
+The radial bar series — each data row becomes one bar.
+
+<ApiTable>
+  <ApiRow name="dataKey" type="string" required>
+    Data key for bar values — the numbers that determine bar size.
+  </ApiRow>
+  <ApiRow name="cornerRadius" type="number" default="5">
+    Corner radius of each bar, in pixels.
+  </ApiRow>
+  <ApiRow name="barSize" type="number" default="14">
+    Thickness of each bar, in pixels.
+  </ApiRow>
+  <ApiRow name="showBackground" type="boolean" default="true">
+    Whether to render the background track (the unfilled portion of each bar).
+  </ApiRow>
+  <ApiRow name="isClickable" type="boolean" default="false">
+    Lets users click bars to select/deselect them. Unselected bars dim while a selection is active.
+  </ApiRow>
+  <ApiRow name="radialBarProps" type='Omit<ComponentProps<typeof RadialBar>, "dataKey">'>
+    Props forwarded to the underlying Recharts RadialBar. See the <Link href="https://recharts.github.io/en-US/api/RadialBar/" _blank>Recharts RadialBar docs</Link> for options.
+  </ApiRow>
+</ApiTable>
+
+<ApiHeading>Tooltip</ApiHeading>
+
+The hover tooltip, labeling each bar by name. Render it to show a tooltip; omit it for none.
+
+<ApiTable>
+  <ApiRow name="variant" type='"default" | "frosted-glass"' default='"default"'>
+    The tooltip's visual style.
+  </ApiRow>
+  <ApiRow name="roundness" type='"sm" | "md" | "lg" | "xl"' default='"lg"'>
+    The tooltip's border-radius.
+  </ApiRow>
+  <ApiRow name="defaultIndex" type="number">
+    Shows the tooltip by default at this data point index.
+  </ApiRow>
+</ApiTable>
+
+<ApiHeading>Legend</ApiHeading>
+
+The bar legend. With `isClickable`, each entry toggles its bar's selection. Render it to show a legend; omit it for none.
+
+<ApiTable>
+  <ApiRow name="variant" type='"square" | "circle" | "circle-outline" | "rounded-square" | "rounded-square-outline" | …'>
+    Visual style of the legend indicators.
+  </ApiRow>
+  <ApiRow name="align" type='"left" | "center" | "right"' default='"center"'>
+    Horizontal placement of the legend.
+  </ApiRow>
+  <ApiRow name="verticalAlign" type='"top" | "middle" | "bottom"' default='"bottom"'>
+    Vertical placement of the legend.
+  </ApiRow>
+  <ApiRow name="isClickable" type="boolean" default="false">
+    When enabled, each entry toggles its bar's selection, driving the shared state read by `<RadialBar />`.
+  </ApiRow>
+</ApiTable>

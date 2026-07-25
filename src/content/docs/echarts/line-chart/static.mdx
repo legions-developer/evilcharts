@@ -1,0 +1,388 @@
+---
+title: Line Chart
+description: Static, beautifully designed line charts powered by Apache ECharts
+image: /og/og-image.png
+links:
+  github: https://github.com/legions-developer/evilcharts/blob/main/src/registry/charts/echarts-line-chart.tsx
+  doc: https://echarts.apache.org/en/index.html
+  api: https://echarts.apache.org/en/option.html
+---
+
+<ComponentPreview title="Basic Chart" name="ex-echarts-line-chart"  />
+
+## Installation
+
+<CodeTabs>
+  <TabsList variant="underline">
+    <TabsTab value="cli">CLI</TabsTab>
+    <TabsTab value="manual">Manual</TabsTab>
+  </TabsList>
+  <TabsPanel value="cli">
+    <CliBlock commands={["@evilcharts/echarts-line-chart"]} />
+  </TabsPanel>
+  <TabsPanel value="manual">
+    <Steps>
+      <Step>
+        <StepTitle>Install the following dependencies:</StepTitle>
+        <StepContent>
+          <CommandBlock commands={["echarts", "motion"]} />
+        </StepContent>
+      </Step>
+      <Step>
+        <StepTitle>Copy and paste the following code snippets into your project.</StepTitle>
+        <StepDescription>
+          Create the folder `evilcharts` with a `charts` subfolder in your `components` directory, then paste the line-chart code into a new `echarts-line-chart.tsx` file there.
+        </StepDescription>
+        <StepContent>
+          <ComponentSource
+            name="echarts-line-chart"
+            title="components/evilcharts/charts/echarts-line-chart.tsx"
+          />
+        </StepContent>
+      </Step>
+      <Step>
+        <StepTitle>Add the shared chart module.</StepTitle>
+        <StepDescription>
+          Create a `ui` folder inside `evilcharts` and paste this one in first — it resolves your config's colors from the page's CSS variables, and every sub-component below imports from it.
+        </StepDescription>
+        <StepContent>
+          <ComponentSource
+            name="echarts-chart"
+            title="components/evilcharts/ui/echarts-chart.tsx"
+          />
+        </StepContent>
+      </Step>
+      <Step>
+        <StepTitle>Add the sub-components.</StepTitle>
+        <StepDescription>
+          Create `echarts-tooltip.tsx` in the same `ui` folder and paste the tooltip surface and its variants there.
+        </StepDescription>
+        <StepContent>
+          <ComponentSource
+            name="echarts-tooltip"
+            title="components/evilcharts/ui/echarts-tooltip.tsx"
+          />
+        </StepContent>
+        <StepDescription>
+          Next, create `echarts-legend.tsx` in the same `ui` folder and paste the legend overlay there.
+        </StepDescription>
+        <StepContent>
+          <ComponentSource
+            name="echarts-legend"
+            title="components/evilcharts/ui/echarts-legend.tsx"
+          />
+        </StepContent>
+        <StepDescription>
+          Next, create `echarts-dot.tsx` in the same `ui` folder and paste the dot styles the series markers draw with there.
+        </StepDescription>
+        <StepContent>
+          <ComponentSource
+            name="echarts-dot"
+            title="components/evilcharts/ui/echarts-dot.tsx"
+          />
+        </StepContent>
+        <StepDescription>
+          Finally, create `echarts-brush.tsx` in the same `ui` folder and paste the zoom brush there.
+        </StepDescription>
+        <StepContent>
+          <ComponentSource
+            name="echarts-brush"
+            title="components/evilcharts/ui/echarts-brush.tsx"
+          />
+        </StepContent>
+      </Step>
+    </Steps>
+  </TabsPanel>
+</CodeTabs>
+
+## Usage
+
+The ECharts line chart is composable, sharing the Recharts twin's API shape. `<EChartsLineChart>` is the container, and every part hangs off it as a compound member — `<EChartsLineChart.Grid>`, `<EChartsLineChart.XAxis>`, `<EChartsLineChart.YAxis>`, `<EChartsLineChart.Legend>`, `<EChartsLineChart.Tooltip>`, and one or more `<EChartsLineChart.Line>` — so a single import gives you the whole chart. Each `<Line>` carries its own `strokeVariant`, `curveType`, `glowing`, `enableBufferLine`, and `isClickable`, so one chart can mix stroke styles and make only some series interactive.
+
+```tsx
+import { EChartsLineChart, type ChartConfig } from "@/components/evilcharts/charts/echarts-line-chart";
+```
+
+```tsx
+<EChartsLineChart data={data} config={chartConfig} curveType="monotone">
+  <EChartsLineChart.Grid />
+  <EChartsLineChart.XAxis dataKey="month" />
+  <EChartsLineChart.YAxis />
+  <EChartsLineChart.Legend isClickable />
+  <EChartsLineChart.Tooltip />
+  <EChartsLineChart.Line dataKey="desktop" strokeVariant="solid" isClickable>
+    <EChartsLineChart.Dot variant="border" />
+    <EChartsLineChart.ActiveDot variant="colored-border" />
+  </EChartsLineChart.Line>
+  <EChartsLineChart.Line dataKey="mobile" strokeVariant="dashed" glowing>
+    <EChartsLineChart.ActiveDot variant="default" />
+  </EChartsLineChart.Line>
+</EChartsLineChart>
+```
+
+The one real difference from the Recharts twin is under the hood: ECharts renders to a `<canvas>`, so these children never mount as DOM. The root reads their props and compiles them into the ECharts option object. Same JSX, same presence semantics (omit a part and it doesn't render), same behavior — the children are declarative config, not live DOM nodes.
+
+The `config` is the same contract as every EvilCharts chart — each key maps a data key to a `label` and a per-theme `colors` array. See <Link href="/docs/chart-config">Chart Config</Link> for the full shape. Colors resolve from your CSS variables at runtime, so dark mode just works.
+
+<Alert>
+  <AlertContent>
+    Canvas rendering brings a few small departures from the Recharts twin: multi-color gradients tint each dot with the color at its x-position; the glow is layered gradient strokes stacked under the line, following the series' color in place of an SVG blur filter; and the zoom brush is a themed mini chart driven by ECharts' native `dataZoom` rather than the custom `EvilBrush`.
+  </AlertContent>
+</Alert>
+
+### Interactive Selection
+
+Add `isClickable` to any `<Line>` (and to `<Legend>`) to make those series selectable, then handle events via the `onSelectionChange` callback on `<EChartsLineChart>`:
+
+```tsx
+<EChartsLineChart
+  data={data}
+  config={chartConfig}
+  onSelectionChange={(selectedDataKey) => {
+    if (selectedDataKey) {
+      console.log("Selected:", selectedDataKey);
+    } else {
+      console.log("Deselected");
+    }
+  }}
+>
+  <EChartsLineChart.XAxis dataKey="month" />
+  <EChartsLineChart.Legend isClickable />
+  <EChartsLineChart.Tooltip />
+  <EChartsLineChart.Line dataKey="desktop" strokeVariant="solid" isClickable />
+  <EChartsLineChart.Line dataKey="mobile" strokeVariant="solid" isClickable />
+</EChartsLineChart>
+```
+
+### Loading State
+
+<ComponentPreview className="mb-0" title="isLoading='true'" name="ex-loading-state-echarts-line-chart"  />
+<Alert>
+  <AlertContent>
+    Pass `isLoading` to show an animated skeleton, `loadingPoints` to set how many points it draws, and `curveType` to match the real chart's curve.
+  </AlertContent>
+</Alert>
+
+### Buffer Line
+
+<ComponentPreview className="mb-0" title="enableBufferLine='true'" name="ex-buffer-echarts-line-chart"  />
+<Alert>
+  <AlertContent>
+    With `enableBufferLine`, each line's last segment renders dashed while the rest stays solid — useful for marking projected, estimated, or incomplete data at the end of a series, as in financial charts and forecasting dashboards.
+  </AlertContent>
+</Alert>
+
+### Hover Reveal
+
+<ComponentPreview title="enableHoverReveal='true'" name="ex-hover-reveal-echarts-line-chart" />
+<Alert>
+  <AlertContent>
+    With `enableHoverReveal`, hovering colors each line only up to the pointer's position and mutes everything past it to a neutral gray, with the active dot riding the cursor — a scrubbing effect for reading a series left-to-right. When not hovering, the chart looks completely normal.
+  </AlertContent>
+</Alert>
+
+## Examples
+
+Examples with different settings. Change `strokeVariant` on a `<Line>` or `curveType` on the chart to restyle it.
+
+### Gradient Colors
+
+<ComponentPreview className="mb-0" title="gradient colors" name="ex-gradient-colors-echarts-line-chart"  />
+<ComponentPreview title="gradient colors - bump" name="ex-gradient-colors-bump-echarts-line-chart"  />
+
+### Curve Types
+
+<ComponentPreview className="mb-0" title="curveType='bump'" name="ex-bump-curve-type-echarts-line-chart"  />
+<ComponentPreview className="mb-0" title="curveType='step'" name="ex-step-curve-type-echarts-line-chart"  />
+<ComponentPreview title="curveType='monotoneY'" name="ex-monotoney-curve-type-echarts-line-chart"  />
+
+### Stroke Variants
+
+<ComponentPreview className="mb-0" title="strokeVariant='solid'" name="ex-solid-stroke-echarts-line-chart"  />
+<ComponentPreview className="mb-0" title="strokeVariant='dashed'" name="ex-dashed-stroke-echarts-line-chart"  />
+<ComponentPreview title="strokeVariant='animated-dashed'" name="ex-animated-dashed-stroke-echarts-line-chart"  />
+
+### Glowing Lines
+
+<ComponentPreview className="mb-0" title="glowing - gradient colors" name="ex-glowing-desktop-echarts-line-chart"  />
+<ComponentPreview title="glowing - solid colors" name="ex-glowing-mobile-echarts-line-chart"  />
+
+## API Reference
+
+The chart is composed of several parts; the props below are grouped by part. On canvas each part is declarative config the root compiles, but the API mirrors the Recharts twin one-to-one.
+
+<ApiHeading>EChartsLineChart</ApiHeading>
+
+The root container. It owns the data, shared selection state, loading skeleton, and optional native `dataZoom` brush. Everything visual is composed as its children and compiled into the ECharts option.
+
+<ApiTable>
+  <ApiRow name="data" type="TData[]" required>
+    The chart data — an array of objects, one per data point (`TData extends Record<string, unknown>`).
+  </ApiRow>
+  <ApiRow name="config" type="ChartConfig" required>
+    Defines the chart's series — each key matches a data key with a `label` and per-theme `colors` array. Same contract as every EvilCharts chart; see <Link href="/docs/chart-config">Chart Config</Link>.
+  </ApiRow>
+  <ApiRow name="children" type="ReactNode" required>
+    The composed chart parts — `<Grid />`, `<XAxis />`, `<YAxis />`, `<Legend />`, `<Tooltip />`, and one or more `<Line />`.
+  </ApiRow>
+  <ApiRow name="className" type="string">
+    Additional CSS classes for the chart container.
+  </ApiRow>
+  <ApiRow name="xDataKey" type="keyof TData & string">
+    The data key for the x-axis categories. Falls back to the `<XAxis dataKey="…" />` value, then to the first data column no `<Line />` claims.
+  </ApiRow>
+  <ApiRow name="curveType" type='"linear" | "smooth" | "bump" | "monotone" | "monotoneX" | "monotoneY" | "natural" | "step"' default='"linear"'>
+    Default curve interpolation inherited by every `<Line />`. Each `<Line />` may override it locally.
+  </ApiRow>
+  <ApiRow name="animation" type="boolean" default="true">
+    Master switch for the intro draw-in. Pass `false` to render the chart instantly, regardless of `animationType`.
+  </ApiRow>
+  <ApiRow name="animationType" type='"none" | "left-to-right" | "right-to-left" | "center-out" | "edges-in"' default='"left-to-right"'>
+    The intro animation inherited by every `<Line />`. Any value but `"none"` plays ECharts' native progressive draw-in (the line traces in and dots pop up as its front passes; direction values exist for API parity with the Recharts twin). `"none"` disables it; devices set to OS reduce-motion fall back to `"none"` automatically.
+  </ApiRow>
+  <ApiRow name="enableHoverHighlight" type="boolean" default="false">
+    Highlights the hovered line by dimming the rest — the hover twin of click selection. Dim levels match the selection styling; a glowing line's glow and a buffer line's dashed tail dim and brighten with their parent.
+  </ApiRow>
+  <ApiRow name="enableHoverReveal" type="boolean" default="false">
+    On hover, colors each line up to the pointer's x-position and mutes the rest to a neutral gray, with the active dot at the cursor. A standalone hover mode that takes visual precedence over `enableHoverHighlight`; idle, the chart renders normally.
+  </ApiRow>
+  <ApiRow name="defaultSelectedDataKey" type="string | null" default="null">
+    The series selected on first render.
+  </ApiRow>
+  <ApiRow name="onSelectionChange" type="(key: string | null) => void">
+    Fires when a series is selected or deselected via a clickable `<Line />` or `<Legend />`. Receives the selected data key, or `null` on deselect.
+  </ApiRow>
+  <ApiRow name="isLoading" type="boolean" default="false">
+    Shows the animated loading skeleton.
+  </ApiRow>
+  <ApiRow name="loadingPoints" type="number" default="14">
+    Number of points in the loading skeleton.
+  </ApiRow>
+  <ApiRow name="chartOptions" type="Record<string, unknown>">
+    Escape hatch merged over the built ECharts option object. See the <Link href="https://echarts.apache.org/en/option.html" _blank>ECharts option documentation</Link>.
+  </ApiRow>
+</ApiTable>
+
+<ApiHeading>Line</ApiHeading>
+
+A single line series. Each `<Line />` is self-contained — its own stroke, glow, and clickability — so a chart can hold any number of independently styled lines.
+
+<ApiTable>
+  <ApiRow name="dataKey" type="string" required>
+    The series key. Must exist on both the data rows and the chart `config`.
+  </ApiRow>
+  <ApiRow name="strokeVariant" type='"solid" | "dashed" | "animated-dashed"' default='"solid"'>
+    The stroke style for this line.
+  </ApiRow>
+  <ApiRow name="strokeWidth" type="number" default="0.8">
+    Stroke thickness for this line, in pixels.
+  </ApiRow>
+  <ApiRow name="curveType" type='"linear" | "smooth" | "bump" | "monotone" | "monotoneX" | "monotoneY" | "natural" | "step"'>
+    The curve interpolation for this line. Falls back to the chart's `curveType` when omitted.
+  </ApiRow>
+  <ApiRow name="animationType" type='"none" | "left-to-right" | "right-to-left" | "center-out" | "edges-in"'>
+    The intro draw-in for this line (the first `<Line />`'s value drives the chart). Falls back to the chart's `animationType` when omitted.
+  </ApiRow>
+  <ApiRow name="connectNulls" type="boolean" default="false">
+    Whether to connect line segments across null or missing values.
+  </ApiRow>
+  <ApiRow name="isClickable" type="boolean" default="false">
+    Lets this line be selected by clicking it. When any line is selected, the rest become semi-transparent.
+  </ApiRow>
+  <ApiRow name="glowing" type="boolean" default="false">
+    Applies a soft outer glow to this line, tinted with its series color.
+  </ApiRow>
+  <ApiRow name="enableBufferLine" type="boolean" default="false">
+    Renders this line's last segment as a dashed buffer while the rest stays solid — useful for projected or incomplete data at the end of a series.
+  </ApiRow>
+  <ApiRow name="children" type="ReactNode">
+    Optional `<Dot />` and `<ActiveDot />` config that adds point markers to this line.
+  </ApiRow>
+</ApiTable>
+
+<ApiHeading>Dot and ActiveDot</ApiHeading>
+
+Point markers composed inside a `<Line />`. `<Dot />` is the resting marker; `<ActiveDot />` is the hovered marker. They render nothing on their own — the parent `<Line />` reads their `variant`.
+
+<ApiTable>
+  <ApiRow name="variant" type='"default" | "border" | "colored-border"' default='"default"'>
+    The visual style of the point marker.
+  </ApiRow>
+</ApiTable>
+
+<ApiHeading>XAxis and YAxis</ApiHeading>
+
+The category and value axes. Include `<XAxis />` for x-axis labels and `<YAxis />` for the y-axis; omit either to hide it. Both hide automatically while the chart loads.
+
+<ApiTable>
+  <ApiRow name="dataKey" type="string">
+    The data key for the axis values.
+  </ApiRow>
+  <ApiRow name="tickFormatter" type="(value: string | number, index: number) => string">
+    Formats the axis tick labels.
+  </ApiRow>
+  <ApiRow name="label" type="string">
+    An axis title rendered clear of the tick labels — centered below the x-axis labels, or rotated alongside the y-axis ones.
+  </ApiRow>
+  <ApiRow name="hideDots" type="boolean" default="false">
+    Hides the small tick dots that sit beside this axis's labels.
+  </ApiRow>
+</ApiTable>
+
+<ApiHeading>Grid</ApiHeading>
+
+The background grid lines. Include it to render the dashed horizontal split lines; omit it and they don't draw. Takes no props.
+
+<ApiHeading>Tooltip</ApiHeading>
+
+The hover tooltip. Include it to enable the tooltip; omit it and none shows. It reads the chart's selection state, dimming unselected series in its content.
+
+<ApiTable>
+  <ApiRow name="variant" type='"default" | "frosted-glass"' default='"default"'>
+    The visual style of the tooltip surface.
+  </ApiRow>
+  <ApiRow name="roundness" type='"sm" | "md" | "lg" | "xl"' default='"lg"'>
+    Controls the border-radius of the tooltip.
+  </ApiRow>
+  <ApiRow name="cursor" type="boolean" default="true">
+    Whether the vertical cursor line follows the pointer on hover.
+  </ApiRow>
+  <ApiRow name="position" type='"fixed" | "variable"' default='"variable"'>
+    How the tooltip is anchored. `"variable"` follows both axes (the default). `"fixed"` pins the tooltip near the top of the chart and only tracks the pointer's X.
+  </ApiRow>
+</ApiTable>
+
+<ApiHeading>Legend</ApiHeading>
+
+The series legend, rendered as HTML above the canvas. Include it to show the legend; omit it and none shows. With `isClickable`, each entry toggles selection of its series.
+
+<ApiTable>
+  <ApiRow name="variant" type='"square" | "circle" | "circle-outline" | "rounded-square" | "rounded-square-outline" | "vertical-bar" | "horizontal-bar"'>
+    The visual style of the legend indicators.
+  </ApiRow>
+  <ApiRow name="align" type='"left" | "center" | "right"' default='"right"'>
+    Horizontal placement of the legend.
+  </ApiRow>
+  <ApiRow name="verticalAlign" type='"top" | "middle" | "bottom"' default='"top"'>
+    Vertical placement of the legend.
+  </ApiRow>
+  <ApiRow name="isClickable" type="boolean" default="false">
+    Lets each legend entry toggle selection of its series.
+  </ApiRow>
+</ApiTable>
+
+<ApiHeading>Brush</ApiHeading>
+
+An optional zoom brush below the chart — a themed mini chart driven by ECharts' native `dataZoom`. Include `<EChartsLineChart.Brush />` to render it; dragging the range filters the main chart.
+
+<ApiTable>
+  <ApiRow name="height" type="number" default="56">
+    Height of the brush preview strip in pixels.
+  </ApiRow>
+  <ApiRow name="formatLabel" type="(value: string | number, index: number) => string">
+    Formats the range-handle labels below the brush.
+  </ApiRow>
+  <ApiRow name="onChange" type="(range: { startIndex: number; endIndex: number }) => void">
+    Fires when the brush selection range changes.
+  </ApiRow>
+</ApiTable>

@@ -1,0 +1,158 @@
+"use client";
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  PROVIDER_META,
+  providerFromPathname,
+  providerHref,
+  type Provider,
+} from "@/globals/constants/providers";
+import {
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  useSidebar,
+} from "@/components/ui/sidebar";
+import { CheckIcon, EChartsIcon, ReactIcon } from "@/assets/icons";
+import { usePathname, useRouter } from "next/navigation";
+import { CaretDown } from "@carbon/icons-react";
+import { cn } from "@/lib/utils";
+
+// Each engine wears its own mark in its own brand color: Recharts renders
+// through React, so it gets the React logo in React blue; ECharts gets
+// Apache's mark in its red.
+const PROVIDER_ICONS: Record<Provider, React.ComponentType<{ className?: string }>> = {
+  echarts: EChartsIcon,
+  recharts: ReactIcon,
+};
+
+const PROVIDER_TINT: Record<Provider, string> = {
+  echarts: "text-[#E43861]",
+  recharts: "text-[#60DAFB]",
+};
+
+// Menu display order only — PROVIDERS' order elsewhere (redirect regexes,
+// llms.txt sections) is intentionally untouched.
+const MENU_ORDER: Provider[] = ["echarts", "recharts"];
+
+function ProviderIcon({ provider, className }: { provider: Provider; className?: string }) {
+  const Icon = PROVIDER_ICONS[provider];
+
+  return <Icon className={cn(PROVIDER_TINT[provider], className)} aria-hidden="true" />;
+}
+
+export function ProviderSwitcher({
+  existingUrls,
+  activeProvider,
+  onProviderChange,
+}: {
+  existingUrls: Set<string>;
+  /** Resolved provider — from the pathname, or sticky on shared pages. */
+  activeProvider: Provider;
+  /** Persists the selection so shared pages keep showing this engine. */
+  onProviderChange: (provider: Provider) => void;
+}) {
+  const pathname = usePathname();
+  const router = useRouter();
+  const { isMobile, setOpenMobile } = useSidebar();
+
+  const displayed = PROVIDER_META[activeProvider];
+
+  const selectProvider = (provider: Provider) => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+    onProviderChange(provider);
+
+    const pathProvider = providerFromPathname(pathname);
+
+    // Shared pages (/docs, /docs/chart-config) belong to both engines — stay
+    // put; only the selection flips.
+    if (!pathProvider || pathProvider === provider) return;
+
+    // Hold your place across the switch when the counterpart page exists:
+    // /docs/recharts/area-chart/static → /docs/echarts/area-chart/static.
+    // Otherwise the provider landing is the only destination we can promise.
+    const candidate = pathname.replace(`/docs/${pathProvider}`, `/docs/${provider}`);
+    if (existingUrls.has(candidate)) {
+      router.push(candidate);
+      return;
+    }
+
+    router.push(providerHref(provider));
+  };
+
+  return (
+    <SidebarMenu>
+      <SidebarMenuItem>
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            render={
+              <SidebarMenuButton
+                size="lg"
+                className={cn(
+                  "data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground",
+                  "border-border/60 border",
+                )}
+              />
+            }
+          >
+            <ProviderIcon provider={displayed.id} className="size-7!" />
+            <div className="ml-0.5 grid flex-1 text-left leading-tight">
+              <span className="truncate text-sm font-medium">{displayed.name}</span>
+              <span className="text-muted-foreground truncate text-[11px]">
+                {displayed.tagline}
+              </span>
+            </div>
+            <CaretDown className="ml-auto opacity-60" />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            align="start"
+            side="bottom"
+            sideOffset={4}
+            className="bg-background w-(--anchor-width)"
+          >
+            <DropdownMenuGroup>
+              <DropdownMenuLabel className="text-muted-foreground text-xs">
+                Rendering engine
+              </DropdownMenuLabel>
+              {MENU_ORDER.map((id) => {
+                const meta = PROVIDER_META[id];
+                const isActive = activeProvider === id;
+
+                return (
+                  <DropdownMenuItem
+                    key={id}
+                    onClick={() => selectProvider(id)}
+                    className="gap-2 p-2"
+                  >
+                    <ProviderIcon provider={id} className="size-6!" />
+                    <div className="ml-0.5 grid flex-1 leading-tight">
+                      <span className="flex items-center gap-1.5 text-sm">
+                        {meta.name}
+                        {!meta.available && (
+                          <span className="border-border text-muted-foreground rounded-sm border px-1 py-px text-[9px] tracking-wide uppercase">
+                            New
+                          </span>
+                        )}
+                      </span>
+                      <span className="text-muted-foreground text-[11px]">{meta.tagline}</span>
+                    </div>
+                    {isActive && <CheckIcon className="size-3.5" />}
+                  </DropdownMenuItem>
+                );
+              })}
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </SidebarMenuItem>
+    </SidebarMenu>
+  );
+}

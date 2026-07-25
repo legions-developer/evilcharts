@@ -1,0 +1,344 @@
+---
+title: Sankey Chart
+description: Visualize flow data as nodes and links, powered by Apache ECharts
+image: /og/og-image.png
+links:
+  github: https://github.com/legions-developer/evilcharts/blob/main/src/registry/charts/echarts-sankey-chart.tsx
+  doc: https://echarts.apache.org/en/index.html
+  api: https://echarts.apache.org/en/option.html#series-sankey
+---
+
+<ComponentPreview title="Basic Chart" name="ex-echarts-sankey-chart"  />
+
+## Installation
+
+<CodeTabs>
+  <TabsList variant="underline">
+    <TabsTab value="cli">CLI</TabsTab>
+    <TabsTab value="manual">Manual</TabsTab>
+  </TabsList>
+  <TabsPanel value="cli">
+    <CliBlock commands={["@evilcharts/echarts-sankey-chart"]} />
+  </TabsPanel>
+  <TabsPanel value="manual">
+    <Steps>
+      <Step>
+        <StepTitle>Install the following dependencies:</StepTitle>
+        <StepContent>
+          <CommandBlock commands={["echarts", "motion"]} />
+        </StepContent>
+      </Step>
+      <Step>
+        <StepTitle>Copy and paste the following code snippets into your project.</StepTitle>
+        <StepDescription>
+          First create the folder `evilcharts` and a subfolder `charts` in your `components` directory, then paste the sankey-chart code into a new `echarts-sankey-chart.tsx` file there.
+        </StepDescription>
+        <StepContent>
+          <ComponentSource
+            name="echarts-sankey-chart"
+            title="components/evilcharts/charts/echarts-sankey-chart.tsx"
+          />
+        </StepContent>
+      </Step>
+      <Step>
+        <StepTitle>Add the shared chart module.</StepTitle>
+        <StepDescription>
+          Create a `ui` folder inside `evilcharts` and paste this one in first — it resolves your config's colors from the page's CSS variables, and every sub-component below imports from it.
+        </StepDescription>
+        <StepContent>
+          <ComponentSource
+            name="echarts-chart"
+            title="components/evilcharts/ui/echarts-chart.tsx"
+          />
+        </StepContent>
+      </Step>
+      <Step>
+        <StepTitle>Add the sub-component.</StepTitle>
+        <StepDescription>
+          Create `echarts-tooltip.tsx` in the same `ui` folder and paste the tooltip surface and its variants there.
+        </StepDescription>
+        <StepContent>
+          <ComponentSource
+            name="echarts-tooltip"
+            title="components/evilcharts/ui/echarts-tooltip.tsx"
+          />
+        </StepContent>
+      </Step>
+    </Steps>
+  </TabsPanel>
+</CodeTabs>
+
+## Usage
+
+The ECharts sankey chart is composible, sharing the Recharts twin's API shape. `<EChartsSankeyChart>` is the container, and every part hangs off it as a compound member — `<EChartsSankeyChart.Node>`, `<EChartsSankeyChart.NodeLabel>`, `<EChartsSankeyChart.Link>`, and `<EChartsSankeyChart.Tooltip>` — so a single import gives you the whole chart. Because nodes and links are intrinsic to the flow data, `<Node>` and `<Link>` always render and just configure the diagram; `<NodeLabel>` and `<Tooltip>` follow presence semantics — omit one and it does not render.
+
+```tsx
+import { EChartsSankeyChart, type ChartConfig, type SankeyData } from "@/components/evilcharts/charts/echarts-sankey-chart";
+```
+
+```tsx
+const data: SankeyData = {
+  nodes: [
+    { name: "Visit" },
+    { name: "Direct-Favourite" },
+    { name: "Page-Click" },
+    { name: "Detail-Favourite" },
+    { name: "Lost" },
+  ],
+  links: [
+    { source: 0, target: 1, value: 3728 },
+    { source: 0, target: 2, value: 354170 },
+    { source: 2, target: 3, value: 62429 },
+    { source: 2, target: 4, value: 291741 },
+  ],
+};
+
+const chartConfig = {
+  Visit: {
+    label: "Visit",
+    colors: { light: ["#3b82f6"], dark: ["#60a5fa"] },
+  },
+  "Page-Click": {
+    label: "Page Click",
+    colors: { light: ["#f59e0b"], dark: ["#fbbf24"] },
+  },
+  // ... more node configs
+} satisfies ChartConfig;
+
+<EChartsSankeyChart data={data} config={chartConfig}>
+  <EChartsSankeyChart.Node isClickable>
+    <EChartsSankeyChart.NodeLabel position="outside" showValues />
+  </EChartsSankeyChart.Node>
+  <EChartsSankeyChart.Link variant="source" />
+  <EChartsSankeyChart.Tooltip />
+</EChartsSankeyChart>
+```
+
+The one real difference is under the hood: ECharts renders to a `<canvas>`, so these children never mount as DOM. The root reads their props and compiles them into the ECharts option — same JSX, same presence semantics, same behavior, but the children are declarative config, not live DOM nodes.
+
+`config` is the same contract as every EvilCharts chart — each key maps a node name to a `label` and a per-theme `colors` array. See <Link href="/docs/chart-config">Chart Config</Link> for the full shape. Colors resolve from CSS variables at runtime, so dark mode just works.
+
+<Alert>
+  <AlertContent>
+    Canvas rendering brings a few small departures from the Recharts twin: node
+    icons are not rendered, and `verticalPadding` on `<Link>` has no ECharts
+    equivalent (see the API notes). All link variants — `gradient`, `solid`,
+    `source`, and `target` — are supported.
+  </AlertContent>
+</Alert>
+
+### Interactive Selection
+
+Set `isClickable` on `<Node>` to make nodes selectable. The selected node and its
+direct neighbors stay highlighted while the rest dim. Handle selection events with
+the root's `onSelectionChange` callback:
+
+```tsx
+<EChartsSankeyChart
+  data={data}
+  config={chartConfig}
+  onSelectionChange={(selection) => {
+    if (selection) {
+      console.log("Selected:", selection.dataKey, "Value:", selection.value);
+    } else {
+      console.log("Deselected");
+    }
+  }}
+>
+  <EChartsSankeyChart.Node isClickable />
+  <EChartsSankeyChart.Link variant="source" />
+  <EChartsSankeyChart.Tooltip />
+</EChartsSankeyChart>
+```
+
+### Loading State
+
+<ComponentPreview className="mb-0" title="isLoading='true'" name="ex-loading-state-echarts-sankey-chart"  />
+<Alert>
+  <AlertContent>
+    Pass `isLoading` to `<EChartsSankeyChart>` to show an animated gray skeleton
+    while data loads.
+  </AlertContent>
+</Alert>
+
+## Examples
+
+Examples of the sankey chart in different configurations. Customize the `<Link>` `variant`, the root `nodeWidth`, `nodePadding`, and more.
+
+### Gradient Colors
+
+<ComponentPreview title="gradient colors" name="ex-gradient-colors-echarts-sankey-chart"  />
+
+### Labeled Nodes
+
+<Alert>
+  <AlertContent>
+    Display labels and values on nodes by composing a `<NodeLabel />` inside `<Node />`.
+  </AlertContent>
+</Alert>
+
+#### Inside Labels
+
+<ComponentPreview className="mb-0" title="showNodeLabels='inside'" name="ex-labeled-nodes-echarts-sankey-chart"  />
+<ComponentPreview className="mb-0" title="showNodeLabels='inside' - solid colors" name="ex-solid-labeled-nodes-echarts-sankey-chart"  />
+<Alert>
+  <AlertContent>
+    Use a larger `nodeWidth` (e.g., 80) on the root to accommodate the text.
+  </AlertContent>
+</Alert>
+
+#### Outside Labels
+
+<ComponentPreview className="mb-0" title="showNodeLabels='outside'" name="ex-outside-labels-echarts-sankey-chart"  />
+
+### Link Variants
+
+<Alert>
+  <AlertContent>
+    Set the link coloring strategy with the `variant` prop on `<Link />`.
+  </AlertContent>
+</Alert>
+
+#### Solid Links
+
+<ComponentPreview className="mb-0" title="<Link variant='solid' />" name="ex-solid-link-variant-echarts-sankey-chart"  />
+<Alert>
+  <AlertContent>
+    Set `<Link />` `variant` to `"solid"` for a single color across all links — clean and minimal.
+  </AlertContent>
+</Alert>
+
+#### Source-colored Links
+
+<ComponentPreview className="mb-0" title="<Link variant='source' />" name="ex-source-link-variant-echarts-sankey-chart"  />
+<Alert>
+  <AlertContent>
+    Set `<Link />` `variant` to `"source"` to color links by their source node, tracing where flows originate.
+  </AlertContent>
+</Alert>
+
+## API Reference
+
+A root container plus a small set of composible parts. Render the root, then compose the parts you need as children. On canvas each part is declarative config the root compiles, but the API closely mirrors the Recharts twin.
+
+<ApiHeading>EChartsSankeyChart</ApiHeading>
+
+The root container. It owns the flow data, shared selection state, loading skeleton, and intro reveal. Everything visual is composed as children and compiled into the ECharts option.
+
+<ApiTable>
+  <ApiRow name="data" type="SankeyData" required>
+    Nodes and links for the flow. `SankeyData` is `{ nodes: SankeyNode[]; links: SankeyLink[] }`, where `SankeyNode = { name: string; icon?: ReactNode }` and `SankeyLink = { source: number; target: number; value: number }`. `source`/`target` are indices into `nodes`. (`icon` is accepted for parity with the Recharts shape but not rendered on canvas.)
+  </ApiRow>
+  <ApiRow name="config" type="ChartConfig" required>
+    Defines the chart's nodes. Each key matches a node name, with a `label` and a per-theme `colors` array. Same contract as every EvilCharts chart — see <Link href="/docs/chart-config">Chart Config</Link>.
+  </ApiRow>
+  <ApiRow name="children" type="ReactNode" required>
+    The composed parts — `<Node />`, `<NodeLabel />`, `<Link />`, and `<Tooltip />`.
+  </ApiRow>
+  <ApiRow name="className" type="string">
+    Additional CSS classes for the chart container.
+  </ApiRow>
+  <ApiRow name="nodeWidth" type="number" default="10">
+    The width of each node in pixels.
+  </ApiRow>
+  <ApiRow name="nodePadding" type="number" default="10">
+    The vertical gap between nodes in pixels (ECharts `nodeGap`).
+  </ApiRow>
+  <ApiRow name="linkCurvature" type="number" default="0.5">
+    Curvature of links between nodes, 0 (straight) to 1 (maximum curve).
+  </ApiRow>
+  <ApiRow name="iterations" type="number" default="32">
+    Iterations for the sankey layout algorithm. Higher values improve the layout but take more time.
+  </ApiRow>
+  <ApiRow name="align" type='"left" | "justify"' default='"justify"'>
+    Horizontal alignment for nodes (ECharts `nodeAlign`). `"left"` aligns to the left, `"justify"` spreads them across the width.
+  </ApiRow>
+  <ApiRow name="sort" type="boolean" default="true">
+    Accepted for parity with the Recharts twin. The ECharts layout always sorts nodes, so this prop has no effect.
+  </ApiRow>
+  <ApiRow name="verticalAlign" type='"justify" | "top"' default='"justify"'>
+    Accepted for parity with the Recharts twin. ECharts has no vertical-alignment control for sankey, so this prop has no effect.
+  </ApiRow>
+  <ApiRow name="defaultSelectedNode" type="string | null" default="null">
+    The node name selected on first render.
+  </ApiRow>
+  <ApiRow name="onSelectionChange" type="(selection: { dataKey: string; value: number } | null) => void">
+    Called when a node is selected or deselected. Receives an object with `dataKey` (node name) and `value` (node value from links), or `null` on deselect. Fires on click while `<Node />` has `isClickable` set.
+  </ApiRow>
+  <ApiRow name="isLoading" type="boolean" default="false">
+    Shows the animated loading skeleton.
+  </ApiRow>
+  <ApiRow name="animation" type="boolean" default="true">
+    Master switch for the intro draw-in. Pass `false` to render the chart instantly.
+  </ApiRow>
+  <ApiRow name="animationType" type='"none" | "default"' default='"default"'>
+    `"default"` plays ECharts' native draw-in on first render; `"none"` disables it. The OS reduce-motion preference falls back to `"none"` automatically.
+  </ApiRow>
+  <ApiRow name="chartOptions" type="Record<string, unknown>">
+    Escape hatch merged over the built ECharts option object. See the <Link href="https://echarts.apache.org/en/option.html#series-sankey" _blank>ECharts sankey option documentation</Link>.
+  </ApiRow>
+</ApiTable>
+
+<ApiHeading>Node</ApiHeading>
+
+Configures how the sankey nodes render. Compose a `<NodeLabel />` inside it to show labels and values.
+
+<ApiTable>
+  <ApiRow name="radius" type="number" default="0">
+    The corner radius of node rectangles in pixels. Set to 0 for square nodes.
+  </ApiRow>
+  <ApiRow name="isClickable" type="boolean" default="false">
+    Lets nodes be clicked to select/deselect them. Selected nodes and their direct neighbors stay highlighted while the rest dim.
+  </ApiRow>
+  <ApiRow name="children" type="ReactNode">
+    Optional `<NodeLabel />` composition.
+  </ApiRow>
+</ApiTable>
+
+<ApiHeading>NodeLabel</ApiHeading>
+
+Declares labels for the `<Node />` it is composed inside. With no `position`, no labels are shown.
+
+<ApiTable>
+  <ApiRow name="position" type='"inside" | "outside"'>
+    Where node labels sit. `"inside"` centers them on the nodes (with a translucent backing plate), `"outside"` hangs them to the right. Without `<NodeLabel />`, or with no `position`, no labels show.
+  </ApiRow>
+  <ApiRow name="showValues" type="boolean" default="false">
+    Show the total flow value alongside each node label.
+  </ApiRow>
+  <ApiRow name="valueFormatter" type="(value: number) => string" default="(value) => value.toLocaleString()">
+    Function to format node values when `showValues` is enabled.
+  </ApiRow>
+</ApiTable>
+
+<ApiHeading>Link</ApiHeading>
+
+Configures how the sankey links render.
+
+<ApiTable>
+  <ApiRow name="variant" type='"gradient" | "solid" | "source" | "target"' default='"gradient"'>
+    The coloring strategy for links. `"gradient"` fades from source to target color, `"solid"` uses the foreground color, `"source"` uses the source node color, `"target"` uses the target node color.
+  </ApiRow>
+  <ApiRow name="verticalPadding" type="number" default="0">
+    Accepted for parity with the Recharts twin. ECharts sizes each link band to its value with no per-link inset, so this prop has no effect.
+  </ApiRow>
+</ApiTable>
+
+<ApiHeading>Tooltip</ApiHeading>
+
+The hover tooltip. Its presence enables it; omit it and none shows. Hovering a node shows its label and total flow; hovering a link shows the source → target flow and its value. Hidden automatically while loading.
+
+<ApiTable>
+  <ApiRow name="variant" type='"default" | "frosted-glass"' default='"default"'>
+    Controls the visual style of the tooltip surface.
+  </ApiRow>
+  <ApiRow name="roundness" type='"sm" | "md" | "lg" | "xl"' default='"lg"'>
+    Controls the border-radius of the tooltip.
+  </ApiRow>
+  <ApiRow name="position" type='"fixed" | "variable"' default='"variable"'>
+    Controls how the tooltip is anchored. `"variable"` follows the pointer (ECharts' default); `"fixed"` pins the tooltip near the top and only tracks the pointer's X.
+  </ApiRow>
+  <ApiRow name="defaultIndex" type="number">
+    Accepted for parity with the Recharts twin. ECharts does not surface a default-visible tooltip for sankey, so this prop has no effect.
+  </ApiRow>
+</ApiTable>

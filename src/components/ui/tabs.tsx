@@ -59,7 +59,7 @@ function TabsTab({ className, ...props }: TabsPrimitive.Tab.Props) {
     <TabsPrimitive.Tab
       className={cn(
         "focus-visible:ring-ring select-none flex shrink-0 grow cursor-pointer items-center justify-center rounded-md text-xs font-medium whitespace-nowrap transition-[color,background-color,box-shadow] outline-none focus-visible:ring-2 data-disabled:pointer-events-none data-disabled:opacity-64 [&_svg]:pointer-events-none [&_svg]:-mx-0.5 [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4",
-        "hover:text-primary data-active:text-foreground",
+        "not-data-active:hover:text-primary data-active:text-foreground",
         "h-6 gap-1.5 px-[calc(--spacing(2.5)-1px)]",
         "data-[orientation=vertical]:w-full data-[orientation=vertical]:justify-start",
         className,

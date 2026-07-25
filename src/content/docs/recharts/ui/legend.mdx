@@ -1,0 +1,65 @@
+---
+title: Legend
+description: Legends that identify each data series in a chart.
+image: /og/legend.png
+---
+
+## Usage
+
+```tsx
+<EvilLineChart
+  xDataKey="month"
+  data={data}
+  chartConfig={chartConfig}
+  legendVariant="circle" | "square" | "circle-outline" // and so on
+/>
+```
+
+## Variants
+
+Control the legend indicator style with the `legendVariant` prop.
+
+### Square
+
+<ComponentPreview title="legendVariant='square'" name="ex-legend-square-line-chart" />
+
+### Circle
+
+<ComponentPreview title="legendVariant='circle'" name="ex-legend-circle-line-chart" />
+
+### Circle Outline
+
+<ComponentPreview title="legendVariant='circle-outline'" name="ex-legend-circle-outline-line-chart" />
+
+### Rounded Square (Default)
+
+<ComponentPreview title="legendVariant='rounded-square'" name="ex-legend-rounded-square-line-chart" />
+
+### Rounded Square Outline
+
+<ComponentPreview title="legendVariant='rounded-square-outline'" name="ex-legend-rounded-square-outline-line-chart" />
+
+### Vertical Bar
+
+<ComponentPreview title="legendVariant='vertical-bar'" name="ex-legend-vertical-bar-line-chart" />
+
+### Horizontal Bar
+
+<ComponentPreview title="legendVariant='horizontal-bar'" name="ex-legend-horizontal-bar-line-chart" />
+
+## API Reference
+
+<ApiTable>
+  <ApiRow name="legendVariant" type='"square" | "circle" | "circle-outline" | "rounded-square" | "rounded-square-outline" | "vertical-bar" | "horizontal-bar"' default='"rounded-square"'>
+    Style of the legend indicator icon.
+  </ApiRow>
+  <ApiRow name="hideLegend" type="boolean" default="false">
+    Hides the legend entirely.
+  </ApiRow>
+  <ApiRow name="hideIcon" type="boolean" default="false">
+    Hides the color icon next to each item, leaving only label text.
+  </ApiRow>
+  <ApiRow name="align" type='"left" | "center" | "right"' default='"right"'>
+    Horizontal alignment of the legend items.
+  </ApiRow>
+</ApiTable>

@@ -1,0 +1,54 @@
+"use client";
+
+import { EvilLineChart } from "@/registry/charts/recharts-line-chart";
+import { type ChartConfig } from "@/registry/ui/recharts-chart";
+
+const data = [
+  { month: "January", desktop: 342, mobile: 184 },
+  { month: "February", desktop: 876, mobile: 491 },
+  { month: "March", desktop: 512, mobile: 290 },
+  { month: "April", desktop: 629, mobile: 391 },
+  { month: "May", desktop: 458, mobile: 309 },
+  { month: "June", desktop: 781, mobile: 449 },
+  { month: "July", desktop: 394, mobile: 234 },
+  { month: "August", desktop: 925, mobile: 557 },
+  { month: "September", desktop: 647, mobile: 367 },
+  { month: "October", desktop: 532, mobile: 357 },
+  { month: "November", desktop: 803, mobile: 515 },
+  { month: "December", desktop: 271, mobile: 149 },
+];
+
+const chartConfig = {
+  desktop: {
+    label: "Desktop",
+    colors: {
+      light: ["red", "orange", "rosybrown", "purple", "blue"], // [!code highlight]
+      dark: ["red", "orange", "rosybrown", "purple", "blue"], // [!code highlight]
+    },
+  },
+  mobile: {
+    label: "Mobile",
+    colors: {
+      light: ["gray"],
+      dark: ["gray"],
+    },
+  },
+} satisfies ChartConfig;
+
+export function EvilExampleLineChart() {
+  return (
+    <EvilLineChart data={data} config={chartConfig} className="h-full w-full p-4">
+      <EvilLineChart.XAxis dataKey="month" tickFormatter={(value) => value.substring(0, 3)} />
+      <EvilLineChart.Legend isClickable />
+      <EvilLineChart.Tooltip />
+      <EvilLineChart.Line dataKey="desktop" strokeVariant="solid" isClickable>
+        <EvilLineChart.Dot variant="colored-border" />
+        <EvilLineChart.ActiveDot variant="default" />
+      </EvilLineChart.Line>
+      <EvilLineChart.Line dataKey="mobile" strokeVariant="solid" isClickable>
+        <EvilLineChart.Dot variant="colored-border" />
+        <EvilLineChart.ActiveDot variant="default" />
+      </EvilLineChart.Line>
+    </EvilLineChart>
+  );
+}

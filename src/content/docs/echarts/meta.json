@@ -1,0 +1,18 @@
+{
+  "title": "ECharts",
+  "pages": [
+    "installation",
+    "components",
+    "area-chart",
+    "line-chart",
+    "bar-chart",
+    "composed-chart",
+    "radar-chart",
+    "pie-chart",
+    "radial-chart",
+    "sankey-chart",
+    "ui/tooltip",
+    "ui/legend",
+    "ui/dots"
+  ]
+}

@@ -1,0 +1,59 @@
+---
+title: Tooltip
+description: Interactive tooltips on chart data-point hover
+image: /og/tooltip.png
+---
+
+## Usage
+
+```tsx
+<EvilBarChart
+  xDataKey="month"
+  data={data}
+  tooltipRoundness="md" | "sm" | "lg" | "xl"  
+  chartConfig={chartConfig}
+  tooltipVariant="frosted-glass" | "default" // and so on
+/>
+```
+
+## Variants
+
+Set the tooltip style with the `tooltipVariant` prop: `"default"` or `"frosted-glass"`.
+
+### Default
+
+A solid background.
+
+<ComponentPreview title="tooltipVariant='default'" name="ex-tooltip-default-bar-chart" />
+
+### Frosted Glass
+
+A semi-transparent background with a backdrop blur.
+
+<ComponentPreview title="tooltipVariant='frosted-glass'" name="ex-tooltip-frosted-glass-bar-chart" />
+
+## API Reference
+
+<ApiTable>
+  <ApiRow name="tooltipVariant" type='"default" | "frosted-glass"' default='"default"'>
+    The tooltip's visual style.
+  </ApiRow>
+  <ApiRow name="tooltipRoundness" type='"sm" | "md" | "lg" | "xl"' default='"lg"'>
+    The tooltip's border-radius.
+  </ApiRow>
+  <ApiRow name="tooltipDefaultIndex" type="number">
+    Shows the tooltip by default at this data-point index.
+  </ApiRow>
+  <ApiRow name="hideTooltip" type="boolean" default="false">
+    When `true`, hides the tooltip.
+  </ApiRow>
+  <ApiRow name="indicator" type='"line" | "dot" | "dashed"' default='"dot"'>
+    Style of the color indicator beside each item.
+  </ApiRow>
+  <ApiRow name="hideLabel" type="boolean" default="false">
+    When `true`, hides the top label (e.g. month name).
+  </ApiRow>
+  <ApiRow name="hideIndicator" type="boolean" default="false">
+    When `true`, hides the color indicator beside each item.
+  </ApiRow>
+</ApiTable>

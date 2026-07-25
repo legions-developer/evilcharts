@@ -1,0 +1,44 @@
+---
+title: Installation
+description: install the evilcharts echarts components in your project
+image: /og/og-image.png
+---
+
+The ECharts provider renders to canvas through Apache ECharts — same config contract, same install flow, built for scale.
+
+## Steps
+<Steps>
+  <Step>
+    <StepTitle>Install ECharts</StepTitle>
+    <StepContent>
+      <StepDescription>
+        Apache ECharts powers the provider and is required by every ECharts component.
+
+        Learn more at the <Link href="https://echarts.apache.org/handbook/en/basics/import" _blank>ECharts import guide</Link>.
+      </StepDescription>
+      <CommandBlock commands={["echarts"]} />
+    </StepContent>
+  </Step>
+
+  <Step>
+    <StepTitle>Setup shadcn/ui</StepTitle>
+    <StepContent>
+      <StepDescription>
+        Initialize shadcn/ui to set up Tailwind CSS, theming, and component structure. Skip this step if you already have it.
+
+        Check out the <Link href="https://ui.shadcn.com/docs/installation/next" _blank>shadcn/ui Next.js installation docs</Link> for more details.
+      </StepDescription>
+      <CliBlock commands={["init"]} />
+    </StepContent>
+  </Step>
+
+  <Step>
+    <StepTitle>Add EvilCharts ECharts Components</StepTitle>
+    <StepContent>
+      <StepDescription>
+        Add components with the CLI. ECharts components are prefixed with `echarts-` — replace `{chart-name}` with a chart type (e.g., `area-chart`, `bar-chart`, `line-chart`, `pie-chart`). Installing one pulls that chart plus the shared `ui` modules it imports, and nothing from Recharts.
+      </StepDescription>
+      <CliBlock commands={["@evilcharts/echarts-{chart-name}"]} />
+    </StepContent>
+  </Step>
+</Steps>

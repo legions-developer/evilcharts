@@ -21,9 +21,11 @@ interface SidebarOption {
 interface RenderDefaultOptionsProps {
   options: SidebarOption[];
   label: string;
+  /** URLs present in the page tree; options pointing elsewhere are dropped. */
+  existingUrls?: Set<string>;
 }
 
-export function RenderDefaultOptions({ options, label }: RenderDefaultOptionsProps) {
+export function RenderDefaultOptions({ options, label, existingUrls }: RenderDefaultOptionsProps) {
   const pathname = usePathname();
   const { isMobile, setOpenMobile } = useSidebar();
 
@@ -33,11 +35,17 @@ export function RenderDefaultOptions({ options, label }: RenderDefaultOptionsPro
     }
   };
 
+  const visibleOptions = existingUrls
+    ? options.filter((item) => existingUrls.has(item.url))
+    : options;
+
+  if (visibleOptions.length === 0) return null;
+
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarGroupLabel>{label}</SidebarGroupLabel>
       <SidebarMenu>
-        {options.map((item) => {
+        {visibleOptions.map((item) => {
           const isActive = pathname === item.url;
 
           return (

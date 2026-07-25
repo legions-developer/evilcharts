@@ -9,7 +9,7 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
   return (
     <SidebarProvider>
       <DocsSidebar />
-      <div className={cn("bg-sidebar w-full", "p-0 sm:p-2")}>
+      <div className={cn("bg-sidebar w-full", "p-0 pl-0 sm:py-2 sm:pr-2")}>
         <DecorativeBorder />
         <div
           className={cn(

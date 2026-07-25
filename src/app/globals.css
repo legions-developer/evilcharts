@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "shadcn/tailwind.css";
 @import "tw-animate-css";
 @import "fumadocs-ui/css/shadcn.css";
 @import "fumadocs-ui/css/preset.css";
@@ -76,11 +77,11 @@
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(100% 0.00011 271.152);
+  --sidebar: oklch(98% 0.00011 271.152);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(15% 0 0);
   --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(95% 0 0);
+  --sidebar-accent: oklch(93% 0 0);
   --sidebar-accent-foreground: oklch(15% 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
@@ -111,7 +112,7 @@
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);
   --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(34.07% 0.00004 271.152);
+  --accent: oklch(20% 0 71);
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
   --destructive-foreground: oklch(62.559% 0.22587 26.142);
@@ -178,15 +179,6 @@ html {
   }
 }
 
-@utility no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-
-  &::-webkit-scrollbar {
-    display: none;
-  }
-}
-
 @utility docs-container {
   @apply mx-auto w-full max-w-2xl px-4;
 }
@@ -222,49 +214,6 @@ html.dark [data-rehype-pretty-code-figure] code span,
   font-style: var(--shiki-dark-font-style) !important;
   font-weight: var(--shiki-dark-font-weight) !important;
   text-decoration: var(--shiki-dark-text-decoration) !important;
-}
-
-.docs-sidebar-top-fade {
-  --docs-sidebar-fade-stop-1: 10%;
-  --docs-sidebar-fade-stop-2: 22%;
-  --docs-sidebar-fade-stop-3: 34%;
-  --docs-sidebar-fade-stop-4: 46%;
-  --docs-sidebar-fade-stop-5: 58%;
-  --docs-sidebar-fade-stop-6: 70%;
-  --docs-sidebar-fade-stop-7: 80%;
-  --docs-sidebar-fade-stop-8: 89%;
-  --docs-sidebar-fade-stop-9: 95%;
-}
-
-.docs-sidebar-top-fade::after {
-  content: "";
-  position: absolute;
-  top: 3.5rem;
-  left: 0;
-  width: 100%;
-  height: 1.8rem;
-  pointer-events: none;
-  background-image:
-    linear-gradient(
-      to bottom,
-      var(--color-sidebar) 0%,
-      color-mix(in srgb, var(--color-sidebar) 98%, transparent) var(--docs-sidebar-fade-stop-1),
-      color-mix(in srgb, var(--color-sidebar) 95%, transparent) var(--docs-sidebar-fade-stop-2),
-      color-mix(in srgb, var(--color-sidebar) 90%, transparent) var(--docs-sidebar-fade-stop-3),
-      color-mix(in srgb, var(--color-sidebar) 83%, transparent) var(--docs-sidebar-fade-stop-4),
-      color-mix(in srgb, var(--color-sidebar) 74%, transparent) var(--docs-sidebar-fade-stop-5),
-      color-mix(in srgb, var(--color-sidebar) 62%, transparent) var(--docs-sidebar-fade-stop-6),
-      color-mix(in srgb, var(--color-sidebar) 48%, transparent) var(--docs-sidebar-fade-stop-7),
-      color-mix(in srgb, var(--color-sidebar) 32%, transparent) var(--docs-sidebar-fade-stop-8),
-      color-mix(in srgb, var(--color-sidebar) 16%, transparent) var(--docs-sidebar-fade-stop-9),
-      transparent 100%
-    ),
-    linear-gradient(
-      to bottom,
-      color-mix(in srgb, var(--color-sidebar) 20%, transparent) 0%,
-      color-mix(in srgb, var(--color-sidebar) 10%, transparent) 52%,
-      transparent 100%
-    );
 }
 
 /* Make code lines stretch full width for highlights */

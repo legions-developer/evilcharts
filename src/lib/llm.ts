@@ -7,42 +7,42 @@ const showcaseItems = [
   {
     name: "Area Chart",
     description: "Highlight trends with filled area ranges.",
-    url: "/docs/area-chart",
+    url: "/docs/recharts/area-chart",
   },
   {
     name: "Line Chart",
     description: "Track change over time with lines.",
-    url: "/docs/line-chart",
+    url: "/docs/recharts/line-chart",
   },
   {
     name: "Bar Chart",
     description: "Compare categories quickly with bold bars.",
-    url: "/docs/bar-chart",
+    url: "/docs/recharts/bar-chart",
   },
   {
     name: "Composed Chart",
     description: "Mix lines, bars, areas in one.",
-    url: "/docs/composed-chart",
+    url: "/docs/recharts/composed-chart",
   },
   {
     name: "Radar Chart",
     description: "Compare multi-metric profiles on radial axes.",
-    url: "/docs/radar-chart",
+    url: "/docs/recharts/radar-chart",
   },
   {
     name: "Pie Chart",
     description: "Show parts of a whole, clearly.",
-    url: "/docs/pie-chart",
+    url: "/docs/recharts/pie-chart",
   },
   {
     name: "Radial Chart",
     description: "Visualize totals in a circular layout.",
-    url: "/docs/radial-chart",
+    url: "/docs/recharts/radial-chart",
   },
   {
     name: "Sankey Chart",
     description: "Show flows between stages with weighted links.",
-    url: "/docs/sankey-chart",
+    url: "/docs/recharts/sankey-chart",
   },
 ]
 

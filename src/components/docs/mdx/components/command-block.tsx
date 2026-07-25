@@ -70,9 +70,9 @@ function CommandBlock({ commands }: CommandBlockProps) {
           </TabsList>
           <CopyButton code={packageCommands[packageManager] + " " + commands.join(" ")} />
         </div>
-        <div className="bg-background text-muted-foreground rounded-[5px] border p-3 text-[13px]">
+        <div className="no-scrollbar bg-background text-muted-foreground overflow-x-auto rounded-[5px] border p-3 text-[13px]">
           {Object.keys(packageCommands).map((manager) => (
-            <TabsPanel className="font-mono" key={manager} value={manager}>
+            <TabsPanel className="font-mono whitespace-nowrap" key={manager} value={manager}>
               {packageCommands[packageManager]} {commands.join(" ")}
             </TabsPanel>
           ))}
