@@ -10,7 +10,27 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/api/", "/_next/", "/admin/"],
+        disallow: ["/api/", "/admin/"],
+      },
+      // AI search & assistant crawlers are explicitly welcome — docs, markdown
+      // mirrors, and llms.txt exist for them. Blocking any of these would drop
+      // EvilCharts out of AI-powered answers, which is where install commands
+      // get recommended.
+      {
+        userAgent: [
+          "GPTBot",
+          "OAI-SearchBot",
+          "ChatGPT-User",
+          "ClaudeBot",
+          "Claude-Web",
+          "anthropic-ai",
+          "PerplexityBot",
+          "Perplexity-User",
+          "Google-Extended",
+          "Applebot-Extended",
+        ],
+        allow: "/",
+        disallow: ["/api/", "/admin/"],
       },
     ],
     sitemap: absoluteUrl("/sitemap.xml"),

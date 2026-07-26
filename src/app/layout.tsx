@@ -2,7 +2,7 @@ import { Analytics as VercelAnalytics } from "@vercel/analytics/next";
 import { JetBrains_Mono, Geist, Inter } from "next/font/google";
 import type { Metadata, Viewport } from "next";
 import { ThemeProvider } from "next-themes";
-import { cn, SITE_URL } from "@/lib/utils";
+import { absoluteUrl, cn, SITE_URL } from "@/lib/utils";
 import {
   SITE_DESCRIPTION,
   SITE_KEYWORDS,
@@ -59,10 +59,10 @@ export const metadata: Metadata = {
     description: SITE_DESCRIPTION,
     images: [
       {
-        url: "/opengraph-image",
+        url: "/og/og-image.png",
         width: 1200,
         height: 630,
-        alt: "Evil Charts — Beautiful & Animated Charts",
+        alt: SITE_TITLE,
       },
     ],
   },
@@ -71,7 +71,7 @@ export const metadata: Metadata = {
     title: SITE_TITLE,
     description: SITE_DESCRIPTION,
     creator: "@legionsdev",
-    images: ["/opengraph-image"],
+    images: ["/og/og-image.png"],
   },
   robots: {
     index: true,
@@ -84,6 +84,53 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
+};
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": `${SITE_URL}/#website`,
+      url: `${SITE_URL}/`,
+      name: SITE_NAME,
+      description: SITE_DESCRIPTION,
+      publisher: { "@id": `${SITE_URL}/#organization` },
+      inLanguage: "en",
+    },
+    {
+      "@type": "Organization",
+      "@id": `${SITE_URL}/#organization`,
+      name: SITE_NAME,
+      url: `${SITE_URL}/`,
+      logo: {
+        "@type": "ImageObject",
+        url: absoluteUrl("/web/logo.svg"),
+      },
+      sameAs: [
+        "https://github.com/legions-developer/evilcharts",
+        "https://x.com/legionsdev",
+      ],
+    },
+    {
+      "@type": "SoftwareApplication",
+      "@id": `${SITE_URL}/#software`,
+      name: SITE_NAME,
+      description: SITE_DESCRIPTION,
+      url: `${SITE_URL}/`,
+      applicationCategory: "DeveloperApplication",
+      operatingSystem: "Any",
+      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+      license: "https://github.com/legions-developer/evilcharts/blob/main/LICENSE",
+      softwareHelp: { "@type": "CreativeWork", url: absoluteUrl("/docs") },
+      author: {
+        "@type": "Person",
+        name: "Gurbinder",
+        url: "https://x.com/legionsdev",
+      },
+      publisher: { "@id": `${SITE_URL}/#organization` },
+    },
+  ],
 };
 
 export const viewport: Viewport = {
@@ -109,6 +156,10 @@ export default function RootLayout({
           "font-inter antialiased",
         )}
       >
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
         <ThemeProvider defaultTheme="system" attribute="class">
           <VercelAnalytics />
           {children}
