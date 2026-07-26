@@ -136,7 +136,10 @@ export default async function Page(props: { params: Promise<{ slug: string[] }> 
     <div className="relative mt-10 flex sm:mt-0">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(buildDocsJsonLd(page)) }}
+        dangerouslySetInnerHTML={{
+          // Escape "<" so frontmatter text can never smuggle in a premature </script>.
+          __html: JSON.stringify(buildDocsJsonLd(page)).replace(/</g, "\\u003c"),
+        }}
       />
       <div className="docs-container flex flex-col py-12 pb-32">
         <div className="flex flex-row items-start gap-4">

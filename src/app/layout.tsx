@@ -86,13 +86,18 @@ export const metadata: Metadata = {
   },
 };
 
+// "/" only redirects, so entity urls point at /docs — the canonical 200 URL the
+// sitemap advertises. The #fragment @ids stay anchored to the bare origin: they
+// are opaque identifiers, and the docs pages reference them cross-page.
+const canonicalHome = absoluteUrl("/docs");
+
 const structuredData = {
   "@context": "https://schema.org",
   "@graph": [
     {
       "@type": "WebSite",
       "@id": `${SITE_URL}/#website`,
-      url: `${SITE_URL}/`,
+      url: canonicalHome,
       name: SITE_NAME,
       description: SITE_DESCRIPTION,
       publisher: { "@id": `${SITE_URL}/#organization` },
@@ -102,7 +107,7 @@ const structuredData = {
       "@type": "Organization",
       "@id": `${SITE_URL}/#organization`,
       name: SITE_NAME,
-      url: `${SITE_URL}/`,
+      url: canonicalHome,
       logo: {
         "@type": "ImageObject",
         url: absoluteUrl("/web/logo.svg"),
@@ -117,7 +122,7 @@ const structuredData = {
       "@id": `${SITE_URL}/#software`,
       name: SITE_NAME,
       description: SITE_DESCRIPTION,
-      url: `${SITE_URL}/`,
+      url: canonicalHome,
       applicationCategory: "DeveloperApplication",
       operatingSystem: "Any",
       offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
@@ -158,7 +163,10 @@ export default function RootLayout({
       >
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+          dangerouslySetInnerHTML={{
+            // Escape "<" so no value can smuggle in a premature </script>.
+            __html: JSON.stringify(structuredData).replace(/</g, "\\u003c"),
+          }}
         />
         <ThemeProvider defaultTheme="system" attribute="class">
           <VercelAnalytics />
