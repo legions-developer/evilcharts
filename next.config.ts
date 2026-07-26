@@ -35,9 +35,11 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   async redirects() {
     return [
+      // "/docs" without a trailing slash — "/docs/" would add a second hop
+      // through Next's trailing-slash normalization redirect.
       {
         source: "/",
-        destination: "/docs/",
+        destination: "/docs",
         permanent: false,
       },
 

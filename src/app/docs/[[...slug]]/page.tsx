@@ -4,9 +4,10 @@ import { MDXNavigation } from "@/components/docs/mdx/components/navigation";
 import { DocsCopyPage } from "@/components/docs/layout/docs-copy-button";
 import { findNeighbour } from "fumadocs-core/page-tree";
 import { mdxComponents } from "@/components/docs/mdx";
+import { PROVIDER_META, PROVIDERS } from "@/globals/constants/providers";
 import { processMdxForLLMs } from "@/lib/llm";
 import { notFound } from "next/navigation";
-import { absoluteUrl } from "@/lib/utils";
+import { absoluteUrl, SITE_URL } from "@/lib/utils";
 import { LinkIcon } from "lucide-react";
 import { source } from "@/lib/source";
 import type { Metadata } from "next";
@@ -26,7 +27,7 @@ export async function generateMetadata(props: {
   const { title, description, image } = page.data;
 
   const url = absoluteUrl(page.url);
-  const ogImage = image ? absoluteUrl(image) : undefined;
+  const ogImage = absoluteUrl(image ?? "/og/og-image.png");
 
   return {
     title,
@@ -43,23 +44,73 @@ export async function generateMetadata(props: {
       title,
       description,
       siteName: "Evil Charts",
-      ...(ogImage && {
-        images: [
-          {
-            url: ogImage,
-            width: 1200,
-            height: 630,
-            alt: `${title} — Evil Charts`,
-          },
-        ],
-      }),
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+          alt: `${title} — Evil Charts`,
+        },
+      ],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      ...(ogImage && { images: [ogImage] }),
+      images: [ogImage],
     },
+  };
+}
+
+type DocsPage = NonNullable<ReturnType<typeof source.getPage>>;
+
+// Breadcrumb skips the chart-folder segment (it only redirects) and points the
+// provider crumb at its components overview — every crumb must resolve to a 200.
+function buildDocsJsonLd(page: DocsPage) {
+  const { title, description, image } = page.data;
+  const url = absoluteUrl(page.url);
+
+  const crumbs = [{ name: "Docs", url: absoluteUrl("/docs") }];
+  const provider = PROVIDERS.find((id) => id === page.slugs[0]);
+  if (provider) {
+    crumbs.push({
+      name: PROVIDER_META[provider].name,
+      url: absoluteUrl(`/docs/${provider}/components`),
+    });
+  }
+  if (page.url !== "/docs") {
+    crumbs.push({ name: title, url });
+  }
+
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "TechArticle",
+        headline: title,
+        description,
+        url,
+        mainEntityOfPage: url,
+        image: absoluteUrl(image ?? "/og/og-image.png"),
+        inLanguage: "en",
+        author: {
+          "@type": "Person",
+          name: "Gurbinder",
+          url: "https://x.com/legionsdev",
+        },
+        publisher: { "@id": `${SITE_URL}/#organization` },
+        isPartOf: { "@id": `${SITE_URL}/#website` },
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: crumbs.map((crumb, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          name: crumb.name,
+          item: crumb.url,
+        })),
+      },
+    ],
   };
 }
 
@@ -83,6 +134,13 @@ export default async function Page(props: { params: Promise<{ slug: string[] }> 
 
   return (
     <div className="relative mt-10 flex sm:mt-0">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          // Escape "<" so frontmatter text can never smuggle in a premature </script>.
+          __html: JSON.stringify(buildDocsJsonLd(page)).replace(/</g, "\\u003c"),
+        }}
+      />
       <div className="docs-container flex flex-col py-12 pb-32">
         <div className="flex flex-row items-start gap-4">
           <div className="flex flex-1 flex-col gap-1">

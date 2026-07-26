@@ -59,12 +59,14 @@ function getPageSummary(page: ReturnType<typeof source.getPages>[number]) {
   };
 }
 
+// Absolute URLs on purpose: agents read llms.txt detached from the site, so a
+// relative link gives them nothing to resolve against.
 function renderLinks(pages: ReturnType<typeof source.getPages>) {
   return pages
     .map((page) => {
       const summary = getPageSummary(page);
       const description = summary.description ? ` - ${summary.description}` : "";
-      return `- [${summary.title}](${summary.markdownUrl})${description}`;
+      return `- [${summary.title}](${absoluteUrl(summary.markdownUrl)})${description}`;
     })
     .join("\n");
 }
@@ -114,9 +116,9 @@ ${renderLinks(startHere)}
 ${providerSections}
 
 ## Agent Resources
-- [Full documentation snapshot](/llms-full.txt)
-- [Agent skill](/skill.md)
-- [MCP server](/mcp)
+- [Full documentation snapshot](${absoluteUrl("/llms-full.txt")})
+- [Agent skill](${absoluteUrl("/skill.md")})
+- [MCP server](${absoluteUrl("/mcp")})
 `;
 }
 
