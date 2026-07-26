@@ -3,7 +3,7 @@ export const SITE_NAME = "Evil Charts";
 export const SITE_TITLE = "Evil Charts — Animated React Chart Components for shadcn/ui";
 
 export const SITE_DESCRIPTION =
-  "Free, open-source animated React chart components built with Recharts, shadcn/ui, and Tailwind CSS. Copy, paste, and ship beautiful charts in seconds.";
+  "Free, open-source animated React chart components built with Recharts, Apache ECharts, shadcn/ui, and Tailwind CSS. Copy, paste, and ship beautiful charts.";
 
 export const SITE_KEYWORDS: string[] = [
   "evil charts",
