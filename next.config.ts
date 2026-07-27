@@ -35,14 +35,6 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   async redirects() {
     return [
-      // "/docs" without a trailing slash — "/docs/" would add a second hop
-      // through Next's trailing-slash normalization redirect.
-      {
-        source: "/",
-        destination: "/docs",
-        permanent: false,
-      },
-
       // Neither provider has an index page — the intro is shared at /docs — so a
       // bare provider URL lands on that engine's components overview. /docs/recharts
       // was a real page until the Recharts-only pitch folded into the shared intro,

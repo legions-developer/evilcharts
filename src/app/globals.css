@@ -335,3 +335,225 @@ text,
 tspan {
   user-select: none;
 }
+@utility easing-gradient {
+  --tw-ease-gradient-stops:
+    var(--tw-gradient-position), var(--tw-gradient-from) 0%,
+    oklch(
+        from
+          color-mix(
+            in oklch,
+            var(--tw-gradient-to, oklch(from var(--tw-gradient-from) l c h / 0))
+              0.12%,
+            var(--tw-gradient-from)
+          )
+          l c h / alpha
+      )
+      5%,
+    oklch(
+        from
+          color-mix(
+            in oklch,
+            var(--tw-gradient-to, oklch(from var(--tw-gradient-from) l c h / 0))
+              0.86%,
+            var(--tw-gradient-from)
+          )
+          l c h / alpha
+      )
+      10%,
+    oklch(
+        from
+          color-mix(
+            in oklch,
+            var(--tw-gradient-to, oklch(from var(--tw-gradient-from) l c h / 0))
+              2.66%,
+            var(--tw-gradient-from)
+          )
+          l c h / alpha
+      )
+      15%,
+    oklch(
+        from
+          color-mix(
+            in oklch,
+            var(--tw-gradient-to, oklch(from var(--tw-gradient-from) l c h / 0))
+              5.79%,
+            var(--tw-gradient-from)
+          )
+          l c h / alpha
+      )
+      20%,
+    oklch(
+        from
+          color-mix(
+            in oklch,
+            var(--tw-gradient-to, oklch(from var(--tw-gradient-from) l c h / 0))
+              10.35%,
+            var(--tw-gradient-from)
+          )
+          l c h / alpha
+      )
+      25%,
+    oklch(
+        from
+          color-mix(
+            in oklch,
+            var(--tw-gradient-to, oklch(from var(--tw-gradient-from) l c h / 0))
+              16.31%,
+            var(--tw-gradient-from)
+          )
+          l c h / alpha
+      )
+      30%,
+    oklch(
+        from
+          color-mix(
+            in oklch,
+            var(--tw-gradient-to, oklch(from var(--tw-gradient-from) l c h / 0))
+              23.52%,
+            var(--tw-gradient-from)
+          )
+          l c h / alpha
+      )
+      35%,
+    oklch(
+        from
+          color-mix(
+            in oklch,
+            var(--tw-gradient-to, oklch(from var(--tw-gradient-from) l c h / 0))
+              31.74%,
+            var(--tw-gradient-from)
+          )
+          l c h / alpha
+      )
+      40%,
+    oklch(
+        from
+          color-mix(
+            in oklch,
+            var(--tw-gradient-to, oklch(from var(--tw-gradient-from) l c h / 0))
+              40.69%,
+            var(--tw-gradient-from)
+          )
+          l c h / alpha
+      )
+      45%,
+    oklch(
+        from
+          color-mix(
+            in oklch,
+            var(--tw-gradient-to, oklch(from var(--tw-gradient-from) l c h / 0))
+              50%,
+            var(--tw-gradient-from)
+          )
+          l c h / alpha
+      )
+      50%,
+    oklch(
+        from
+          color-mix(
+            in oklch,
+            var(--tw-gradient-to, oklch(from var(--tw-gradient-from) l c h / 0))
+              59.31%,
+            var(--tw-gradient-from)
+          )
+          l c h / alpha
+      )
+      55%,
+    oklch(
+        from
+          color-mix(
+            in oklch,
+            var(--tw-gradient-to, oklch(from var(--tw-gradient-from) l c h / 0))
+              68.26%,
+            var(--tw-gradient-from)
+          )
+          l c h / alpha
+      )
+      60%,
+    oklch(
+        from
+          color-mix(
+            in oklch,
+            var(--tw-gradient-to, oklch(from var(--tw-gradient-from) l c h / 0))
+              76.48%,
+            var(--tw-gradient-from)
+          )
+          l c h / alpha
+      )
+      65%,
+    oklch(
+        from
+          color-mix(
+            in oklch,
+            var(--tw-gradient-to, oklch(from var(--tw-gradient-from) l c h / 0))
+              83.69%,
+            var(--tw-gradient-from)
+          )
+          l c h / alpha
+      )
+      70%,
+    oklch(
+        from
+          color-mix(
+            in oklch,
+            var(--tw-gradient-to, oklch(from var(--tw-gradient-from) l c h / 0))
+              89.65%,
+            var(--tw-gradient-from)
+          )
+          l c h / alpha
+      )
+      75%,
+    oklch(
+        from
+          color-mix(
+            in oklch,
+            var(--tw-gradient-to, oklch(from var(--tw-gradient-from) l c h / 0))
+              96.21%,
+            var(--tw-gradient-from)
+          )
+          l c h / alpha
+      )
+      80%,
+    oklch(
+        from
+          color-mix(
+            in oklch,
+            var(--tw-gradient-to, oklch(from var(--tw-gradient-from) l c h / 0))
+              97.34%,
+            var(--tw-gradient-from)
+          )
+          l c h / alpha
+      )
+      85%,
+    oklch(
+        from
+          color-mix(
+            in oklch,
+            var(--tw-gradient-to, oklch(from var(--tw-gradient-from) l c h / 0))
+              99.14%,
+            var(--tw-gradient-from)
+          )
+          l c h / alpha
+      )
+      90%,
+    oklch(
+        from
+          color-mix(
+            in oklch,
+            var(--tw-gradient-to, oklch(from var(--tw-gradient-from) l c h / 0))
+              99.88%,
+            var(--tw-gradient-from)
+          )
+          l c h / alpha
+      )
+      95%,
+    oklch(
+        from
+          var(--tw-gradient-to, oklch(from var(--tw-gradient-from) l c h / 0)) l
+          c h / alpha
+      )
+      100%;
+  /* !important so composing with from-* / to-* works: those utilities also set
+     --tw-gradient-stops and would otherwise win the cascade over this one. */
+  --tw-gradient-stops: var(--tw-ease-gradient-stops) !important;
+}
