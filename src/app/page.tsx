@@ -12,7 +12,28 @@ export const metadata: Metadata = {
   description: SITE_DESCRIPTION,
 };
 
+// ISR: the page is served from cache and re-rendered (with a fresh star
+// count) at most once an hour.
+export const revalidate = 3600;
+
 const GITHUB_URL = "https://github.com/legions-developer/evilcharts";
+
+async function getGithubStars(): Promise<number | null> {
+  try {
+    const res = await fetch("https://api.github.com/repos/legions-developer/evilcharts", {
+      next: { revalidate: 3600 },
+      headers: { Accept: "application/vnd.github+json" },
+    });
+    if (!res.ok) return null;
+    const data = (await res.json()) as { stargazers_count?: number };
+    return typeof data.stargazers_count === "number" ? data.stargazers_count : null;
+  } catch {
+    return null;
+  }
+}
+
+const formatStars = (count: number) =>
+  count >= 1000 ? `${(count / 1000).toFixed(1).replace(/\.0$/, "")}k` : String(count);
 
 function GithubIcon() {
   return (
@@ -22,7 +43,9 @@ function GithubIcon() {
   );
 }
 
-export default function Home() {
+export default async function Home() {
+  const stars = await getGithubStars();
+
   return (
     <main className="bg-background relative flex min-h-dvh flex-col overflow-hidden lg:h-dvh">
       <section className="relative z-10 flex flex-col justify-center px-6 pt-20 pb-10 sm:px-12 lg:h-full lg:w-[44%] lg:min-w-105 lg:items-center lg:px-12 lg:pt-0 lg:pb-0">
@@ -46,6 +69,11 @@ export default function Home() {
             >
               <GithubIcon />
               Star on GitHub
+              {stars !== null && (
+                <span className="text-muted-foreground border-l pl-1.5 font-mono text-xs tabular-nums">
+                  {formatStars(stars)}
+                </span>
+              )}
             </Button>
           </div>
         </div>

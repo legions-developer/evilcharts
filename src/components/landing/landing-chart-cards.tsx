@@ -467,3 +467,287 @@ export function LandingCircleRadarChart() {
     </EChartsRadarChart>
   );
 }
+
+const monthly3 = [
+  { month: "Jan", primary: 186, secondary: 120, tertiary: 90 },
+  { month: "Feb", primary: 305, secondary: 180, tertiary: 130 },
+  { month: "Mar", primary: 237, secondary: 150, tertiary: 170 },
+  { month: "Apr", primary: 173, secondary: 210, tertiary: 110 },
+  { month: "May", primary: 209, secondary: 160, tertiary: 190 },
+  { month: "Jun", primary: 264, secondary: 200, tertiary: 140 },
+  { month: "Jul", primary: 232, secondary: 240, tertiary: 180 },
+  { month: "Aug", primary: 291, secondary: 190, tertiary: 220 },
+];
+
+const hatchedAreaConfig = {
+  primary: {
+    label: "Compute",
+    colors: { light: ["#4f46e5"], dark: ["#818cf8"] },
+  },
+  secondary: {
+    label: "Storage",
+    colors: { light: ["#e11d48"], dark: ["#fb7185"] },
+  },
+} satisfies ChartConfig;
+
+export function LandingHatchedAreaChart() {
+  return (
+    <EChartsAreaChart
+      data={monthly}
+      config={hatchedAreaConfig}
+      className="h-full w-full p-3"
+      stackType="stacked"
+    >
+      <EChartsAreaChart.Grid />
+      <EChartsAreaChart.XAxis dataKey="month" />
+      <EChartsAreaChart.Tooltip />
+      <EChartsAreaChart.Area dataKey="primary" variant="hatched">
+        <EChartsAreaChart.ActiveDot variant="default" />
+      </EChartsAreaChart.Area>
+      <EChartsAreaChart.Area dataKey="secondary" variant="hatched">
+        <EChartsAreaChart.ActiveDot variant="default" />
+      </EChartsAreaChart.Area>
+    </EChartsAreaChart>
+  );
+}
+
+const linesAreaConfig = {
+  primary: {
+    label: "Ingest",
+    colors: { light: ["#0d9488"], dark: ["#2dd4bf"] },
+  },
+  secondary: {
+    label: "Egress",
+    colors: { light: ["#ea580c"], dark: ["#fb923c"] },
+  },
+} satisfies ChartConfig;
+
+export function LandingLinesAreaChart() {
+  return (
+    <EChartsAreaChart
+      data={monthly}
+      config={linesAreaConfig}
+      className="h-full w-full p-3"
+      stackType="stacked"
+    >
+      <EChartsAreaChart.Grid />
+      <EChartsAreaChart.XAxis dataKey="month" />
+      <EChartsAreaChart.Tooltip />
+      <EChartsAreaChart.Area dataKey="primary" variant="lines">
+        <EChartsAreaChart.ActiveDot variant="default" />
+      </EChartsAreaChart.Area>
+      <EChartsAreaChart.Area dataKey="secondary" variant="lines">
+        <EChartsAreaChart.ActiveDot variant="default" />
+      </EChartsAreaChart.Area>
+    </EChartsAreaChart>
+  );
+}
+
+const expandedAreaConfig = {
+  primary: {
+    label: "Web",
+    colors: { light: ["#0284c7"], dark: ["#38bdf8"] },
+  },
+  secondary: {
+    label: "Mobile",
+    colors: { light: ["#7c3aed"], dark: ["#a78bfa"] },
+  },
+  tertiary: {
+    label: "API",
+    colors: { light: ["#059669"], dark: ["#34d399"] },
+  },
+} satisfies ChartConfig;
+
+export function LandingExpandedAreaChart() {
+  return (
+    <EChartsAreaChart
+      data={monthly3}
+      config={expandedAreaConfig}
+      className="h-full w-full p-3"
+      stackType="expanded"
+    >
+      <EChartsAreaChart.Grid />
+      <EChartsAreaChart.XAxis dataKey="month" />
+      <EChartsAreaChart.Tooltip />
+      <EChartsAreaChart.Area dataKey="primary" variant="gradient">
+        <EChartsAreaChart.ActiveDot variant="default" />
+      </EChartsAreaChart.Area>
+      <EChartsAreaChart.Area dataKey="secondary" variant="gradient">
+        <EChartsAreaChart.ActiveDot variant="default" />
+      </EChartsAreaChart.Area>
+      <EChartsAreaChart.Area dataKey="tertiary" variant="gradient">
+        <EChartsAreaChart.ActiveDot variant="default" />
+      </EChartsAreaChart.Area>
+    </EChartsAreaChart>
+  );
+}
+
+const stackedBarConfig = {
+  primary: {
+    label: "Seed",
+    colors: { light: ["#d97706"], dark: ["#fbbf24"] },
+  },
+  secondary: {
+    label: "Series A",
+    colors: { light: ["#e11d48"], dark: ["#fb7185"] },
+  },
+  tertiary: {
+    label: "Series B",
+    colors: { light: ["#7c3aed"], dark: ["#a78bfa"] },
+  },
+} satisfies ChartConfig;
+
+export function LandingStackedBarChart() {
+  return (
+    <EChartsBarChart
+      data={monthly3}
+      config={stackedBarConfig}
+      className="h-full w-full p-3"
+      stackType="stacked"
+    >
+      <EChartsBarChart.Grid />
+      <EChartsBarChart.XAxis dataKey="month" />
+      <EChartsBarChart.Tooltip />
+      <EChartsBarChart.Bar dataKey="primary" />
+      <EChartsBarChart.Bar dataKey="secondary" />
+      <EChartsBarChart.Bar dataKey="tertiary" />
+    </EChartsBarChart>
+  );
+}
+
+const horizontalBarConfig = {
+  primary: {
+    label: "Imports",
+    colors: { light: ["#0891b2"], dark: ["#22d3ee"] },
+  },
+  secondary: {
+    label: "Exports",
+    colors: { light: ["#db2777"], dark: ["#f472b6"] },
+  },
+} satisfies ChartConfig;
+
+export function LandingHorizontalBarChart() {
+  return (
+    <EChartsBarChart
+      data={monthly}
+      config={horizontalBarConfig}
+      className="h-full w-full p-3"
+      layout="horizontal"
+    >
+      <EChartsBarChart.Grid />
+      <EChartsBarChart.XAxis dataKey="month" />
+      <EChartsBarChart.Tooltip />
+      <EChartsBarChart.Bar dataKey="primary" />
+      <EChartsBarChart.Bar dataKey="secondary" />
+    </EChartsBarChart>
+  );
+}
+
+const bumpLineConfig = {
+  primary: {
+    label: "Alpha",
+    colors: { light: ["#059669"], dark: ["#34d399"] },
+  },
+  secondary: {
+    label: "Beta",
+    colors: { light: ["#d97706"], dark: ["#fbbf24"] },
+  },
+  tertiary: {
+    label: "Gamma",
+    colors: { light: ["#2563eb"], dark: ["#60a5fa"] },
+  },
+} satisfies ChartConfig;
+
+export function LandingBumpLineChart() {
+  return (
+    <EChartsLineChart
+      data={monthly3}
+      config={bumpLineConfig}
+      className="h-full w-full p-3"
+      curveType="bump"
+    >
+      <EChartsLineChart.Grid />
+      <EChartsLineChart.XAxis dataKey="month" />
+      <EChartsLineChart.Tooltip />
+      <EChartsLineChart.Line dataKey="primary" strokeVariant="solid" strokeWidth={2}>
+        <EChartsLineChart.Dot variant="default" />
+        <EChartsLineChart.ActiveDot variant="default" />
+      </EChartsLineChart.Line>
+      <EChartsLineChart.Line dataKey="secondary" strokeVariant="solid" strokeWidth={2}>
+        <EChartsLineChart.Dot variant="default" />
+        <EChartsLineChart.ActiveDot variant="default" />
+      </EChartsLineChart.Line>
+      <EChartsLineChart.Line dataKey="tertiary" strokeVariant="solid" strokeWidth={2}>
+        <EChartsLineChart.Dot variant="default" />
+        <EChartsLineChart.ActiveDot variant="default" />
+      </EChartsLineChart.Line>
+    </EChartsLineChart>
+  );
+}
+
+const linesRadarConfig = {
+  core: {
+    label: "Current",
+    colors: {
+      light: ["#7c3aed", "#c026d3"],
+      dark: ["#a78bfa", "#e879f9"],
+    },
+  },
+  edge: {
+    label: "Target",
+    colors: {
+      light: ["#4d7c0f", "#059669"],
+      dark: ["#a3e635", "#34d399"],
+    },
+  },
+} satisfies ChartConfig;
+
+export function LandingLinesRadarChart() {
+  return (
+    <EChartsRadarChart data={radarData} config={linesRadarConfig} className="h-full w-full p-3">
+      <EChartsRadarChart.PolarGrid />
+      <EChartsRadarChart.PolarAngleAxis dataKey="axis" />
+      <EChartsRadarChart.Tooltip />
+      <EChartsRadarChart.Radar dataKey="core" variant="lines">
+        <EChartsRadarChart.Dot variant="colored-border" />
+        <EChartsRadarChart.ActiveDot variant="default" />
+      </EChartsRadarChart.Radar>
+      <EChartsRadarChart.Radar dataKey="edge" variant="lines">
+        <EChartsRadarChart.Dot variant="colored-border" />
+        <EChartsRadarChart.ActiveDot variant="default" />
+      </EChartsRadarChart.Radar>
+    </EChartsRadarChart>
+  );
+}
+
+const paddedPieData = [
+  { stack: "render", value: 340 },
+  { stack: "compute", value: 260 },
+  { stack: "storage", value: 210 },
+  { stack: "network", value: 150 },
+  { stack: "other", value: 90 },
+];
+
+const paddedPieConfig = {
+  render: { label: "Render", colors: { light: ["#c026d3"], dark: ["#e879f9"] } },
+  compute: { label: "Compute", colors: { light: ["#0891b2"], dark: ["#22d3ee"] } },
+  storage: { label: "Storage", colors: { light: ["#65a30d"], dark: ["#a3e635"] } },
+  network: { label: "Network", colors: { light: ["#ea580c"], dark: ["#fb923c"] } },
+  other: { label: "Other", colors: { light: ["#4f46e5"], dark: ["#818cf8"] } },
+} satisfies ChartConfig;
+
+export function LandingPaddedPieChart() {
+  return (
+    <EChartsPieChart
+      data={paddedPieData}
+      dataKey="value"
+      nameKey="stack"
+      config={paddedPieConfig}
+      className="h-full w-full p-3"
+    >
+      <EChartsPieChart.Legend />
+      <EChartsPieChart.Tooltip />
+      <EChartsPieChart.Pie innerRadius={30} paddingAngle={4} />
+    </EChartsPieChart>
+  );
+}
