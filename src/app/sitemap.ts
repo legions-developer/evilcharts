@@ -8,9 +8,13 @@ export const revalidate = false;
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
 
-  // "/" is absent on purpose: it redirects to /docs, and a sitemap should only
-  // list canonical URLs that return 200.
   const staticEntries: MetadataRoute.Sitemap = [
+    {
+      url: absoluteUrl("/"),
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 1,
+    },
     {
       url: absoluteUrl("/docs"),
       lastModified: now,

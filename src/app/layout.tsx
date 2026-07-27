@@ -86,10 +86,11 @@ export const metadata: Metadata = {
   },
 };
 
-// "/" only redirects, so entity urls point at /docs — the canonical 200 URL the
-// sitemap advertises. The #fragment @ids stay anchored to the bare origin: they
-// are opaque identifiers, and the docs pages reference them cross-page.
-const canonicalHome = absoluteUrl("/docs");
+// "/" serves the landing page, so entity urls point at the bare origin — the
+// canonical 200 URL the sitemap advertises. The #fragment @ids stay anchored to
+// the bare origin: they are opaque identifiers, and the docs pages reference
+// them cross-page.
+const canonicalHome = SITE_URL;
 
 const structuredData = {
   "@context": "https://schema.org",
