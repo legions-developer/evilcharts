@@ -206,7 +206,7 @@ export function ChartStage({ className }: { className?: string }) {
         >
           <div
             aria-hidden
-            className="absolute -inset-[1600px] bg-[radial-gradient(circle,var(--color-border)_1px,transparent_1px)] bg-[size:26px_26px] opacity-60"
+            className="absolute -inset-[1600px] bg-[radial-gradient(circle,var(--color-border)_1px,transparent_1px)] bg-[size:26px_26px] opacity-50"
           />
           {CARDS.map((card, index) => {
             const isFocused = index === active;
