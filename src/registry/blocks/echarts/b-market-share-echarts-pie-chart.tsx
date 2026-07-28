@@ -39,7 +39,7 @@ export function EChartsMarketSharePieChart() {
   const [selected, setSelected] = useState<string | null>(null);
 
   return (
-    <div className="flex h-full w-full flex-col p-4">
+    <div className="@container flex h-full w-full flex-col p-4">
       <div className="relative min-h-0 w-full flex-1">
         <EChartsPieChart
           data={chartData}
@@ -64,10 +64,10 @@ export function EChartsMarketSharePieChart() {
         </EChartsPieChart>
 
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-0.5">
-          <span className="text-primary text-xl font-semibold tracking-tight sm:text-3xl">
+          <span className="text-primary text-xl font-semibold tracking-tight @xl:text-3xl">
             ${TOTAL}B
           </span>
-          <span className="text-muted-foreground text-[10px] sm:text-xs">Ecosystem value</span>
+          <span className="text-muted-foreground text-[10px] @xl:text-xs">Ecosystem value</span>
         </div>
       </div>
 
