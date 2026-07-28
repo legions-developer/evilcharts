@@ -105,6 +105,7 @@ export function tooltipBaseOption(params: {
     show: present,
     trigger: "axis",
     confine: true,
+    displayTransition: false,
     backgroundColor: "transparent",
     borderWidth: 0,
     padding: 0,

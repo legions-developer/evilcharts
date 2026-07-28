@@ -610,6 +610,7 @@ function buildTooltipOption(ctx: OptionBuildContext): TooltipComponentOption {
     borderWidth: 0,
     padding: 0,
     extraCssText: "box-shadow:none;",
+    displayTransition: false,
     position: resolveTooltipPosition(tooltipSlot.position),
     formatter: createTooltipFormatter(ctx),
   };

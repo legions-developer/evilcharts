@@ -973,6 +973,7 @@ function buildTooltipOption(ctx: OptionBuildContext): TooltipComponentOption {
     borderWidth: 0,
     padding: 0,
     extraCssText: "box-shadow:none;",
+    displayTransition: false,
     // "variable" (default) keeps ECharts' item-follow position — the current
     // behavior; "fixed" pins the tooltip near the top and tracks only the
     // pointer's X. The sankey tooltip is item-triggered (nodes/links, no axis),
