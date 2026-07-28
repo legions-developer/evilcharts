@@ -1798,9 +1798,9 @@ export function EChartsBarChart<TData extends Record<string, unknown>>({
       onChange({ startIndex, endIndex });
     });
 
-    // The stripped cap needs the value-axis pixel scale, which only exists AFTER a
-    // layout. Once rendering settles — the first paint, a zoom that rescaled the
-    // axis — measure it and, if it moved, correct the caps. The correction is a
+    // Every push measures the axis scale and corrects stripped caps before it
+    // paints, so this only catches rescales that BYPASS push — a dataZoom drag
+    // narrowing the window until the value axis re-ranges. The correction is a
     // SILENT series-only merge (patchStrippedCaps), so it can't reset a dataZoom
     // drag. Held off until the entrance finishes (revealEndsAt) so it never lands
     // mid-grow; guarded by an epsilon so a stable measurement doesn't loop.
@@ -1877,8 +1877,9 @@ export function EChartsBarChart<TData extends Record<string, unknown>>({
     const push = (withEntrance: boolean) => {
       // Refresh the value-axis pixel scale before building, so stripped caps get the
       // right per-bar fraction on this same push (after a resize the coordinate
-      // system is already updated here). Null before the very first push — the
-      // `finished` handler corrects that first paint once the axis exists.
+      // system is already updated here). Null before the very first push, and stale
+      // when this push rescales the axis (loading skeleton → real data) — the
+      // post-apply re-measure below corrects both before anything paints.
       const measured = measureValuePxPerUnit(chart, isHorizontal);
       if (measured != null) live.valuePxPerUnit = measured;
 
@@ -1897,13 +1898,14 @@ export function EChartsBarChart<TData extends Record<string, unknown>>({
 
       apply();
 
-      // Two things can only be sized once a coordinate system has been laid out, so
+      // Some things can only be sized once a coordinate system has been laid out, so
       // the first build uses fallbacks: the `blocks` variant's square segments (bar
-      // width) and the stacked-segment gap (value-axis pixels-per-unit). Measure
-      // both now and, if either moved, rebuild IMMEDIATELY — still inside this task,
-      // before the browser paints, so the corrected chart is the only thing ever
-      // shown. Doing this from the async `finished` handler instead made the bars
-      // visibly re-align a frame later.
+      // width), the stacked-segment gap, and the stripped variant's constant-pixel
+      // cap (both value-axis pixels-per-unit). Measure now and, if anything moved,
+      // rebuild IMMEDIATELY — still inside this task, before the browser paints, so
+      // the corrected chart is the only thing ever shown. Doing this from the async
+      // `finished` handler instead made the bars visibly re-align a frame later —
+      // exactly the stripped-cap flicker this replaces.
       let needsRebuild = false;
       if (live.handlers.hasBlocks) {
         const width = measureBarWidthPx(chart, isHorizontal, barCategoryGap);
@@ -1912,7 +1914,7 @@ export function EChartsBarChart<TData extends Record<string, unknown>>({
           needsRebuild = true;
         }
       }
-      if (live.handlers.hasStackGap) {
+      if (live.handlers.hasStackGap || live.handlers.hasStripped) {
         const scale = measureValuePxPerUnit(chart, isHorizontal);
         if (scale != null && (live.valuePxPerUnit == null || live.valuePxPerUnit !== scale)) {
           live.valuePxPerUnit = scale;
