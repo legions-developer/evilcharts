@@ -115,13 +115,13 @@ import { EChartsAreaChart, type ChartConfig } from "@/components/evilcharts/char
 </EChartsAreaChart>
 ```
 
-The one real difference is under the hood: ECharts renders to a `<canvas>`, so these children never mount as DOM. The root reads their props and compiles them into the ECharts option — same JSX, same presence semantics (omit a part and it won't render), same behavior, just declarative config instead of live DOM nodes.
+The difference is under the hood: these compound children are declarative configuration slots rather than visual React DOM nodes. The root reads their props and compiles an ECharts option, which ECharts paints with Canvas by default or SVG when `renderer="svg"`.
 
 The `config` is the same contract as every EvilCharts chart — each key maps a data key to a `label` and a per-theme `colors` array. See <Link href="/docs/chart-config">Chart Config</Link> for the full shape. Colors resolve from CSS variables at runtime, so dark mode just works.
 
 <Alert>
   <AlertContent>
-    Canvas rendering brings two small departures from the Recharts twin: multi-color gradients bake into a texture at render size (visually equivalent, rebuilt on resize), and the zoom brush is a themed mini chart driven by ECharts' native `dataZoom` instead of the custom `EvilBrush`.
+    The ECharts implementation brings two small departures from the Recharts twin: multi-color gradient areas and the `dotted`, `lines`, and `hatched` fills use offscreen canvas textures sized to the plot. With `renderer="svg"`, ECharts may embed those texture tiles as raster images inside the SVG. The zoom brush is a themed mini chart driven by ECharts' native `dataZoom` instead of the custom `EvilBrush`.
   </AlertContent>
 </Alert>
 
@@ -137,6 +137,12 @@ The `config` is the same contract as every EvilCharts chart — each key maps a 
 ## Examples
 
 Change `variant` and `strokeVariant` on an `<Area>`, or `curveType` and `stackType` on the chart, to restyle it.
+
+### SVG Renderer
+
+Pass `renderer="svg"` to the chart root to opt into ECharts' SVG renderer. Omit it to use the default Canvas renderer.
+
+<ComponentPreview title='renderer="svg"' name="ex-svg-renderer-echarts-area-chart" />
 
 ### Hover Highlight
 
@@ -194,7 +200,7 @@ Change `variant` and `strokeVariant` on an `<Area>`, or `curveType` and `stackTy
 
 ## API Reference
 
-Props are grouped by the part they belong to. On canvas each part is declarative config the root compiles, but the API mirrors the Recharts twin one-to-one.
+Props are grouped by the part they belong to. Regardless of renderer, each part is declarative config the root compiles, but the API mirrors the Recharts twin one-to-one.
 
 <ApiHeading>EChartsAreaChart</ApiHeading>
 
@@ -212,6 +218,9 @@ The root container. It owns the data, shared selection state, loading skeleton, 
   </ApiRow>
   <ApiRow name="className" type="string">
     Additional CSS classes for the chart container.
+  </ApiRow>
+  <ApiRow name="renderer" type='"canvas" | "svg"' default='"canvas"'>
+    Rendering engine used by ECharts. Use `"svg"` for an SVG-backed chart surface; omit the prop to keep the Canvas default.
   </ApiRow>
   <ApiRow name="xDataKey" type="keyof TData & string">
     Data key for the x-axis categories.
@@ -336,7 +345,7 @@ The hover tooltip. Include it to enable the tooltip; omit it and none shows. It 
 
 <ApiHeading>Legend</ApiHeading>
 
-The series legend, rendered as HTML above the canvas. Include it to show the legend; omit it and none shows. When `isClickable` is set, each entry toggles selection of its series.
+The series legend, rendered as HTML above the chart surface. Include it to show the legend; omit it and none shows. When `isClickable` is set, each entry toggles selection of its series.
 
 <ApiTable>
   <ApiRow name="variant" type='"square" | "circle" | "circle-outline" | "rounded-square" | "rounded-square-outline" | "vertical-bar" | "horizontal-bar"'>

@@ -127,15 +127,21 @@ const chartConfig = {
 </EChartsRadarChart>
 ```
 
-The one difference from the Recharts twin is under the hood: ECharts renders to a `<canvas>`, so these children never mount as DOM. The root reads their props and compiles them into the ECharts option — same JSX, same presence semantics (omit a part and it doesn't render), same behavior, only the children are declarative config rather than live DOM nodes.
+The difference from the Recharts twin is under the hood: these compound children are declarative configuration slots rather than visual React DOM nodes. The root reads their props and compiles an ECharts option, which ECharts paints with Canvas by default or SVG when `renderer="svg"`.
 
 The `config` is the same contract as every EvilCharts chart — each key maps a data key to a `label` and a per-theme `colors` array. See <Link href="/docs/chart-config">Chart Config</Link> for the full shape. Colors resolve from your CSS variables at runtime, so dark mode just works.
 
 <Alert>
   <AlertContent>
-    Canvas rendering brings two small departures from the Recharts twin: a radar series is a single polygon, so multi-color configs paint the stroke and fill as gradients while the vertex dots take one representative color; and the tooltip is item-triggered, showing the hovered series and its per-category values rather than anchoring on a category.
+    The ECharts implementation brings two small departures from the Recharts twin: a radar series is a single polygon, so multi-color configs paint the stroke and fill as gradients while the vertex dots take one representative color; and the tooltip is item-triggered, showing the hovered series and its per-category values rather than anchoring on a category.
   </AlertContent>
 </Alert>
+
+### SVG Renderer
+
+Pass `renderer="svg"` to the chart root to opt into ECharts' SVG renderer. Omit it to use the default Canvas renderer.
+
+<ComponentPreview title='renderer="svg"' name="ex-svg-renderer-echarts-radar-chart" />
 
 ### Interactive Selection
 
@@ -210,7 +216,7 @@ Radar charts with different configurations.
 
 ## API Reference
 
-The radar chart is a root container plus composible parts. On canvas each part is declarative config the root compiles, but the API mirrors the Recharts twin. Each is documented below.
+The radar chart is a root container plus composible parts. Regardless of renderer, each part is declarative config the root compiles, but the API mirrors the Recharts twin. Each is documented below.
 
 <ApiHeading>EChartsRadarChart</ApiHeading>
 
@@ -228,6 +234,9 @@ The root container. It owns the data, shared selection state, loading skeleton, 
   </ApiRow>
   <ApiRow name="className" type="string">
     Additional CSS classes for the chart container.
+  </ApiRow>
+  <ApiRow name="renderer" type='"canvas" | "svg"' default='"canvas"'>
+    Rendering engine used by ECharts. Use `"svg"` for an SVG-backed chart surface; omit the prop to keep the Canvas default.
   </ApiRow>
   <ApiRow name="animation" type="boolean" default="true">
     Master switch for the intro draw-in — the radar polygon grows from the center on first render. Pass `false` to render instantly. The OS reduce-motion preference disables it automatically.
@@ -307,7 +316,7 @@ The radial value axis — the scale running from the center outward. Its presenc
 
 <ApiHeading>Tooltip</ApiHeading>
 
-The hover tooltip. Its presence enables the tooltip; omit it and none shows. On canvas the tooltip is item-triggered — it shows the hovered series and its value at each category, and dims its content when another series is selected.
+The hover tooltip. Its presence enables the tooltip; omit it and none shows. The tooltip is item-triggered — it shows the hovered series and its value at each category, and dims its content when another series is selected.
 
 <ApiTable>
   <ApiRow name="variant" type='"default" | "frosted-glass"' default='"default"'>
@@ -326,7 +335,7 @@ The hover tooltip. Its presence enables the tooltip; omit it and none shows. On 
 
 <ApiHeading>Legend</ApiHeading>
 
-The series legend, rendered as HTML above the canvas. Its presence enables the legend; omit it and none shows. When `isClickable` is set, each entry toggles selection of its series. Hidden automatically while the chart is loading.
+The series legend, rendered as HTML above the chart surface. Its presence enables the legend; omit it and none shows. When `isClickable` is set, each entry toggles selection of its series. Hidden automatically while the chart is loading.
 
 <ApiTable>
   <ApiRow name="variant" type='"square" | "circle" | "circle-outline" | "rounded-square" | "rounded-square-outline" | "vertical-bar" | "horizontal-bar"'>

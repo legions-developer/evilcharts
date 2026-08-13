@@ -118,15 +118,21 @@ const chartConfig = {
 </EChartsPieChart>
 ```
 
-The one real difference is under the hood: ECharts renders to a `<canvas>`, so these children never mount as DOM. The root reads their props and compiles them into the ECharts option — same JSX, same presence semantics (omit a part and it won't render), same behavior, just declarative config instead of live DOM nodes.
+The difference is under the hood: these compound children are declarative configuration slots rather than visual React DOM nodes. The root reads their props and compiles an ECharts option, which ECharts paints with Canvas by default or SVG when `renderer="svg"`.
 
 The `config` is the same contract as every EvilCharts chart — each key maps a sector name to a `label` and a per-theme `colors` array. See <Link href="/docs/chart-config">Chart Config</Link> for the full shape. Colors resolve from your CSS variables at runtime, so dark mode works with no extra wiring.
 
 <Alert>
   <AlertContent>
-    Canvas rendering brings a few small departures from the Recharts twin: per-sector gradients paint across each sector's own bounding box, sector gaps are constant-width background borders (parallel-edged from rim to center, not a wedge-shaped angular pad), and the `<Background>` pattern is an SVG layer behind the transparent canvas.
+    The ECharts implementation brings a few small departures from the Recharts twin: per-sector gradients paint across each sector's own bounding box, sector gaps are constant-width background borders (parallel-edged from rim to center, not a wedge-shaped angular pad), and the `<Background>` pattern is a separate SVG layer behind the transparent ECharts surface.
   </AlertContent>
 </Alert>
+
+### SVG Renderer
+
+Pass `renderer="svg"` to the chart root to opt into ECharts' SVG renderer. Omit it to use the default Canvas renderer.
+
+<ComponentPreview title='renderer="svg"' name="ex-svg-renderer-echarts-pie-chart" />
 
 ### Interactive Selection
 
@@ -214,7 +220,7 @@ Examples of the pie chart in different configurations. Customize `innerRadius`, 
 
 ## API Reference
 
-The chart has several parts; the props below are grouped by part. On canvas each part is declarative config the root compiles, but the API mirrors the Recharts twin one-to-one.
+The chart has several parts; the props below are grouped by part. Regardless of renderer, each part is declarative config the root compiles, but the API mirrors the Recharts twin one-to-one.
 
 <ApiHeading>EChartsPieChart</ApiHeading>
 
@@ -239,8 +245,11 @@ The root container. It owns the data, shared selection state, loading skeleton, 
   <ApiRow name="className" type="string">
     Extra CSS classes for the chart container.
   </ApiRow>
+  <ApiRow name="renderer" type='"canvas" | "svg"' default='"canvas"'>
+    Rendering engine used by ECharts. Use `"svg"` for an SVG-backed chart surface; omit the prop to keep the Canvas default.
+  </ApiRow>
   <ApiRow name="animation" type="boolean" default="true">
-    Master switch for the intro draw-in. Pass `false` to render instantly. Not on the Recharts twin — it's the canvas off-switch. The OS reduce-motion preference disables the entrance automatically.
+    Master switch for the intro draw-in. Pass `false` to render instantly. Not on the Recharts twin — it's the ECharts off-switch. The OS reduce-motion preference disables the entrance automatically.
   </ApiRow>
   <ApiRow name="defaultSelectedSector" type="string | null" default="null">
     The sector selected on first render.
@@ -327,7 +336,7 @@ The hover tooltip. Its presence enables the tooltip; omit it and none shows. Hid
 
 <ApiHeading>Legend</ApiHeading>
 
-The sector legend, rendered as HTML over the canvas. Its presence enables the legend; omit it and none shows. When `isClickable` is set, each entry toggles selection of its sector.
+The sector legend, rendered as HTML over the chart surface. Its presence enables the legend; omit it and none shows. When `isClickable` is set, each entry toggles selection of its sector.
 
 <ApiTable>
   <ApiRow name="variant" type='"square" | "circle" | "circle-outline" | "rounded-square" | "rounded-square-outline" | "vertical-bar" | "horizontal-bar"'>

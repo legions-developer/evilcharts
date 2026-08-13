@@ -1,6 +1,18 @@
 "use client";
 
 import {
+  DEFAULT_ECHARTS_RENDERER,
+  buildChartCss,
+  flattenColor,
+  getColorsCount,
+  resolveColors,
+  seriesPaint,
+  withAlpha,
+  type ChartConfig,
+  type EChartsRenderer,
+  type ResolvedColors,
+} from "@/registry/ui/echarts-chart";
+import {
   tooltipBaseOption,
   tooltipIndicatorHtml,
   tooltipRow,
@@ -27,16 +39,6 @@ import {
   type TooltipComponentOption,
 } from "echarts/components";
 import {
-  buildChartCss,
-  flattenColor,
-  getColorsCount,
-  resolveColors,
-  seriesPaint,
-  withAlpha,
-  type ChartConfig,
-  type ResolvedColors,
-} from "@/registry/ui/echarts-chart";
-import {
   Children,
   isValidElement,
   useCallback,
@@ -54,7 +56,6 @@ import { BarChart, LineChart, type BarSeriesOption, type LineSeriesOption } from
 import { LegendOverlay, type LegendVariant } from "@/registry/ui/echarts-legend";
 import type { ComposeOption, ImagePatternObject } from "echarts/core";
 import { motion, useReducedMotion } from "motion/react";
-import { CanvasRenderer } from "echarts/renderers";
 import * as echarts from "echarts/core";
 
 // Re-export the shared types that were previously declared inline here, so
@@ -62,6 +63,7 @@ import * as echarts from "echarts/core";
 export type {
   ChartConfig,
   DotVariant,
+  EChartsRenderer,
   LegendVariant,
   TooltipPosition,
   TooltipRoundness,
@@ -73,14 +75,7 @@ export type {
 // `DataZoomComponent` bundles both the slider (brush footer) and inside (wheel/
 // drag) zoom; the brush's frame/handles/labels are raw zrender elements, NOT the
 // graphic component (never registered) — see syncBrushOverlay.
-echarts.use([
-  BarChart,
-  LineChart,
-  GridComponent,
-  TooltipComponent,
-  DataZoomComponent,
-  CanvasRenderer,
-]);
+echarts.use([BarChart, LineChart, GridComponent, TooltipComponent, DataZoomComponent]);
 
 type EChartsInstance = ReturnType<typeof echarts.init>;
 
@@ -217,6 +212,7 @@ export type CurveType =
 export interface EChartsComposedChartProps<TData extends Record<string, unknown>> {
   data: TData[]; // rows rendered by the chart
   config: ChartConfig; // series colors + labels for every bar and line
+  renderer?: EChartsRenderer; // rendering engine — defaults to canvas
   xDataKey?: keyof TData & string; // x category key — falls back to the <XAxis> dataKey / first free column
   className?: string; // extra classes for the chart container
   curveType?: CurveType; // default curve interpolation each <Line> inherits
@@ -1412,6 +1408,7 @@ type LiveState = {
 export function EChartsComposedChart<TData extends Record<string, unknown>>({
   data,
   config,
+  renderer = DEFAULT_ECHARTS_RENDERER,
   xDataKey,
   className,
   curveType = "linear",
@@ -1678,13 +1675,13 @@ export function EChartsComposedChart<TData extends Record<string, unknown>>({
     brushHeight,
   ]);
 
-  // ── Init + resize + theme observer (once) ────────────────────────────────────
+  // ── Init + resize + theme observer (per renderer instance) ──────────────────
   useEffect(() => {
     const mount = mountRef.current;
     const container = containerRef.current;
     if (!mount || !container) return;
 
-    const chart = echarts.init(mount);
+    const chart = echarts.init(mount, null, { renderer });
     echartsRef.current = chart;
 
     const resizeObserver = new ResizeObserver(() => {
@@ -1778,13 +1775,14 @@ export function EChartsComposedChart<TData extends Record<string, unknown>>({
       echartsRef.current = null;
       // The overlay elements died with the zrender instance.
       live.brushOverlay = null;
+      live.brushHover = { inside: false, left: false, right: false };
       // The reveal guard belongs to the chart instance it guarded. Without this
       // reset, StrictMode's dev-only mount→unmount→remount plays the entrance on
       // the throwaway instance and the surviving one renders without it.
       live.hasRevealed = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [renderer]);
 
   // ── Sync ECharts with props/theme/selection — resolve, build, push ────────────
   useEffect(() => {
@@ -1834,6 +1832,7 @@ export function EChartsComposedChart<TData extends Record<string, unknown>>({
       push(false);
     };
   }, [
+    renderer,
     live,
     buildOption,
     chartOptions,
@@ -1862,9 +1861,11 @@ export function EChartsComposedChart<TData extends Record<string, unknown>>({
 
     return () => {
       clearTimeout(timer);
-      chart.dispatchAction({ type: "hideTip" });
+      // The renderer-init effect is declared first, so its cleanup may already
+      // have disposed this instance during a renderer switch or unmount.
+      if (!chart.isDisposed()) chart.dispatchAction({ type: "hideTip" });
     };
-  }, [live, isLoading, tooltipSlot.present, tooltipSlot.defaultIndex]);
+  }, [renderer, live, isLoading, tooltipSlot.present, tooltipSlot.defaultIndex]);
 
   // ── Animated dashed stroke — rAF sweeps the dash offset while unselected ─────
   useEffect(() => {
@@ -1903,7 +1904,7 @@ export function EChartsComposedChart<TData extends Record<string, unknown>>({
       if (delayTimer !== undefined) clearTimeout(delayTimer);
       cancelAnimationFrame(raf);
     };
-  }, [live, lines, selectedDataKey, isLoading]);
+  }, [renderer, live, lines, selectedDataKey, isLoading]);
 
   // ── Loading shimmer — rAF sweeps a bright clip window across the skeleton ─────
   useEffect(() => {
@@ -1969,7 +1970,7 @@ export function EChartsComposedChart<TData extends Record<string, unknown>>({
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [live, isLoading, loadingBars, loadingData, loadingLineData]);
+  }, [renderer, live, isLoading, loadingBars, loadingData, loadingLineData]);
 
   // ── Legend overlay position ──────────────────────────────────────────────────
   // Insets match the Recharts legend's breathing room inside the plot frame.

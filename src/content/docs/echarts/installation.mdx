@@ -4,7 +4,19 @@ description: install the evilcharts echarts components in your project
 image: /og/og-image.png
 ---
 
-The ECharts provider renders to canvas through Apache ECharts — same config contract, same install flow, built for scale.
+The ECharts provider uses Apache ECharts with Canvas by default and optional SVG rendering — same config contract, same install flow, and a renderer choice on every chart root.
+
+Omit `renderer` to keep the Canvas default, or pass `renderer="svg"` to select ECharts' SVG renderer:
+
+```tsx
+<EChartsAreaChart data={data} config={chartConfig}>
+  {/* Canvas */}
+</EChartsAreaChart>
+
+<EChartsAreaChart renderer="svg" data={data} config={chartConfig}>
+  {/* SVG renderer */}
+</EChartsAreaChart>
+```
 
 ## Steps
 <Steps>

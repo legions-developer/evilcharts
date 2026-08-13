@@ -1,6 +1,18 @@
 "use client";
 
 import {
+  DEFAULT_ECHARTS_RENDERER,
+  buildChartCss,
+  flattenColor,
+  getColorsCount,
+  resolveColors,
+  seriesPaint,
+  withAlpha,
+  type ChartConfig,
+  type EChartsRenderer,
+  type ResolvedColors,
+} from "@/registry/ui/echarts-chart";
+import {
   tooltipBaseOption,
   tooltipIndicatorHtml,
   tooltipRow,
@@ -27,16 +39,6 @@ import {
   type TooltipComponentOption,
 } from "echarts/components";
 import {
-  buildChartCss,
-  flattenColor,
-  getColorsCount,
-  resolveColors,
-  seriesPaint,
-  withAlpha,
-  type ChartConfig,
-  type ResolvedColors,
-} from "@/registry/ui/echarts-chart";
-import {
   Children,
   isValidElement,
   useCallback,
@@ -54,7 +56,6 @@ import { LegendOverlay, type LegendVariant } from "@/registry/ui/echarts-legend"
 import type { ComposeOption, ImagePatternObject } from "echarts/core";
 import { LineChart, type LineSeriesOption } from "echarts/charts";
 import { motion, useReducedMotion } from "motion/react";
-import { CanvasRenderer } from "echarts/renderers";
 import * as echarts from "echarts/core";
 
 // Re-export the shared types that were previously declared inline here, so
@@ -62,6 +63,7 @@ import * as echarts from "echarts/core";
 export type {
   ChartConfig,
   DotVariant,
+  EChartsRenderer,
   LegendVariant,
   TooltipPosition,
   TooltipRoundness,
@@ -72,7 +74,7 @@ export type {
 // `DataZoomComponent` bundles both the slider (brush footer) and inside (wheel/drag)
 // zoom. The brush's frame/handles/labels are raw zrender elements, not the
 // graphic component — see syncBrushOverlay.
-echarts.use([LineChart, GridComponent, TooltipComponent, DataZoomComponent, CanvasRenderer]);
+echarts.use([LineChart, GridComponent, TooltipComponent, DataZoomComponent]);
 
 type EChartsInstance = ReturnType<typeof echarts.init>;
 
@@ -165,6 +167,7 @@ export type CurveType =
 export interface EChartsAreaChartProps<TData extends Record<string, unknown>> {
   data: TData[]; // rows rendered by the chart
   config: ChartConfig; // series colors + labels
+  renderer?: EChartsRenderer; // rendering engine — defaults to canvas
   xDataKey?: keyof TData & string; // x category key — falls back to the <XAxis> dataKey / first free column
   className?: string; // extra classes for the chart container
   curveType?: CurveType; // default curve interpolation each <Area> inherits
@@ -1534,6 +1537,7 @@ type LiveState = {
 export function EChartsAreaChart<TData extends Record<string, unknown>>({
   data,
   config,
+  renderer = DEFAULT_ECHARTS_RENDERER,
   xDataKey,
   className,
   curveType = "linear",
@@ -1850,13 +1854,22 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
     enableHoverReveal,
   ]);
 
-  // ── Init + resize + theme observer (once) ────────────────────────────────────
+  // ── Init + resize + theme observer (per renderer instance) ──────────────────
   useEffect(() => {
     const mount = mountRef.current;
     const container = containerRef.current;
     if (!mount || !container) return;
 
-    const chart = echarts.init(mount);
+    // Pointer state belongs to the renderer instance. A renderer switch disposes
+    // that surface without emitting mouseout/globalout, so do not carry a hover,
+    // reveal slice, or brush-hover treatment into the replacement instance.
+    // Keep brushRange: the selected zoom window should survive the switch.
+    live.hoveredKey = null;
+    live.revealIndex = null;
+    live.brushHover = { inside: false, left: false, right: false };
+    setHoveredDataKey(null);
+
+    const chart = echarts.init(mount, null, { renderer });
     echartsRef.current = chart;
 
     const resizeObserver = new ResizeObserver(() => {
@@ -2115,7 +2128,7 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
       live.hasRevealed = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [renderer]);
 
   // ── Sync ECharts with props/theme/selection — resolve, build, push ────────────
   useEffect(() => {
@@ -2164,6 +2177,7 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
       push(false);
     };
   }, [
+    renderer,
     live,
     buildOption,
     chartOptions,
@@ -2211,7 +2225,7 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
       if (delayTimer !== undefined) clearTimeout(delayTimer);
       cancelAnimationFrame(raf);
     };
-  }, [live, areas, hasSelection, isLoading]);
+  }, [renderer, live, areas, hasSelection, isLoading]);
 
   // ── Loading shimmer — rAF sweeps a bright band, regenerating data off-screen ─
   useEffect(() => {
@@ -2270,7 +2284,7 @@ export function EChartsAreaChart<TData extends Record<string, unknown>>({
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [live, isLoading, loadingPoints, loadingData]);
+  }, [renderer, live, isLoading, loadingPoints, loadingData]);
 
   // ── Legend overlay position ──────────────────────────────────────────────────
   // Insets match the Recharts legend's breathing room inside the plot frame.

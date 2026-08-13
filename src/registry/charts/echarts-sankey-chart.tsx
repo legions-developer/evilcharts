@@ -11,11 +11,13 @@ import {
   type TooltipVariant,
 } from "@/registry/ui/echarts-tooltip";
 import {
+  DEFAULT_ECHARTS_RENDERER,
   buildChartCss,
   getColorsCount,
   resolveColors,
   withAlpha,
   type ChartConfig,
+  type EChartsRenderer,
   type ResolvedColors,
 } from "@/registry/ui/echarts-chart";
 import {
@@ -33,19 +35,18 @@ import {
 import { TooltipComponent, type TooltipComponentOption } from "echarts/components";
 import { SankeyChart, type SankeySeriesOption } from "echarts/charts";
 import { motion, useReducedMotion } from "motion/react";
-import { CanvasRenderer } from "echarts/renderers";
 import type { ComposeOption } from "echarts/core";
 import * as echarts from "echarts/core";
 
 // Re-export the shared types that were previously declared inline here, so
 // existing consumers/examples keep importing them from the chart module.
-export type { ChartConfig, TooltipPosition, TooltipRoundness, TooltipVariant };
+export type { ChartConfig, EChartsRenderer, TooltipPosition, TooltipRoundness, TooltipVariant };
 
 // Modular registration keeps the bundle lean — only the pieces this chart needs.
 // A sankey draws its own node/link geometry, so there is no grid, axis, or
 // dataZoom here; the tooltip is the one extra component. GraphicComponent is
 // deliberately NOT registered — this chart adds no raw graphic overlays.
-echarts.use([SankeyChart, TooltipComponent, CanvasRenderer]);
+echarts.use([SankeyChart, TooltipComponent]);
 
 type EChartsInstance = ReturnType<typeof echarts.init>;
 
@@ -175,6 +176,7 @@ export interface EChartsSankeyChartProps {
   config: ChartConfig; // node colors + labels keyed by node name
   children: ReactNode; // composed parts — <Node>, <NodeLabel>, <Link>, <Tooltip>
   className?: string; // extra classes for the chart container
+  renderer?: EChartsRenderer; // rendering engine — canvas by default, or SVG
   nodeWidth?: number; // width of each node in pixels
   nodePadding?: number; // vertical gap between nodes (echarts nodeGap)
   linkCurvature?: number; // link curve amount, 0 (straight) to 1 (maximum)
@@ -1058,6 +1060,7 @@ export function EChartsSankeyChart({
   config,
   children,
   className,
+  renderer = DEFAULT_ECHARTS_RENDERER,
   nodeWidth = DEFAULT_NODE_WIDTH,
   nodePadding = DEFAULT_NODE_PADDING,
   linkCurvature = DEFAULT_LINK_CURVATURE,
@@ -1188,13 +1191,13 @@ export function EChartsSankeyChart({
     outsideLabels,
   ]);
 
-  // ── Init + resize + theme observer (once) ────────────────────────────────────
+  // ── Init + resize + theme observer (per renderer instance) ───────────────────
   useEffect(() => {
     const mount = mountRef.current;
     const container = containerRef.current;
     if (!mount || !container) return;
 
-    const chart = echarts.init(mount);
+    const chart = echarts.init(mount, null, { renderer });
     echartsRef.current = chart;
 
     const resizeObserver = new ResizeObserver(() => {
@@ -1240,7 +1243,7 @@ export function EChartsSankeyChart({
       live.hasRevealed = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [renderer]);
 
   // ── Sync ECharts with props/theme/selection — resolve, build, push ────────────
   useEffect(() => {
@@ -1327,6 +1330,7 @@ export function EChartsSankeyChart({
     animationType,
     shouldReduceMotion,
     config,
+    renderer,
     nodeNames,
   ]);
 
@@ -1382,7 +1386,7 @@ export function EChartsSankeyChart({
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [live, isLoading]);
+  }, [live, isLoading, renderer]);
 
   return (
     <div

@@ -11,6 +11,16 @@ import {
   type TooltipVariant,
 } from "@/registry/ui/echarts-tooltip";
 import {
+  DEFAULT_ECHARTS_RENDERER,
+  buildChartCss,
+  getColorsCount,
+  resolveColors,
+  withAlpha,
+  type ChartConfig,
+  type EChartsRenderer,
+  type ResolvedColors,
+} from "@/registry/ui/echarts-chart";
+import {
   Children,
   isValidElement,
   useCallback,
@@ -24,14 +34,6 @@ import {
   type ReactNode,
 } from "react";
 import {
-  buildChartCss,
-  getColorsCount,
-  resolveColors,
-  withAlpha,
-  type ChartConfig,
-  type ResolvedColors,
-} from "@/registry/ui/echarts-chart";
-import {
   RadarComponent,
   TooltipComponent,
   type RadarComponentOption,
@@ -41,7 +43,6 @@ import { dotStyle, sampleGradient, type DotVariant } from "@/registry/ui/echarts
 import { LegendOverlay, type LegendVariant } from "@/registry/ui/echarts-legend";
 import { RadarChart, type RadarSeriesOption } from "echarts/charts";
 import { motion, useReducedMotion } from "motion/react";
-import { CanvasRenderer } from "echarts/renderers";
 import type { ComposeOption } from "echarts/core";
 import * as echarts from "echarts/core";
 
@@ -50,6 +51,7 @@ import * as echarts from "echarts/core";
 export type {
   ChartConfig,
   DotVariant,
+  EChartsRenderer,
   LegendVariant,
   TooltipPosition,
   TooltipRoundness,
@@ -60,7 +62,7 @@ export type {
 // `RadarComponent` is the polar coordinate system (indicators, rings, spokes);
 // `RadarChart` is the series that draws polygons inside it. No GraphicComponent —
 // this chart has no zrender overlays (the recharts twin has no brush).
-echarts.use([RadarChart, RadarComponent, TooltipComponent, CanvasRenderer]);
+echarts.use([RadarChart, RadarComponent, TooltipComponent]);
 
 type EChartsInstance = ReturnType<typeof echarts.init>;
 
@@ -131,6 +133,7 @@ export interface EChartsRadarChartProps<TData extends Record<string, unknown>> {
   data: TData[]; // rows rendered by the chart — each row is one angle-axis category
   config: ChartConfig; // series colors + labels
   className?: string; // extra classes for the chart container
+  renderer?: EChartsRenderer; // rendering engine — canvas by default, or SVG
   animation?: boolean; // master switch for the intro draw-in — false renders instantly
   defaultSelectedDataKey?: string | null; // series selected on first render
   onSelectionChange?: (key: string | null) => void; // fires when the selected series changes
@@ -779,6 +782,7 @@ export function EChartsRadarChart<TData extends Record<string, unknown>>({
   data,
   config,
   className,
+  renderer = DEFAULT_ECHARTS_RENDERER,
   animation = true,
   defaultSelectedDataKey = null,
   onSelectionChange,
@@ -944,13 +948,13 @@ export function EChartsRadarChart<TData extends Record<string, unknown>>({
     loadingPoints,
   ]);
 
-  // ── Init + resize + theme observer (once) ────────────────────────────────────
+  // ── Init + resize + theme observer (per renderer instance) ───────────────────
   useEffect(() => {
     const mount = mountRef.current;
     const container = containerRef.current;
     if (!mount || !container) return;
 
-    const chart = echarts.init(mount);
+    const chart = echarts.init(mount, null, { renderer });
     echartsRef.current = chart;
 
     const resizeObserver = new ResizeObserver(() => {
@@ -1000,7 +1004,7 @@ export function EChartsRadarChart<TData extends Record<string, unknown>>({
       live.hasRevealed = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [renderer]);
 
   // ── Sync ECharts with props/theme/selection — resolve, build, push ────────────
   useEffect(() => {
@@ -1118,6 +1122,7 @@ export function EChartsRadarChart<TData extends Record<string, unknown>>({
     animation,
     shouldReduceMotion,
     config,
+    renderer,
     seriesKeys,
     tooltipSlot.present,
     tooltipSlot.defaultIndex,
@@ -1176,7 +1181,7 @@ export function EChartsRadarChart<TData extends Record<string, unknown>>({
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [live, isLoading, loadingPoints, loadingData]);
+  }, [live, isLoading, loadingPoints, loadingData, renderer]);
 
   // ── Legend overlay position ──────────────────────────────────────────────────
   // Insets match the Recharts legend's breathing room inside the plot frame.

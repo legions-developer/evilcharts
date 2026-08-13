@@ -25,6 +25,17 @@ export const examples: Registry["items"] = [
     ],
   },
   {
+    name: "ex-svg-renderer-echarts-area-chart",
+    registryDependencies: ["@evilcharts/echarts-area-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/echarts/ex-svg-renderer-echarts-area-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
     name: "ex-brush-echarts-area-chart",
     registryDependencies: ["@evilcharts/echarts-area-chart"],
     type: "registry:block",
@@ -263,6 +274,17 @@ export const examples: Registry["items"] = [
     files: [
       {
         path: "examples/echarts/ex-echarts-line-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-svg-renderer-echarts-line-chart",
+    registryDependencies: ["@evilcharts/echarts-line-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/echarts/ex-svg-renderer-echarts-line-chart.tsx",
         type: "registry:block",
       },
     ],
@@ -544,6 +566,17 @@ export const examples: Registry["items"] = [
     ],
   },
   {
+    name: "ex-svg-renderer-echarts-bar-chart",
+    registryDependencies: ["@evilcharts/echarts-bar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/echarts/ex-svg-renderer-echarts-bar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
     name: "ex-buffer-echarts-bar-chart",
     registryDependencies: ["@evilcharts/echarts-bar-chart"],
     type: "registry:block",
@@ -798,6 +831,17 @@ export const examples: Registry["items"] = [
     ],
   },
   {
+    name: "ex-svg-renderer-echarts-composed-chart",
+    registryDependencies: ["@evilcharts/echarts-composed-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/echarts/ex-svg-renderer-echarts-composed-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
     name: "ex-gradient-colors-echarts-composed-chart",
     registryDependencies: ["@evilcharts/echarts-composed-chart"],
     type: "registry:block",
@@ -942,6 +986,17 @@ export const examples: Registry["items"] = [
     ],
   },
   {
+    name: "ex-svg-renderer-echarts-radar-chart",
+    registryDependencies: ["@evilcharts/echarts-radar-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/echarts/ex-svg-renderer-echarts-radar-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
     name: "ex-lines-variant-echarts-radar-chart",
     registryDependencies: ["@evilcharts/echarts-radar-chart"],
     type: "registry:block",
@@ -993,6 +1048,17 @@ export const examples: Registry["items"] = [
     files: [
       {
         path: "examples/echarts/ex-echarts-pie-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-svg-renderer-echarts-pie-chart",
+    registryDependencies: ["@evilcharts/echarts-pie-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/echarts/ex-svg-renderer-echarts-pie-chart.tsx",
         type: "registry:block",
       },
     ],
@@ -1087,6 +1153,17 @@ export const examples: Registry["items"] = [
     ],
   },
   {
+    name: "ex-svg-renderer-echarts-radial-chart",
+    registryDependencies: ["@evilcharts/echarts-radial-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/echarts/ex-svg-renderer-echarts-radial-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
     name: "ex-semi-variant-echarts-radial-chart",
     registryDependencies: ["@evilcharts/echarts-radial-chart"],
     type: "registry:block",
@@ -1127,6 +1204,17 @@ export const examples: Registry["items"] = [
     files: [
       {
         path: "examples/echarts/ex-echarts-sankey-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-svg-renderer-echarts-sankey-chart",
+    registryDependencies: ["@evilcharts/echarts-sankey-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/echarts/ex-svg-renderer-echarts-sankey-chart.tsx",
         type: "registry:block",
       },
     ],

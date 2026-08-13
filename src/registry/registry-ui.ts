@@ -77,7 +77,7 @@ export const ui: Registry["items"] = [
     ],
   },
 
-  // ── ECharts shared UI — the canvas counterparts of the recharts primitives.
+  // ── ECharts shared UI — the renderer-agnostic counterparts of the Recharts primitives.
   // Each ECharts chart pulls the modules it uses; nothing here touches recharts.
   {
     name: "echarts-chart",

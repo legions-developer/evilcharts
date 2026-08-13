@@ -1,5 +1,19 @@
+import { CanvasRenderer, SVGRenderer } from "echarts/renderers";
 import type { ComponentType, ReactNode } from "react";
 import * as echarts from "echarts/core";
+
+export const ECHARTS_RENDERERS = {
+  canvas: "canvas",
+  svg: "svg",
+} as const;
+
+export type EChartsRenderer = (typeof ECHARTS_RENDERERS)[keyof typeof ECHARTS_RENDERERS];
+
+export const DEFAULT_ECHARTS_RENDERER = ECHARTS_RENDERERS.canvas;
+
+// Renderer registration is shared by every modular ECharts chart. Individual
+// chart modules only register the series and components they use.
+echarts.use([CanvasRenderer, SVGRenderer]);
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Theme keys + config — replicated from the repo's <ChartStyle> so the ECharts

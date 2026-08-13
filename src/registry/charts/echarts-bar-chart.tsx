@@ -1,6 +1,17 @@
 "use client";
 
 import {
+  DEFAULT_ECHARTS_RENDERER,
+  buildChartCss,
+  flattenColor,
+  getColorsCount,
+  resolveColors,
+  withAlpha,
+  type ChartConfig,
+  type EChartsRenderer,
+  type ResolvedColors,
+} from "@/registry/ui/echarts-chart";
+import {
   tooltipBaseOption,
   tooltipIndicatorHtml,
   tooltipRow,
@@ -39,33 +50,30 @@ import {
   type FC,
   type ReactNode,
 } from "react";
-import {
-  buildChartCss,
-  flattenColor,
-  getColorsCount,
-  resolveColors,
-  withAlpha,
-  type ChartConfig,
-  type ResolvedColors,
-} from "@/registry/ui/echarts-chart";
 import { LegendOverlay, type LegendVariant } from "@/registry/ui/echarts-legend";
 import type { ComposeOption, ImagePatternObject } from "echarts/core";
 import { BarChart, type BarSeriesOption } from "echarts/charts";
 import { sampleGradient } from "@/registry/ui/echarts-dot";
 import { motion, useReducedMotion } from "motion/react";
-import { CanvasRenderer } from "echarts/renderers";
 import * as echarts from "echarts/core";
 
 // Re-export the shared types that were previously declared inline here, so
 // existing consumers/examples keep importing them from the chart module.
-export type { ChartConfig, LegendVariant, TooltipPosition, TooltipRoundness, TooltipVariant };
+export type {
+  ChartConfig,
+  EChartsRenderer,
+  LegendVariant,
+  TooltipPosition,
+  TooltipRoundness,
+  TooltipVariant,
+};
 
 // Modular registration keeps the bundle lean — only the pieces this chart needs.
 // `DataZoomComponent` bundles both the slider (brush footer) and inside (wheel/drag)
 // zoom. The brush's frame/handles/labels are raw zrender elements, not the
 // graphic component — see syncBrushOverlay. No LineChart: the main plot, the
 // loading skeleton, and the brush mini chart are ALL bar series.
-echarts.use([BarChart, GridComponent, TooltipComponent, DataZoomComponent, CanvasRenderer]);
+echarts.use([BarChart, GridComponent, TooltipComponent, DataZoomComponent]);
 
 type EChartsInstance = ReturnType<typeof echarts.init>;
 
@@ -189,6 +197,7 @@ export type BarAnimationType =
 export interface EChartsBarChartProps<TData extends Record<string, unknown>> {
   data: TData[]; // rows rendered by the chart
   config: ChartConfig; // series colors + labels
+  renderer?: EChartsRenderer; // rendering engine — defaults to canvas
   xDataKey?: keyof TData & string; // category key — falls back to the axis dataKey / first free column
   className?: string; // extra classes for the chart container
   stackType?: StackType; // how multiple bars combine
@@ -1420,6 +1429,7 @@ type LiveState = {
 export function EChartsBarChart<TData extends Record<string, unknown>>({
   data,
   config,
+  renderer = DEFAULT_ECHARTS_RENDERER,
   xDataKey,
   className,
   stackType = "default",
@@ -1714,13 +1724,13 @@ export function EChartsBarChart<TData extends Record<string, unknown>>({
     maxHighlightIndex,
   ]);
 
-  // ── Init + resize + theme observer (once) ────────────────────────────────────
+  // ── Init + resize + theme observer (per renderer instance) ──────────────────
   useEffect(() => {
     const mount = mountRef.current;
     const container = containerRef.current;
     if (!mount || !container) return;
 
-    const chart = echarts.init(mount);
+    const chart = echarts.init(mount, null, { renderer });
     echartsRef.current = chart;
 
     const resizeObserver = new ResizeObserver(() => {
@@ -1852,17 +1862,29 @@ export function EChartsBarChart<TData extends Record<string, unknown>>({
       zr.off("globalout", onZrOut);
       resizeObserver.disconnect();
       themeObserver.disconnect();
+      if (live.expandRaf) {
+        cancelAnimationFrame(live.expandRaf);
+        live.expandRaf = 0;
+      }
       chart.dispose();
       echartsRef.current = null;
       // The overlay elements died with the zrender instance.
       live.brushOverlay = null;
+      live.brushHover = { inside: false, left: false, right: false };
+      // Expand progress and layout measurements belong to the disposed painter.
+      // Recompute them for the replacement renderer instead of briefly painting
+      // its first frame with geometry captured from the old surface.
+      live.expand = { key: null, hovered: null, progress: new Map<number, number>() };
+      live.animateExpand = () => {};
+      live.valuePxPerUnit = null;
+      live.barWidthPx = null;
       // The reveal guard belongs to the chart instance it guarded. Without this
       // reset, StrictMode's dev-only mount→unmount→remount plays the entrance on
       // the throwaway instance and the surviving one renders without it.
       live.hasRevealed = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [renderer]);
 
   // ── Sync ECharts with props/theme/selection — resolve, build, push ────────────
   useEffect(() => {
@@ -2030,6 +2052,7 @@ export function EChartsBarChart<TData extends Record<string, unknown>>({
       push(false);
     };
   }, [
+    renderer,
     live,
     buildOption,
     chartOptions,
@@ -2057,7 +2080,14 @@ export function EChartsBarChart<TData extends Record<string, unknown>>({
       chart.dispatchAction({ type: "showTip", seriesIndex: 0, dataIndex: index });
     }, 300);
     return () => clearTimeout(timer);
-  }, [tooltipSlot.present, tooltipSlot.defaultIndex, isLoading, data.length, seriesKeys.length]);
+  }, [
+    renderer,
+    tooltipSlot.present,
+    tooltipSlot.defaultIndex,
+    isLoading,
+    data.length,
+    seriesKeys.length,
+  ]);
 
   // ── Loading shimmer — rAF sweeps a bright band across the gray bars ──────────
   useEffect(() => {
@@ -2106,7 +2136,7 @@ export function EChartsBarChart<TData extends Record<string, unknown>>({
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [live, isLoading, loadingBars, loadingData]);
+  }, [renderer, live, isLoading, loadingBars, loadingData]);
 
   // ── Legend overlay position ──────────────────────────────────────────────────
   // Insets match the Recharts legend's breathing room inside the plot frame.

@@ -11,11 +11,13 @@ import {
   type TooltipVariant,
 } from "@/registry/ui/echarts-tooltip";
 import {
+  DEFAULT_ECHARTS_RENDERER,
   buildChartCss,
   getColorsCount,
   resolveColors,
   withAlpha,
   type ChartConfig,
+  type EChartsRenderer,
   type ResolvedColors,
 } from "@/registry/ui/echarts-chart";
 import {
@@ -39,13 +41,19 @@ import {
 import { LegendIndicator, type LegendVariant } from "@/registry/ui/echarts-legend";
 import { BarChart, type BarSeriesOption } from "echarts/charts";
 import { motion, useReducedMotion } from "motion/react";
-import { CanvasRenderer } from "echarts/renderers";
 import type { ComposeOption } from "echarts/core";
 import * as echarts from "echarts/core";
 
 // Re-export the shared types that were previously declared inline here, so
 // existing consumers/examples keep importing them from the chart module.
-export type { ChartConfig, LegendVariant, TooltipPosition, TooltipRoundness, TooltipVariant };
+export type {
+  ChartConfig,
+  EChartsRenderer,
+  LegendVariant,
+  TooltipPosition,
+  TooltipRoundness,
+  TooltipVariant,
+};
 
 // Modular registration keeps the bundle lean — only the pieces this chart needs.
 // `PolarComponent` bundles the polar coordinate system together with its
@@ -53,7 +61,7 @@ export type { ChartConfig, LegendVariant, TooltipPosition, TooltipRoundness, Too
 // value drives the sweep angle). No GraphicComponent: unlike the area chart's
 // brush, nothing here draws raw zrender overlays — selection is per-datum
 // opacity, and the skeleton shimmer is a swept gradient.
-echarts.use([BarChart, PolarComponent, TooltipComponent, CanvasRenderer]);
+echarts.use([BarChart, PolarComponent, TooltipComponent]);
 
 type EChartsInstance = ReturnType<typeof echarts.init>;
 
@@ -138,6 +146,7 @@ export interface EChartsRadialChartProps<TData extends Record<string, unknown>> 
   config: ChartConfig; // bar colors + labels, keyed by each bar's name
   nameKey: keyof TData & string; // data key holding each bar's name
   className?: string; // extra classes for the chart container
+  renderer?: EChartsRenderer; // rendering engine — canvas by default, or SVG
   variant?: RadialVariant; // arc shape — full circle or half circle
   // Value a full sweep represents. Without it the scale is derived from the data,
   // so the largest bar always fills the arc — set it (e.g. 100) for gauges, where
@@ -879,6 +888,7 @@ export function EChartsRadialChart<TData extends Record<string, unknown>>({
   config,
   nameKey,
   className,
+  renderer = DEFAULT_ECHARTS_RENDERER,
   variant = "full",
   max,
   innerRadius = DEFAULT_INNER_RADIUS,
@@ -1023,13 +1033,13 @@ export function EChartsRadialChart<TData extends Record<string, unknown>>({
     loadingData,
   ]);
 
-  // ── Init + resize + theme observer (once) ────────────────────────────────────
+  // ── Init + resize + theme observer (per renderer instance) ───────────────────
   useEffect(() => {
     const mount = mountRef.current;
     const container = containerRef.current;
     if (!mount || !container) return;
 
-    const chart = echarts.init(mount);
+    const chart = echarts.init(mount, null, { renderer });
     echartsRef.current = chart;
 
     const resizeObserver = new ResizeObserver(() => {
@@ -1072,7 +1082,7 @@ export function EChartsRadialChart<TData extends Record<string, unknown>>({
       live.hasRevealed = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [renderer]);
 
   // ── Sync ECharts with props/theme/selection — resolve, build, push ────────────
   useEffect(() => {
@@ -1131,6 +1141,7 @@ export function EChartsRadialChart<TData extends Record<string, unknown>>({
     isLoading,
     shouldReduceMotion,
     config,
+    renderer,
     configKeys,
     tooltipSlot,
   ]);
@@ -1178,11 +1189,11 @@ export function EChartsRadialChart<TData extends Record<string, unknown>>({
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [live, isLoading, loadingData]);
+  }, [live, isLoading, loadingData, renderer]);
 
   // ── Legend overlay (HTML) ─────────────────────────────────────────────────────
   // One entry per ring. Unlike the area twin's absolutely-positioned legend, the
-  // top/bottom placements flow above/below the canvas so they RESERVE space —
+  // top/bottom placements flow above/below the plot so they RESERVE space —
   // the polar plot shrinks to fit, matching how Recharts lays the legend out.
   // `middle` overlays, centered.
   const legendJustify =

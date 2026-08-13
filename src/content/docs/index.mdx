@@ -45,11 +45,12 @@ Reach for it by default: product dashboards, marketing pages, anything where the
 
 ### ECharts
 
-**Canvas, built for scale.** The ECharts provider draws the same components onto a single canvas, so the point count stops being a DOM problem.
+**Canvas by default, SVG when you need it.** The ECharts provider draws the same components with Canvas for scale, or on an SVG-backed chart surface when you pass `renderer="svg"` to a chart root.
 
-- **Dense data stays smooth.** Thousands of points are pixels, not thousands of nodes.
+- **Dense data stays smooth.** With the default Canvas renderer, thousands of points are pixels, not thousands of nodes.
 - **Built for live data.** Frequent updates and zooming don't fight the browser's layout engine.
-- **Same look.** The variants, glows and entrance animations are ported, not approximated — canvas gradients and pattern tiles doing what the SVG defs do.
+- **Renderer per chart.** Keep Canvas for dense, frequently updated data, or select ECharts' SVG renderer without changing the compound API.
+- **Same look.** The variants, glows, and entrance animations are ported across ECharts renderers using renderer-aware gradients and patterns.
 
 Reach for it when the data outgrows the DOM: long time series, high-frequency updates, dashboards that keep drawing while people interact with them.
 
