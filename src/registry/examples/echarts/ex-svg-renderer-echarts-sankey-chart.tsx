@@ -93,7 +93,7 @@ const chartConfig = {
 export function EChartsSvgRendererSankeyChart() {
   return (
     <EChartsSankeyChart
-      renderer="svg"
+      renderer="svg" // [!code highlight]
       className="h-full w-full p-4"
       data={data}
       config={chartConfig}

@@ -51,7 +51,7 @@ const chartConfig = {
 export function EChartsSvgRendererRadialChart() {
   return (
     <EChartsRadialChart
-      renderer="svg"
+      renderer="svg" // [!code highlight]
       className="h-full w-full p-4"
       data={data}
       nameKey="browser"

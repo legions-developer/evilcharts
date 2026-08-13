@@ -31,7 +31,7 @@ const chartConfig = {
 export function EChartsSvgRendererRadarChart() {
   return (
     <EChartsRadarChart
-      renderer="svg"
+      renderer="svg" // [!code highlight]
       data={data}
       config={chartConfig}
       className="h-full w-full p-4"

@@ -37,7 +37,7 @@ const chartConfig = {
 export function EChartsSvgRendererLineChart() {
   return (
     <EChartsLineChart
-      renderer="svg"
+      renderer="svg" // [!code highlight]
       data={data}
       config={chartConfig}
       className="h-full w-full p-4"

@@ -37,7 +37,7 @@ const chartConfig = {
 export function EChartsSvgRendererComposedChart() {
   return (
     <EChartsComposedChart
-      renderer="svg"
+      renderer="svg" // [!code highlight]
       className="h-full w-full p-4"
       xDataKey="month"
       data={data}

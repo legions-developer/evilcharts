@@ -51,7 +51,7 @@ const chartConfig = {
 export function EChartsSvgRendererPieChart() {
   return (
     <EChartsPieChart
-      renderer="svg"
+      renderer="svg" // [!code highlight]
       className="h-full w-full p-4"
       data={data}
       dataKey="visitors"
