@@ -114,15 +114,21 @@ import { EChartsBarChart, type ChartConfig } from "@/components/evilcharts/chart
 </EChartsBarChart>
 ```
 
-The one real difference is under the hood: ECharts renders to a `<canvas>`, so these children never mount as DOM. The root reads their props and compiles them into the ECharts option object — same JSX, same presence semantics (omit a part and it doesn't render), but the children are declarative config, not live DOM nodes.
+The difference is under the hood: these compound children are declarative configuration slots rather than visual React DOM nodes. The root reads their props and compiles an ECharts option, which ECharts paints with Canvas by default or SVG when `renderer="svg"`.
 
 The `config` is the same contract as every EvilCharts chart — each key maps a data key to a `label` and a per-theme `colors` array. See <Link href="/docs/chart-config">Chart Config</Link> for the full shape. Colors resolve from CSS variables at runtime, so dark mode just works.
 
 <Alert>
   <AlertContent>
-    Canvas rendering brings a few small departures from the Recharts twin: the `duotone` split is baked as a single ECharts gradient (visually equivalent for single-color series), the `stripped` cap is a fixed-height band derived from the measured axis scale, the `hatched` fill is a tiling canvas texture, and the zoom brush is a themed mini chart driven by ECharts' native `dataZoom` rather than the custom `EvilBrush`.
+    The ECharts implementation brings a few small departures from the Recharts twin: the `duotone` split is a single ECharts gradient, the `stripped` cap is a fixed-height band derived from the measured axis scale, and the zoom brush is a themed mini chart driven by ECharts' native `dataZoom`. The `hatched`, `blocks`, and buffer fills use offscreen canvas tiles; with `renderer="svg"`, ECharts may embed those tiles as raster images inside the SVG.
   </AlertContent>
 </Alert>
+
+### SVG Renderer
+
+Pass `renderer="svg"` to the chart root to opt into ECharts' SVG renderer. Omit it to use the default Canvas renderer.
+
+<ComponentPreview title='renderer="svg"' name="ex-svg-renderer-echarts-bar-chart" />
 
 ### Interactive Selection
 
@@ -229,7 +235,7 @@ Examples of the bar chart with different `variants`. Each `<Bar>` sets its own `
 
 ## API Reference
 
-The props below are grouped by the part they belong to. On canvas each part is declarative config the root compiles, but the API mirrors the Recharts twin one-to-one.
+The props below are grouped by the part they belong to. Regardless of renderer, each part is declarative config the root compiles, but the API mirrors the Recharts twin one-to-one.
 
 <ApiHeading>EChartsBarChart</ApiHeading>
 
@@ -247,6 +253,9 @@ The root container. It owns the data, shared selection state, loading skeleton, 
   </ApiRow>
   <ApiRow name="className" type="string">
     Additional CSS classes for the chart container.
+  </ApiRow>
+  <ApiRow name="renderer" type='"canvas" | "svg"' default='"canvas"'>
+    Rendering engine used by ECharts. Use `"svg"` for an SVG-backed chart surface; omit the prop to keep the Canvas default.
   </ApiRow>
   <ApiRow name="stackType" type='"default" | "stacked" | "percent"' default='"default"'>
     How multiple bars combine. `"default"` renders them side by side, `"stacked"` stacks them, and `"percent"` normalizes them to a percentage distribution.
@@ -367,7 +376,7 @@ The hover tooltip. Include it to enable the tooltip; omit it and none shows. It 
 
 <ApiHeading>Legend</ApiHeading>
 
-The series legend, rendered as HTML above the canvas. Include it to show the legend; omit it and none shows. With `isClickable`, each entry toggles selection of its series.
+The series legend, rendered as HTML above the chart surface. Include it to show the legend; omit it and none shows. With `isClickable`, each entry toggles selection of its series.
 
 <ApiTable>
   <ApiRow name="variant" type='"square" | "circle" | "circle-outline" | "rounded-square" | "rounded-square-outline" | "vertical-bar" | "horizontal-bar"'>

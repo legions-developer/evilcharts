@@ -66,7 +66,7 @@ const [range, setRange] = useState({ startIndex: 0, endIndex: data.length - 1 })
 
 ## How It Differs from Recharts
 
-Same JSX, same props, same behavior — but ECharts renders to a `<canvas>`, so the brush is built differently underneath. The miniature is a real second ECharts grid holding mirrored copies of every series. A fully transparent native `dataZoom` slider sits on top of it and supplies the drag interaction, while everything you actually see — the rounded selection frame, the dimmed sides, the grip-dot handle pills, and the range labels — is drawn as canvas elements that track the selection directly.
+Same JSX, same props, same behavior — but the ECharts brush is built differently underneath. The miniature is a real second ECharts grid holding mirrored copies of every series. A fully transparent native `dataZoom` slider sits on top of it and supplies the drag interaction, while the active renderer — Canvas by default or SVG when `renderer="svg"` is set on the chart root — draws the rounded selection frame, dimmed sides, grip-dot handle pills, and range labels that track the selection directly.
 
 The practical differences: the main plot gains drag-to-pan for free, and the footer is a close reconstruction of the Recharts `EvilBrush` rather than a pixel-identical copy of it.
 

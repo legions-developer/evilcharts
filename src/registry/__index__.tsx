@@ -529,6 +529,24 @@ export const Index: Record<string, any> = {
     categories: undefined,
     meta: undefined,
   },
+  "ex-svg-renderer-echarts-area-chart": {
+    name: "ex-svg-renderer-echarts-area-chart",
+    description: "",
+    type: "registry:block",
+    registryDependencies: ["@evilcharts/echarts-area-chart"],
+    files: [{
+      path: "@/registry/examples/echarts/ex-svg-renderer-echarts-area-chart.tsx",
+      type: "registry:block",
+      target: ""
+    }],
+    component: React.lazy(async () => {
+      const mod = await import("@/registry/examples/echarts/ex-svg-renderer-echarts-area-chart.tsx")
+      const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
+      return { default: mod.default || mod[exportName] }
+    }),
+    categories: undefined,
+    meta: undefined,
+  },
   "ex-brush-echarts-area-chart": {
     name: "ex-brush-echarts-area-chart",
     description: "",
@@ -919,6 +937,24 @@ export const Index: Record<string, any> = {
     }],
     component: React.lazy(async () => {
       const mod = await import("@/registry/examples/echarts/ex-echarts-line-chart.tsx")
+      const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
+      return { default: mod.default || mod[exportName] }
+    }),
+    categories: undefined,
+    meta: undefined,
+  },
+  "ex-svg-renderer-echarts-line-chart": {
+    name: "ex-svg-renderer-echarts-line-chart",
+    description: "",
+    type: "registry:block",
+    registryDependencies: ["@evilcharts/echarts-line-chart"],
+    files: [{
+      path: "@/registry/examples/echarts/ex-svg-renderer-echarts-line-chart.tsx",
+      type: "registry:block",
+      target: ""
+    }],
+    component: React.lazy(async () => {
+      const mod = await import("@/registry/examples/echarts/ex-svg-renderer-echarts-line-chart.tsx")
       const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
       return { default: mod.default || mod[exportName] }
     }),
@@ -1375,6 +1411,24 @@ export const Index: Record<string, any> = {
     categories: undefined,
     meta: undefined,
   },
+  "ex-svg-renderer-echarts-bar-chart": {
+    name: "ex-svg-renderer-echarts-bar-chart",
+    description: "",
+    type: "registry:block",
+    registryDependencies: ["@evilcharts/echarts-bar-chart"],
+    files: [{
+      path: "@/registry/examples/echarts/ex-svg-renderer-echarts-bar-chart.tsx",
+      type: "registry:block",
+      target: ""
+    }],
+    component: React.lazy(async () => {
+      const mod = await import("@/registry/examples/echarts/ex-svg-renderer-echarts-bar-chart.tsx")
+      const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
+      return { default: mod.default || mod[exportName] }
+    }),
+    categories: undefined,
+    meta: undefined,
+  },
   "ex-buffer-echarts-bar-chart": {
     name: "ex-buffer-echarts-bar-chart",
     description: "",
@@ -1789,6 +1843,24 @@ export const Index: Record<string, any> = {
     categories: undefined,
     meta: undefined,
   },
+  "ex-svg-renderer-echarts-composed-chart": {
+    name: "ex-svg-renderer-echarts-composed-chart",
+    description: "",
+    type: "registry:block",
+    registryDependencies: ["@evilcharts/echarts-composed-chart"],
+    files: [{
+      path: "@/registry/examples/echarts/ex-svg-renderer-echarts-composed-chart.tsx",
+      type: "registry:block",
+      target: ""
+    }],
+    component: React.lazy(async () => {
+      const mod = await import("@/registry/examples/echarts/ex-svg-renderer-echarts-composed-chart.tsx")
+      const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
+      return { default: mod.default || mod[exportName] }
+    }),
+    categories: undefined,
+    meta: undefined,
+  },
   "ex-gradient-colors-echarts-composed-chart": {
     name: "ex-gradient-colors-echarts-composed-chart",
     description: "",
@@ -2023,6 +2095,24 @@ export const Index: Record<string, any> = {
     categories: undefined,
     meta: undefined,
   },
+  "ex-svg-renderer-echarts-radar-chart": {
+    name: "ex-svg-renderer-echarts-radar-chart",
+    description: "",
+    type: "registry:block",
+    registryDependencies: ["@evilcharts/echarts-radar-chart"],
+    files: [{
+      path: "@/registry/examples/echarts/ex-svg-renderer-echarts-radar-chart.tsx",
+      type: "registry:block",
+      target: ""
+    }],
+    component: React.lazy(async () => {
+      const mod = await import("@/registry/examples/echarts/ex-svg-renderer-echarts-radar-chart.tsx")
+      const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
+      return { default: mod.default || mod[exportName] }
+    }),
+    categories: undefined,
+    meta: undefined,
+  },
   "ex-lines-variant-echarts-radar-chart": {
     name: "ex-lines-variant-echarts-radar-chart",
     description: "",
@@ -2107,6 +2197,24 @@ export const Index: Record<string, any> = {
     }],
     component: React.lazy(async () => {
       const mod = await import("@/registry/examples/echarts/ex-echarts-pie-chart.tsx")
+      const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
+      return { default: mod.default || mod[exportName] }
+    }),
+    categories: undefined,
+    meta: undefined,
+  },
+  "ex-svg-renderer-echarts-pie-chart": {
+    name: "ex-svg-renderer-echarts-pie-chart",
+    description: "",
+    type: "registry:block",
+    registryDependencies: ["@evilcharts/echarts-pie-chart"],
+    files: [{
+      path: "@/registry/examples/echarts/ex-svg-renderer-echarts-pie-chart.tsx",
+      type: "registry:block",
+      target: ""
+    }],
+    component: React.lazy(async () => {
+      const mod = await import("@/registry/examples/echarts/ex-svg-renderer-echarts-pie-chart.tsx")
       const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
       return { default: mod.default || mod[exportName] }
     }),
@@ -2257,6 +2365,24 @@ export const Index: Record<string, any> = {
     categories: undefined,
     meta: undefined,
   },
+  "ex-svg-renderer-echarts-radial-chart": {
+    name: "ex-svg-renderer-echarts-radial-chart",
+    description: "",
+    type: "registry:block",
+    registryDependencies: ["@evilcharts/echarts-radial-chart"],
+    files: [{
+      path: "@/registry/examples/echarts/ex-svg-renderer-echarts-radial-chart.tsx",
+      type: "registry:block",
+      target: ""
+    }],
+    component: React.lazy(async () => {
+      const mod = await import("@/registry/examples/echarts/ex-svg-renderer-echarts-radial-chart.tsx")
+      const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
+      return { default: mod.default || mod[exportName] }
+    }),
+    categories: undefined,
+    meta: undefined,
+  },
   "ex-semi-variant-echarts-radial-chart": {
     name: "ex-semi-variant-echarts-radial-chart",
     description: "",
@@ -2323,6 +2449,24 @@ export const Index: Record<string, any> = {
     }],
     component: React.lazy(async () => {
       const mod = await import("@/registry/examples/echarts/ex-echarts-sankey-chart.tsx")
+      const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
+      return { default: mod.default || mod[exportName] }
+    }),
+    categories: undefined,
+    meta: undefined,
+  },
+  "ex-svg-renderer-echarts-sankey-chart": {
+    name: "ex-svg-renderer-echarts-sankey-chart",
+    description: "",
+    type: "registry:block",
+    registryDependencies: ["@evilcharts/echarts-sankey-chart"],
+    files: [{
+      path: "@/registry/examples/echarts/ex-svg-renderer-echarts-sankey-chart.tsx",
+      type: "registry:block",
+      target: ""
+    }],
+    component: React.lazy(async () => {
+      const mod = await import("@/registry/examples/echarts/ex-svg-renderer-echarts-sankey-chart.tsx")
       const exportName = Object.keys(mod).find(key => typeof mod[key] === 'function' || typeof mod[key] === 'object') || item.name
       return { default: mod.default || mod[exportName] }
     }),

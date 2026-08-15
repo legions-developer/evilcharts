@@ -114,18 +114,24 @@ const chartConfig = {
 </EChartsSankeyChart>
 ```
 
-The one real difference is under the hood: ECharts renders to a `<canvas>`, so these children never mount as DOM. The root reads their props and compiles them into the ECharts option — same JSX, same presence semantics, same behavior, but the children are declarative config, not live DOM nodes.
+The difference is under the hood: these compound children are declarative configuration slots rather than visual React DOM nodes. The root reads their props and compiles an ECharts option, which ECharts paints with Canvas by default or SVG when `renderer="svg"`.
 
 `config` is the same contract as every EvilCharts chart — each key maps a node name to a `label` and a per-theme `colors` array. See <Link href="/docs/chart-config">Chart Config</Link> for the full shape. Colors resolve from CSS variables at runtime, so dark mode just works.
 
 <Alert>
   <AlertContent>
-    Canvas rendering brings a few small departures from the Recharts twin: node
+    The ECharts implementation brings a few small departures from the Recharts twin: node
     icons are not rendered, and `verticalPadding` on `<Link>` has no ECharts
     equivalent (see the API notes). All link variants — `gradient`, `solid`,
     `source`, and `target` — are supported.
   </AlertContent>
 </Alert>
+
+### SVG Renderer
+
+Pass `renderer="svg"` to the chart root to opt into ECharts' SVG renderer. Omit it to use the default Canvas renderer.
+
+<ComponentPreview title='renderer="svg"' name="ex-svg-renderer-echarts-sankey-chart" />
 
 ### Interactive Selection
 
@@ -219,7 +225,7 @@ Examples of the sankey chart in different configurations. Customize the `<Link>`
 
 ## API Reference
 
-A root container plus a small set of composible parts. Render the root, then compose the parts you need as children. On canvas each part is declarative config the root compiles, but the API closely mirrors the Recharts twin.
+A root container plus a small set of composible parts. Render the root, then compose the parts you need as children. Regardless of renderer, each part is declarative config the root compiles, but the API closely mirrors the Recharts twin.
 
 <ApiHeading>EChartsSankeyChart</ApiHeading>
 
@@ -227,7 +233,7 @@ The root container. It owns the flow data, shared selection state, loading skele
 
 <ApiTable>
   <ApiRow name="data" type="SankeyData" required>
-    Nodes and links for the flow. `SankeyData` is `{ nodes: SankeyNode[]; links: SankeyLink[] }`, where `SankeyNode = { name: string; icon?: ReactNode }` and `SankeyLink = { source: number; target: number; value: number }`. `source`/`target` are indices into `nodes`. (`icon` is accepted for parity with the Recharts shape but not rendered on canvas.)
+    Nodes and links for the flow. `SankeyData` is `{ nodes: SankeyNode[]; links: SankeyLink[] }`, where `SankeyNode = { name: string; icon?: ReactNode }` and `SankeyLink = { source: number; target: number; value: number }`. `source`/`target` are indices into `nodes`. (`icon` is accepted for parity with the Recharts shape but is not rendered by the ECharts provider.)
   </ApiRow>
   <ApiRow name="config" type="ChartConfig" required>
     Defines the chart's nodes. Each key matches a node name, with a `label` and a per-theme `colors` array. Same contract as every EvilCharts chart — see <Link href="/docs/chart-config">Chart Config</Link>.
@@ -237,6 +243,9 @@ The root container. It owns the flow data, shared selection state, loading skele
   </ApiRow>
   <ApiRow name="className" type="string">
     Additional CSS classes for the chart container.
+  </ApiRow>
+  <ApiRow name="renderer" type='"canvas" | "svg"' default='"canvas"'>
+    Rendering engine used by ECharts. Use `"svg"` for an SVG-backed chart surface; omit the prop to keep the Canvas default.
   </ApiRow>
   <ApiRow name="nodeWidth" type="number" default="10">
     The width of each node in pixels.

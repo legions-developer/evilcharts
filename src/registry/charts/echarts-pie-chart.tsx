@@ -11,6 +11,16 @@ import {
   type TooltipVariant,
 } from "@/registry/ui/echarts-tooltip";
 import {
+  DEFAULT_ECHARTS_RENDERER,
+  buildChartCss,
+  getColorsCount,
+  resolveColors,
+  withAlpha,
+  type ChartConfig,
+  type EChartsRenderer,
+  type ResolvedColors,
+} from "@/registry/ui/echarts-chart";
+import {
   Children,
   isValidElement,
   useCallback,
@@ -23,31 +33,29 @@ import {
   type FC,
   type ReactNode,
 } from "react";
-import {
-  buildChartCss,
-  getColorsCount,
-  resolveColors,
-  withAlpha,
-  type ChartConfig,
-  type ResolvedColors,
-} from "@/registry/ui/echarts-chart";
 import { TooltipComponent, type TooltipComponentOption } from "echarts/components";
 import { LegendOverlay, type LegendVariant } from "@/registry/ui/echarts-legend";
 import { PieChart, type PieSeriesOption } from "echarts/charts";
 import { motion, useReducedMotion } from "motion/react";
-import { CanvasRenderer } from "echarts/renderers";
 import type { ComposeOption } from "echarts/core";
 import * as echarts from "echarts/core";
 
 // Re-export the shared types that were previously declared inline here, so
 // existing consumers/examples keep importing them from the chart module.
-export type { ChartConfig, LegendVariant, TooltipPosition, TooltipRoundness, TooltipVariant };
+export type {
+  ChartConfig,
+  EChartsRenderer,
+  LegendVariant,
+  TooltipPosition,
+  TooltipRoundness,
+  TooltipVariant,
+};
 
 // Modular registration keeps the bundle lean — only the pieces this chart needs.
 // A pie has no coordinate system, so there is no GridComponent and no axes; the
 // tooltip is item-triggered. Never register GraphicComponent: the loading shimmer
 // and selection dim are per-sector itemStyle updates, not graphic overlays.
-echarts.use([PieChart, TooltipComponent, CanvasRenderer]);
+echarts.use([PieChart, TooltipComponent]);
 
 type EChartsInstance = ReturnType<typeof echarts.init>;
 
@@ -166,8 +174,9 @@ export interface EChartsPieChartProps<TData extends Record<string, unknown>> {
   dataKey: keyof TData & string; // key holding each sector's numeric value
   nameKey: keyof TData & string; // key holding each sector's name
   className?: string; // extra classes for the chart container
+  renderer?: EChartsRenderer; // rendering engine — canvas by default, or SVG
   // Master switch for the intro draw-in. Not present on the Recharts twin (which
-  // hardcodes its animation); added here as the canvas off-switch, mirroring the
+  // hardcodes its animation); added here as the ECharts off-switch, mirroring the
   // ECharts area chart's `animation` prop. OS reduce-motion also disables it.
   animation?: boolean;
   defaultSelectedSector?: string | null; // sector selected on first render
@@ -873,6 +882,7 @@ export function EChartsPieChart<TData extends Record<string, unknown>>({
   dataKey,
   nameKey,
   className,
+  renderer = DEFAULT_ECHARTS_RENDERER,
   animation = true,
   defaultSelectedSector = null,
   selectedSector: selectedSectorProp,
@@ -907,7 +917,9 @@ export function EChartsPieChart<TData extends Record<string, unknown>>({
 
   // Selection is controlled when the `selectedSector` prop is provided; otherwise
   // the internal state (seeded by defaultSelectedSector) drives it.
-  const [internalSelectedSector, setSelectedSector] = useState<string | null>(defaultSelectedSector);
+  const [internalSelectedSector, setSelectedSector] = useState<string | null>(
+    defaultSelectedSector,
+  );
   const selectedSector =
     selectedSectorProp !== undefined ? selectedSectorProp : internalSelectedSector;
 
@@ -987,13 +999,13 @@ export function EChartsPieChart<TData extends Record<string, unknown>>({
     isLoading,
   ]);
 
-  // ── Init + resize + theme observer (once) ────────────────────────────────────
+  // ── Init + resize + theme observer (per renderer instance) ───────────────────
   useEffect(() => {
     const mount = mountRef.current;
     const container = containerRef.current;
     if (!mount || !container) return;
 
-    const chart = echarts.init(mount);
+    const chart = echarts.init(mount, null, { renderer });
     echartsRef.current = chart;
 
     const resizeObserver = new ResizeObserver(() => {
@@ -1041,7 +1053,7 @@ export function EChartsPieChart<TData extends Record<string, unknown>>({
       live.hasRevealed = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [renderer]);
 
   // ── Sync ECharts with props/theme/selection — resolve, build, push ────────────
   useEffect(() => {
@@ -1091,6 +1103,7 @@ export function EChartsPieChart<TData extends Record<string, unknown>>({
     animation,
     shouldReduceMotion,
     config,
+    renderer,
     sectorKeys,
   ]);
 
@@ -1107,7 +1120,7 @@ export function EChartsPieChart<TData extends Record<string, unknown>>({
       });
     });
     return () => cancelAnimationFrame(raf);
-  }, [isLoading, tooltipSlot.present, tooltipSlot.defaultIndex]);
+  }, [isLoading, tooltipSlot.present, tooltipSlot.defaultIndex, renderer]);
 
   // ── Loading shimmer — rAF sweeps a bright window around the ring ──────────────
   useEffect(() => {
@@ -1150,7 +1163,7 @@ export function EChartsPieChart<TData extends Record<string, unknown>>({
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [live, isLoading, pie]);
+  }, [live, isLoading, pie, renderer]);
 
   // ── Legend overlay position ──────────────────────────────────────────────────
   const legendStyle: CSSProperties = {

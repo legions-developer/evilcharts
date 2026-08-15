@@ -39,7 +39,7 @@ export const PROVIDER_META: Record<Provider, ProviderMeta> = {
   echarts: {
     id: "echarts",
     name: "ECharts",
-    tagline: "Canvas · built for scale",
+    tagline: "Canvas + SVG · built for scale",
     available: false,
   },
 };

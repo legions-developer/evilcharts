@@ -22,7 +22,7 @@ The installable registry source is the product. Site code demonstrates and deliv
 - Base UI (`@base-ui/react`) for site primitives; this codebase is not using Radix
 - Fumadocs MDX for documentation
 - Recharts 3 for SVG charts
-- ECharts 6 with modular imports and the canvas renderer
+- ECharts 6 with modular imports; Canvas is the default renderer and SVG is optional
 - Motion (`motion/react`) for animation
 - shadcn CLI registry schema/build tooling
 - ESLint 9 and Prettier with import and Tailwind class sorting plugins
@@ -79,8 +79,8 @@ An MDX `<ComponentPreview name="..." />` resolves through the generated `Index`.
 The two providers intentionally share concepts and `ChartConfig`, not rendering internals.
 
 - Recharts modules export compound components such as `EvilAreaChart`. The root owns shared state in React context and visual children such as `Area`, `XAxis`, `Grid`, `Tooltip`, and `Legend` consume it. Recharts renders SVG.
-- ECharts modules export roots such as `EChartsAreaChart`. Their child components are declarative configuration slots that return `null`; the root inspects its children and builds a typed ECharts option. ECharts is registered modularly and renders to canvas.
-- `ChartConfig` colors are exposed as `--color-<key>-<slot>` CSS variables. Recharts consumes them directly; ECharts resolves browser CSS colors before painting to canvas.
+- ECharts modules export roots such as `EChartsAreaChart`. Their child components are declarative configuration slots that return `null`; the root inspects its children and builds a typed ECharts option. ECharts is registered modularly, uses Canvas by default, and supports SVG through the root's `renderer="svg"` prop.
+- `ChartConfig` colors are exposed as `--color-<key>-<slot>` CSS variables. Recharts consumes them directly; ECharts resolves browser CSS colors before painting with the selected renderer.
 - Cartesian charts support selection, loading states, animation, tooltips/legends, and optional brush behavior. Preserve parity between provider twins where their APIs overlap, while respecting renderer-specific implementations.
 - Motion-heavy work must honor `prefers-reduced-motion`/`useReducedMotion`. Avoid option pushes or React state churn inside continuous ECharts pointer, zoom, or animation loops unless there is no imperative alternative.
 
