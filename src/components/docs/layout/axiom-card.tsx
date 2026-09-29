@@ -5,27 +5,29 @@ const AXIOM_PARTNER_URL = "https://partners.axiom.co/gurbinder";
 
 export function AxiomCard({ className }: { className?: string }) {
   return (
-    <a
-      href={AXIOM_PARTNER_URL}
-      target="_blank"
-      rel="sponsored noopener"
-      className={cn(
-        "group focus-visible:ring-ring/50 relative flex aspect-video flex-col justify-between overflow-hidden rounded-xl border border-white/10 bg-[#0c0c0c] transition-colors duration-200 outline-none hover:border-white/20 focus-visible:ring-[3px]",
-        className,
-      )}
-    >
-      <AxiomFlares className="absolute inset-0 size-full" />
-      <div className="relative flex items-start justify-between p-3">
-        <AxiomWordmark className="h-3 w-auto text-white" />
-        <ArrowUpRight
-          aria-hidden="true"
-          className="-mt-0.5 -mr-0.5 size-3.5 text-white/50 transition-[color,translate] duration-200 group-hover:translate-x-px group-hover:-translate-y-px group-hover:text-white"
-        />
-      </div>
-      <p className="relative bg-linear-to-t from-[#0c0c0c] via-[#0c0c0c]/80 to-transparent px-3 pt-6 pb-3 text-[13px] leading-[1.45] font-medium text-pretty text-white">
-        Petabyte-scale schema-less ingest on a fully managed event store with 95%+ compression
-      </p>
-    </a>
+    <div className="pl-5">
+      <a
+        href={AXIOM_PARTNER_URL}
+        target="_blank"
+        rel="sponsored noopener"
+        className={cn(
+          "group focus-visible:ring-ring/50 relative flex h-36 flex-col justify-between overflow-hidden rounded-xl border border-white/4 bg-[#0c0c0c] transition-colors duration-200 outline-none hover:border-white/10 focus-visible:ring-[3px] dark:bg-transparent",
+          className,
+        )}
+      >
+        <AxiomFlares className="absolute inset-0 size-full" />
+        <div className="relative flex items-start justify-between p-3">
+          <AxiomWordmark className="h-3 w-auto text-white" />
+          <ArrowUpRight
+            aria-hidden="true"
+            className="-mt-0.5 -mr-0.5 size-3.5 text-white/50 transition-[color,translate] duration-200 group-hover:translate-x-px group-hover:-translate-y-px group-hover:text-white"
+          />
+        </div>
+        <p className="relative bg-linear-to-t from-[#0c0c0c] via-[#0c0c0c]/80 to-transparent px-3 pt-6 pb-3 text-[13px] leading-[1.45] font-medium text-pretty text-white">
+          Petabyte-scale schema-less ingest on a fully managed event store with 95%+ compression
+        </p>
+      </a>
+    </div>
   );
 }
 
