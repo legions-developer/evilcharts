@@ -2,6 +2,7 @@ import { DocsTableOfContents } from "@/components/docs/mdx/components/table-of-c
 import { FeedbackButtons } from "@/components/docs/mdx/components/feedback-buttons";
 import { MDXNavigation } from "@/components/docs/mdx/components/navigation";
 import { DocsCopyPage } from "@/components/docs/layout/docs-copy-button";
+import { AxiomCard } from "@/components/docs/layout/axiom-card";
 import { findNeighbour } from "fumadocs-core/page-tree";
 import { mdxComponents } from "@/components/docs/mdx";
 import { PROVIDER_META, PROVIDERS } from "@/globals/constants/providers";
@@ -213,11 +214,14 @@ export default async function Page(props: { params: Promise<{ slug: string[] }> 
         </div>
       </div>
       <div className="sticky top-26 hidden h-fit self-start xl:flex">
-        {doc.toc?.length ? (
-          <div className="no-scrollbar w-72 overflow-y-auto px-8">
-            <DocsTableOfContents toc={doc.toc} />
-          </div>
-        ) : null}
+        <div className="flex max-h-[calc(100vh-9.5rem)] w-72 flex-col gap-10 px-8">
+          {doc.toc?.length ? (
+            <div className="no-scrollbar min-h-0 overflow-y-auto">
+              <DocsTableOfContents toc={doc.toc} />
+            </div>
+          ) : null}
+          <AxiomCard className="shrink-0" />
+        </div>
       </div>
     </div>
   );

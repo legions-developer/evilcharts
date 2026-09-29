@@ -49,6 +49,22 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
   --color-path: var(--path);
+  --animate-flare-shine: flare-shine 1.4s cubic-bezier(0.45, 0, 0.25, 1);
+
+  @keyframes flare-shine {
+    0% {
+      opacity: 0;
+      transform: translate(0, 0);
+    }
+    20%,
+    80% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      transform: translate(480px, -480px);
+    }
+  }
 }
 
 :root {
