@@ -220,7 +220,7 @@ export default async function Page(props: { params: Promise<{ slug: string[] }> 
               <DocsTableOfContents toc={doc.toc} />
             </div>
           ) : null}
-          <AxiomCard className="shrink-0" />
+          <AxiomCard className="-mx-4 shrink-0" />
         </div>
       </div>
     </div>

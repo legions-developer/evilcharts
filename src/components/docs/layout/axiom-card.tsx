@@ -10,19 +10,19 @@ export function AxiomCard({ className }: { className?: string }) {
       target="_blank"
       rel="sponsored noopener"
       className={cn(
-        "group bg-muted/40 hover:border-foreground/15 focus-visible:ring-ring/50 flex flex-col gap-3 rounded-xl border p-1.5 transition-colors duration-200 outline-none focus-visible:ring-[3px]",
+        "group focus-visible:ring-ring/50 relative flex aspect-video flex-col justify-between overflow-hidden rounded-xl border border-white/10 bg-[#0c0c0c] transition-colors duration-200 outline-none hover:border-white/20 focus-visible:ring-[3px]",
         className,
       )}
     >
-      <div className="relative aspect-2/1 overflow-hidden rounded-md bg-[#0c0c0c]">
-        <AxiomFlares className="absolute inset-0 size-full" />
-        <AxiomWordmark className="absolute top-2.5 left-2.5 h-3 w-auto text-white" />
+      <AxiomFlares className="absolute inset-0 size-full" />
+      <div className="relative flex items-start justify-between p-3">
+        <AxiomWordmark className="h-3 w-auto text-white" />
         <ArrowUpRight
           aria-hidden="true"
-          className="absolute top-2 right-2 size-3.5 text-white/50 transition-[color,translate] duration-200 group-hover:translate-x-px group-hover:-translate-y-px group-hover:text-white"
+          className="-mt-0.5 -mr-0.5 size-3.5 text-white/50 transition-[color,translate] duration-200 group-hover:translate-x-px group-hover:-translate-y-px group-hover:text-white"
         />
       </div>
-      <p className="text-foreground/90 px-2.5 pb-2.5 text-[13px] leading-[1.45] font-medium text-pretty">
+      <p className="relative bg-linear-to-t from-[#0c0c0c] via-[#0c0c0c]/80 to-transparent px-3 pt-6 pb-3 text-[13px] leading-[1.45] font-medium text-pretty text-white">
         Petabyte-scale schema-less ingest on a fully managed event store with 95%+ compression
       </p>
     </a>
@@ -48,13 +48,13 @@ function AxiomWordmark({ className }: { className?: string }) {
   );
 }
 
-// Axiom's homepage hero flares, cropped around the hotspot for the banner. The banner
+// Axiom's homepage hero flares, cropped around the hotspot to fill the card. The card
 // is always dark, so the hero's theme-aware grays are baked in as their dark values.
 // Hover effects key off the card's `group`: a bloom fades in and a shine sweeps the hero line.
 function AxiomFlares({ className }: { className?: string }) {
   return (
     <svg
-      viewBox="180 262 380 190"
+      viewBox="160 268 400 225"
       preserveAspectRatio="xMidYMid slice"
       fill="none"
       aria-hidden="true"
