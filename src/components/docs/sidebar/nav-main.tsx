@@ -13,21 +13,18 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { flattenTree, type Root as PageTreeRoot } from "fumadocs-core/page-tree";
 import { getNavItemIcon } from "@/globals/functions/getNavItemIcon";
 import { isExcludedPage } from "@/globals/constants/docs-sidebar";
+import { useMemo, useState, type ComponentProps } from "react";
 import type { Provider } from "@/globals/constants/providers";
-import type { Root as PageTreeRoot } from "fumadocs-core/page-tree";
 import { CaretRight } from "@carbon/icons-react";
 import { usePathname } from "next/navigation";
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
-import { useMemo, useState, type ComponentProps } from "react";
 import Link from "next/link";
 
-function NavFolderCollapsible({
-  defaultOpen,
-  ...props
-}: ComponentProps<typeof Collapsible>) {
+function NavFolderCollapsible({ defaultOpen, ...props }: ComponentProps<typeof Collapsible>) {
   // Base UI warns if an uncontrolled Collapsible's defaultOpen changes after
   // init (hasActiveChild flips on navigation); freeze the first value to keep
   // Radix's mount-only defaultOpen semantics.
@@ -144,9 +141,13 @@ export function NavMain({
 
   // Charts sit one level deeper since the provider split: the tree's top level is
   // the provider folders, and the chart folders are their children.
+  // Folder ID prefixes vary across Fumadocs versions; page URLs identify the provider.
   const providerChildren = useMemo(() => {
+    const providerUrl = `/docs/${provider}/`;
     const providerFolder = tree.children.find(
-      (item) => item.type === "folder" && item.$id === `root:${provider}`,
+      (item) =>
+        item.type === "folder" &&
+        flattenTree(item.children).some((page) => page.url.startsWith(providerUrl)),
     );
 
     return providerFolder?.type === "folder" ? providerFolder.children : [];
@@ -198,7 +199,7 @@ export function NavMain({
             (child) => child.type === "page" && child.url === activeTrigger?.url,
           );
 
-          // If there is only one child, show it directly as clickable element 
+          // If there is only one child, show it directly as clickable element
           if (visibleChildren.length === 1) {
             const singleChild = visibleChildren[0];
             const isActive = singleChild.type === "page" && singleChild.url === pathname;
@@ -271,10 +272,7 @@ export function NavMain({
                     }
 
                     return (
-                      <SidebarMenuSubItem
-                        key={subItem.$id}
-                        className={cn("relative flex w-full")}
-                      >
+                      <SidebarMenuSubItem key={subItem.$id} className={cn("relative flex w-full")}>
                         <SidebarMenuSubButton
                           className={cn(
                             "w-full pl-8",

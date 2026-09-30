@@ -10,11 +10,13 @@ import {
 } from "@/assets/icons";
 
 // Custom icons for each item in the sidebar of MDX files.
-// Folder ids arrive as `root:<path>` where path is relative to the content root —
-// `root:recharts/area-chart`, `root:echarts/area-chart`, … Matching on the last
-// path segment keeps one case per chart type across every provider.
+// Folder ids use content paths, with a `root:` prefix in older Fumadocs versions.
+// Matching on the last path segment keeps one case per chart type across providers.
 export function getNavItemIcon(tag?: string) {
-  const chart = tag?.replace(/^root:/, "").split("/").pop();
+  const chart = tag
+    ?.replace(/^root:/, "")
+    .split("/")
+    .pop();
 
   switch (chart) {
     case "area-chart":
