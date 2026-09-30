@@ -1,0 +1,4887 @@
+{
+  "schemaVersion": 1,
+  "label": "vercel",
+  "origin": "https://evilcharts.com",
+  "startedAt": "2026-09-30T15:04:56.406Z",
+  "methodology": {
+    "repetitions": 3,
+    "aggregation": "Median of each metric across 3 runs; ranges retained. Runs are sequential, each in a fresh Chrome profile with an empty browser cache. CDN cache is not purged.",
+    "profiles": "Lighthouse default simulated mobile and desktop presets; exact settings saved per run.",
+    "http": "Five fresh curl processes per endpoint, compressed HTTP responses; connection/TLS setup included. These timings are not browser lab timings.",
+    "fieldData": "No CrUX field data or real-user INP was collected. Total blocking time is a lab metric, not INP.",
+    "timezone": "Asia/Calcutta"
+  },
+  "environment": {
+    "platform": "darwin",
+    "architecture": "arm64",
+    "cpu": "Apple M4 Pro",
+    "logicalCpus": 14,
+    "memoryGiB": 48,
+    "auditNodeVersion": "v24.19.0",
+    "lighthouseVersion": "13.5.0",
+    "chromePath": "/Users/gurbinder/Library/Caches/ms-playwright/chromium-1208/chrome-mac-arm64/Google Chrome for Testing.app/Contents/MacOS/Google Chrome for Testing",
+    "chromeVersion": "Google Chrome for Testing 145.0.7632.6"
+  },
+  "pages": [
+    {
+      "id": "home",
+      "path": "/",
+      "title": "Homepage"
+    },
+    {
+      "id": "docs",
+      "path": "/docs",
+      "title": "Docs introduction"
+    },
+    {
+      "id": "recharts-bar",
+      "path": "/docs/recharts/bar-chart/static",
+      "title": "Recharts bar chart"
+    },
+    {
+      "id": "echarts-bar",
+      "path": "/docs/echarts/bar-chart/static",
+      "title": "ECharts bar chart"
+    }
+  ],
+  "runs": [
+    {
+      "page": "home",
+      "profile": "mobile",
+      "round": 1,
+      "fetchTime": "2026-09-30T15:04:56.406Z",
+      "requestedUrl": "https://evilcharts.com/",
+      "finalUrl": "https://evilcharts.com/",
+      "lighthouseVersion": "13.5.0",
+      "hostUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+      "benchmarkIndex": 4073.5,
+      "configSettings": {
+        "output": [
+          "json",
+          "html"
+        ],
+        "maxWaitForFcp": 30000,
+        "maxWaitForLoad": 45000,
+        "pauseAfterFcpMs": 1000,
+        "pauseAfterLoadMs": 1000,
+        "networkQuietThresholdMs": 1000,
+        "cpuQuietThresholdMs": 1000,
+        "formFactor": "mobile",
+        "throttling": {
+          "rttMs": 150,
+          "throughputKbps": 1638.4,
+          "requestLatencyMs": 562.5,
+          "downloadThroughputKbps": 1474.5600000000002,
+          "uploadThroughputKbps": 675,
+          "cpuSlowdownMultiplier": 4
+        },
+        "throttlingMethod": "simulate",
+        "screenEmulation": {
+          "mobile": true,
+          "width": 412,
+          "height": 823,
+          "deviceScaleFactor": 1.75,
+          "disabled": false
+        },
+        "emulatedUserAgent": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Mobile Safari/537.36",
+        "auditMode": false,
+        "gatherMode": false,
+        "clearStorageTypes": [
+          "file_systems",
+          "shader_cache",
+          "service_workers",
+          "cache_storage"
+        ],
+        "disableStorageReset": false,
+        "debugNavigation": false,
+        "channel": "cli",
+        "usePassiveGathering": false,
+        "disableFullPageScreenshot": false,
+        "skipAboutBlank": false,
+        "blankPage": "about:blank",
+        "ignoreStatusCode": false,
+        "locale": "en-US",
+        "blockedUrlPatterns": null,
+        "additionalTraceCategories": null,
+        "extraHeaders": null,
+        "precomputedLanternData": null,
+        "onlyAudits": null,
+        "onlyCategories": [
+          "performance"
+        ],
+        "skipAudits": null
+      },
+      "warnings": [],
+      "metrics": {
+        "score": 64,
+        "fcpMs": 1126.605,
+        "lcpMs": 5087.605,
+        "tbtMs": 633,
+        "cls": 0,
+        "speedIndexMs": 3232.725042494674,
+        "transferBytes": 1170829,
+        "javascriptBytes": 959644,
+        "requests": 59,
+        "mainThreadMs": 3015.5679999998933,
+        "javascriptMs": 2081.151999999959,
+        "unusedJavascriptBytes": 356652
+      },
+      "findings": [
+        {
+          "id": "first-contentful-paint",
+          "title": "First Contentful Paint",
+          "display": "1.1 s",
+          "value": 1126.605
+        },
+        {
+          "id": "largest-contentful-paint",
+          "title": "Largest Contentful Paint",
+          "display": "5.1 s",
+          "value": 5087.605
+        },
+        {
+          "id": "speed-index",
+          "title": "Speed Index",
+          "display": "3.2 s",
+          "value": 3232.725042494674
+        },
+        {
+          "id": "total-blocking-time",
+          "title": "Total Blocking Time",
+          "display": "630 ms",
+          "value": 633
+        },
+        {
+          "id": "max-potential-fid",
+          "title": "Max Potential First Input Delay",
+          "display": "660 ms",
+          "value": 661
+        },
+        {
+          "id": "interactive",
+          "title": "Time to Interactive",
+          "display": "5.3 s",
+          "value": 5320.105
+        },
+        {
+          "id": "mainthread-work-breakdown",
+          "title": "Minimize main-thread work",
+          "display": "3.0 s",
+          "value": 3015.5679999998933
+        },
+        {
+          "id": "bootup-time",
+          "title": "Reduce JavaScript execution time",
+          "display": "2.1 s",
+          "value": 2081.151999999959
+        },
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "display": "Est savings of 348 KiB",
+          "value": 450
+        },
+        {
+          "id": "forced-reflow-insight",
+          "title": "Forced reflow",
+          "display": null,
+          "value": null
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "display": "Est savings of 14 KiB",
+          "value": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "display": null,
+          "value": null
+        },
+        {
+          "id": "render-blocking-insight",
+          "title": "Render-blocking requests",
+          "display": "Est savings of 290 ms",
+          "value": null
+        }
+      ]
+    },
+    {
+      "page": "home",
+      "profile": "desktop",
+      "round": 1,
+      "fetchTime": "2026-09-30T15:11:19.294Z",
+      "requestedUrl": "https://evilcharts.com/",
+      "finalUrl": "https://evilcharts.com/",
+      "lighthouseVersion": "13.5.0",
+      "hostUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+      "benchmarkIndex": 3972,
+      "configSettings": {
+        "output": [
+          "json",
+          "html"
+        ],
+        "maxWaitForFcp": 30000,
+        "maxWaitForLoad": 45000,
+        "pauseAfterFcpMs": 1000,
+        "pauseAfterLoadMs": 1000,
+        "networkQuietThresholdMs": 1000,
+        "cpuQuietThresholdMs": 1000,
+        "formFactor": "desktop",
+        "throttling": {
+          "rttMs": 40,
+          "throughputKbps": 10240,
+          "requestLatencyMs": 0,
+          "downloadThroughputKbps": 0,
+          "uploadThroughputKbps": 0,
+          "cpuSlowdownMultiplier": 1
+        },
+        "throttlingMethod": "simulate",
+        "screenEmulation": {
+          "mobile": false,
+          "width": 1350,
+          "height": 940,
+          "deviceScaleFactor": 1,
+          "disabled": false
+        },
+        "emulatedUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36",
+        "auditMode": false,
+        "gatherMode": false,
+        "clearStorageTypes": [
+          "file_systems",
+          "shader_cache",
+          "service_workers",
+          "cache_storage"
+        ],
+        "disableStorageReset": false,
+        "debugNavigation": false,
+        "channel": "cli",
+        "usePassiveGathering": false,
+        "disableFullPageScreenshot": false,
+        "skipAboutBlank": false,
+        "blankPage": "about:blank",
+        "ignoreStatusCode": false,
+        "locale": "en-US",
+        "blockedUrlPatterns": null,
+        "additionalTraceCategories": null,
+        "extraHeaders": null,
+        "precomputedLanternData": null,
+        "onlyAudits": null,
+        "onlyCategories": [
+          "performance"
+        ],
+        "skipAudits": null
+      },
+      "warnings": [],
+      "metrics": {
+        "score": 100,
+        "fcpMs": 359.481,
+        "lcpMs": 639.481,
+        "tbtMs": 60,
+        "cls": 0,
+        "speedIndexMs": 872.5148120700159,
+        "transferBytes": 1170879,
+        "javascriptBytes": 959736,
+        "requests": 59,
+        "mainThreadMs": 654.9499999999334,
+        "javascriptMs": 383.1530000000084,
+        "unusedJavascriptBytes": 358056
+      },
+      "findings": [
+        {
+          "id": "largest-contentful-paint",
+          "title": "Largest Contentful Paint",
+          "display": "0.6 s",
+          "value": 639.481
+        },
+        {
+          "id": "speed-index",
+          "title": "Speed Index",
+          "display": "0.9 s",
+          "value": 872.5148120700159
+        },
+        {
+          "id": "max-potential-fid",
+          "title": "Max Potential First Input Delay",
+          "display": "130 ms",
+          "value": 130
+        },
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "display": "Est savings of 350 KiB",
+          "value": 0
+        },
+        {
+          "id": "forced-reflow-insight",
+          "title": "Forced reflow",
+          "display": null,
+          "value": null
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "display": "Est savings of 14 KiB",
+          "value": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "display": null,
+          "value": null
+        },
+        {
+          "id": "render-blocking-insight",
+          "title": "Render-blocking requests",
+          "display": "Est savings of 80 ms",
+          "value": null
+        }
+      ]
+    },
+    {
+      "page": "docs",
+      "profile": "mobile",
+      "round": 1,
+      "fetchTime": "2026-09-30T15:11:32.365Z",
+      "requestedUrl": "https://evilcharts.com/docs",
+      "finalUrl": "https://evilcharts.com/docs",
+      "lighthouseVersion": "13.5.0",
+      "hostUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+      "benchmarkIndex": 3999.5,
+      "configSettings": {
+        "output": [
+          "json",
+          "html"
+        ],
+        "maxWaitForFcp": 30000,
+        "maxWaitForLoad": 45000,
+        "pauseAfterFcpMs": 1000,
+        "pauseAfterLoadMs": 1000,
+        "networkQuietThresholdMs": 1000,
+        "cpuQuietThresholdMs": 1000,
+        "formFactor": "mobile",
+        "throttling": {
+          "rttMs": 150,
+          "throughputKbps": 1638.4,
+          "requestLatencyMs": 562.5,
+          "downloadThroughputKbps": 1474.5600000000002,
+          "uploadThroughputKbps": 675,
+          "cpuSlowdownMultiplier": 4
+        },
+        "throttlingMethod": "simulate",
+        "screenEmulation": {
+          "mobile": true,
+          "width": 412,
+          "height": 823,
+          "deviceScaleFactor": 1.75,
+          "disabled": false
+        },
+        "emulatedUserAgent": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Mobile Safari/537.36",
+        "auditMode": false,
+        "gatherMode": false,
+        "clearStorageTypes": [
+          "file_systems",
+          "shader_cache",
+          "service_workers",
+          "cache_storage"
+        ],
+        "disableStorageReset": false,
+        "debugNavigation": false,
+        "channel": "cli",
+        "usePassiveGathering": false,
+        "disableFullPageScreenshot": false,
+        "skipAboutBlank": false,
+        "blankPage": "about:blank",
+        "ignoreStatusCode": false,
+        "locale": "en-US",
+        "blockedUrlPatterns": null,
+        "additionalTraceCategories": null,
+        "extraHeaders": null,
+        "precomputedLanternData": null,
+        "onlyAudits": null,
+        "onlyCategories": [
+          "performance"
+        ],
+        "skipAudits": null
+      },
+      "warnings": [],
+      "metrics": {
+        "score": 78,
+        "fcpMs": 1284.498,
+        "lcpMs": 6234.498,
+        "tbtMs": 7,
+        "cls": 0,
+        "speedIndexMs": 1284.498,
+        "transferBytes": 1076644,
+        "javascriptBytes": 871970,
+        "requests": 46,
+        "mainThreadMs": 653.159999999997,
+        "javascriptMs": 223.92000000000144,
+        "unusedJavascriptBytes": 465939
+      },
+      "findings": [
+        {
+          "id": "first-contentful-paint",
+          "title": "First Contentful Paint",
+          "display": "1.3 s",
+          "value": 1284.498
+        },
+        {
+          "id": "largest-contentful-paint",
+          "title": "Largest Contentful Paint",
+          "display": "6.2 s",
+          "value": 6234.498
+        },
+        {
+          "id": "interactive",
+          "title": "Time to Interactive",
+          "display": "6.2 s",
+          "value": 6234.498
+        },
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "display": "Est savings of 455 KiB",
+          "value": 2400
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "display": "Est savings of 14 KiB",
+          "value": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "display": null,
+          "value": null
+        },
+        {
+          "id": "render-blocking-insight",
+          "title": "Render-blocking requests",
+          "display": "Est savings of 270 ms",
+          "value": null
+        }
+      ]
+    },
+    {
+      "page": "docs",
+      "profile": "desktop",
+      "round": 1,
+      "fetchTime": "2026-09-30T15:11:43.206Z",
+      "requestedUrl": "https://evilcharts.com/docs",
+      "finalUrl": "https://evilcharts.com/docs",
+      "lighthouseVersion": "13.5.0",
+      "hostUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+      "benchmarkIndex": 4011,
+      "configSettings": {
+        "output": [
+          "json",
+          "html"
+        ],
+        "maxWaitForFcp": 30000,
+        "maxWaitForLoad": 45000,
+        "pauseAfterFcpMs": 1000,
+        "pauseAfterLoadMs": 1000,
+        "networkQuietThresholdMs": 1000,
+        "cpuQuietThresholdMs": 1000,
+        "formFactor": "desktop",
+        "throttling": {
+          "rttMs": 40,
+          "throughputKbps": 10240,
+          "requestLatencyMs": 0,
+          "downloadThroughputKbps": 0,
+          "uploadThroughputKbps": 0,
+          "cpuSlowdownMultiplier": 1
+        },
+        "throttlingMethod": "simulate",
+        "screenEmulation": {
+          "mobile": false,
+          "width": 1350,
+          "height": 940,
+          "deviceScaleFactor": 1,
+          "disabled": false
+        },
+        "emulatedUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36",
+        "auditMode": false,
+        "gatherMode": false,
+        "clearStorageTypes": [
+          "file_systems",
+          "shader_cache",
+          "service_workers",
+          "cache_storage"
+        ],
+        "disableStorageReset": false,
+        "debugNavigation": false,
+        "channel": "cli",
+        "usePassiveGathering": false,
+        "disableFullPageScreenshot": false,
+        "skipAboutBlank": false,
+        "blankPage": "about:blank",
+        "ignoreStatusCode": false,
+        "locale": "en-US",
+        "blockedUrlPatterns": null,
+        "additionalTraceCategories": null,
+        "extraHeaders": null,
+        "precomputedLanternData": null,
+        "onlyAudits": null,
+        "onlyCategories": [
+          "performance"
+        ],
+        "skipAudits": null
+      },
+      "warnings": [],
+      "metrics": {
+        "score": 98,
+        "fcpMs": 357.871,
+        "lcpMs": 1117.871,
+        "tbtMs": 0,
+        "cls": 0,
+        "speedIndexMs": 381.46341668914954,
+        "transferBytes": 1417928,
+        "javascriptBytes": 871980,
+        "requests": 87,
+        "mainThreadMs": 246.67199999999931,
+        "javascriptMs": 0,
+        "unusedJavascriptBytes": 447554
+      },
+      "findings": [
+        {
+          "id": "largest-contentful-paint",
+          "title": "Largest Contentful Paint",
+          "display": "1.1 s",
+          "value": 1117.871
+        },
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "display": "Est savings of 437 KiB",
+          "value": 360
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "display": "Est savings of 14 KiB",
+          "value": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "display": null,
+          "value": null
+        },
+        {
+          "id": "render-blocking-insight",
+          "title": "Render-blocking requests",
+          "display": "Est savings of 70 ms",
+          "value": null
+        }
+      ]
+    },
+    {
+      "page": "recharts-bar",
+      "profile": "mobile",
+      "round": 1,
+      "fetchTime": "2026-09-30T15:11:54.733Z",
+      "requestedUrl": "https://evilcharts.com/docs/recharts/bar-chart/static",
+      "finalUrl": "https://evilcharts.com/docs/recharts/bar-chart/static",
+      "lighthouseVersion": "13.5.0",
+      "hostUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+      "benchmarkIndex": 4038.5,
+      "configSettings": {
+        "output": [
+          "json",
+          "html"
+        ],
+        "maxWaitForFcp": 30000,
+        "maxWaitForLoad": 45000,
+        "pauseAfterFcpMs": 1000,
+        "pauseAfterLoadMs": 1000,
+        "networkQuietThresholdMs": 1000,
+        "cpuQuietThresholdMs": 1000,
+        "formFactor": "mobile",
+        "throttling": {
+          "rttMs": 150,
+          "throughputKbps": 1638.4,
+          "requestLatencyMs": 562.5,
+          "downloadThroughputKbps": 1474.5600000000002,
+          "uploadThroughputKbps": 675,
+          "cpuSlowdownMultiplier": 4
+        },
+        "throttlingMethod": "simulate",
+        "screenEmulation": {
+          "mobile": true,
+          "width": 412,
+          "height": 823,
+          "deviceScaleFactor": 1.75,
+          "disabled": false
+        },
+        "emulatedUserAgent": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Mobile Safari/537.36",
+        "auditMode": false,
+        "gatherMode": false,
+        "clearStorageTypes": [
+          "file_systems",
+          "shader_cache",
+          "service_workers",
+          "cache_storage"
+        ],
+        "disableStorageReset": false,
+        "debugNavigation": false,
+        "channel": "cli",
+        "usePassiveGathering": false,
+        "disableFullPageScreenshot": false,
+        "skipAboutBlank": false,
+        "blankPage": "about:blank",
+        "ignoreStatusCode": false,
+        "locale": "en-US",
+        "blockedUrlPatterns": null,
+        "additionalTraceCategories": null,
+        "extraHeaders": null,
+        "precomputedLanternData": null,
+        "onlyAudits": null,
+        "onlyCategories": [
+          "performance"
+        ],
+        "skipAudits": null
+      },
+      "warnings": [],
+      "metrics": {
+        "score": 74,
+        "fcpMs": 1724.1405,
+        "lcpMs": 6524.1404999999995,
+        "tbtMs": 141,
+        "cls": 0,
+        "speedIndexMs": 2958.324303556771,
+        "transferBytes": 1154887,
+        "javascriptBytes": 871939,
+        "requests": 46,
+        "mainThreadMs": 1642.320000000024,
+        "javascriptMs": 799.7200000000081,
+        "unusedJavascriptBytes": 400127
+      },
+      "findings": [
+        {
+          "id": "first-contentful-paint",
+          "title": "First Contentful Paint",
+          "display": "1.7 s",
+          "value": 1724.1405
+        },
+        {
+          "id": "largest-contentful-paint",
+          "title": "Largest Contentful Paint",
+          "display": "6.5 s",
+          "value": 6524.1404999999995
+        },
+        {
+          "id": "speed-index",
+          "title": "Speed Index",
+          "display": "3.0 s",
+          "value": 2958.324303556771
+        },
+        {
+          "id": "total-blocking-time",
+          "title": "Total Blocking Time",
+          "display": "140 ms",
+          "value": 141
+        },
+        {
+          "id": "max-potential-fid",
+          "title": "Max Potential First Input Delay",
+          "display": "160 ms",
+          "value": 161
+        },
+        {
+          "id": "interactive",
+          "title": "Time to Interactive",
+          "display": "6.5 s",
+          "value": 6524.1404999999995
+        },
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "display": "Est savings of 391 KiB",
+          "value": 1950
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "display": "Est savings of 14 KiB",
+          "value": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "display": null,
+          "value": null
+        },
+        {
+          "id": "render-blocking-insight",
+          "title": "Render-blocking requests",
+          "display": "Est savings of 290 ms",
+          "value": null
+        }
+      ]
+    },
+    {
+      "page": "recharts-bar",
+      "profile": "desktop",
+      "round": 1,
+      "fetchTime": "2026-09-30T15:12:06.685Z",
+      "requestedUrl": "https://evilcharts.com/docs/recharts/bar-chart/static",
+      "finalUrl": "https://evilcharts.com/docs/recharts/bar-chart/static",
+      "lighthouseVersion": "13.5.0",
+      "hostUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+      "benchmarkIndex": 3978.5,
+      "configSettings": {
+        "output": [
+          "json",
+          "html"
+        ],
+        "maxWaitForFcp": 30000,
+        "maxWaitForLoad": 45000,
+        "pauseAfterFcpMs": 1000,
+        "pauseAfterLoadMs": 1000,
+        "networkQuietThresholdMs": 1000,
+        "cpuQuietThresholdMs": 1000,
+        "formFactor": "desktop",
+        "throttling": {
+          "rttMs": 40,
+          "throughputKbps": 10240,
+          "requestLatencyMs": 0,
+          "downloadThroughputKbps": 0,
+          "uploadThroughputKbps": 0,
+          "cpuSlowdownMultiplier": 1
+        },
+        "throttlingMethod": "simulate",
+        "screenEmulation": {
+          "mobile": false,
+          "width": 1350,
+          "height": 940,
+          "deviceScaleFactor": 1,
+          "disabled": false
+        },
+        "emulatedUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36",
+        "auditMode": false,
+        "gatherMode": false,
+        "clearStorageTypes": [
+          "file_systems",
+          "shader_cache",
+          "service_workers",
+          "cache_storage"
+        ],
+        "disableStorageReset": false,
+        "debugNavigation": false,
+        "channel": "cli",
+        "usePassiveGathering": false,
+        "disableFullPageScreenshot": false,
+        "skipAboutBlank": false,
+        "blankPage": "about:blank",
+        "ignoreStatusCode": false,
+        "locale": "en-US",
+        "blockedUrlPatterns": null,
+        "additionalTraceCategories": null,
+        "extraHeaders": null,
+        "precomputedLanternData": null,
+        "onlyAudits": null,
+        "onlyCategories": [
+          "performance"
+        ],
+        "skipAudits": null
+      },
+      "warnings": [],
+      "metrics": {
+        "score": 95,
+        "fcpMs": 656.751,
+        "lcpMs": 1416.751,
+        "tbtMs": 0,
+        "cls": 0,
+        "speedIndexMs": 869.5661796534424,
+        "transferBytes": 1874370,
+        "javascriptBytes": 871947,
+        "requests": 119,
+        "mainThreadMs": 745.3040000000211,
+        "javascriptMs": 380.22900000001226,
+        "unusedJavascriptBytes": 377528
+      },
+      "findings": [
+        {
+          "id": "first-contentful-paint",
+          "title": "First Contentful Paint",
+          "display": "0.7 s",
+          "value": 656.751
+        },
+        {
+          "id": "largest-contentful-paint",
+          "title": "Largest Contentful Paint",
+          "display": "1.4 s",
+          "value": 1416.751
+        },
+        {
+          "id": "speed-index",
+          "title": "Speed Index",
+          "display": "0.9 s",
+          "value": 869.5661796534424
+        },
+        {
+          "id": "interactive",
+          "title": "Time to Interactive",
+          "display": "1.4 s",
+          "value": 1416.7510000000002
+        },
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "display": "Est savings of 369 KiB",
+          "value": 320
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "display": "Est savings of 14 KiB",
+          "value": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "display": null,
+          "value": null
+        },
+        {
+          "id": "render-blocking-insight",
+          "title": "Render-blocking requests",
+          "display": "Est savings of 60 ms",
+          "value": null
+        }
+      ]
+    },
+    {
+      "page": "echarts-bar",
+      "profile": "mobile",
+      "round": 1,
+      "fetchTime": "2026-09-30T15:12:24.272Z",
+      "requestedUrl": "https://evilcharts.com/docs/echarts/bar-chart/static",
+      "finalUrl": "https://evilcharts.com/docs/echarts/bar-chart/static",
+      "lighthouseVersion": "13.5.0",
+      "hostUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+      "benchmarkIndex": 4106,
+      "configSettings": {
+        "output": [
+          "json",
+          "html"
+        ],
+        "maxWaitForFcp": 30000,
+        "maxWaitForLoad": 45000,
+        "pauseAfterFcpMs": 1000,
+        "pauseAfterLoadMs": 1000,
+        "networkQuietThresholdMs": 1000,
+        "cpuQuietThresholdMs": 1000,
+        "formFactor": "mobile",
+        "throttling": {
+          "rttMs": 150,
+          "throughputKbps": 1638.4,
+          "requestLatencyMs": 562.5,
+          "downloadThroughputKbps": 1474.5600000000002,
+          "uploadThroughputKbps": 675,
+          "cpuSlowdownMultiplier": 4
+        },
+        "throttlingMethod": "simulate",
+        "screenEmulation": {
+          "mobile": true,
+          "width": 412,
+          "height": 823,
+          "deviceScaleFactor": 1.75,
+          "disabled": false
+        },
+        "emulatedUserAgent": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Mobile Safari/537.36",
+        "auditMode": false,
+        "gatherMode": false,
+        "clearStorageTypes": [
+          "file_systems",
+          "shader_cache",
+          "service_workers",
+          "cache_storage"
+        ],
+        "disableStorageReset": false,
+        "debugNavigation": false,
+        "channel": "cli",
+        "usePassiveGathering": false,
+        "disableFullPageScreenshot": false,
+        "skipAboutBlank": false,
+        "blankPage": "about:blank",
+        "ignoreStatusCode": false,
+        "locale": "en-US",
+        "blockedUrlPatterns": null,
+        "additionalTraceCategories": null,
+        "extraHeaders": null,
+        "precomputedLanternData": null,
+        "onlyAudits": null,
+        "onlyCategories": [
+          "performance"
+        ],
+        "skipAudits": null
+      },
+      "warnings": [],
+      "metrics": {
+        "score": 74,
+        "fcpMs": 2036.057,
+        "lcpMs": 6986.057,
+        "tbtMs": 76,
+        "cls": 0,
+        "speedIndexMs": 2722.544353298039,
+        "transferBytes": 1228996,
+        "javascriptBytes": 871963,
+        "requests": 46,
+        "mainThreadMs": 1721.6240000000232,
+        "javascriptMs": 1034.920000000005,
+        "unusedJavascriptBytes": 290297
+      },
+      "findings": [
+        {
+          "id": "first-contentful-paint",
+          "title": "First Contentful Paint",
+          "display": "2.0 s",
+          "value": 2036.057
+        },
+        {
+          "id": "largest-contentful-paint",
+          "title": "Largest Contentful Paint",
+          "display": "7.0 s",
+          "value": 6986.057
+        },
+        {
+          "id": "speed-index",
+          "title": "Speed Index",
+          "display": "2.7 s",
+          "value": 2722.544353298039
+        },
+        {
+          "id": "total-blocking-time",
+          "title": "Total Blocking Time",
+          "display": "80 ms",
+          "value": 76
+        },
+        {
+          "id": "max-potential-fid",
+          "title": "Max Potential First Input Delay",
+          "display": "90 ms",
+          "value": 93
+        },
+        {
+          "id": "interactive",
+          "title": "Time to Interactive",
+          "display": "7.0 s",
+          "value": 6986.057000000001
+        },
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "display": "Est savings of 283 KiB",
+          "value": 1500
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "display": "Est savings of 14 KiB",
+          "value": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "display": null,
+          "value": null
+        },
+        {
+          "id": "render-blocking-insight",
+          "title": "Render-blocking requests",
+          "display": "Est savings of 290 ms",
+          "value": null
+        }
+      ]
+    },
+    {
+      "page": "echarts-bar",
+      "profile": "desktop",
+      "round": 1,
+      "fetchTime": "2026-09-30T15:12:35.867Z",
+      "requestedUrl": "https://evilcharts.com/docs/echarts/bar-chart/static",
+      "finalUrl": "https://evilcharts.com/docs/echarts/bar-chart/static",
+      "lighthouseVersion": "13.5.0",
+      "hostUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+      "benchmarkIndex": 4142,
+      "configSettings": {
+        "output": [
+          "json",
+          "html"
+        ],
+        "maxWaitForFcp": 30000,
+        "maxWaitForLoad": 45000,
+        "pauseAfterFcpMs": 1000,
+        "pauseAfterLoadMs": 1000,
+        "networkQuietThresholdMs": 1000,
+        "cpuQuietThresholdMs": 1000,
+        "formFactor": "desktop",
+        "throttling": {
+          "rttMs": 40,
+          "throughputKbps": 10240,
+          "requestLatencyMs": 0,
+          "downloadThroughputKbps": 0,
+          "uploadThroughputKbps": 0,
+          "cpuSlowdownMultiplier": 1
+        },
+        "throttlingMethod": "simulate",
+        "screenEmulation": {
+          "mobile": false,
+          "width": 1350,
+          "height": 940,
+          "deviceScaleFactor": 1,
+          "disabled": false
+        },
+        "emulatedUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36",
+        "auditMode": false,
+        "gatherMode": false,
+        "clearStorageTypes": [
+          "file_systems",
+          "shader_cache",
+          "service_workers",
+          "cache_storage"
+        ],
+        "disableStorageReset": false,
+        "debugNavigation": false,
+        "channel": "cli",
+        "usePassiveGathering": false,
+        "disableFullPageScreenshot": false,
+        "skipAboutBlank": false,
+        "blankPage": "about:blank",
+        "ignoreStatusCode": false,
+        "locale": "en-US",
+        "blockedUrlPatterns": null,
+        "additionalTraceCategories": null,
+        "extraHeaders": null,
+        "precomputedLanternData": null,
+        "onlyAudits": null,
+        "onlyCategories": [
+          "performance"
+        ],
+        "skipAudits": null
+      },
+      "warnings": [],
+      "metrics": {
+        "score": 97,
+        "fcpMs": 496.382,
+        "lcpMs": 1276.382,
+        "tbtMs": 0,
+        "cls": 0,
+        "speedIndexMs": 742.3381609158862,
+        "transferBytes": 1733048,
+        "javascriptBytes": 871947,
+        "requests": 95,
+        "mainThreadMs": 506.5210000000048,
+        "javascriptMs": 252.41500000000167,
+        "unusedJavascriptBytes": 268056
+      },
+      "findings": [
+        {
+          "id": "largest-contentful-paint",
+          "title": "Largest Contentful Paint",
+          "display": "1.3 s",
+          "value": 1276.382
+        },
+        {
+          "id": "speed-index",
+          "title": "Speed Index",
+          "display": "0.7 s",
+          "value": 742.3381609158862
+        },
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "display": "Est savings of 262 KiB",
+          "value": 200
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "display": "Est savings of 14 KiB",
+          "value": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "display": null,
+          "value": null
+        },
+        {
+          "id": "render-blocking-insight",
+          "title": "Render-blocking requests",
+          "display": "Est savings of 80 ms",
+          "value": null
+        }
+      ]
+    },
+    {
+      "page": "home",
+      "profile": "mobile",
+      "round": 2,
+      "fetchTime": "2026-09-30T15:12:48.580Z",
+      "requestedUrl": "https://evilcharts.com/",
+      "finalUrl": "https://evilcharts.com/",
+      "lighthouseVersion": "13.5.0",
+      "hostUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+      "benchmarkIndex": 4125.5,
+      "configSettings": {
+        "output": [
+          "json",
+          "html"
+        ],
+        "maxWaitForFcp": 30000,
+        "maxWaitForLoad": 45000,
+        "pauseAfterFcpMs": 1000,
+        "pauseAfterLoadMs": 1000,
+        "networkQuietThresholdMs": 1000,
+        "cpuQuietThresholdMs": 1000,
+        "formFactor": "mobile",
+        "throttling": {
+          "rttMs": 150,
+          "throughputKbps": 1638.4,
+          "requestLatencyMs": 562.5,
+          "downloadThroughputKbps": 1474.5600000000002,
+          "uploadThroughputKbps": 675,
+          "cpuSlowdownMultiplier": 4
+        },
+        "throttlingMethod": "simulate",
+        "screenEmulation": {
+          "mobile": true,
+          "width": 412,
+          "height": 823,
+          "deviceScaleFactor": 1.75,
+          "disabled": false
+        },
+        "emulatedUserAgent": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Mobile Safari/537.36",
+        "auditMode": false,
+        "gatherMode": false,
+        "clearStorageTypes": [
+          "file_systems",
+          "shader_cache",
+          "service_workers",
+          "cache_storage"
+        ],
+        "disableStorageReset": false,
+        "debugNavigation": false,
+        "channel": "cli",
+        "usePassiveGathering": false,
+        "disableFullPageScreenshot": false,
+        "skipAboutBlank": false,
+        "blankPage": "about:blank",
+        "ignoreStatusCode": false,
+        "locale": "en-US",
+        "blockedUrlPatterns": null,
+        "additionalTraceCategories": null,
+        "extraHeaders": null,
+        "precomputedLanternData": null,
+        "onlyAudits": null,
+        "onlyCategories": [
+          "performance"
+        ],
+        "skipAudits": null
+      },
+      "warnings": [],
+      "metrics": {
+        "score": 79,
+        "fcpMs": 1124.692,
+        "lcpMs": 4274.692,
+        "tbtMs": 303.5,
+        "cls": 0,
+        "speedIndexMs": 2557.6458153896097,
+        "transferBytes": 1170886,
+        "javascriptBytes": 959686,
+        "requests": 59,
+        "mainThreadMs": 4295.323999999251,
+        "javascriptMs": 3229.7999999997255,
+        "unusedJavascriptBytes": 356652
+      },
+      "findings": [
+        {
+          "id": "first-contentful-paint",
+          "title": "First Contentful Paint",
+          "display": "1.1 s",
+          "value": 1124.692
+        },
+        {
+          "id": "largest-contentful-paint",
+          "title": "Largest Contentful Paint",
+          "display": "4.3 s",
+          "value": 4274.692
+        },
+        {
+          "id": "speed-index",
+          "title": "Speed Index",
+          "display": "2.6 s",
+          "value": 2557.6458153896097
+        },
+        {
+          "id": "total-blocking-time",
+          "title": "Total Blocking Time",
+          "display": "300 ms",
+          "value": 303.5
+        },
+        {
+          "id": "max-potential-fid",
+          "title": "Max Potential First Input Delay",
+          "display": "460 ms",
+          "value": 459
+        },
+        {
+          "id": "interactive",
+          "title": "Time to Interactive",
+          "display": "5.3 s",
+          "value": 5283.392
+        },
+        {
+          "id": "mainthread-work-breakdown",
+          "title": "Minimize main-thread work",
+          "display": "4.3 s",
+          "value": 4295.323999999251
+        },
+        {
+          "id": "bootup-time",
+          "title": "Reduce JavaScript execution time",
+          "display": "3.2 s",
+          "value": 3229.7999999997255
+        },
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "display": "Est savings of 348 KiB",
+          "value": 450
+        },
+        {
+          "id": "forced-reflow-insight",
+          "title": "Forced reflow",
+          "display": null,
+          "value": null
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "display": "Est savings of 14 KiB",
+          "value": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "display": null,
+          "value": null
+        },
+        {
+          "id": "render-blocking-insight",
+          "title": "Render-blocking requests",
+          "display": "Est savings of 290 ms",
+          "value": null
+        }
+      ]
+    },
+    {
+      "page": "home",
+      "profile": "desktop",
+      "round": 2,
+      "fetchTime": "2026-09-30T15:13:01.625Z",
+      "requestedUrl": "https://evilcharts.com/",
+      "finalUrl": "https://evilcharts.com/",
+      "lighthouseVersion": "13.5.0",
+      "hostUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+      "benchmarkIndex": 4087.5,
+      "configSettings": {
+        "output": [
+          "json",
+          "html"
+        ],
+        "maxWaitForFcp": 30000,
+        "maxWaitForLoad": 45000,
+        "pauseAfterFcpMs": 1000,
+        "pauseAfterLoadMs": 1000,
+        "networkQuietThresholdMs": 1000,
+        "cpuQuietThresholdMs": 1000,
+        "formFactor": "desktop",
+        "throttling": {
+          "rttMs": 40,
+          "throughputKbps": 10240,
+          "requestLatencyMs": 0,
+          "downloadThroughputKbps": 0,
+          "uploadThroughputKbps": 0,
+          "cpuSlowdownMultiplier": 1
+        },
+        "throttlingMethod": "simulate",
+        "screenEmulation": {
+          "mobile": false,
+          "width": 1350,
+          "height": 940,
+          "deviceScaleFactor": 1,
+          "disabled": false
+        },
+        "emulatedUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36",
+        "auditMode": false,
+        "gatherMode": false,
+        "clearStorageTypes": [
+          "file_systems",
+          "shader_cache",
+          "service_workers",
+          "cache_storage"
+        ],
+        "disableStorageReset": false,
+        "debugNavigation": false,
+        "channel": "cli",
+        "usePassiveGathering": false,
+        "disableFullPageScreenshot": false,
+        "skipAboutBlank": false,
+        "blankPage": "about:blank",
+        "ignoreStatusCode": false,
+        "locale": "en-US",
+        "blockedUrlPatterns": null,
+        "additionalTraceCategories": null,
+        "extraHeaders": null,
+        "precomputedLanternData": null,
+        "onlyAudits": null,
+        "onlyCategories": [
+          "performance"
+        ],
+        "skipAudits": null
+      },
+      "warnings": [],
+      "metrics": {
+        "score": 99,
+        "fcpMs": 322.05,
+        "lcpMs": 842.05,
+        "tbtMs": 48.5,
+        "cls": 0,
+        "speedIndexMs": 704.1445577547797,
+        "transferBytes": 1170748,
+        "javascriptBytes": 959731,
+        "requests": 59,
+        "mainThreadMs": 1040.7339999998578,
+        "javascriptMs": 716.2209999999702,
+        "unusedJavascriptBytes": 358056
+      },
+      "findings": [
+        {
+          "id": "largest-contentful-paint",
+          "title": "Largest Contentful Paint",
+          "display": "0.8 s",
+          "value": 842.05
+        },
+        {
+          "id": "max-potential-fid",
+          "title": "Max Potential First Input Delay",
+          "display": "120 ms",
+          "value": 120
+        },
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "display": "Est savings of 350 KiB",
+          "value": 80
+        },
+        {
+          "id": "forced-reflow-insight",
+          "title": "Forced reflow",
+          "display": null,
+          "value": null
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "display": "Est savings of 14 KiB",
+          "value": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "display": null,
+          "value": null
+        },
+        {
+          "id": "render-blocking-insight",
+          "title": "Render-blocking requests",
+          "display": "Est savings of 80 ms",
+          "value": null
+        }
+      ]
+    },
+    {
+      "page": "docs",
+      "profile": "mobile",
+      "round": 2,
+      "fetchTime": "2026-09-30T15:13:14.449Z",
+      "requestedUrl": "https://evilcharts.com/docs",
+      "finalUrl": "https://evilcharts.com/docs",
+      "lighthouseVersion": "13.5.0",
+      "hostUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+      "benchmarkIndex": 4111.5,
+      "configSettings": {
+        "output": [
+          "json",
+          "html"
+        ],
+        "maxWaitForFcp": 30000,
+        "maxWaitForLoad": 45000,
+        "pauseAfterFcpMs": 1000,
+        "pauseAfterLoadMs": 1000,
+        "networkQuietThresholdMs": 1000,
+        "cpuQuietThresholdMs": 1000,
+        "formFactor": "mobile",
+        "throttling": {
+          "rttMs": 150,
+          "throughputKbps": 1638.4,
+          "requestLatencyMs": 562.5,
+          "downloadThroughputKbps": 1474.5600000000002,
+          "uploadThroughputKbps": 675,
+          "cpuSlowdownMultiplier": 4
+        },
+        "throttlingMethod": "simulate",
+        "screenEmulation": {
+          "mobile": true,
+          "width": 412,
+          "height": 823,
+          "deviceScaleFactor": 1.75,
+          "disabled": false
+        },
+        "emulatedUserAgent": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Mobile Safari/537.36",
+        "auditMode": false,
+        "gatherMode": false,
+        "clearStorageTypes": [
+          "file_systems",
+          "shader_cache",
+          "service_workers",
+          "cache_storage"
+        ],
+        "disableStorageReset": false,
+        "debugNavigation": false,
+        "channel": "cli",
+        "usePassiveGathering": false,
+        "disableFullPageScreenshot": false,
+        "skipAboutBlank": false,
+        "blankPage": "about:blank",
+        "ignoreStatusCode": false,
+        "locale": "en-US",
+        "blockedUrlPatterns": null,
+        "additionalTraceCategories": null,
+        "extraHeaders": null,
+        "precomputedLanternData": null,
+        "onlyAudits": null,
+        "onlyCategories": [
+          "performance"
+        ],
+        "skipAudits": null
+      },
+      "warnings": [],
+      "metrics": {
+        "score": 77,
+        "fcpMs": 1333.261,
+        "lcpMs": 6283.261,
+        "tbtMs": 2,
+        "cls": 0,
+        "speedIndexMs": 1333.261,
+        "transferBytes": 1076602,
+        "javascriptBytes": 871923,
+        "requests": 46,
+        "mainThreadMs": 645.2639999999982,
+        "javascriptMs": 230.25200000000132,
+        "unusedJavascriptBytes": 467122
+      },
+      "findings": [
+        {
+          "id": "first-contentful-paint",
+          "title": "First Contentful Paint",
+          "display": "1.3 s",
+          "value": 1333.261
+        },
+        {
+          "id": "largest-contentful-paint",
+          "title": "Largest Contentful Paint",
+          "display": "6.3 s",
+          "value": 6283.261
+        },
+        {
+          "id": "interactive",
+          "title": "Time to Interactive",
+          "display": "6.3 s",
+          "value": 6283.261
+        },
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "display": "Est savings of 456 KiB",
+          "value": 2400
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "display": "Est savings of 14 KiB",
+          "value": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "display": null,
+          "value": null
+        },
+        {
+          "id": "render-blocking-insight",
+          "title": "Render-blocking requests",
+          "display": "Est savings of 290 ms",
+          "value": null
+        }
+      ]
+    },
+    {
+      "page": "docs",
+      "profile": "desktop",
+      "round": 2,
+      "fetchTime": "2026-09-30T15:13:25.368Z",
+      "requestedUrl": "https://evilcharts.com/docs",
+      "finalUrl": "https://evilcharts.com/docs",
+      "lighthouseVersion": "13.5.0",
+      "hostUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+      "benchmarkIndex": 3962.5,
+      "configSettings": {
+        "output": [
+          "json",
+          "html"
+        ],
+        "maxWaitForFcp": 30000,
+        "maxWaitForLoad": 45000,
+        "pauseAfterFcpMs": 1000,
+        "pauseAfterLoadMs": 1000,
+        "networkQuietThresholdMs": 1000,
+        "cpuQuietThresholdMs": 1000,
+        "formFactor": "desktop",
+        "throttling": {
+          "rttMs": 40,
+          "throughputKbps": 10240,
+          "requestLatencyMs": 0,
+          "downloadThroughputKbps": 0,
+          "uploadThroughputKbps": 0,
+          "cpuSlowdownMultiplier": 1
+        },
+        "throttlingMethod": "simulate",
+        "screenEmulation": {
+          "mobile": false,
+          "width": 1350,
+          "height": 940,
+          "deviceScaleFactor": 1,
+          "disabled": false
+        },
+        "emulatedUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36",
+        "auditMode": false,
+        "gatherMode": false,
+        "clearStorageTypes": [
+          "file_systems",
+          "shader_cache",
+          "service_workers",
+          "cache_storage"
+        ],
+        "disableStorageReset": false,
+        "debugNavigation": false,
+        "channel": "cli",
+        "usePassiveGathering": false,
+        "disableFullPageScreenshot": false,
+        "skipAboutBlank": false,
+        "blankPage": "about:blank",
+        "ignoreStatusCode": false,
+        "locale": "en-US",
+        "blockedUrlPatterns": null,
+        "additionalTraceCategories": null,
+        "extraHeaders": null,
+        "precomputedLanternData": null,
+        "onlyAudits": null,
+        "onlyCategories": [
+          "performance"
+        ],
+        "skipAudits": null
+      },
+      "warnings": [],
+      "metrics": {
+        "score": 98,
+        "fcpMs": 375.53499999999997,
+        "lcpMs": 1155.5349999999999,
+        "tbtMs": 0,
+        "cls": 0,
+        "speedIndexMs": 499.9967916940848,
+        "transferBytes": 1417854,
+        "javascriptBytes": 871982,
+        "requests": 87,
+        "mainThreadMs": 305.675,
+        "javascriptMs": 58.86800000000001,
+        "unusedJavascriptBytes": 447545
+      },
+      "findings": [
+        {
+          "id": "largest-contentful-paint",
+          "title": "Largest Contentful Paint",
+          "display": "1.2 s",
+          "value": 1155.5349999999999
+        },
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "display": "Est savings of 437 KiB",
+          "value": 360
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "display": "Est savings of 14 KiB",
+          "value": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "display": null,
+          "value": null
+        },
+        {
+          "id": "render-blocking-insight",
+          "title": "Render-blocking requests",
+          "display": "Est savings of 80 ms",
+          "value": null
+        }
+      ]
+    },
+    {
+      "page": "recharts-bar",
+      "profile": "mobile",
+      "round": 2,
+      "fetchTime": "2026-09-30T15:13:37.416Z",
+      "requestedUrl": "https://evilcharts.com/docs/recharts/bar-chart/static",
+      "finalUrl": "https://evilcharts.com/docs/recharts/bar-chart/static",
+      "lighthouseVersion": "13.5.0",
+      "hostUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+      "benchmarkIndex": 3973,
+      "configSettings": {
+        "output": [
+          "json",
+          "html"
+        ],
+        "maxWaitForFcp": 30000,
+        "maxWaitForLoad": 45000,
+        "pauseAfterFcpMs": 1000,
+        "pauseAfterLoadMs": 1000,
+        "networkQuietThresholdMs": 1000,
+        "cpuQuietThresholdMs": 1000,
+        "formFactor": "mobile",
+        "throttling": {
+          "rttMs": 150,
+          "throughputKbps": 1638.4,
+          "requestLatencyMs": 562.5,
+          "downloadThroughputKbps": 1474.5600000000002,
+          "uploadThroughputKbps": 675,
+          "cpuSlowdownMultiplier": 4
+        },
+        "throttlingMethod": "simulate",
+        "screenEmulation": {
+          "mobile": true,
+          "width": 412,
+          "height": 823,
+          "deviceScaleFactor": 1.75,
+          "disabled": false
+        },
+        "emulatedUserAgent": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Mobile Safari/537.36",
+        "auditMode": false,
+        "gatherMode": false,
+        "clearStorageTypes": [
+          "file_systems",
+          "shader_cache",
+          "service_workers",
+          "cache_storage"
+        ],
+        "disableStorageReset": false,
+        "debugNavigation": false,
+        "channel": "cli",
+        "usePassiveGathering": false,
+        "disableFullPageScreenshot": false,
+        "skipAboutBlank": false,
+        "blankPage": "about:blank",
+        "ignoreStatusCode": false,
+        "locale": "en-US",
+        "blockedUrlPatterns": null,
+        "additionalTraceCategories": null,
+        "extraHeaders": null,
+        "precomputedLanternData": null,
+        "onlyAudits": null,
+        "onlyCategories": [
+          "performance"
+        ],
+        "skipAudits": null
+      },
+      "warnings": [],
+      "metrics": {
+        "score": 75,
+        "fcpMs": 1736.319,
+        "lcpMs": 6386.3189999999995,
+        "tbtMs": 126,
+        "cls": 0,
+        "speedIndexMs": 2511.2531106159395,
+        "transferBytes": 1154935,
+        "javascriptBytes": 872006,
+        "requests": 46,
+        "mainThreadMs": 1611.3720000000208,
+        "javascriptMs": 786.0680000000075,
+        "unusedJavascriptBytes": 398662
+      },
+      "findings": [
+        {
+          "id": "first-contentful-paint",
+          "title": "First Contentful Paint",
+          "display": "1.7 s",
+          "value": 1736.319
+        },
+        {
+          "id": "largest-contentful-paint",
+          "title": "Largest Contentful Paint",
+          "display": "6.4 s",
+          "value": 6386.3189999999995
+        },
+        {
+          "id": "speed-index",
+          "title": "Speed Index",
+          "display": "2.5 s",
+          "value": 2511.2531106159395
+        },
+        {
+          "id": "total-blocking-time",
+          "title": "Total Blocking Time",
+          "display": "130 ms",
+          "value": 126
+        },
+        {
+          "id": "max-potential-fid",
+          "title": "Max Potential First Input Delay",
+          "display": "160 ms",
+          "value": 163
+        },
+        {
+          "id": "interactive",
+          "title": "Time to Interactive",
+          "display": "6.4 s",
+          "value": 6386.3189999999995
+        },
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "display": "Est savings of 389 KiB",
+          "value": 1800
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "display": "Est savings of 14 KiB",
+          "value": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "display": null,
+          "value": null
+        },
+        {
+          "id": "render-blocking-insight",
+          "title": "Render-blocking requests",
+          "display": "Est savings of 290 ms",
+          "value": null
+        }
+      ]
+    },
+    {
+      "page": "recharts-bar",
+      "profile": "desktop",
+      "round": 2,
+      "fetchTime": "2026-09-30T15:13:48.967Z",
+      "requestedUrl": "https://evilcharts.com/docs/recharts/bar-chart/static",
+      "finalUrl": "https://evilcharts.com/docs/recharts/bar-chart/static",
+      "lighthouseVersion": "13.5.0",
+      "hostUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+      "benchmarkIndex": 4076,
+      "configSettings": {
+        "output": [
+          "json",
+          "html"
+        ],
+        "maxWaitForFcp": 30000,
+        "maxWaitForLoad": 45000,
+        "pauseAfterFcpMs": 1000,
+        "pauseAfterLoadMs": 1000,
+        "networkQuietThresholdMs": 1000,
+        "cpuQuietThresholdMs": 1000,
+        "formFactor": "desktop",
+        "throttling": {
+          "rttMs": 40,
+          "throughputKbps": 10240,
+          "requestLatencyMs": 0,
+          "downloadThroughputKbps": 0,
+          "uploadThroughputKbps": 0,
+          "cpuSlowdownMultiplier": 1
+        },
+        "throttlingMethod": "simulate",
+        "screenEmulation": {
+          "mobile": false,
+          "width": 1350,
+          "height": 940,
+          "deviceScaleFactor": 1,
+          "disabled": false
+        },
+        "emulatedUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36",
+        "auditMode": false,
+        "gatherMode": false,
+        "clearStorageTypes": [
+          "file_systems",
+          "shader_cache",
+          "service_workers",
+          "cache_storage"
+        ],
+        "disableStorageReset": false,
+        "debugNavigation": false,
+        "channel": "cli",
+        "usePassiveGathering": false,
+        "disableFullPageScreenshot": false,
+        "skipAboutBlank": false,
+        "blankPage": "about:blank",
+        "ignoreStatusCode": false,
+        "locale": "en-US",
+        "blockedUrlPatterns": null,
+        "additionalTraceCategories": null,
+        "extraHeaders": null,
+        "precomputedLanternData": null,
+        "onlyAudits": null,
+        "onlyCategories": [
+          "performance"
+        ],
+        "skipAudits": null
+      },
+      "warnings": [],
+      "metrics": {
+        "score": 99,
+        "fcpMs": 452.788,
+        "lcpMs": 972.788,
+        "tbtMs": 0,
+        "cls": 0,
+        "speedIndexMs": 730.9448860520879,
+        "transferBytes": 1874404,
+        "javascriptBytes": 871989,
+        "requests": 119,
+        "mainThreadMs": 571.420000000005,
+        "javascriptMs": 270.240000000003,
+        "unusedJavascriptBytes": 377528
+      },
+      "findings": [
+        {
+          "id": "largest-contentful-paint",
+          "title": "Largest Contentful Paint",
+          "display": "1.0 s",
+          "value": 972.788
+        },
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "display": "Est savings of 369 KiB",
+          "value": 80
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "display": "Est savings of 14 KiB",
+          "value": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "display": null,
+          "value": null
+        },
+        {
+          "id": "render-blocking-insight",
+          "title": "Render-blocking requests",
+          "display": "Est savings of 70 ms",
+          "value": null
+        }
+      ]
+    },
+    {
+      "page": "echarts-bar",
+      "profile": "mobile",
+      "round": 2,
+      "fetchTime": "2026-09-30T15:14:02.393Z",
+      "requestedUrl": "https://evilcharts.com/docs/echarts/bar-chart/static",
+      "finalUrl": "https://evilcharts.com/docs/echarts/bar-chart/static",
+      "lighthouseVersion": "13.5.0",
+      "hostUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+      "benchmarkIndex": 4140,
+      "configSettings": {
+        "output": [
+          "json",
+          "html"
+        ],
+        "maxWaitForFcp": 30000,
+        "maxWaitForLoad": 45000,
+        "pauseAfterFcpMs": 1000,
+        "pauseAfterLoadMs": 1000,
+        "networkQuietThresholdMs": 1000,
+        "cpuQuietThresholdMs": 1000,
+        "formFactor": "mobile",
+        "throttling": {
+          "rttMs": 150,
+          "throughputKbps": 1638.4,
+          "requestLatencyMs": 562.5,
+          "downloadThroughputKbps": 1474.5600000000002,
+          "uploadThroughputKbps": 675,
+          "cpuSlowdownMultiplier": 4
+        },
+        "throttlingMethod": "simulate",
+        "screenEmulation": {
+          "mobile": true,
+          "width": 412,
+          "height": 823,
+          "deviceScaleFactor": 1.75,
+          "disabled": false
+        },
+        "emulatedUserAgent": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Mobile Safari/537.36",
+        "auditMode": false,
+        "gatherMode": false,
+        "clearStorageTypes": [
+          "file_systems",
+          "shader_cache",
+          "service_workers",
+          "cache_storage"
+        ],
+        "disableStorageReset": false,
+        "debugNavigation": false,
+        "channel": "cli",
+        "usePassiveGathering": false,
+        "disableFullPageScreenshot": false,
+        "skipAboutBlank": false,
+        "blankPage": "about:blank",
+        "ignoreStatusCode": false,
+        "locale": "en-US",
+        "blockedUrlPatterns": null,
+        "additionalTraceCategories": null,
+        "extraHeaders": null,
+        "precomputedLanternData": null,
+        "onlyAudits": null,
+        "onlyCategories": [
+          "performance"
+        ],
+        "skipAudits": null
+      },
+      "warnings": [],
+      "metrics": {
+        "score": 76,
+        "fcpMs": 2048.384,
+        "lcpMs": 6248.384,
+        "tbtMs": 48,
+        "cls": 0,
+        "speedIndexMs": 2760.1999953128443,
+        "transferBytes": 1229031,
+        "javascriptBytes": 871959,
+        "requests": 46,
+        "mainThreadMs": 1653.9000000000171,
+        "javascriptMs": 974.4600000000042,
+        "unusedJavascriptBytes": 289114
+      },
+      "findings": [
+        {
+          "id": "first-contentful-paint",
+          "title": "First Contentful Paint",
+          "display": "2.0 s",
+          "value": 2048.384
+        },
+        {
+          "id": "largest-contentful-paint",
+          "title": "Largest Contentful Paint",
+          "display": "6.2 s",
+          "value": 6248.384
+        },
+        {
+          "id": "speed-index",
+          "title": "Speed Index",
+          "display": "2.8 s",
+          "value": 2760.1999953128443
+        },
+        {
+          "id": "max-potential-fid",
+          "title": "Max Potential First Input Delay",
+          "display": "90 ms",
+          "value": 86
+        },
+        {
+          "id": "interactive",
+          "title": "Time to Interactive",
+          "display": "6.6 s",
+          "value": 6649.384
+        },
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "display": "Est savings of 282 KiB",
+          "value": 1200
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "display": "Est savings of 14 KiB",
+          "value": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "display": null,
+          "value": null
+        },
+        {
+          "id": "render-blocking-insight",
+          "title": "Render-blocking requests",
+          "display": "Est savings of 290 ms",
+          "value": null
+        }
+      ]
+    },
+    {
+      "page": "echarts-bar",
+      "profile": "desktop",
+      "round": 2,
+      "fetchTime": "2026-09-30T15:14:14.005Z",
+      "requestedUrl": "https://evilcharts.com/docs/echarts/bar-chart/static",
+      "finalUrl": "https://evilcharts.com/docs/echarts/bar-chart/static",
+      "lighthouseVersion": "13.5.0",
+      "hostUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+      "benchmarkIndex": 4128,
+      "configSettings": {
+        "output": [
+          "json",
+          "html"
+        ],
+        "maxWaitForFcp": 30000,
+        "maxWaitForLoad": 45000,
+        "pauseAfterFcpMs": 1000,
+        "pauseAfterLoadMs": 1000,
+        "networkQuietThresholdMs": 1000,
+        "cpuQuietThresholdMs": 1000,
+        "formFactor": "desktop",
+        "throttling": {
+          "rttMs": 40,
+          "throughputKbps": 10240,
+          "requestLatencyMs": 0,
+          "downloadThroughputKbps": 0,
+          "uploadThroughputKbps": 0,
+          "cpuSlowdownMultiplier": 1
+        },
+        "throttlingMethod": "simulate",
+        "screenEmulation": {
+          "mobile": false,
+          "width": 1350,
+          "height": 940,
+          "deviceScaleFactor": 1,
+          "disabled": false
+        },
+        "emulatedUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36",
+        "auditMode": false,
+        "gatherMode": false,
+        "clearStorageTypes": [
+          "file_systems",
+          "shader_cache",
+          "service_workers",
+          "cache_storage"
+        ],
+        "disableStorageReset": false,
+        "debugNavigation": false,
+        "channel": "cli",
+        "usePassiveGathering": false,
+        "disableFullPageScreenshot": false,
+        "skipAboutBlank": false,
+        "blankPage": "about:blank",
+        "ignoreStatusCode": false,
+        "locale": "en-US",
+        "blockedUrlPatterns": null,
+        "additionalTraceCategories": null,
+        "extraHeaders": null,
+        "precomputedLanternData": null,
+        "onlyAudits": null,
+        "onlyCategories": [
+          "performance"
+        ],
+        "skipAudits": null
+      },
+      "warnings": [],
+      "metrics": {
+        "score": 97,
+        "fcpMs": 506.034,
+        "lcpMs": 1266.034,
+        "tbtMs": 0,
+        "cls": 0,
+        "speedIndexMs": 739.0904875590172,
+        "transferBytes": 1669188,
+        "javascriptBytes": 869620,
+        "requests": 83,
+        "mainThreadMs": 547.8090000000051,
+        "javascriptMs": 266.5300000000006,
+        "unusedJavascriptBytes": 269409
+      },
+      "findings": [
+        {
+          "id": "largest-contentful-paint",
+          "title": "Largest Contentful Paint",
+          "display": "1.3 s",
+          "value": 1266.034
+        },
+        {
+          "id": "speed-index",
+          "title": "Speed Index",
+          "display": "0.7 s",
+          "value": 739.0904875590172
+        },
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "display": "Est savings of 263 KiB",
+          "value": 200
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "display": "Est savings of 14 KiB",
+          "value": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "display": null,
+          "value": null
+        },
+        {
+          "id": "render-blocking-insight",
+          "title": "Render-blocking requests",
+          "display": "Est savings of 60 ms",
+          "value": null
+        }
+      ]
+    },
+    {
+      "page": "home",
+      "profile": "mobile",
+      "round": 3,
+      "fetchTime": "2026-09-30T15:14:44.910Z",
+      "requestedUrl": "https://evilcharts.com/",
+      "finalUrl": "https://evilcharts.com/",
+      "lighthouseVersion": "13.5.0",
+      "hostUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+      "benchmarkIndex": 4083,
+      "configSettings": {
+        "output": [
+          "json",
+          "html"
+        ],
+        "maxWaitForFcp": 30000,
+        "maxWaitForLoad": 45000,
+        "pauseAfterFcpMs": 1000,
+        "pauseAfterLoadMs": 1000,
+        "networkQuietThresholdMs": 1000,
+        "cpuQuietThresholdMs": 1000,
+        "formFactor": "mobile",
+        "throttling": {
+          "rttMs": 150,
+          "throughputKbps": 1638.4,
+          "requestLatencyMs": 562.5,
+          "downloadThroughputKbps": 1474.5600000000002,
+          "uploadThroughputKbps": 675,
+          "cpuSlowdownMultiplier": 4
+        },
+        "throttlingMethod": "simulate",
+        "screenEmulation": {
+          "mobile": true,
+          "width": 412,
+          "height": 823,
+          "deviceScaleFactor": 1.75,
+          "disabled": false
+        },
+        "emulatedUserAgent": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Mobile Safari/537.36",
+        "auditMode": false,
+        "gatherMode": false,
+        "clearStorageTypes": [
+          "file_systems",
+          "shader_cache",
+          "service_workers",
+          "cache_storage"
+        ],
+        "disableStorageReset": false,
+        "debugNavigation": false,
+        "channel": "cli",
+        "usePassiveGathering": false,
+        "disableFullPageScreenshot": false,
+        "skipAboutBlank": false,
+        "blankPage": "about:blank",
+        "ignoreStatusCode": false,
+        "locale": "en-US",
+        "blockedUrlPatterns": null,
+        "additionalTraceCategories": null,
+        "extraHeaders": null,
+        "precomputedLanternData": null,
+        "onlyAudits": null,
+        "onlyCategories": [
+          "performance"
+        ],
+        "skipAudits": null
+      },
+      "warnings": [],
+      "metrics": {
+        "score": 90,
+        "fcpMs": 1135.9479999999999,
+        "lcpMs": 2185.948,
+        "tbtMs": 348,
+        "cls": 0,
+        "speedIndexMs": 2772.320473126182,
+        "transferBytes": 1170902,
+        "javascriptBytes": 959736,
+        "requests": 59,
+        "mainThreadMs": 4174.927999999395,
+        "javascriptMs": 3155.527999999893,
+        "unusedJavascriptBytes": 356652
+      },
+      "findings": [
+        {
+          "id": "first-contentful-paint",
+          "title": "First Contentful Paint",
+          "display": "1.1 s",
+          "value": 1135.9479999999999
+        },
+        {
+          "id": "largest-contentful-paint",
+          "title": "Largest Contentful Paint",
+          "display": "2.2 s",
+          "value": 2185.948
+        },
+        {
+          "id": "speed-index",
+          "title": "Speed Index",
+          "display": "2.8 s",
+          "value": 2772.320473126182
+        },
+        {
+          "id": "total-blocking-time",
+          "title": "Total Blocking Time",
+          "display": "350 ms",
+          "value": 348
+        },
+        {
+          "id": "max-potential-fid",
+          "title": "Max Potential First Input Delay",
+          "display": "460 ms",
+          "value": 463
+        },
+        {
+          "id": "interactive",
+          "title": "Time to Interactive",
+          "display": "5.2 s",
+          "value": 5217.2480000000005
+        },
+        {
+          "id": "mainthread-work-breakdown",
+          "title": "Minimize main-thread work",
+          "display": "4.2 s",
+          "value": 4174.927999999395
+        },
+        {
+          "id": "bootup-time",
+          "title": "Reduce JavaScript execution time",
+          "display": "3.2 s",
+          "value": 3155.527999999893
+        },
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "display": "Est savings of 348 KiB",
+          "value": 150
+        },
+        {
+          "id": "forced-reflow-insight",
+          "title": "Forced reflow",
+          "display": null,
+          "value": null
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "display": "Est savings of 14 KiB",
+          "value": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "display": null,
+          "value": null
+        },
+        {
+          "id": "render-blocking-insight",
+          "title": "Render-blocking requests",
+          "display": "Est savings of 290 ms",
+          "value": null
+        }
+      ]
+    },
+    {
+      "page": "home",
+      "profile": "desktop",
+      "round": 3,
+      "fetchTime": "2026-09-30T15:14:58.079Z",
+      "requestedUrl": "https://evilcharts.com/",
+      "finalUrl": "https://evilcharts.com/",
+      "lighthouseVersion": "13.5.0",
+      "hostUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+      "benchmarkIndex": 4082,
+      "configSettings": {
+        "output": [
+          "json",
+          "html"
+        ],
+        "maxWaitForFcp": 30000,
+        "maxWaitForLoad": 45000,
+        "pauseAfterFcpMs": 1000,
+        "pauseAfterLoadMs": 1000,
+        "networkQuietThresholdMs": 1000,
+        "cpuQuietThresholdMs": 1000,
+        "formFactor": "desktop",
+        "throttling": {
+          "rttMs": 40,
+          "throughputKbps": 10240,
+          "requestLatencyMs": 0,
+          "downloadThroughputKbps": 0,
+          "uploadThroughputKbps": 0,
+          "cpuSlowdownMultiplier": 1
+        },
+        "throttlingMethod": "simulate",
+        "screenEmulation": {
+          "mobile": false,
+          "width": 1350,
+          "height": 940,
+          "deviceScaleFactor": 1,
+          "disabled": false
+        },
+        "emulatedUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36",
+        "auditMode": false,
+        "gatherMode": false,
+        "clearStorageTypes": [
+          "file_systems",
+          "shader_cache",
+          "service_workers",
+          "cache_storage"
+        ],
+        "disableStorageReset": false,
+        "debugNavigation": false,
+        "channel": "cli",
+        "usePassiveGathering": false,
+        "disableFullPageScreenshot": false,
+        "skipAboutBlank": false,
+        "blankPage": "about:blank",
+        "ignoreStatusCode": false,
+        "locale": "en-US",
+        "blockedUrlPatterns": null,
+        "additionalTraceCategories": null,
+        "extraHeaders": null,
+        "precomputedLanternData": null,
+        "onlyAudits": null,
+        "onlyCategories": [
+          "performance"
+        ],
+        "skipAudits": null
+      },
+      "warnings": [],
+      "metrics": {
+        "score": 100,
+        "fcpMs": 361.3,
+        "lcpMs": 721.3,
+        "tbtMs": 40,
+        "cls": 0,
+        "speedIndexMs": 811.3724284160354,
+        "transferBytes": 1170928,
+        "javascriptBytes": 959695,
+        "requests": 59,
+        "mainThreadMs": 1033.7089999998464,
+        "javascriptMs": 721.4149999999697,
+        "unusedJavascriptBytes": 356329
+      },
+      "findings": [
+        {
+          "id": "largest-contentful-paint",
+          "title": "Largest Contentful Paint",
+          "display": "0.7 s",
+          "value": 721.3
+        },
+        {
+          "id": "speed-index",
+          "title": "Speed Index",
+          "display": "0.8 s",
+          "value": 811.3724284160354
+        },
+        {
+          "id": "max-potential-fid",
+          "title": "Max Potential First Input Delay",
+          "display": "110 ms",
+          "value": 112
+        },
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "display": "Est savings of 348 KiB",
+          "value": 40
+        },
+        {
+          "id": "forced-reflow-insight",
+          "title": "Forced reflow",
+          "display": null,
+          "value": null
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "display": "Est savings of 14 KiB",
+          "value": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "display": null,
+          "value": null
+        },
+        {
+          "id": "render-blocking-insight",
+          "title": "Render-blocking requests",
+          "display": "Est savings of 80 ms",
+          "value": null
+        }
+      ]
+    },
+    {
+      "page": "docs",
+      "profile": "mobile",
+      "round": 3,
+      "fetchTime": "2026-09-30T15:15:11.186Z",
+      "requestedUrl": "https://evilcharts.com/docs",
+      "finalUrl": "https://evilcharts.com/docs",
+      "lighthouseVersion": "13.5.0",
+      "hostUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+      "benchmarkIndex": 4082.5,
+      "configSettings": {
+        "output": [
+          "json",
+          "html"
+        ],
+        "maxWaitForFcp": 30000,
+        "maxWaitForLoad": 45000,
+        "pauseAfterFcpMs": 1000,
+        "pauseAfterLoadMs": 1000,
+        "networkQuietThresholdMs": 1000,
+        "cpuQuietThresholdMs": 1000,
+        "formFactor": "mobile",
+        "throttling": {
+          "rttMs": 150,
+          "throughputKbps": 1638.4,
+          "requestLatencyMs": 562.5,
+          "downloadThroughputKbps": 1474.5600000000002,
+          "uploadThroughputKbps": 675,
+          "cpuSlowdownMultiplier": 4
+        },
+        "throttlingMethod": "simulate",
+        "screenEmulation": {
+          "mobile": true,
+          "width": 412,
+          "height": 823,
+          "deviceScaleFactor": 1.75,
+          "disabled": false
+        },
+        "emulatedUserAgent": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Mobile Safari/537.36",
+        "auditMode": false,
+        "gatherMode": false,
+        "clearStorageTypes": [
+          "file_systems",
+          "shader_cache",
+          "service_workers",
+          "cache_storage"
+        ],
+        "disableStorageReset": false,
+        "debugNavigation": false,
+        "channel": "cli",
+        "usePassiveGathering": false,
+        "disableFullPageScreenshot": false,
+        "skipAboutBlank": false,
+        "blankPage": "about:blank",
+        "ignoreStatusCode": false,
+        "locale": "en-US",
+        "blockedUrlPatterns": null,
+        "additionalTraceCategories": null,
+        "extraHeaders": null,
+        "precomputedLanternData": null,
+        "onlyAudits": null,
+        "onlyCategories": [
+          "performance"
+        ],
+        "skipAudits": null
+      },
+      "warnings": [],
+      "metrics": {
+        "score": 85,
+        "fcpMs": 1325.1055000000001,
+        "lcpMs": 4325.1055,
+        "tbtMs": 12,
+        "cls": 0,
+        "speedIndexMs": 1325.1055000000001,
+        "transferBytes": 1076508,
+        "javascriptBytes": 871906,
+        "requests": 46,
+        "mainThreadMs": 620.9839999999986,
+        "javascriptMs": 217.56399999999863,
+        "unusedJavascriptBytes": 467122
+      },
+      "findings": [
+        {
+          "id": "first-contentful-paint",
+          "title": "First Contentful Paint",
+          "display": "1.3 s",
+          "value": 1325.1055000000001
+        },
+        {
+          "id": "largest-contentful-paint",
+          "title": "Largest Contentful Paint",
+          "display": "4.3 s",
+          "value": 4325.1055
+        },
+        {
+          "id": "interactive",
+          "title": "Time to Interactive",
+          "display": "4.3 s",
+          "value": 4325.1055
+        },
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "display": "Est savings of 456 KiB",
+          "value": 900
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "display": "Est savings of 14 KiB",
+          "value": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "display": null,
+          "value": null
+        },
+        {
+          "id": "render-blocking-insight",
+          "title": "Render-blocking requests",
+          "display": "Est savings of 290 ms",
+          "value": null
+        }
+      ]
+    },
+    {
+      "page": "docs",
+      "profile": "desktop",
+      "round": 3,
+      "fetchTime": "2026-09-30T15:15:22.080Z",
+      "requestedUrl": "https://evilcharts.com/docs",
+      "finalUrl": "https://evilcharts.com/docs",
+      "lighthouseVersion": "13.5.0",
+      "hostUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+      "benchmarkIndex": 4130.5,
+      "configSettings": {
+        "output": [
+          "json",
+          "html"
+        ],
+        "maxWaitForFcp": 30000,
+        "maxWaitForLoad": 45000,
+        "pauseAfterFcpMs": 1000,
+        "pauseAfterLoadMs": 1000,
+        "networkQuietThresholdMs": 1000,
+        "cpuQuietThresholdMs": 1000,
+        "formFactor": "desktop",
+        "throttling": {
+          "rttMs": 40,
+          "throughputKbps": 10240,
+          "requestLatencyMs": 0,
+          "downloadThroughputKbps": 0,
+          "uploadThroughputKbps": 0,
+          "cpuSlowdownMultiplier": 1
+        },
+        "throttlingMethod": "simulate",
+        "screenEmulation": {
+          "mobile": false,
+          "width": 1350,
+          "height": 940,
+          "deviceScaleFactor": 1,
+          "disabled": false
+        },
+        "emulatedUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36",
+        "auditMode": false,
+        "gatherMode": false,
+        "clearStorageTypes": [
+          "file_systems",
+          "shader_cache",
+          "service_workers",
+          "cache_storage"
+        ],
+        "disableStorageReset": false,
+        "debugNavigation": false,
+        "channel": "cli",
+        "usePassiveGathering": false,
+        "disableFullPageScreenshot": false,
+        "skipAboutBlank": false,
+        "blankPage": "about:blank",
+        "ignoreStatusCode": false,
+        "locale": "en-US",
+        "blockedUrlPatterns": null,
+        "additionalTraceCategories": null,
+        "extraHeaders": null,
+        "precomputedLanternData": null,
+        "onlyAudits": null,
+        "onlyCategories": [
+          "performance"
+        ],
+        "skipAudits": null
+      },
+      "warnings": [],
+      "metrics": {
+        "score": 98,
+        "fcpMs": 352.756,
+        "lcpMs": 1112.7559999999999,
+        "tbtMs": 0,
+        "cls": 0,
+        "speedIndexMs": 374.1495916458289,
+        "transferBytes": 1417847,
+        "javascriptBytes": 871892,
+        "requests": 87,
+        "mainThreadMs": 380.16600000001466,
+        "javascriptMs": 141.4680000000092,
+        "unusedJavascriptBytes": 446192
+      },
+      "findings": [
+        {
+          "id": "largest-contentful-paint",
+          "title": "Largest Contentful Paint",
+          "display": "1.1 s",
+          "value": 1112.7559999999999
+        },
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "display": "Est savings of 436 KiB",
+          "value": 360
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "display": "Est savings of 14 KiB",
+          "value": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "display": null,
+          "value": null
+        },
+        {
+          "id": "render-blocking-insight",
+          "title": "Render-blocking requests",
+          "display": "Est savings of 70 ms",
+          "value": null
+        }
+      ]
+    },
+    {
+      "page": "recharts-bar",
+      "profile": "mobile",
+      "round": 3,
+      "fetchTime": "2026-09-30T15:15:33.939Z",
+      "requestedUrl": "https://evilcharts.com/docs/recharts/bar-chart/static",
+      "finalUrl": "https://evilcharts.com/docs/recharts/bar-chart/static",
+      "lighthouseVersion": "13.5.0",
+      "hostUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+      "benchmarkIndex": 4123,
+      "configSettings": {
+        "output": [
+          "json",
+          "html"
+        ],
+        "maxWaitForFcp": 30000,
+        "maxWaitForLoad": 45000,
+        "pauseAfterFcpMs": 1000,
+        "pauseAfterLoadMs": 1000,
+        "networkQuietThresholdMs": 1000,
+        "cpuQuietThresholdMs": 1000,
+        "formFactor": "mobile",
+        "throttling": {
+          "rttMs": 150,
+          "throughputKbps": 1638.4,
+          "requestLatencyMs": 562.5,
+          "downloadThroughputKbps": 1474.5600000000002,
+          "uploadThroughputKbps": 675,
+          "cpuSlowdownMultiplier": 4
+        },
+        "throttlingMethod": "simulate",
+        "screenEmulation": {
+          "mobile": true,
+          "width": 412,
+          "height": 823,
+          "deviceScaleFactor": 1.75,
+          "disabled": false
+        },
+        "emulatedUserAgent": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Mobile Safari/537.36",
+        "auditMode": false,
+        "gatherMode": false,
+        "clearStorageTypes": [
+          "file_systems",
+          "shader_cache",
+          "service_workers",
+          "cache_storage"
+        ],
+        "disableStorageReset": false,
+        "debugNavigation": false,
+        "channel": "cli",
+        "usePassiveGathering": false,
+        "disableFullPageScreenshot": false,
+        "skipAboutBlank": false,
+        "blankPage": "about:blank",
+        "ignoreStatusCode": false,
+        "locale": "en-US",
+        "blockedUrlPatterns": null,
+        "additionalTraceCategories": null,
+        "extraHeaders": null,
+        "precomputedLanternData": null,
+        "onlyAudits": null,
+        "onlyCategories": [
+          "performance"
+        ],
+        "skipAudits": null
+      },
+      "warnings": [],
+      "metrics": {
+        "score": 75,
+        "fcpMs": 1734.146,
+        "lcpMs": 6684.146,
+        "tbtMs": 125,
+        "cls": 0,
+        "speedIndexMs": 2526.3245994717086,
+        "transferBytes": 1154877,
+        "javascriptBytes": 871966,
+        "requests": 46,
+        "mainThreadMs": 1625.7040000000197,
+        "javascriptMs": 790.5160000000071,
+        "unusedJavascriptBytes": 398944
+      },
+      "findings": [
+        {
+          "id": "first-contentful-paint",
+          "title": "First Contentful Paint",
+          "display": "1.7 s",
+          "value": 1734.146
+        },
+        {
+          "id": "largest-contentful-paint",
+          "title": "Largest Contentful Paint",
+          "display": "6.7 s",
+          "value": 6684.146
+        },
+        {
+          "id": "speed-index",
+          "title": "Speed Index",
+          "display": "2.5 s",
+          "value": 2526.3245994717086
+        },
+        {
+          "id": "total-blocking-time",
+          "title": "Total Blocking Time",
+          "display": "130 ms",
+          "value": 125
+        },
+        {
+          "id": "max-potential-fid",
+          "title": "Max Potential First Input Delay",
+          "display": "150 ms",
+          "value": 147
+        },
+        {
+          "id": "interactive",
+          "title": "Time to Interactive",
+          "display": "6.7 s",
+          "value": 6684.146000000001
+        },
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "display": "Est savings of 390 KiB",
+          "value": 1950
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "display": "Est savings of 14 KiB",
+          "value": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "display": null,
+          "value": null
+        },
+        {
+          "id": "render-blocking-insight",
+          "title": "Render-blocking requests",
+          "display": "Est savings of 260 ms",
+          "value": null
+        }
+      ]
+    },
+    {
+      "page": "recharts-bar",
+      "profile": "desktop",
+      "round": 3,
+      "fetchTime": "2026-09-30T15:15:45.408Z",
+      "requestedUrl": "https://evilcharts.com/docs/recharts/bar-chart/static",
+      "finalUrl": "https://evilcharts.com/docs/recharts/bar-chart/static",
+      "lighthouseVersion": "13.5.0",
+      "hostUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+      "benchmarkIndex": 4096.5,
+      "configSettings": {
+        "output": [
+          "json",
+          "html"
+        ],
+        "maxWaitForFcp": 30000,
+        "maxWaitForLoad": 45000,
+        "pauseAfterFcpMs": 1000,
+        "pauseAfterLoadMs": 1000,
+        "networkQuietThresholdMs": 1000,
+        "cpuQuietThresholdMs": 1000,
+        "formFactor": "desktop",
+        "throttling": {
+          "rttMs": 40,
+          "throughputKbps": 10240,
+          "requestLatencyMs": 0,
+          "downloadThroughputKbps": 0,
+          "uploadThroughputKbps": 0,
+          "cpuSlowdownMultiplier": 1
+        },
+        "throttlingMethod": "simulate",
+        "screenEmulation": {
+          "mobile": false,
+          "width": 1350,
+          "height": 940,
+          "deviceScaleFactor": 1,
+          "disabled": false
+        },
+        "emulatedUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36",
+        "auditMode": false,
+        "gatherMode": false,
+        "clearStorageTypes": [
+          "file_systems",
+          "shader_cache",
+          "service_workers",
+          "cache_storage"
+        ],
+        "disableStorageReset": false,
+        "debugNavigation": false,
+        "channel": "cli",
+        "usePassiveGathering": false,
+        "disableFullPageScreenshot": false,
+        "skipAboutBlank": false,
+        "blankPage": "about:blank",
+        "ignoreStatusCode": false,
+        "locale": "en-US",
+        "blockedUrlPatterns": null,
+        "additionalTraceCategories": null,
+        "extraHeaders": null,
+        "precomputedLanternData": null,
+        "onlyAudits": null,
+        "onlyCategories": [
+          "performance"
+        ],
+        "skipAudits": null
+      },
+      "warnings": [],
+      "metrics": {
+        "score": 97,
+        "fcpMs": 449.6,
+        "lcpMs": 1169.6,
+        "tbtMs": 0,
+        "cls": 0,
+        "speedIndexMs": 747.4314280656436,
+        "transferBytes": 1874497,
+        "javascriptBytes": 872020,
+        "requests": 119,
+        "mainThreadMs": 586.5800000000065,
+        "javascriptMs": 257.81100000000276,
+        "unusedJavascriptBytes": 377902
+      },
+      "findings": [
+        {
+          "id": "largest-contentful-paint",
+          "title": "Largest Contentful Paint",
+          "display": "1.2 s",
+          "value": 1169.6
+        },
+        {
+          "id": "speed-index",
+          "title": "Speed Index",
+          "display": "0.7 s",
+          "value": 747.4314280656436
+        },
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "display": "Est savings of 369 KiB",
+          "value": 240
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "display": "Est savings of 14 KiB",
+          "value": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "display": null,
+          "value": null
+        },
+        {
+          "id": "render-blocking-insight",
+          "title": "Render-blocking requests",
+          "display": "Est savings of 80 ms",
+          "value": null
+        }
+      ]
+    },
+    {
+      "page": "echarts-bar",
+      "profile": "mobile",
+      "round": 3,
+      "fetchTime": "2026-09-30T15:15:58.772Z",
+      "requestedUrl": "https://evilcharts.com/docs/echarts/bar-chart/static",
+      "finalUrl": "https://evilcharts.com/docs/echarts/bar-chart/static",
+      "lighthouseVersion": "13.5.0",
+      "hostUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+      "benchmarkIndex": 4126,
+      "configSettings": {
+        "output": [
+          "json",
+          "html"
+        ],
+        "maxWaitForFcp": 30000,
+        "maxWaitForLoad": 45000,
+        "pauseAfterFcpMs": 1000,
+        "pauseAfterLoadMs": 1000,
+        "networkQuietThresholdMs": 1000,
+        "cpuQuietThresholdMs": 1000,
+        "formFactor": "mobile",
+        "throttling": {
+          "rttMs": 150,
+          "throughputKbps": 1638.4,
+          "requestLatencyMs": 562.5,
+          "downloadThroughputKbps": 1474.5600000000002,
+          "uploadThroughputKbps": 675,
+          "cpuSlowdownMultiplier": 4
+        },
+        "throttlingMethod": "simulate",
+        "screenEmulation": {
+          "mobile": true,
+          "width": 412,
+          "height": 823,
+          "deviceScaleFactor": 1.75,
+          "disabled": false
+        },
+        "emulatedUserAgent": "Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Mobile Safari/537.36",
+        "auditMode": false,
+        "gatherMode": false,
+        "clearStorageTypes": [
+          "file_systems",
+          "shader_cache",
+          "service_workers",
+          "cache_storage"
+        ],
+        "disableStorageReset": false,
+        "debugNavigation": false,
+        "channel": "cli",
+        "usePassiveGathering": false,
+        "disableFullPageScreenshot": false,
+        "skipAboutBlank": false,
+        "blankPage": "about:blank",
+        "ignoreStatusCode": false,
+        "locale": "en-US",
+        "blockedUrlPatterns": null,
+        "additionalTraceCategories": null,
+        "extraHeaders": null,
+        "precomputedLanternData": null,
+        "onlyAudits": null,
+        "onlyCategories": [
+          "performance"
+        ],
+        "skipAudits": null
+      },
+      "warnings": [],
+      "metrics": {
+        "score": 74,
+        "fcpMs": 2096.3905,
+        "lcpMs": 7046.3904999999995,
+        "tbtMs": 56,
+        "cls": 0,
+        "speedIndexMs": 2637.803375134268,
+        "transferBytes": 1229033,
+        "javascriptBytes": 871960,
+        "requests": 46,
+        "mainThreadMs": 1611.988000000018,
+        "javascriptMs": 938.7320000000045,
+        "unusedJavascriptBytes": 289114
+      },
+      "findings": [
+        {
+          "id": "first-contentful-paint",
+          "title": "First Contentful Paint",
+          "display": "2.1 s",
+          "value": 2096.3905
+        },
+        {
+          "id": "largest-contentful-paint",
+          "title": "Largest Contentful Paint",
+          "display": "7.0 s",
+          "value": 7046.3904999999995
+        },
+        {
+          "id": "speed-index",
+          "title": "Speed Index",
+          "display": "2.6 s",
+          "value": 2637.803375134268
+        },
+        {
+          "id": "max-potential-fid",
+          "title": "Max Potential First Input Delay",
+          "display": "80 ms",
+          "value": 82
+        },
+        {
+          "id": "interactive",
+          "title": "Time to Interactive",
+          "display": "7.0 s",
+          "value": 7046.3904999999995
+        },
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "display": "Est savings of 282 KiB",
+          "value": 1500
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "display": "Est savings of 14 KiB",
+          "value": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "display": null,
+          "value": null
+        },
+        {
+          "id": "render-blocking-insight",
+          "title": "Render-blocking requests",
+          "display": "Est savings of 290 ms",
+          "value": null
+        }
+      ]
+    },
+    {
+      "page": "echarts-bar",
+      "profile": "desktop",
+      "round": 3,
+      "fetchTime": "2026-09-30T15:16:10.252Z",
+      "requestedUrl": "https://evilcharts.com/docs/echarts/bar-chart/static",
+      "finalUrl": "https://evilcharts.com/docs/echarts/bar-chart/static",
+      "lighthouseVersion": "13.5.0",
+      "hostUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/145.0.0.0 Safari/537.36",
+      "benchmarkIndex": 4115,
+      "configSettings": {
+        "output": [
+          "json",
+          "html"
+        ],
+        "maxWaitForFcp": 30000,
+        "maxWaitForLoad": 45000,
+        "pauseAfterFcpMs": 1000,
+        "pauseAfterLoadMs": 1000,
+        "networkQuietThresholdMs": 1000,
+        "cpuQuietThresholdMs": 1000,
+        "formFactor": "desktop",
+        "throttling": {
+          "rttMs": 40,
+          "throughputKbps": 10240,
+          "requestLatencyMs": 0,
+          "downloadThroughputKbps": 0,
+          "uploadThroughputKbps": 0,
+          "cpuSlowdownMultiplier": 1
+        },
+        "throttlingMethod": "simulate",
+        "screenEmulation": {
+          "mobile": false,
+          "width": 1350,
+          "height": 940,
+          "deviceScaleFactor": 1,
+          "disabled": false
+        },
+        "emulatedUserAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36",
+        "auditMode": false,
+        "gatherMode": false,
+        "clearStorageTypes": [
+          "file_systems",
+          "shader_cache",
+          "service_workers",
+          "cache_storage"
+        ],
+        "disableStorageReset": false,
+        "debugNavigation": false,
+        "channel": "cli",
+        "usePassiveGathering": false,
+        "disableFullPageScreenshot": false,
+        "skipAboutBlank": false,
+        "blankPage": "about:blank",
+        "ignoreStatusCode": false,
+        "locale": "en-US",
+        "blockedUrlPatterns": null,
+        "additionalTraceCategories": null,
+        "extraHeaders": null,
+        "precomputedLanternData": null,
+        "onlyAudits": null,
+        "onlyCategories": [
+          "performance"
+        ],
+        "skipAudits": null
+      },
+      "warnings": [],
+      "metrics": {
+        "score": 97,
+        "fcpMs": 531.351,
+        "lcpMs": 1191.351,
+        "tbtMs": 0,
+        "cls": 0,
+        "speedIndexMs": 789.6052776682797,
+        "transferBytes": 1733071,
+        "javascriptBytes": 871969,
+        "requests": 95,
+        "mainThreadMs": 559.1830000000034,
+        "javascriptMs": 291.0040000000035,
+        "unusedJavascriptBytes": 268056
+      },
+      "findings": [
+        {
+          "id": "largest-contentful-paint",
+          "title": "Largest Contentful Paint",
+          "display": "1.2 s",
+          "value": 1191.351
+        },
+        {
+          "id": "speed-index",
+          "title": "Speed Index",
+          "display": "0.8 s",
+          "value": 789.6052776682797
+        },
+        {
+          "id": "unused-javascript",
+          "title": "Reduce unused JavaScript",
+          "display": "Est savings of 262 KiB",
+          "value": 160
+        },
+        {
+          "id": "legacy-javascript-insight",
+          "title": "Legacy JavaScript",
+          "display": "Est savings of 14 KiB",
+          "value": null
+        },
+        {
+          "id": "network-dependency-tree-insight",
+          "title": "Network dependency tree",
+          "display": null,
+          "value": null
+        },
+        {
+          "id": "render-blocking-insight",
+          "title": "Render-blocking requests",
+          "display": "Est savings of 80 ms",
+          "value": null
+        }
+      ]
+    }
+  ],
+  "http": [
+    {
+      "name": "Homepage",
+      "path": "/",
+      "method": "GET",
+      "samples": [
+        {
+          "timestamp": "2026-09-30T15:16:21.807Z",
+          "status": 200,
+          "ttfbMs": 233.574,
+          "totalMs": 235.815,
+          "dnsMs": 6.025,
+          "tlsReadyMs": 145.861,
+          "transferredBytes": 10364,
+          "decodedBytes": 48235,
+          "bodySha256": "791581e290af082cd36a4f9aa29d08348cc828b267eab5cb54cc9eb2d3ecbb8e",
+          "headers": {
+            "age": "152",
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-encoding": "gzip",
+            "content-type": "text/html; charset=utf-8",
+            "etag": "W/\"zbv7m3azmg117b\"",
+            "server": "Vercel",
+            "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+            "x-nextjs-prerender": "1",
+            "x-vercel-cache": "HIT",
+            "x-vercel-id": "bom1::iad1::q2c6n-1790781381751-a94e254fd08f"
+          }
+        },
+        {
+          "timestamp": "2026-09-30T15:16:22.067Z",
+          "status": 200,
+          "ttfbMs": 239.612,
+          "totalMs": 241.382,
+          "dnsMs": 3.585,
+          "tlsReadyMs": 153.983,
+          "transferredBytes": 10364,
+          "decodedBytes": 48235,
+          "bodySha256": "791581e290af082cd36a4f9aa29d08348cc828b267eab5cb54cc9eb2d3ecbb8e",
+          "headers": {
+            "age": "152",
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-encoding": "gzip",
+            "content-type": "text/html; charset=utf-8",
+            "etag": "W/\"zbv7m3azmg117b\"",
+            "server": "Vercel",
+            "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+            "x-nextjs-prerender": "1",
+            "x-vercel-cache": "HIT",
+            "x-vercel-id": "bom1::iad1::sk4n7-1790781382014-4627be9f270b"
+          }
+        },
+        {
+          "timestamp": "2026-09-30T15:16:22.317Z",
+          "status": 200,
+          "ttfbMs": 224.406,
+          "totalMs": 228.91400000000002,
+          "dnsMs": 3.476,
+          "tlsReadyMs": 147.728,
+          "transferredBytes": 10364,
+          "decodedBytes": 48235,
+          "bodySha256": "791581e290af082cd36a4f9aa29d08348cc828b267eab5cb54cc9eb2d3ecbb8e",
+          "headers": {
+            "age": "153",
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-encoding": "gzip",
+            "content-type": "text/html; charset=utf-8",
+            "etag": "W/\"zbv7m3azmg117b\"",
+            "server": "Vercel",
+            "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+            "x-nextjs-prerender": "1",
+            "x-vercel-cache": "HIT",
+            "x-vercel-id": "bom1::iad1::dlxll-1790781382269-736b921d5514"
+          }
+        },
+        {
+          "timestamp": "2026-09-30T15:16:22.579Z",
+          "status": 200,
+          "ttfbMs": 240.66199999999998,
+          "totalMs": 242.464,
+          "dnsMs": 3.438,
+          "tlsReadyMs": 154.098,
+          "transferredBytes": 10364,
+          "decodedBytes": 48235,
+          "bodySha256": "791581e290af082cd36a4f9aa29d08348cc828b267eab5cb54cc9eb2d3ecbb8e",
+          "headers": {
+            "age": "153",
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-encoding": "gzip",
+            "content-type": "text/html; charset=utf-8",
+            "etag": "W/\"zbv7m3azmg117b\"",
+            "server": "Vercel",
+            "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+            "x-nextjs-prerender": "1",
+            "x-vercel-cache": "HIT",
+            "x-vercel-id": "bom1::iad1::b4nsm-1790781382527-ea5e7c3aa42d"
+          }
+        },
+        {
+          "timestamp": "2026-09-30T15:16:22.822Z",
+          "status": 200,
+          "ttfbMs": 225.933,
+          "totalMs": 226.81699999999998,
+          "dnsMs": 3.467,
+          "tlsReadyMs": 147.273,
+          "transferredBytes": 10364,
+          "decodedBytes": 48235,
+          "bodySha256": "791581e290af082cd36a4f9aa29d08348cc828b267eab5cb54cc9eb2d3ecbb8e",
+          "headers": {
+            "age": "153",
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-encoding": "gzip",
+            "content-type": "text/html; charset=utf-8",
+            "etag": "W/\"zbv7m3azmg117b\"",
+            "server": "Vercel",
+            "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+            "x-nextjs-prerender": "1",
+            "x-vercel-cache": "HIT",
+            "x-vercel-id": "bom1::iad1::dlddh-1790781382779-f654f242b79c"
+          }
+        }
+      ],
+      "median": {
+        "ttfbMs": 233.574,
+        "totalMs": 235.815,
+        "transferredBytes": 10364
+      }
+    },
+    {
+      "name": "Docs introduction",
+      "path": "/docs",
+      "method": "GET",
+      "samples": [
+        {
+          "timestamp": "2026-09-30T15:16:23.123Z",
+          "status": 200,
+          "ttfbMs": 238.7,
+          "totalMs": 286.402,
+          "dnsMs": 2.706,
+          "tlsReadyMs": 142.237,
+          "transferredBytes": 43167,
+          "decodedBytes": 215046,
+          "bodySha256": "e421514bd24717b6f0b147d5be1ea24cc90bd1065ff5a29bf00d863c49b69cbd",
+          "headers": {
+            "age": "1496",
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-encoding": "gzip",
+            "content-type": "text/html; charset=utf-8",
+            "etag": "W/\"ur0lnooxyp4lux\"",
+            "server": "Vercel",
+            "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+            "x-nextjs-prerender": "1",
+            "x-vercel-cache": "HIT",
+            "x-vercel-id": "bom1::iad1::qhsmf-1790781383013-4b292a84dba8"
+          }
+        },
+        {
+          "timestamp": "2026-09-30T15:16:23.448Z",
+          "status": 200,
+          "ttfbMs": 263.624,
+          "totalMs": 308.59799999999996,
+          "dnsMs": 2.37,
+          "tlsReadyMs": 157.191,
+          "transferredBytes": 43167,
+          "decodedBytes": 215046,
+          "bodySha256": "e421514bd24717b6f0b147d5be1ea24cc90bd1065ff5a29bf00d863c49b69cbd",
+          "headers": {
+            "age": "1497",
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-encoding": "gzip",
+            "content-type": "text/html; charset=utf-8",
+            "etag": "W/\"ur0lnooxyp4lux\"",
+            "server": "Vercel",
+            "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+            "x-nextjs-prerender": "1",
+            "x-vercel-cache": "HIT",
+            "x-vercel-id": "bom1::iad1::z8ksd-1790781383331-c2eedf3e5fa6"
+          }
+        },
+        {
+          "timestamp": "2026-09-30T15:16:23.920Z",
+          "status": 200,
+          "ttfbMs": 408.68100000000004,
+          "totalMs": 453.38800000000003,
+          "dnsMs": 3.648,
+          "tlsReadyMs": 145.452,
+          "transferredBytes": 43167,
+          "decodedBytes": 215046,
+          "bodySha256": "e421514bd24717b6f0b147d5be1ea24cc90bd1065ff5a29bf00d863c49b69cbd",
+          "headers": {
+            "age": "1497",
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-encoding": "gzip",
+            "content-type": "text/html; charset=utf-8",
+            "etag": "W/\"ur0lnooxyp4lux\"",
+            "server": "Vercel",
+            "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+            "x-nextjs-prerender": "1",
+            "x-vercel-cache": "HIT",
+            "x-vercel-id": "bom1::iad1::5kc4r-1790781383664-146008b70ff5"
+          }
+        },
+        {
+          "timestamp": "2026-09-30T15:16:24.234Z",
+          "status": 200,
+          "ttfbMs": 248.749,
+          "totalMs": 293.719,
+          "dnsMs": 3.492,
+          "tlsReadyMs": 145.895,
+          "transferredBytes": 43167,
+          "decodedBytes": 215046,
+          "bodySha256": "e421514bd24717b6f0b147d5be1ea24cc90bd1065ff5a29bf00d863c49b69cbd",
+          "headers": {
+            "age": "1497",
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-encoding": "gzip",
+            "content-type": "text/html; charset=utf-8",
+            "etag": "W/\"ur0lnooxyp4lux\"",
+            "server": "Vercel",
+            "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+            "x-nextjs-prerender": "1",
+            "x-vercel-cache": "HIT",
+            "x-vercel-id": "bom1::iad1::mp9pz-1790781384117-648e17b03c4a"
+          }
+        },
+        {
+          "timestamp": "2026-09-30T15:16:24.609Z",
+          "status": 200,
+          "ttfbMs": 306.848,
+          "totalMs": 354.345,
+          "dnsMs": 2.8579999999999997,
+          "tlsReadyMs": 155.713,
+          "transferredBytes": 43167,
+          "decodedBytes": 215046,
+          "bodySha256": "e421514bd24717b6f0b147d5be1ea24cc90bd1065ff5a29bf00d863c49b69cbd",
+          "headers": {
+            "age": "1498",
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-encoding": "gzip",
+            "content-type": "text/html; charset=utf-8",
+            "etag": "W/\"ur0lnooxyp4lux\"",
+            "server": "Vercel",
+            "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+            "x-nextjs-prerender": "1",
+            "x-vercel-cache": "HIT",
+            "x-vercel-id": "bom1::iad1::f4jrj-1790781384442-9db0ba081293"
+          }
+        }
+      ],
+      "median": {
+        "ttfbMs": 263.624,
+        "totalMs": 308.59799999999996,
+        "transferredBytes": 43167
+      }
+    },
+    {
+      "name": "Recharts bar chart",
+      "path": "/docs/recharts/bar-chart/static",
+      "method": "GET",
+      "samples": [
+        {
+          "timestamp": "2026-09-30T15:16:24.998Z",
+          "status": 200,
+          "ttfbMs": 270.09499999999997,
+          "totalMs": 368.332,
+          "dnsMs": 3.7100000000000004,
+          "tlsReadyMs": 143.631,
+          "transferredBytes": 178890,
+          "decodedBytes": 2169744,
+          "bodySha256": "c6290be5bdd51a6156ed649a782a9b4af5dcb684285ab38c592c843f0fba6702",
+          "headers": {
+            "age": "2553",
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-encoding": "gzip",
+            "content-type": "text/html; charset=utf-8",
+            "etag": "W/\"117u51gxvc21acuq\"",
+            "server": "Vercel",
+            "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+            "x-nextjs-prerender": "1",
+            "x-vercel-cache": "HIT",
+            "x-vercel-id": "bom1::iad1::dx9nt-1790781384806-d451b1c02c2a"
+          }
+        },
+        {
+          "timestamp": "2026-09-30T15:16:25.422Z",
+          "status": 200,
+          "ttfbMs": 302.44599999999997,
+          "totalMs": 404.824,
+          "dnsMs": 3.364,
+          "tlsReadyMs": 145.69099999999997,
+          "transferredBytes": 178890,
+          "decodedBytes": 2169744,
+          "bodySha256": "c6290be5bdd51a6156ed649a782a9b4af5dcb684285ab38c592c843f0fba6702",
+          "headers": {
+            "age": "2554",
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-encoding": "gzip",
+            "content-type": "text/html; charset=utf-8",
+            "etag": "W/\"117u51gxvc21acuq\"",
+            "server": "Vercel",
+            "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+            "x-nextjs-prerender": "1",
+            "x-vercel-cache": "HIT",
+            "x-vercel-id": "bom1::iad1::dlddh-1790781385195-392df9c6cc88"
+          }
+        },
+        {
+          "timestamp": "2026-09-30T15:16:25.822Z",
+          "status": 200,
+          "ttfbMs": 280.22,
+          "totalMs": 379.898,
+          "dnsMs": 3.1710000000000003,
+          "tlsReadyMs": 157.607,
+          "transferredBytes": 178890,
+          "decodedBytes": 2169744,
+          "bodySha256": "c6290be5bdd51a6156ed649a782a9b4af5dcb684285ab38c592c843f0fba6702",
+          "headers": {
+            "age": "2554",
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-encoding": "gzip",
+            "content-type": "text/html; charset=utf-8",
+            "etag": "W/\"117u51gxvc21acuq\"",
+            "server": "Vercel",
+            "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+            "x-nextjs-prerender": "1",
+            "x-vercel-cache": "HIT",
+            "x-vercel-id": "bom1::iad1::7rcmx-1790781385631-06bbe6470a06"
+          }
+        },
+        {
+          "timestamp": "2026-09-30T15:16:26.225Z",
+          "status": 200,
+          "ttfbMs": 280.42499999999995,
+          "totalMs": 382.986,
+          "dnsMs": 3.438,
+          "tlsReadyMs": 147.57799999999997,
+          "transferredBytes": 178890,
+          "decodedBytes": 2169744,
+          "bodySha256": "c6290be5bdd51a6156ed649a782a9b4af5dcb684285ab38c592c843f0fba6702",
+          "headers": {
+            "age": "2555",
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-encoding": "gzip",
+            "content-type": "text/html; charset=utf-8",
+            "etag": "W/\"117u51gxvc21acuq\"",
+            "server": "Vercel",
+            "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+            "x-nextjs-prerender": "1",
+            "x-vercel-cache": "HIT",
+            "x-vercel-id": "bom1::iad1::flh6d-1790781386023-860b050ba351"
+          }
+        },
+        {
+          "timestamp": "2026-09-30T15:16:26.631Z",
+          "status": 200,
+          "ttfbMs": 275.111,
+          "totalMs": 385.779,
+          "dnsMs": 2.9499999999999997,
+          "tlsReadyMs": 147.535,
+          "transferredBytes": 178890,
+          "decodedBytes": 2169744,
+          "bodySha256": "c6290be5bdd51a6156ed649a782a9b4af5dcb684285ab38c592c843f0fba6702",
+          "headers": {
+            "age": "2555",
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-encoding": "gzip",
+            "content-type": "text/html; charset=utf-8",
+            "etag": "W/\"117u51gxvc21acuq\"",
+            "server": "Vercel",
+            "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+            "x-nextjs-prerender": "1",
+            "x-vercel-cache": "HIT",
+            "x-vercel-id": "bom1::iad1::bb267-1790781386425-0c0555421f82"
+          }
+        }
+      ],
+      "median": {
+        "ttfbMs": 280.22,
+        "totalMs": 382.986,
+        "transferredBytes": 178890
+      }
+    },
+    {
+      "name": "ECharts bar chart",
+      "path": "/docs/echarts/bar-chart/static",
+      "method": "GET",
+      "samples": [
+        {
+          "timestamp": "2026-09-30T15:16:27.162Z",
+          "status": 200,
+          "ttfbMs": 374.471,
+          "totalMs": 511.783,
+          "dnsMs": 2.7230000000000003,
+          "tlsReadyMs": 193.186,
+          "transferredBytes": 278262,
+          "decodedBytes": 3117062,
+          "bodySha256": "755ee2e042484a6f7818581301a61d104038a48ea4266759f166cf4a92217c78",
+          "headers": {
+            "age": "3415",
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-encoding": "gzip",
+            "content-type": "text/html; charset=utf-8",
+            "etag": "W/\"n1lgo3ntc11ud2d\"",
+            "server": "Vercel",
+            "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+            "x-nextjs-prerender": "1",
+            "x-vercel-cache": "HIT",
+            "x-vercel-id": "bom1::iad1::fwp5l-1790781386880-05ff4a00ff51"
+          }
+        },
+        {
+          "timestamp": "2026-09-30T15:16:27.607Z",
+          "status": 200,
+          "ttfbMs": 317.89099999999996,
+          "totalMs": 425.53999999999996,
+          "dnsMs": 3.1710000000000003,
+          "tlsReadyMs": 149.749,
+          "transferredBytes": 278262,
+          "decodedBytes": 3117062,
+          "bodySha256": "755ee2e042484a6f7818581301a61d104038a48ea4266759f166cf4a92217c78",
+          "headers": {
+            "age": "3416",
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-encoding": "gzip",
+            "content-type": "text/html; charset=utf-8",
+            "etag": "W/\"n1lgo3ntc11ud2d\"",
+            "server": "Vercel",
+            "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+            "x-nextjs-prerender": "1",
+            "x-vercel-cache": "HIT",
+            "x-vercel-id": "bom1::iad1::pcbcx-1790781387366-878755646c00"
+          }
+        },
+        {
+          "timestamp": "2026-09-30T15:16:28.017Z",
+          "status": 200,
+          "ttfbMs": 292.456,
+          "totalMs": 392.606,
+          "dnsMs": 3.316,
+          "tlsReadyMs": 148.781,
+          "transferredBytes": 278262,
+          "decodedBytes": 3117062,
+          "bodySha256": "755ee2e042484a6f7818581301a61d104038a48ea4266759f166cf4a92217c78",
+          "headers": {
+            "age": "3416",
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-encoding": "gzip",
+            "content-type": "text/html; charset=utf-8",
+            "etag": "W/\"n1lgo3ntc11ud2d\"",
+            "server": "Vercel",
+            "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+            "x-nextjs-prerender": "1",
+            "x-vercel-cache": "HIT",
+            "x-vercel-id": "bom1::iad1::h9dqc-1790781387811-45dbc181fa85"
+          }
+        },
+        {
+          "timestamp": "2026-09-30T15:16:28.507Z",
+          "status": 200,
+          "ttfbMs": 320.227,
+          "totalMs": 476.95300000000003,
+          "dnsMs": 2.5100000000000002,
+          "tlsReadyMs": 148.444,
+          "transferredBytes": 278262,
+          "decodedBytes": 3117062,
+          "bodySha256": "755ee2e042484a6f7818581301a61d104038a48ea4266759f166cf4a92217c78",
+          "headers": {
+            "age": "3417",
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-encoding": "gzip",
+            "content-type": "text/html; charset=utf-8",
+            "etag": "W/\"n1lgo3ntc11ud2d\"",
+            "server": "Vercel",
+            "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+            "x-nextjs-prerender": "1",
+            "x-vercel-cache": "HIT",
+            "x-vercel-id": "bom1::iad1::jkt82-1790781388213-8c696f363abd"
+          }
+        },
+        {
+          "timestamp": "2026-09-30T15:16:28.932Z",
+          "status": 200,
+          "ttfbMs": 307.718,
+          "totalMs": 406.399,
+          "dnsMs": 2.601,
+          "tlsReadyMs": 165.886,
+          "transferredBytes": 278262,
+          "decodedBytes": 3117062,
+          "bodySha256": "755ee2e042484a6f7818581301a61d104038a48ea4266759f166cf4a92217c78",
+          "headers": {
+            "age": "3417",
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-encoding": "gzip",
+            "content-type": "text/html; charset=utf-8",
+            "etag": "W/\"n1lgo3ntc11ud2d\"",
+            "server": "Vercel",
+            "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+            "x-nextjs-prerender": "1",
+            "x-vercel-cache": "HIT",
+            "x-vercel-id": "bom1::iad1::nx4pm-1790781388723-273a025c24bb"
+          }
+        }
+      ],
+      "median": {
+        "ttfbMs": 317.89099999999996,
+        "totalMs": 425.53999999999996,
+        "transferredBytes": 278262
+      }
+    },
+    {
+      "name": "Docs markdown",
+      "path": "/docs/recharts/bar-chart/static.md",
+      "method": "GET",
+      "samples": [
+        {
+          "timestamp": "2026-09-30T15:16:29.556Z",
+          "status": 200,
+          "ttfbMs": 598.503,
+          "totalMs": 601.895,
+          "dnsMs": 4.337,
+          "tlsReadyMs": 148.763,
+          "transferredBytes": 21922,
+          "decodedBytes": 97263,
+          "bodySha256": "3054470aa5f22bf55932c05cdaa3c0a4d5f2f5675be76fa4eaafaf0b7faaaa89",
+          "headers": {
+            "age": "67241",
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-encoding": "gzip",
+            "content-type": "text/markdown; charset=utf-8",
+            "etag": "W/\"c36a57ead0a00bef79d5ea3d45979f1b\"",
+            "server": "Vercel",
+            "vary": "Accept",
+            "x-vercel-cache": "HIT",
+            "x-vercel-id": "bom1::dx9nt-1790781389136-91beb74f1033"
+          }
+        },
+        {
+          "timestamp": "2026-09-30T15:16:29.829Z",
+          "status": 200,
+          "ttfbMs": 250.42399999999998,
+          "totalMs": 253.019,
+          "dnsMs": 3.241,
+          "tlsReadyMs": 147.597,
+          "transferredBytes": 21922,
+          "decodedBytes": 97263,
+          "bodySha256": "3054470aa5f22bf55932c05cdaa3c0a4d5f2f5675be76fa4eaafaf0b7faaaa89",
+          "headers": {
+            "age": "67241",
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-encoding": "gzip",
+            "content-type": "text/markdown; charset=utf-8",
+            "etag": "W/\"c36a57ead0a00bef79d5ea3d45979f1b\"",
+            "server": "Vercel",
+            "vary": "Accept",
+            "x-vercel-cache": "HIT",
+            "x-vercel-id": "bom1::7w9pr-1790781389758-818c9b543e7f"
+          }
+        },
+        {
+          "timestamp": "2026-09-30T15:16:30.132Z",
+          "status": 200,
+          "ttfbMs": 280.639,
+          "totalMs": 283.10600000000005,
+          "dnsMs": 3.18,
+          "tlsReadyMs": 163.506,
+          "transferredBytes": 21922,
+          "decodedBytes": 97263,
+          "bodySha256": "3054470aa5f22bf55932c05cdaa3c0a4d5f2f5675be76fa4eaafaf0b7faaaa89",
+          "headers": {
+            "age": "67242",
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-encoding": "gzip",
+            "content-type": "text/markdown; charset=utf-8",
+            "etag": "W/\"c36a57ead0a00bef79d5ea3d45979f1b\"",
+            "server": "Vercel",
+            "vary": "Accept",
+            "x-vercel-cache": "HIT",
+            "x-vercel-id": "bom1::kndt6-1790781390050-12e36d220d6b"
+          }
+        },
+        {
+          "timestamp": "2026-09-30T15:16:30.448Z",
+          "status": 200,
+          "ttfbMs": 293.73,
+          "totalMs": 296.334,
+          "dnsMs": 3.327,
+          "tlsReadyMs": 180.013,
+          "transferredBytes": 21922,
+          "decodedBytes": 97263,
+          "bodySha256": "3054470aa5f22bf55932c05cdaa3c0a4d5f2f5675be76fa4eaafaf0b7faaaa89",
+          "headers": {
+            "age": "67242",
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-encoding": "gzip",
+            "content-type": "text/markdown; charset=utf-8",
+            "etag": "W/\"c36a57ead0a00bef79d5ea3d45979f1b\"",
+            "server": "Vercel",
+            "vary": "Accept",
+            "x-vercel-cache": "HIT",
+            "x-vercel-id": "bom1::2sjwh-1790781390366-8238e2b49fce"
+          }
+        },
+        {
+          "timestamp": "2026-09-30T15:16:30.731Z",
+          "status": 200,
+          "ttfbMs": 264.409,
+          "totalMs": 265.52500000000003,
+          "dnsMs": 3.469,
+          "tlsReadyMs": 154.611,
+          "transferredBytes": 21922,
+          "decodedBytes": 97263,
+          "bodySha256": "3054470aa5f22bf55932c05cdaa3c0a4d5f2f5675be76fa4eaafaf0b7faaaa89",
+          "headers": {
+            "age": "67242",
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-encoding": "gzip",
+            "content-type": "text/markdown; charset=utf-8",
+            "etag": "W/\"c36a57ead0a00bef79d5ea3d45979f1b\"",
+            "server": "Vercel",
+            "vary": "Accept",
+            "x-vercel-cache": "HIT",
+            "x-vercel-id": "bom1::xlcrg-1790781390666-d97a8dcd4b25"
+          }
+        }
+      ],
+      "median": {
+        "ttfbMs": 280.639,
+        "totalMs": 283.10600000000005,
+        "transferredBytes": 21922
+      }
+    },
+    {
+      "name": "Negotiated docs markdown",
+      "path": "/docs/recharts/bar-chart/static",
+      "method": "GET",
+      "accept": "text/markdown",
+      "samples": [
+        {
+          "timestamp": "2026-09-30T15:16:30.999Z",
+          "status": 200,
+          "ttfbMs": 250.68,
+          "totalMs": 252.743,
+          "dnsMs": 1.805,
+          "tlsReadyMs": 142.787,
+          "transferredBytes": 21922,
+          "decodedBytes": 97263,
+          "bodySha256": "3054470aa5f22bf55932c05cdaa3c0a4d5f2f5675be76fa4eaafaf0b7faaaa89",
+          "headers": {
+            "age": "67243",
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-encoding": "gzip",
+            "content-type": "text/markdown; charset=utf-8",
+            "etag": "W/\"c36a57ead0a00bef79d5ea3d45979f1b\"",
+            "server": "Vercel",
+            "vary": "Accept",
+            "x-vercel-cache": "HIT",
+            "x-vercel-id": "bom1::v6djx-1790781390925-3068f472ae90"
+          }
+        },
+        {
+          "timestamp": "2026-09-30T15:16:31.253Z",
+          "status": 200,
+          "ttfbMs": 236.00799999999998,
+          "totalMs": 237.22299999999998,
+          "dnsMs": 3.922,
+          "tlsReadyMs": 143.591,
+          "transferredBytes": 21922,
+          "decodedBytes": 97263,
+          "bodySha256": "3054470aa5f22bf55932c05cdaa3c0a4d5f2f5675be76fa4eaafaf0b7faaaa89",
+          "headers": {
+            "age": "67243",
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-encoding": "gzip",
+            "content-type": "text/markdown; charset=utf-8",
+            "etag": "W/\"c36a57ead0a00bef79d5ea3d45979f1b\"",
+            "server": "Vercel",
+            "vary": "Accept",
+            "x-vercel-cache": "HIT",
+            "x-vercel-id": "bom1::lxrf9-1790781391195-aaa55cb8a9bb"
+          }
+        },
+        {
+          "timestamp": "2026-09-30T15:16:31.509Z",
+          "status": 200,
+          "ttfbMs": 237.404,
+          "totalMs": 239.643,
+          "dnsMs": 2.864,
+          "tlsReadyMs": 146.131,
+          "transferredBytes": 21922,
+          "decodedBytes": 97263,
+          "bodySha256": "3054470aa5f22bf55932c05cdaa3c0a4d5f2f5675be76fa4eaafaf0b7faaaa89",
+          "headers": {
+            "age": "67243",
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-encoding": "gzip",
+            "content-type": "text/markdown; charset=utf-8",
+            "etag": "W/\"c36a57ead0a00bef79d5ea3d45979f1b\"",
+            "server": "Vercel",
+            "vary": "Accept",
+            "x-vercel-cache": "HIT",
+            "x-vercel-id": "bom1::cqwpg-1790781391449-042ba2379000"
+          }
+        },
+        {
+          "timestamp": "2026-09-30T15:16:34.750Z",
+          "status": 200,
+          "ttfbMs": 3221.039,
+          "totalMs": 3222.8819999999996,
+          "dnsMs": 3.2560000000000002,
+          "tlsReadyMs": 160.09,
+          "transferredBytes": 21922,
+          "decodedBytes": 97263,
+          "bodySha256": "3054470aa5f22bf55932c05cdaa3c0a4d5f2f5675be76fa4eaafaf0b7faaaa89",
+          "headers": {
+            "age": "67246",
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-encoding": "gzip",
+            "content-type": "text/markdown; charset=utf-8",
+            "etag": "W/\"c36a57ead0a00bef79d5ea3d45979f1b\"",
+            "server": "Vercel",
+            "vary": "Accept",
+            "x-vercel-cache": "HIT",
+            "x-vercel-id": "bom1::qhsmf-1790781394672-8d27c765cfbc"
+          }
+        },
+        {
+          "timestamp": "2026-09-30T15:16:34.928Z",
+          "status": 200,
+          "ttfbMs": 156.57,
+          "totalMs": 158.733,
+          "dnsMs": 3.351,
+          "tlsReadyMs": 92.61999999999999,
+          "transferredBytes": 21922,
+          "decodedBytes": 97263,
+          "bodySha256": "3054470aa5f22bf55932c05cdaa3c0a4d5f2f5675be76fa4eaafaf0b7faaaa89",
+          "headers": {
+            "age": "67247",
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-encoding": "gzip",
+            "content-type": "text/markdown; charset=utf-8",
+            "etag": "W/\"c36a57ead0a00bef79d5ea3d45979f1b\"",
+            "server": "Vercel",
+            "vary": "Accept",
+            "x-vercel-cache": "HIT",
+            "x-vercel-id": "bom1::xlcrg-1790781394883-2a77958e0301"
+          }
+        }
+      ],
+      "median": {
+        "ttfbMs": 237.404,
+        "totalMs": 239.643,
+        "transferredBytes": 21922
+      }
+    },
+    {
+      "name": "Documentation index",
+      "path": "/llms.txt",
+      "method": "GET",
+      "samples": [
+        {
+          "timestamp": "2026-09-30T15:16:35.184Z",
+          "status": 200,
+          "ttfbMs": 233.074,
+          "totalMs": 233.879,
+          "dnsMs": 10.343,
+          "tlsReadyMs": 156.308,
+          "transferredBytes": 958,
+          "decodedBytes": 2870,
+          "bodySha256": "959cf848172a7c6d6b81c2edd246565e778309addfc079a41ee77881d66f9679",
+          "headers": {
+            "age": "79407",
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-encoding": "gzip",
+            "content-type": "text/markdown; charset=utf-8",
+            "etag": "W/\"1644cffff4f9cec10d24ccfc03087b77\"",
+            "server": "Vercel",
+            "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+            "x-vercel-cache": "HIT",
+            "x-vercel-id": "bom1::z8ksd-1790781395141-e242b06352d3"
+          }
+        },
+        {
+          "timestamp": "2026-09-30T15:16:35.467Z",
+          "status": 200,
+          "ttfbMs": 263.59700000000004,
+          "totalMs": 264.789,
+          "dnsMs": 3.2030000000000003,
+          "tlsReadyMs": 155.92600000000002,
+          "transferredBytes": 958,
+          "decodedBytes": 2870,
+          "bodySha256": "959cf848172a7c6d6b81c2edd246565e778309addfc079a41ee77881d66f9679",
+          "headers": {
+            "age": "79407",
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-encoding": "gzip",
+            "content-type": "text/markdown; charset=utf-8",
+            "etag": "W/\"1644cffff4f9cec10d24ccfc03087b77\"",
+            "server": "Vercel",
+            "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+            "x-vercel-cache": "HIT",
+            "x-vercel-id": "bom1::v2ljx-1790781395392-f807120004b5"
+          }
+        },
+        {
+          "timestamp": "2026-09-30T15:16:35.730Z",
+          "status": 200,
+          "ttfbMs": 243.17600000000002,
+          "totalMs": 243.675,
+          "dnsMs": 3.487,
+          "tlsReadyMs": 152.301,
+          "transferredBytes": 958,
+          "decodedBytes": 2870,
+          "bodySha256": "959cf848172a7c6d6b81c2edd246565e778309addfc079a41ee77881d66f9679",
+          "headers": {
+            "age": "79408",
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-encoding": "gzip",
+            "content-type": "text/markdown; charset=utf-8",
+            "etag": "W/\"1644cffff4f9cec10d24ccfc03087b77\"",
+            "server": "Vercel",
+            "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+            "x-vercel-cache": "HIT",
+            "x-vercel-id": "bom1::q8dnb-1790781395681-befd8b0fd268"
+          }
+        },
+        {
+          "timestamp": "2026-09-30T15:16:36.011Z",
+          "status": 200,
+          "ttfbMs": 261.669,
+          "totalMs": 262.635,
+          "dnsMs": 2.659,
+          "tlsReadyMs": 147.96699999999998,
+          "transferredBytes": 958,
+          "decodedBytes": 2870,
+          "bodySha256": "959cf848172a7c6d6b81c2edd246565e778309addfc079a41ee77881d66f9679",
+          "headers": {
+            "age": "79408",
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-encoding": "gzip",
+            "content-type": "text/markdown; charset=utf-8",
+            "etag": "W/\"1644cffff4f9cec10d24ccfc03087b77\"",
+            "server": "Vercel",
+            "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+            "x-vercel-cache": "HIT",
+            "x-vercel-id": "bom1::dx9nt-1790781395930-5e89e490fb48"
+          }
+        },
+        {
+          "timestamp": "2026-09-30T15:16:36.258Z",
+          "status": 200,
+          "ttfbMs": 225.998,
+          "totalMs": 227.19400000000002,
+          "dnsMs": 2.941,
+          "tlsReadyMs": 151.647,
+          "transferredBytes": 958,
+          "decodedBytes": 2870,
+          "bodySha256": "959cf848172a7c6d6b81c2edd246565e778309addfc079a41ee77881d66f9679",
+          "headers": {
+            "age": "79408",
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-encoding": "gzip",
+            "content-type": "text/markdown; charset=utf-8",
+            "etag": "W/\"1644cffff4f9cec10d24ccfc03087b77\"",
+            "server": "Vercel",
+            "vary": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+            "x-vercel-cache": "HIT",
+            "x-vercel-id": "bom1::4pp85-1790781396216-632c278c1215"
+          }
+        }
+      ],
+      "median": {
+        "ttfbMs": 243.17600000000002,
+        "totalMs": 243.675,
+        "transferredBytes": 958
+      }
+    },
+    {
+      "name": "Registry download",
+      "path": "/r/recharts-bar-chart.json",
+      "method": "GET",
+      "samples": [
+        {
+          "timestamp": "2026-09-30T15:16:36.811Z",
+          "status": 200,
+          "ttfbMs": 531.0070000000001,
+          "totalMs": 532.076,
+          "dnsMs": 2.553,
+          "tlsReadyMs": 148.478,
+          "transferredBytes": 11413,
+          "decodedBytes": 46794,
+          "bodySha256": "1cab6e3c55d9c84e2112138695c1cd7532b37dfadf970e6186633362481b370d",
+          "headers": {
+            "age": "0",
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-encoding": "gzip",
+            "content-type": "application/json; charset=utf-8",
+            "etag": "W/\"03e84ccd0c37881cac4a9ccf483ebf4b\"",
+            "server": "Vercel",
+            "x-vercel-cache": "MISS",
+            "x-vercel-id": "bom1::4hw4d-1790781396461-f2050b33a48c"
+          }
+        },
+        {
+          "timestamp": "2026-09-30T15:16:37.142Z",
+          "status": 200,
+          "ttfbMs": 308.265,
+          "totalMs": 311.176,
+          "dnsMs": 3.2880000000000003,
+          "tlsReadyMs": 142.537,
+          "transferredBytes": 11413,
+          "decodedBytes": 46794,
+          "bodySha256": "1cab6e3c55d9c84e2112138695c1cd7532b37dfadf970e6186633362481b370d",
+          "headers": {
+            "age": "0",
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-encoding": "gzip",
+            "content-type": "application/json; charset=utf-8",
+            "etag": "W/\"03e84ccd0c37881cac4a9ccf483ebf4b\"",
+            "server": "Vercel",
+            "x-vercel-cache": "HIT",
+            "x-vercel-id": "bom1::9rvzk-1790781397009-2de44d407764"
+          }
+        },
+        {
+          "timestamp": "2026-09-30T15:16:37.411Z",
+          "status": 200,
+          "ttfbMs": 244.648,
+          "totalMs": 247.399,
+          "dnsMs": 3.387,
+          "tlsReadyMs": 145.62800000000001,
+          "transferredBytes": 11413,
+          "decodedBytes": 46794,
+          "bodySha256": "1cab6e3c55d9c84e2112138695c1cd7532b37dfadf970e6186633362481b370d",
+          "headers": {
+            "age": "0",
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-encoding": "gzip",
+            "content-type": "application/json; charset=utf-8",
+            "etag": "W/\"03e84ccd0c37881cac4a9ccf483ebf4b\"",
+            "server": "Vercel",
+            "x-vercel-cache": "HIT",
+            "x-vercel-id": "bom1::qhsmf-1790781397342-41f7d280e774"
+          }
+        },
+        {
+          "timestamp": "2026-09-30T15:16:37.678Z",
+          "status": 200,
+          "ttfbMs": 244.768,
+          "totalMs": 246.537,
+          "dnsMs": 3.444,
+          "tlsReadyMs": 147.677,
+          "transferredBytes": 11413,
+          "decodedBytes": 46794,
+          "bodySha256": "1cab6e3c55d9c84e2112138695c1cd7532b37dfadf970e6186633362481b370d",
+          "headers": {
+            "age": "0",
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-encoding": "gzip",
+            "content-type": "application/json; charset=utf-8",
+            "etag": "W/\"03e84ccd0c37881cac4a9ccf483ebf4b\"",
+            "server": "Vercel",
+            "x-vercel-cache": "HIT",
+            "x-vercel-id": "bom1::nqzvp-1790781397613-46fb43523140"
+          }
+        },
+        {
+          "timestamp": "2026-09-30T15:16:37.949Z",
+          "status": 200,
+          "ttfbMs": 249.225,
+          "totalMs": 251.354,
+          "dnsMs": 3.378,
+          "tlsReadyMs": 150.04500000000002,
+          "transferredBytes": 11413,
+          "decodedBytes": 46794,
+          "bodySha256": "1cab6e3c55d9c84e2112138695c1cd7532b37dfadf970e6186633362481b370d",
+          "headers": {
+            "age": "1",
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-encoding": "gzip",
+            "content-type": "application/json; charset=utf-8",
+            "etag": "W/\"03e84ccd0c37881cac4a9ccf483ebf4b\"",
+            "server": "Vercel",
+            "x-vercel-cache": "HIT",
+            "x-vercel-id": "bom1::5xqzb-1790781397881-ecd1c0392c89"
+          }
+        }
+      ],
+      "median": {
+        "ttfbMs": 249.225,
+        "totalMs": 251.354,
+        "transferredBytes": 11413
+      }
+    },
+    {
+      "name": "MCP initialize",
+      "path": "/mcp",
+      "method": "POST",
+      "samples": [
+        {
+          "timestamp": "2026-09-30T15:16:38.399Z",
+          "status": 200,
+          "ttfbMs": 429.06,
+          "totalMs": 430.30899999999997,
+          "dnsMs": 2.686,
+          "tlsReadyMs": 141.437,
+          "transferredBytes": 152,
+          "decodedBytes": 152,
+          "bodySha256": "51c17ebe299c4067d0e8d1eaf179414d2c28d3389e29f1c3fcee37945f8d9a11",
+          "headers": {
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-encoding": "gzip",
+            "content-type": "application/json",
+            "server": "Vercel",
+            "x-vercel-cache": "MISS",
+            "x-vercel-id": "bom1::iad1::pvt77-1790781398145-436df085d020"
+          }
+        },
+        {
+          "timestamp": "2026-09-30T15:16:38.856Z",
+          "status": 200,
+          "ttfbMs": 436.042,
+          "totalMs": 436.769,
+          "dnsMs": 3.3649999999999998,
+          "tlsReadyMs": 148.60899999999998,
+          "transferredBytes": 152,
+          "decodedBytes": 152,
+          "bodySha256": "51c17ebe299c4067d0e8d1eaf179414d2c28d3389e29f1c3fcee37945f8d9a11",
+          "headers": {
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-encoding": "gzip",
+            "content-type": "application/json",
+            "server": "Vercel",
+            "x-vercel-cache": "MISS",
+            "x-vercel-id": "bom1::iad1::qcj7m-1790781398600-fe23a7879f75"
+          }
+        },
+        {
+          "timestamp": "2026-09-30T15:16:39.316Z",
+          "status": 200,
+          "ttfbMs": 440.261,
+          "totalMs": 441.369,
+          "dnsMs": 3.284,
+          "tlsReadyMs": 151.923,
+          "transferredBytes": 152,
+          "decodedBytes": 152,
+          "bodySha256": "51c17ebe299c4067d0e8d1eaf179414d2c28d3389e29f1c3fcee37945f8d9a11",
+          "headers": {
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-encoding": "gzip",
+            "content-type": "application/json",
+            "server": "Vercel",
+            "x-vercel-cache": "MISS",
+            "x-vercel-id": "bom1::iad1::kn78r-1790781399061-7227cde1bf7b"
+          }
+        },
+        {
+          "timestamp": "2026-09-30T15:16:39.771Z",
+          "status": 200,
+          "ttfbMs": 436.958,
+          "totalMs": 437.82,
+          "dnsMs": 3.444,
+          "tlsReadyMs": 146.457,
+          "transferredBytes": 152,
+          "decodedBytes": 152,
+          "bodySha256": "51c17ebe299c4067d0e8d1eaf179414d2c28d3389e29f1c3fcee37945f8d9a11",
+          "headers": {
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-encoding": "gzip",
+            "content-type": "application/json",
+            "server": "Vercel",
+            "x-vercel-cache": "MISS",
+            "x-vercel-id": "bom1::iad1::8vnd8-1790781399515-f220a2e628b4"
+          }
+        },
+        {
+          "timestamp": "2026-09-30T15:16:40.215Z",
+          "status": 200,
+          "ttfbMs": 422.761,
+          "totalMs": 424.008,
+          "dnsMs": 3.285,
+          "tlsReadyMs": 145.081,
+          "transferredBytes": 152,
+          "decodedBytes": 152,
+          "bodySha256": "51c17ebe299c4067d0e8d1eaf179414d2c28d3389e29f1c3fcee37945f8d9a11",
+          "headers": {
+            "cache-control": "public, max-age=0, must-revalidate",
+            "content-encoding": "gzip",
+            "content-type": "application/json",
+            "server": "Vercel",
+            "x-vercel-cache": "MISS",
+            "x-vercel-id": "bom1::iad1::nmj2c-1790781399973-06767e10914e"
+          }
+        }
+      ],
+      "median": {
+        "ttfbMs": 436.042,
+        "totalMs": 436.769,
+        "transferredBytes": 152
+      }
+    }
+  ],
+  "summary": [
+    {
+      "page": "home",
+      "title": "Homepage",
+      "profile": "mobile",
+      "samples": 3,
+      "median": {
+        "score": 79,
+        "fcpMs": 1126.605,
+        "lcpMs": 4274.692,
+        "tbtMs": 348,
+        "cls": 0,
+        "speedIndexMs": 2772.320473126182,
+        "transferBytes": 1170886,
+        "javascriptBytes": 959686,
+        "requests": 59,
+        "mainThreadMs": 4174.927999999395,
+        "javascriptMs": 3155.527999999893,
+        "unusedJavascriptBytes": 356652
+      },
+      "range": {
+        "score": [
+          64,
+          90
+        ],
+        "fcpMs": [
+          1124.692,
+          1135.9479999999999
+        ],
+        "lcpMs": [
+          2185.948,
+          5087.605
+        ],
+        "tbtMs": [
+          303.5,
+          633
+        ],
+        "cls": [
+          0,
+          0
+        ],
+        "speedIndexMs": [
+          2557.6458153896097,
+          3232.725042494674
+        ],
+        "transferBytes": [
+          1170829,
+          1170902
+        ],
+        "javascriptBytes": [
+          959644,
+          959736
+        ],
+        "requests": [
+          59,
+          59
+        ],
+        "mainThreadMs": [
+          3015.5679999998933,
+          4295.323999999251
+        ],
+        "javascriptMs": [
+          2081.151999999959,
+          3229.7999999997255
+        ],
+        "unusedJavascriptBytes": [
+          356652,
+          356652
+        ]
+      }
+    },
+    {
+      "page": "home",
+      "title": "Homepage",
+      "profile": "desktop",
+      "samples": 3,
+      "median": {
+        "score": 100,
+        "fcpMs": 359.481,
+        "lcpMs": 721.3,
+        "tbtMs": 48.5,
+        "cls": 0,
+        "speedIndexMs": 811.3724284160354,
+        "transferBytes": 1170879,
+        "javascriptBytes": 959731,
+        "requests": 59,
+        "mainThreadMs": 1033.7089999998464,
+        "javascriptMs": 716.2209999999702,
+        "unusedJavascriptBytes": 358056
+      },
+      "range": {
+        "score": [
+          99,
+          100
+        ],
+        "fcpMs": [
+          322.05,
+          361.3
+        ],
+        "lcpMs": [
+          639.481,
+          842.05
+        ],
+        "tbtMs": [
+          40,
+          60
+        ],
+        "cls": [
+          0,
+          0
+        ],
+        "speedIndexMs": [
+          704.1445577547797,
+          872.5148120700159
+        ],
+        "transferBytes": [
+          1170748,
+          1170928
+        ],
+        "javascriptBytes": [
+          959695,
+          959736
+        ],
+        "requests": [
+          59,
+          59
+        ],
+        "mainThreadMs": [
+          654.9499999999334,
+          1040.7339999998578
+        ],
+        "javascriptMs": [
+          383.1530000000084,
+          721.4149999999697
+        ],
+        "unusedJavascriptBytes": [
+          356329,
+          358056
+        ]
+      }
+    },
+    {
+      "page": "docs",
+      "title": "Docs introduction",
+      "profile": "mobile",
+      "samples": 3,
+      "median": {
+        "score": 78,
+        "fcpMs": 1325.1055000000001,
+        "lcpMs": 6234.498,
+        "tbtMs": 7,
+        "cls": 0,
+        "speedIndexMs": 1325.1055000000001,
+        "transferBytes": 1076602,
+        "javascriptBytes": 871923,
+        "requests": 46,
+        "mainThreadMs": 645.2639999999982,
+        "javascriptMs": 223.92000000000144,
+        "unusedJavascriptBytes": 467122
+      },
+      "range": {
+        "score": [
+          77,
+          85
+        ],
+        "fcpMs": [
+          1284.498,
+          1333.261
+        ],
+        "lcpMs": [
+          4325.1055,
+          6283.261
+        ],
+        "tbtMs": [
+          2,
+          12
+        ],
+        "cls": [
+          0,
+          0
+        ],
+        "speedIndexMs": [
+          1284.498,
+          1333.261
+        ],
+        "transferBytes": [
+          1076508,
+          1076644
+        ],
+        "javascriptBytes": [
+          871906,
+          871970
+        ],
+        "requests": [
+          46,
+          46
+        ],
+        "mainThreadMs": [
+          620.9839999999986,
+          653.159999999997
+        ],
+        "javascriptMs": [
+          217.56399999999863,
+          230.25200000000132
+        ],
+        "unusedJavascriptBytes": [
+          465939,
+          467122
+        ]
+      }
+    },
+    {
+      "page": "docs",
+      "title": "Docs introduction",
+      "profile": "desktop",
+      "samples": 3,
+      "median": {
+        "score": 98,
+        "fcpMs": 357.871,
+        "lcpMs": 1117.871,
+        "tbtMs": 0,
+        "cls": 0,
+        "speedIndexMs": 381.46341668914954,
+        "transferBytes": 1417854,
+        "javascriptBytes": 871980,
+        "requests": 87,
+        "mainThreadMs": 305.675,
+        "javascriptMs": 58.86800000000001,
+        "unusedJavascriptBytes": 447545
+      },
+      "range": {
+        "score": [
+          98,
+          98
+        ],
+        "fcpMs": [
+          352.756,
+          375.53499999999997
+        ],
+        "lcpMs": [
+          1112.7559999999999,
+          1155.5349999999999
+        ],
+        "tbtMs": [
+          0,
+          0
+        ],
+        "cls": [
+          0,
+          0
+        ],
+        "speedIndexMs": [
+          374.1495916458289,
+          499.9967916940848
+        ],
+        "transferBytes": [
+          1417847,
+          1417928
+        ],
+        "javascriptBytes": [
+          871892,
+          871982
+        ],
+        "requests": [
+          87,
+          87
+        ],
+        "mainThreadMs": [
+          246.67199999999931,
+          380.16600000001466
+        ],
+        "javascriptMs": [
+          0,
+          141.4680000000092
+        ],
+        "unusedJavascriptBytes": [
+          446192,
+          447554
+        ]
+      }
+    },
+    {
+      "page": "recharts-bar",
+      "title": "Recharts bar chart",
+      "profile": "mobile",
+      "samples": 3,
+      "median": {
+        "score": 75,
+        "fcpMs": 1734.146,
+        "lcpMs": 6524.1404999999995,
+        "tbtMs": 126,
+        "cls": 0,
+        "speedIndexMs": 2526.3245994717086,
+        "transferBytes": 1154887,
+        "javascriptBytes": 871966,
+        "requests": 46,
+        "mainThreadMs": 1625.7040000000197,
+        "javascriptMs": 790.5160000000071,
+        "unusedJavascriptBytes": 398944
+      },
+      "range": {
+        "score": [
+          74,
+          75
+        ],
+        "fcpMs": [
+          1724.1405,
+          1736.319
+        ],
+        "lcpMs": [
+          6386.3189999999995,
+          6684.146
+        ],
+        "tbtMs": [
+          125,
+          141
+        ],
+        "cls": [
+          0,
+          0
+        ],
+        "speedIndexMs": [
+          2511.2531106159395,
+          2958.324303556771
+        ],
+        "transferBytes": [
+          1154877,
+          1154935
+        ],
+        "javascriptBytes": [
+          871939,
+          872006
+        ],
+        "requests": [
+          46,
+          46
+        ],
+        "mainThreadMs": [
+          1611.3720000000208,
+          1642.320000000024
+        ],
+        "javascriptMs": [
+          786.0680000000075,
+          799.7200000000081
+        ],
+        "unusedJavascriptBytes": [
+          398662,
+          400127
+        ]
+      }
+    },
+    {
+      "page": "recharts-bar",
+      "title": "Recharts bar chart",
+      "profile": "desktop",
+      "samples": 3,
+      "median": {
+        "score": 97,
+        "fcpMs": 452.788,
+        "lcpMs": 1169.6,
+        "tbtMs": 0,
+        "cls": 0,
+        "speedIndexMs": 747.4314280656436,
+        "transferBytes": 1874404,
+        "javascriptBytes": 871989,
+        "requests": 119,
+        "mainThreadMs": 586.5800000000065,
+        "javascriptMs": 270.240000000003,
+        "unusedJavascriptBytes": 377528
+      },
+      "range": {
+        "score": [
+          95,
+          99
+        ],
+        "fcpMs": [
+          449.6,
+          656.751
+        ],
+        "lcpMs": [
+          972.788,
+          1416.751
+        ],
+        "tbtMs": [
+          0,
+          0
+        ],
+        "cls": [
+          0,
+          0
+        ],
+        "speedIndexMs": [
+          730.9448860520879,
+          869.5661796534424
+        ],
+        "transferBytes": [
+          1874370,
+          1874497
+        ],
+        "javascriptBytes": [
+          871947,
+          872020
+        ],
+        "requests": [
+          119,
+          119
+        ],
+        "mainThreadMs": [
+          571.420000000005,
+          745.3040000000211
+        ],
+        "javascriptMs": [
+          257.81100000000276,
+          380.22900000001226
+        ],
+        "unusedJavascriptBytes": [
+          377528,
+          377902
+        ]
+      }
+    },
+    {
+      "page": "echarts-bar",
+      "title": "ECharts bar chart",
+      "profile": "mobile",
+      "samples": 3,
+      "median": {
+        "score": 74,
+        "fcpMs": 2048.384,
+        "lcpMs": 6986.057,
+        "tbtMs": 56,
+        "cls": 0,
+        "speedIndexMs": 2722.544353298039,
+        "transferBytes": 1229031,
+        "javascriptBytes": 871960,
+        "requests": 46,
+        "mainThreadMs": 1653.9000000000171,
+        "javascriptMs": 974.4600000000042,
+        "unusedJavascriptBytes": 289114
+      },
+      "range": {
+        "score": [
+          74,
+          76
+        ],
+        "fcpMs": [
+          2036.057,
+          2096.3905
+        ],
+        "lcpMs": [
+          6248.384,
+          7046.3904999999995
+        ],
+        "tbtMs": [
+          48,
+          76
+        ],
+        "cls": [
+          0,
+          0
+        ],
+        "speedIndexMs": [
+          2637.803375134268,
+          2760.1999953128443
+        ],
+        "transferBytes": [
+          1228996,
+          1229033
+        ],
+        "javascriptBytes": [
+          871959,
+          871963
+        ],
+        "requests": [
+          46,
+          46
+        ],
+        "mainThreadMs": [
+          1611.988000000018,
+          1721.6240000000232
+        ],
+        "javascriptMs": [
+          938.7320000000045,
+          1034.920000000005
+        ],
+        "unusedJavascriptBytes": [
+          289114,
+          290297
+        ]
+      }
+    },
+    {
+      "page": "echarts-bar",
+      "title": "ECharts bar chart",
+      "profile": "desktop",
+      "samples": 3,
+      "median": {
+        "score": 97,
+        "fcpMs": 506.034,
+        "lcpMs": 1266.034,
+        "tbtMs": 0,
+        "cls": 0,
+        "speedIndexMs": 742.3381609158862,
+        "transferBytes": 1733048,
+        "javascriptBytes": 871947,
+        "requests": 95,
+        "mainThreadMs": 547.8090000000051,
+        "javascriptMs": 266.5300000000006,
+        "unusedJavascriptBytes": 268056
+      },
+      "range": {
+        "score": [
+          97,
+          97
+        ],
+        "fcpMs": [
+          496.382,
+          531.351
+        ],
+        "lcpMs": [
+          1191.351,
+          1276.382
+        ],
+        "tbtMs": [
+          0,
+          0
+        ],
+        "cls": [
+          0,
+          0
+        ],
+        "speedIndexMs": [
+          739.0904875590172,
+          789.6052776682797
+        ],
+        "transferBytes": [
+          1669188,
+          1733071
+        ],
+        "javascriptBytes": [
+          869620,
+          871969
+        ],
+        "requests": [
+          83,
+          95
+        ],
+        "mainThreadMs": [
+          506.5210000000048,
+          559.1830000000034
+        ],
+        "javascriptMs": [
+          252.41500000000167,
+          291.0040000000035
+        ],
+        "unusedJavascriptBytes": [
+          268056,
+          269409
+        ]
+      }
+    }
+  ],
+  "completedAt": "2026-09-30T15:16:40.217Z"
+}
