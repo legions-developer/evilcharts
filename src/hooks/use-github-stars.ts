@@ -5,9 +5,8 @@ export const useGithubStars = async (): Promise<number | null> => {
         Accept: "application/vnd.github+json",
         "X-GitHub-Api-Version": "2022-11-28",
       },
-      next: {
-        revalidate: 3600,
-      },
+      // Static export refreshes this snapshot on each deployment.
+      cache: "no-store",
     });
 
     if (!res.ok) {

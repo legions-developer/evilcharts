@@ -1,0 +1,14 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "evilcharts",
+  "main": "cloudflare/worker.ts",
+  "compatibility_date": "2026-09-30",
+  "assets": {
+    "directory": "./out",
+    "binding": "ASSETS",
+    "html_handling": "drop-trailing-slash",
+    "not_found_handling": "404-page",
+    "run_worker_first": ["/mcp", "/mcp/", "/docs", "/docs/*", "/llm", "/llm/*", "/r/*"],
+  },
+  "observability": { "enabled": true },
+}

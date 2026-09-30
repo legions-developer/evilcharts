@@ -206,7 +206,7 @@ export function processMdxForLLMs(content: string) {
   )
 
   content = content.replace(
-    /<ComponentSource[\s\S]*?\/>/g,
+    /<ComponentSource\b(?:[^"'<>]|"[^"]*"|'[^']*')*\/>/g,
     (match) => {
       const name = getAttribute(match, "name")
       const title = getAttribute(match, "title")
@@ -216,7 +216,7 @@ export function processMdxForLLMs(content: string) {
   )
 
   // Replace <ComponentPreview ... name="xxx" ... /> with actual source code.
-  return content.replace(/<ComponentPreview[\s\S]*?\/>/g, (match) => {
+  return content.replace(/<ComponentPreview\b(?:[^"'<>]|"[^"]*"|'[^']*')*\/>/g, (match) => {
     const name = getAttribute(match, "name")
     const title = getAttribute(match, "title")
 

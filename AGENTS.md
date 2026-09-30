@@ -39,10 +39,13 @@ bunx eslint <files...>      # lint only touched files
 bunx tsc --noEmit           # type-check
 bun run registry:build      # rebuild registry artifacts without cleaning first
 bun run registry:fresh      # remove and rebuild all registry artifacts
-bun run build               # registry:fresh followed by next build
+bun run build               # registry:fresh, Next.js static export, Cloudflare assets
+bun run preview             # serve out/ and the Worker locally with Wrangler
+bun run verify:static       # check the running preview (default localhost:8787)
+bun run deploy              # build and deploy to Cloudflare
 ```
 
-There is currently no automated test suite. For most changes, use scoped ESLint plus TypeScript. Run `registry:fresh` for registry work and a production build for routing, MDX, metadata, or integration changes when practical.
+There is no general automated test suite. `verify:static` checks a running Cloudflare preview or deployment, including docs/markdown, redirects, registry downloads, MCP, and missing routes. For most changes, use scoped ESLint plus TypeScript. Run `registry:fresh` for registry work and a production build for routing, MDX, metadata, or integration changes when practical.
 
 `CONTRIBUTING.md` and older prose may mention obsolete paths or package-manager commands. The scripts in `package.json` and the current source tree are authoritative.
 
@@ -100,7 +103,7 @@ Each provider has `installation.mdx`, `components.mdx`, chart folders, UI pages,
 
 The MDX collection is defined in `source.config.ts`, loaded by `src/lib/source.ts`, and rendered by `src/app/docs/[[...slug]]/page.tsx`. Custom MDX components live in `src/components/docs/mdx`, with preview/source machinery in `src/components/docs/charts`.
 
-`next.config.ts` owns provider redirects, legacy Recharts URLs, and `.md` rewrites. Its chart slug list is explicit. When adding a new chart type or increasing documentation nesting depth, update routing rules as well as content metadata.
+`src/globals/constants/site-redirects.ts` owns provider redirects and legacy Recharts URLs; its chart slug list is explicit. The export script generates Cloudflare `_redirects` from it. `next.config.ts` uses the same rules for local development. When adding a new chart type, update routing rules as well as content metadata.
 
 ### Provider release state
 
@@ -124,13 +127,13 @@ The repository can contain complete, directly navigable ECharts source/docs whil
 Agent-readable delivery is a first-class surface:
 
 - `/llms.txt` and `/llms-full.txt`
-- `/docs/**.md` via rewrites to `src/app/llm/[[...slug]]`
+- `/docs/**.md` generated from static `src/app/llm/[[...slug]]` responses
 - `/mcp` JSON-RPC endpoint with documentation search/read tools
 - `/skill.md` and `/.well-known/{skills,agent-skills}` discovery routes
 
 `src/lib/agent-docs.ts` derives these surfaces from the Fumadocs source and provider availability. `src/lib/llm.ts` converts custom MDX into readable markdown and embeds registry source. When adding a custom MDX component or changing provider publication, verify both the browser docs and markdown/agent output.
 
-Axiom tracking in `src/lib/axiom.ts` is optional and must remain harmless when its environment variables are absent. Never expose or commit `.env*` values.
+The site uses `output: "export"`. Next.js and source-file reads run at build time; `src/scripts/build-static-site.mts` finalizes `out/` with markdown, redirects, and headers. `cloudflare/worker.ts` serves MCP POSTs, markdown negotiation, legacy `/llm` URLs, and optional Axiom tracking using static assets. Worker secrets are `AXIOM_TOKEN` and `AXIOM_DATASET`; absent values must remain harmless. Never expose or commit `.env*` or `.dev.vars*` values. GitHub stars are build-time snapshots. See `docs/cloudflare-deployment.md` for deployment and verification.
 
 ## Common change workflows
 
@@ -141,7 +144,7 @@ Axiom tracking in `src/lib/axiom.ts` is optional and must remain harmless when i
 3. Update the entry in `src/registry/registry-chart.ts`, including direct dependencies, `registryDependencies`, and target path.
 4. Add/update examples in the matching provider directory and their entries in `registry-example.ts`.
 5. Update the provider MDX API docs and preview names.
-6. For a new chart type, update the provider `meta.json` and the explicit chart redirects in `next.config.ts`.
+6. For a new chart type, update the provider `meta.json` and the explicit chart redirects in `src/globals/constants/site-redirects.ts`.
 7. Run scoped lint, TypeScript, and `bun run registry:fresh`.
 
 ### Add an example or block
@@ -180,4 +183,4 @@ Axiom tracking in `src/lib/axiom.ts` is optional and must remain harmless when i
 - Run the smallest meaningful checks, then broader checks in proportion to risk.
 - For visual chart work, verify light/dark themes, responsive sizing, loading/empty states, interaction, and reduced motion.
 - For registry work, confirm manifest names, dependencies, consumer target paths, generated JSON, and MDX preview lookup all agree.
-- Do not commit temporary screenshots, browser artifacts, `.env*`, `.next/`, `.source/`, or `public/r/`.
+- Do not commit temporary screenshots, browser artifacts, `.env*`, `.dev.vars*`, `.next/`, `.source/`, `.wrangler/`, `out/`, or `public/r/`.

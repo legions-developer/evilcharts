@@ -1,15 +1,20 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { notFound } from "next/navigation";
 
-import { source } from "@/lib/source";
 import { processMdxForLLMs } from "@/lib/llm";
+import { source } from "@/lib/source";
 
 export const revalidate = false;
+export const dynamic = "force-static";
+export const dynamicParams = false;
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ slug?: string[] }> }) {
   const [{ slug }] = await Promise.all([params]);
 
-  const page = source.getPage(slug);
+  const segments = [...(slug ?? [])];
+  const last = segments.pop()?.replace(/\.md$/, "");
+  if (last && !(segments.length === 0 && last === "index")) segments.push(last);
+  const page = source.getPage(segments);
 
   if (!page) {
     notFound();
@@ -27,5 +32,11 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ slu
 }
 
 export function generateStaticParams() {
-  return source.generateParams();
+  // Every route ends in .md so the root document can coexist with nested files
+  // in the exported filesystem. The export script places these at /docs/**.md.
+  return source.getPages().map((page) => {
+    const slug = [...page.slugs];
+    const last = slug.pop();
+    return { slug: [...slug, `${last ?? "index"}.md`] };
+  });
 }

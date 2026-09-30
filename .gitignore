@@ -45,3 +45,7 @@ next-env.d.ts
  
 #public
 /public/r
+
+# Cloudflare local state and secrets
+.wrangler/
+.dev.vars*

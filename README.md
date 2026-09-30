@@ -15,6 +15,12 @@ A modern, customizable chart library for React and Next.js applications featurin
 - 🎭 Customizable styles, patterns, and effects
 - 📱 Fully responsive design
 
+## Hosting
+
+The site exports static assets for Cloudflare with a small Worker for MCP and
+markdown requests. See [Cloudflare deployment](docs/cloudflare-deployment.md)
+for build, preview, verification, and deployment instructions.
+
 ## Contributing
 
 We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on:

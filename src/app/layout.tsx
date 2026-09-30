@@ -1,14 +1,8 @@
-import { Analytics as VercelAnalytics } from "@vercel/analytics/next";
+import { SITE_DESCRIPTION, SITE_KEYWORDS, SITE_NAME, SITE_TITLE } from "@/globals/constants/site";
 import { JetBrains_Mono, Geist, Inter } from "next/font/google";
+import { absoluteUrl, cn, SITE_URL } from "@/lib/utils";
 import type { Metadata, Viewport } from "next";
 import { ThemeProvider } from "next-themes";
-import { absoluteUrl, cn, SITE_URL } from "@/lib/utils";
-import {
-  SITE_DESCRIPTION,
-  SITE_KEYWORDS,
-  SITE_NAME,
-  SITE_TITLE,
-} from "@/globals/constants/site";
 import "./globals.css";
 
 const inter = Inter({
@@ -113,10 +107,7 @@ const structuredData = {
         "@type": "ImageObject",
         url: absoluteUrl("/web/logo.svg"),
       },
-      sameAs: [
-        "https://github.com/legions-developer/evilcharts",
-        "https://x.com/legionsdev",
-      ],
+      sameAs: ["https://github.com/legions-developer/evilcharts", "https://x.com/legionsdev"],
     },
     {
       "@type": "SoftwareApplication",
@@ -170,7 +161,6 @@ export default function RootLayout({
           }}
         />
         <ThemeProvider defaultTheme="system" attribute="class">
-          <VercelAnalytics />
           {children}
         </ThemeProvider>
       </body>

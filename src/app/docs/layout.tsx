@@ -28,4 +28,4 @@ export default function DocsLayout({ children }: { children: React.ReactNode }) 
 }
 
 export const dynamic = "force-static";
-export const revalidate = 86400; // 1 day – we need to rebuild the page so that it refreshes the GitHub stars daily
+export const revalidate = false;

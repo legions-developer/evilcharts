@@ -12,16 +12,16 @@ export const metadata: Metadata = {
   description: SITE_DESCRIPTION,
 };
 
-// ISR: the page is served from cache and re-rendered (with a fresh star
-// count) at most once an hour.
-export const revalidate = 3600;
+// The star count is a snapshot refreshed on each deployment.
+export const dynamic = "force-static";
+export const revalidate = false;
 
 const GITHUB_URL = "https://github.com/legions-developer/evilcharts";
 
 async function getGithubStars(): Promise<number | null> {
   try {
     const res = await fetch("https://api.github.com/repos/legions-developer/evilcharts", {
-      next: { revalidate: 3600 },
+      cache: "no-store",
       headers: { Accept: "application/vnd.github+json" },
     });
     if (!res.ok) return null;

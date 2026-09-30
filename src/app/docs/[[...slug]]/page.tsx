@@ -2,16 +2,18 @@ import { DocsTableOfContents } from "@/components/docs/mdx/components/table-of-c
 import { FeedbackButtons } from "@/components/docs/mdx/components/feedback-buttons";
 import { MDXNavigation } from "@/components/docs/mdx/components/navigation";
 import { DocsCopyPage } from "@/components/docs/layout/docs-copy-button";
+import { PROVIDER_META, PROVIDERS } from "@/globals/constants/providers";
 import { AxiomCard } from "@/components/docs/layout/axiom-card";
 import { findNeighbour } from "fumadocs-core/page-tree";
 import { mdxComponents } from "@/components/docs/mdx";
-import { PROVIDER_META, PROVIDERS } from "@/globals/constants/providers";
+import { absoluteUrl, SITE_URL } from "@/lib/utils";
 import { processMdxForLLMs } from "@/lib/llm";
 import { notFound } from "next/navigation";
-import { absoluteUrl, SITE_URL } from "@/lib/utils";
 import { LinkIcon } from "lucide-react";
 import { source } from "@/lib/source";
 import type { Metadata } from "next";
+
+export const dynamicParams = false;
 
 export function generateStaticParams() {
   return source.generateParams();
@@ -151,8 +153,8 @@ export default async function Page(props: { params: Promise<{ slug: string[] }> 
             <blockquote className="sr-only">
               <h2>Documentation Index</h2>
               <p>
-                Fetch the complete documentation index at: <a href="/llms.txt">/llms.txt</a>.
-                Use this file to discover all available pages before exploring further.
+                Fetch the complete documentation index at: <a href="/llms.txt">/llms.txt</a>. Use
+                this file to discover all available pages before exploring further.
               </p>
             </blockquote>
             {doc.description && (
