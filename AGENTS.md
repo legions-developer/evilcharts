@@ -125,7 +125,6 @@ Agent-readable delivery is a first-class surface:
 
 - `/llms.txt` and `/llms-full.txt`
 - `/docs/**.md` via rewrites to `src/app/llm/[[...slug]]`
-- `/mcp` JSON-RPC endpoint with documentation search/read tools
 - `/skill.md` and `/.well-known/{skills,agent-skills}` discovery routes
 
 `src/lib/agent-docs.ts` derives these surfaces from the Fumadocs source and provider availability. `src/lib/llm.ts` converts custom MDX into readable markdown and embeds registry source. When adding a custom MDX component or changing provider publication, verify both the browser docs and markdown/agent output.

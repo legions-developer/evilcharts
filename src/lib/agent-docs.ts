@@ -32,7 +32,7 @@ function isProviderPage(url: string, provider: Provider) {
 
 // Derived rather than enumerated: an added chart or provider shows up on its own.
 // The old hardcoded path lists failed silently — a missed entry dropped the page from
-// llms.txt and MCP with nothing to notice it.
+// llms.txt with nothing to notice it.
 function providerPages(pages: Page[], provider: Provider) {
   const prefix = `/docs/${provider}/`;
   const inProvider = pages.filter((page) => isProviderPage(page.url, provider));
@@ -73,8 +73,8 @@ function renderLinks(pages: ReturnType<typeof source.getPages>) {
 
 /**
  * Pages exposed to agents: everything shared, plus every shippable provider's docs.
- * Placeholder providers are filtered out here, so llms-full.txt and the MCP server
- * inherit the same guarantee without repeating the rule.
+ * Placeholder providers are filtered out here, so llms.txt and llms-full.txt inherit
+ * the same guarantee without repeating the rule.
  */
 export function getAgentDocPages() {
   return source.getPages().filter((page) => {
@@ -118,7 +118,6 @@ ${providerSections}
 ## Agent Resources
 - [Full documentation snapshot](${absoluteUrl("/llms-full.txt")})
 - [Agent skill](${absoluteUrl("/skill.md")})
-- [MCP server](${absoluteUrl("/mcp")})
 `;
 }
 
