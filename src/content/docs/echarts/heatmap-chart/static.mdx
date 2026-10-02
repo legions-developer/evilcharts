@@ -1,0 +1,336 @@
+---
+title: Heatmap Chart
+description: A GitHub-style calendar heatmap — one cell per day, colored by intensity — powered by Apache ECharts
+image: /og/heatmap-chart.png
+links:
+  github: https://github.com/legions-developer/evilcharts/blob/main/src/registry/charts/echarts-heatmap-chart.tsx
+  doc: https://echarts.apache.org/en/index.html
+  api: https://echarts.apache.org/en/option.html#calendar
+---
+
+<ComponentPreview title="Basic Chart" name="ex-echarts-heatmap-chart"  />
+
+## Installation
+
+<CodeTabs>
+  <TabsList variant="underline">
+    <TabsTab value="cli">CLI</TabsTab>
+    <TabsTab value="manual">Manual</TabsTab>
+  </TabsList>
+  <TabsPanel value="cli">
+    <CliBlock commands={["@evilcharts/echarts-heatmap-chart"]} />
+  </TabsPanel>
+  <TabsPanel value="manual">
+    <Steps>
+      <Step>
+        <StepTitle>Install the following dependencies:</StepTitle>
+        <StepContent>
+          <CommandBlock commands={["echarts", "motion"]} />
+        </StepContent>
+      </Step>
+      <Step>
+        <StepTitle>Copy and paste the following code snippets into your project.</StepTitle>
+        <StepDescription>
+          First create the folder `evilcharts` and a subfolder `charts` in your `components` directory, then paste the heatmap-chart code into a new `echarts-heatmap-chart.tsx` file there.
+        </StepDescription>
+        <StepContent>
+          <ComponentSource
+            name="echarts-heatmap-chart"
+            title="components/evilcharts/charts/echarts-heatmap-chart.tsx"
+          />
+        </StepContent>
+      </Step>
+      <Step>
+        <StepTitle>Add the shared chart module.</StepTitle>
+        <StepDescription>
+          Create a `ui` folder inside `evilcharts` and paste this one in first — it resolves your config's colors from the page's CSS variables, and every sub-component below imports from it.
+        </StepDescription>
+        <StepContent>
+          <ComponentSource
+            name="echarts-chart"
+            title="components/evilcharts/ui/echarts-chart.tsx"
+          />
+        </StepContent>
+      </Step>
+      <Step>
+        <StepTitle>Add the sub-component.</StepTitle>
+        <StepDescription>
+          Create `echarts-tooltip.tsx` in the same `ui` folder and paste the tooltip surface and its variants there.
+        </StepDescription>
+        <StepContent>
+          <ComponentSource
+            name="echarts-tooltip"
+            title="components/evilcharts/ui/echarts-tooltip.tsx"
+          />
+        </StepContent>
+      </Step>
+    </Steps>
+  </TabsPanel>
+</CodeTabs>
+
+## Usage
+
+The heatmap is the GitHub contribution graph shape: a calendar year laid out as week columns, one square per day, with color intensity standing in for the value. `<EChartsHeatmapChart>` is the container, and every part hangs off it as a compound member — `<EChartsHeatmapChart.Cell>`, `<EChartsHeatmapChart.MonthLabel>`, `<EChartsHeatmapChart.DayLabel>`, `<EChartsHeatmapChart.Tooltip>`, and `<EChartsHeatmapChart.Legend>` — so a single import gives you the whole chart. The cells are intrinsic to the data, so `<Cell>` always renders and just configures the grid; the labels, tooltip, and legend follow presence semantics — omit one and it does not render.
+
+```tsx
+import { EChartsHeatmapChart, type ChartConfig, type HeatmapDatum } from "@/components/evilcharts/charts/echarts-heatmap-chart";
+```
+
+```tsx
+// One entry per day that has a value. Days you leave out render as empty cells.
+const data: HeatmapDatum[] = [
+  { date: "2025-01-06", value: 3 },
+  { date: "2025-01-07", value: 11 },
+  { date: "2025-01-09", value: 1 },
+  // ...
+];
+
+// The color array IS the intensity ramp — lightest first, strongest last.
+const chartConfig = {
+  contributions: {
+    label: "Contributions",
+    colors: {
+      light: ["#9be9a8", "#40c463", "#30a14e", "#216e39"],
+      dark: ["#0e4429", "#006d32", "#26a641", "#39d353"],
+    },
+  },
+} satisfies ChartConfig;
+
+<EChartsHeatmapChart data={data} config={chartConfig}>
+  <EChartsHeatmapChart.Cell dataKey="contributions" />
+  <EChartsHeatmapChart.MonthLabel />
+  <EChartsHeatmapChart.DayLabel />
+  <EChartsHeatmapChart.Tooltip />
+  <EChartsHeatmapChart.Legend />
+</EChartsHeatmapChart>
+```
+
+Under the hood these compound children are declarative configuration slots rather than visual React DOM nodes. The root reads their props and compiles an ECharts option — a `calendar` coordinate system for the date math, and a custom series for the cells so they can carry a gap, rounded corners, and a per-day color — which ECharts paints with Canvas by default or SVG when `renderer="svg"`.
+
+`config` is the same contract as every EvilCharts chart — a key maps to a `label` and a per-theme `colors` array. See <Link href="/docs/chart-config">Chart Config</Link> for the full shape. Here the array does double duty: its length is the number of intensity levels, and each entry is that level's color. Colors resolve from CSS variables at runtime, so dark mode just works.
+
+<Alert>
+  <AlertContent>
+    With no `range`, the chart shows the trailing year ending on the latest date in `data`, so a
+    feed of recent activity lays out the way GitHub does without any date math on your side.
+  </AlertContent>
+</Alert>
+
+### SVG Renderer
+
+Pass `renderer="svg"` to the chart root to opt into ECharts' SVG renderer. Omit it to use the default Canvas renderer.
+
+<ComponentPreview title='renderer="svg"' name="ex-svg-renderer-echarts-heatmap-chart" />
+
+### Interactive Selection
+
+Set `isClickable` on `<Cell>` to make days selectable. The selected day keeps full strength and wears a ring while the rest soften. Handle selection events with the root's `onSelectionChange` callback:
+
+<ComponentPreview className="mb-0" title="isClickable" name="ex-clickable-echarts-heatmap-chart" />
+
+```tsx
+<EChartsHeatmapChart
+  data={data}
+  config={chartConfig}
+  onSelectionChange={(selection) => {
+    if (selection) {
+      console.log("Selected:", selection.date, "Value:", selection.value);
+    } else {
+      console.log("Deselected");
+    }
+  }}
+>
+  <EChartsHeatmapChart.Cell dataKey="contributions" isClickable />
+  <EChartsHeatmapChart.Tooltip />
+</EChartsHeatmapChart>
+```
+
+### Loading State
+
+<ComponentPreview className="mb-0" title="isLoading='true'" name="ex-loading-state-echarts-heatmap-chart"  />
+<Alert>
+  <AlertContent>
+    Pass `isLoading` to `<EChartsHeatmapChart>` to show an animated gray skeleton of the grid
+    while data loads. The intro sweep replays once the data lands.
+  </AlertContent>
+</Alert>
+
+## Examples
+
+Examples of the heatmap in different configurations. Customize the root `range`, `weekStart`, and `scale`, the `<Cell>` `radius` and `gap`, and more.
+
+### Calendar Year
+
+<ComponentPreview className="mb-0" title="range={2025} scale='linear'" name="ex-year-range-echarts-heatmap-chart"  />
+<Alert>
+  <AlertContent>
+    Pass a year to `range` for January through December. `scale="linear"` spreads the levels
+    evenly between the smallest and largest value instead of by quantile.
+  </AlertContent>
+</Alert>
+
+### Monday Start
+
+<ComponentPreview className="mb-0" title="weekStart='monday'" name="ex-monday-start-echarts-heatmap-chart"  />
+<Alert>
+  <AlertContent>
+    `weekStart="monday"` puts Monday on the top row. `<DayLabel labels>` takes seven names,
+    Sunday first — pass an empty string to leave a row unlabeled.
+  </AlertContent>
+</Alert>
+
+### Rounded Cells
+
+<ComponentPreview className="mb-0" title="radius={6} gap={5}" name="ex-rounded-cells-echarts-heatmap-chart"  />
+<Alert>
+  <AlertContent>
+    A shorter `range` — here one quarter — gives the cells room, so a larger `radius` and `gap`
+    read as tiles rather than pixels.
+  </AlertContent>
+</Alert>
+
+### Explicit Thresholds
+
+<ComponentPreview className="mb-0" title="thresholds={[3, 10]}" name="ex-thresholds-echarts-heatmap-chart"  />
+<Alert>
+  <AlertContent>
+    `thresholds` pins the level boundaries: values below `3` are the first level, `3`–`9` the
+    second, `10` and up the third. With three cuts the config needs three colors — one per level.
+  </AlertContent>
+</Alert>
+
+## API Reference
+
+A root container plus a small set of composible parts. Render the root, then compose the parts you need as children. Each part is declarative config the root compiles into the ECharts option.
+
+<ApiHeading>EChartsHeatmapChart</ApiHeading>
+
+The root container. It owns the date window, the value → level mapping, shared selection state, the loading skeleton, and the intro sweep. Everything visual is composed as children and compiled into the ECharts option.
+
+<ApiTable>
+  <ApiRow name="data" type="HeatmapDatum[]" required>
+    One entry per day that has a value. `HeatmapDatum` is `{ date: string; value: number }`, where `date` is an ISO calendar date (`YYYY-MM-DD`). Days absent from the array render as empty cells; duplicate dates are summed.
+  </ApiRow>
+  <ApiRow name="config" type="ChartConfig" required>
+    Defines the series. The key named by `<Cell dataKey>` supplies a `label` and a per-theme `colors` array that becomes the intensity ramp — lightest first, strongest last. Same contract as every EvilCharts chart — see <Link href="/docs/chart-config">Chart Config</Link>.
+  </ApiRow>
+  <ApiRow name="children" type="ReactNode" required>
+    The composed parts — `<Cell />`, `<MonthLabel />`, `<DayLabel />`, `<Tooltip />`, and `<Legend />`.
+  </ApiRow>
+  <ApiRow name="className" type="string">
+    Additional CSS classes for the chart container.
+  </ApiRow>
+  <ApiRow name="renderer" type='"canvas" | "svg"' default='"canvas"'>
+    Rendering engine used by ECharts. Use `"svg"` for an SVG-backed chart surface; omit the prop to keep the Canvas default.
+  </ApiRow>
+  <ApiRow name="range" type="number | string | [string, string]">
+    The calendar window. A year (`2025`) shows January through December, a month string (`"2025-03"`) shows that month, and an `[start, end]` pair of ISO dates shows that inclusive span. Omit it for the trailing year ending on the latest date in `data`.
+  </ApiRow>
+  <ApiRow name="weekStart" type='"sunday" | "monday"' default='"sunday"'>
+    Which day sits on the top row of each week column.
+  </ApiRow>
+  <ApiRow name="cellSize" type="number">
+    A fixed cell size in pixels. Omit it to fit square cells to the container's width (capped by its height) and re-fit on resize.
+  </ApiRow>
+  <ApiRow name="scale" type='"quantile" | "linear"' default='"quantile"'>
+    How values map onto the ramp when no `thresholds` are given. `"quantile"` shares the non-zero days evenly across the levels, like GitHub, so a few huge days don't wash out the rest; `"linear"` divides the min→max span evenly.
+  </ApiRow>
+  <ApiRow name="thresholds" type="number[]">
+    Explicit ascending level boundaries. Values below the first threshold are level one; each threshold a value reaches moves it up a level. `n` thresholds make `n + 1` levels, spread across however many colors the config provides.
+  </ApiRow>
+  <ApiRow name="defaultSelectedDate" type="string | null" default="null">
+    The ISO date selected on first render.
+  </ApiRow>
+  <ApiRow name="onSelectionChange" type="(selection: { date: string; value: number } | null) => void">
+    Called when a day is selected or deselected. Receives the day's `date` and `value`, or `null` on deselect. Fires on click while `<Cell />` has `isClickable` set.
+  </ApiRow>
+  <ApiRow name="isLoading" type="boolean" default="false">
+    Shows the animated loading skeleton.
+  </ApiRow>
+  <ApiRow name="animation" type="boolean" default="true">
+    Master switch for the intro sweep. Pass `false` to render the chart instantly.
+  </ApiRow>
+  <ApiRow name="animationType" type='"none" | "default"' default='"default"'>
+    `"default"` pops the cells in column by column, left to right, on first render; `"none"` disables it. The OS reduce-motion preference falls back to `"none"` automatically.
+  </ApiRow>
+  <ApiRow name="chartOptions" type="Record<string, unknown>">
+    Escape hatch merged over the built ECharts option object. See the <Link href="https://echarts.apache.org/en/option.html#calendar" _blank>ECharts calendar option documentation</Link>.
+  </ApiRow>
+</ApiTable>
+
+<ApiHeading>Cell</ApiHeading>
+
+Configures the day cells. Always renders — it names the config key to color the grid with and shapes each cell.
+
+<ApiTable>
+  <ApiRow name="dataKey" type="string" required>
+    The `config` key whose `colors` array forms the intensity ramp and whose `label` names the value in the tooltip.
+  </ApiRow>
+  <ApiRow name="radius" type="number" default="2">
+    The corner radius of each cell in pixels. Set to 0 for square cells.
+  </ApiRow>
+  <ApiRow name="gap" type="number" default="3">
+    The space between neighboring cells in pixels.
+  </ApiRow>
+  <ApiRow name="isClickable" type="boolean" default="false">
+    Lets days be clicked to select/deselect them. The selected day keeps full strength and wears a ring while the rest soften.
+  </ApiRow>
+</ApiTable>
+
+<ApiHeading>MonthLabel</ApiHeading>
+
+Shows month names above the grid, each over the column where the month begins. Its presence enables it; omit it and none show.
+
+<ApiTable>
+  <ApiRow name="labels" type="string[]" default='["Jan", …, "Dec"]'>
+    Twelve month names, January first.
+  </ApiRow>
+</ApiTable>
+
+<ApiHeading>DayLabel</ApiHeading>
+
+Shows weekday names beside the grid. Its presence enables it; omit it and none show.
+
+<ApiTable>
+  <ApiRow name="labels" type="string[]" default='["", "Mon", "", "Wed", "", "Fri", ""]'>
+    Seven day names, Sunday first, regardless of `weekStart`. An empty string leaves that row unlabeled — the default labels every other row, like GitHub.
+  </ApiRow>
+</ApiTable>
+
+<ApiHeading>Tooltip</ApiHeading>
+
+The hover tooltip. Its presence enables it; omit it and none shows. Hovering a day shows the formatted date as the title and the series label with that day's value beneath it. Hidden automatically while loading.
+
+<ApiTable>
+  <ApiRow name="variant" type='"default" | "frosted-glass"' default='"default"'>
+    Controls the visual style of the tooltip surface.
+  </ApiRow>
+  <ApiRow name="roundness" type='"sm" | "md" | "lg" | "xl"' default='"lg"'>
+    Controls the border-radius of the tooltip.
+  </ApiRow>
+  <ApiRow name="position" type='"fixed" | "variable"' default='"variable"'>
+    Controls how the tooltip is anchored. `"variable"` follows the pointer (ECharts' default); `"fixed"` pins the tooltip near the top and only tracks the pointer's X.
+  </ApiRow>
+  <ApiRow name="dateFormatter" type="(date: string) => string">
+    Formats the hovered day's ISO date for the tooltip title. Defaults to `"Mar 3, 2026"` style English.
+  </ApiRow>
+  <ApiRow name="valueFormatter" type="(value: number) => string" default="(value) => value.toLocaleString()">
+    Formats the hovered day's value.
+  </ApiRow>
+</ApiTable>
+
+<ApiHeading>Legend</ApiHeading>
+
+The "Less → More" ramp rendered under the grid, one swatch per level plus the empty cell. Its presence enables it; omit it and none shows. Hidden while loading.
+
+<ApiTable>
+  <ApiRow name="align" type='"left" | "right"' default='"right"'>
+    Which side of the chart the ramp sits on.
+  </ApiRow>
+  <ApiRow name="lessLabel" type="string" default='"Less"'>
+    Text before the ramp.
+  </ApiRow>
+  <ApiRow name="moreLabel" type="string" default='"More"'>
+    Text after the ramp.
+  </ApiRow>
+</ApiTable>

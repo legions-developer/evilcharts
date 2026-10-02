@@ -2632,4 +2632,93 @@ export const examples: Registry["items"] = [
       },
     ],
   },
+  // ECharts Heatmap Chart (calendar heatmap)
+  {
+    name: "ex-echarts-heatmap-chart",
+    registryDependencies: ["@evilcharts/echarts-heatmap-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/echarts/ex-echarts-heatmap-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-svg-renderer-echarts-heatmap-chart",
+    registryDependencies: ["@evilcharts/echarts-heatmap-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/echarts/ex-svg-renderer-echarts-heatmap-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-loading-state-echarts-heatmap-chart",
+    registryDependencies: ["@evilcharts/echarts-heatmap-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/echarts/ex-loading-state-echarts-heatmap-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-monday-start-echarts-heatmap-chart",
+    registryDependencies: ["@evilcharts/echarts-heatmap-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/echarts/ex-monday-start-echarts-heatmap-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-clickable-echarts-heatmap-chart",
+    registryDependencies: ["@evilcharts/echarts-heatmap-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/echarts/ex-clickable-echarts-heatmap-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-year-range-echarts-heatmap-chart",
+    registryDependencies: ["@evilcharts/echarts-heatmap-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/echarts/ex-year-range-echarts-heatmap-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-rounded-cells-echarts-heatmap-chart",
+    registryDependencies: ["@evilcharts/echarts-heatmap-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/echarts/ex-rounded-cells-echarts-heatmap-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
+  {
+    name: "ex-thresholds-echarts-heatmap-chart",
+    registryDependencies: ["@evilcharts/echarts-heatmap-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "examples/echarts/ex-thresholds-echarts-heatmap-chart.tsx",
+        type: "registry:block",
+      },
+    ],
+  },
 ];

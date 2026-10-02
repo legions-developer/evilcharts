@@ -313,4 +313,48 @@ export const blocks: Registry["items"] = [
       },
     ],
   },
+  {
+    name: "contributions-echarts-heatmap-chart",
+    description: "GitHub-style contribution graph with a yearly total and longest-streak summary",
+    dependencies: ["echarts", "motion"],
+    registryDependencies: ["@evilcharts/echarts-heatmap-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "blocks/echarts/b-contributions-echarts-heatmap-chart.tsx",
+        type: "registry:block",
+        target: TARGET_BASE_PATH + "/contributions-echarts-heatmap-chart.tsx",
+      },
+    ],
+  },
+  {
+    name: "deploys-echarts-heatmap-chart",
+    description:
+      "Six months of deploy frequency on a Monday-first calendar with a three-stat header",
+    dependencies: ["echarts", "motion"],
+    registryDependencies: ["@evilcharts/echarts-heatmap-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "blocks/echarts/b-deploys-echarts-heatmap-chart.tsx",
+        type: "registry:block",
+        target: TARGET_BASE_PATH + "/deploys-echarts-heatmap-chart.tsx",
+      },
+    ],
+  },
+  {
+    name: "incidents-echarts-heatmap-chart",
+    description:
+      "A quarter of on-call alerts with fixed severity thresholds and a clickable day detail header",
+    dependencies: ["echarts", "motion"],
+    registryDependencies: ["@evilcharts/echarts-heatmap-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "blocks/echarts/b-incidents-echarts-heatmap-chart.tsx",
+        type: "registry:block",
+        target: TARGET_BASE_PATH + "/incidents-echarts-heatmap-chart.tsx",
+      },
+    ],
+  },
 ];

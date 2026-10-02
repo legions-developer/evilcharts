@@ -155,6 +155,21 @@ export const charts: Registry["items"] = [
     ],
   },
   {
+    name: "echarts-heatmap-chart",
+    description:
+      "Calendar heatmap component rendered with Apache ECharts — GitHub contribution graph style",
+    registryDependencies: ["@evilcharts/echarts-chart", "@evilcharts/echarts-tooltip"],
+    dependencies: ["echarts", "motion"],
+    type: "registry:component",
+    files: [
+      {
+        path: "charts/echarts-heatmap-chart.tsx",
+        type: "registry:component",
+        target: TARGET_BASE_PATH + "/echarts-heatmap-chart.tsx",
+      },
+    ],
+  },
+  {
     name: "recharts-area-chart",
     description: "Area chart component",
     registryDependencies: [

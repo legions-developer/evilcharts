@@ -44,6 +44,11 @@ const showcaseItems = [
     description: "Show flows between stages with weighted links.",
     url: "/docs/recharts/sankey-chart",
   },
+  {
+    name: "Heatmap Chart",
+    description: "Map daily activity onto a calendar, GitHub style.",
+    url: "/docs/echarts/heatmap-chart",
+  },
 ]
 
 const packageInstallCommands = {

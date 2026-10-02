@@ -324,6 +324,55 @@ export function SankeyChartIcon({
   );
 }
 
+export function HeatmapChartIcon({
+  fill = "currentColor",
+  width = "1em",
+  height = "1em",
+  ...props
+}: IconProps) {
+  const cells: [number, number, number][] = [
+    [1, 1, 0.4],
+    [5, 1, 1],
+    [9, 1, 0.4],
+    [13, 1, 0.4],
+    [1, 5, 1],
+    [5, 5, 0.4],
+    [9, 5, 1],
+    [13, 5, 1],
+    [1, 9, 0.4],
+    [5, 9, 1],
+    [9, 9, 0.4],
+    [13, 9, 1],
+    [1, 13, 0.4],
+    [5, 13, 0.4],
+    [9, 13, 1],
+    [13, 13, 0.4],
+  ];
+  return (
+    <svg
+      height={height}
+      width={width}
+      viewBox="0 0 18 18"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      {cells.map(([x, y, opacity]) => (
+        <rect
+          key={`${x}-${y}`}
+          x={x}
+          y={y}
+          width="3.5"
+          height="3.5"
+          rx="0.8"
+          fill={fill}
+          fillOpacity={opacity}
+        />
+      ))}
+    </svg>
+  );
+}
+
 export function ShapesIcon({
   fill = "currentColor",
   secondaryfill,

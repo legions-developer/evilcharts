@@ -11,6 +11,7 @@
     "pie-chart",
     "radial-chart",
     "sankey-chart",
+    "heatmap-chart",
     "ui/tooltip",
     "ui/legend",
     "ui/dots",

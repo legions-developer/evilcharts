@@ -342,6 +342,26 @@
       ]
     },
     {
+      "name": "echarts-heatmap-chart",
+      "description": "Calendar heatmap component rendered with Apache ECharts — GitHub contribution graph style",
+      "registryDependencies": [
+        "@evilcharts/echarts-chart",
+        "@evilcharts/echarts-tooltip"
+      ],
+      "dependencies": [
+        "echarts",
+        "motion"
+      ],
+      "type": "registry:component",
+      "files": [
+        {
+          "path": "src/registry/charts/echarts-heatmap-chart.tsx",
+          "type": "registry:component",
+          "target": "components/evilcharts/charts/echarts-heatmap-chart.tsx"
+        }
+      ]
+    },
+    {
       "name": "recharts-area-chart",
       "description": "Area chart component",
       "registryDependencies": [
@@ -3515,6 +3535,110 @@
       ]
     },
     {
+      "name": "ex-echarts-heatmap-chart",
+      "registryDependencies": [
+        "@evilcharts/echarts-heatmap-chart"
+      ],
+      "type": "registry:block",
+      "files": [
+        {
+          "path": "src/registry/examples/echarts/ex-echarts-heatmap-chart.tsx",
+          "type": "registry:block"
+        }
+      ]
+    },
+    {
+      "name": "ex-svg-renderer-echarts-heatmap-chart",
+      "registryDependencies": [
+        "@evilcharts/echarts-heatmap-chart"
+      ],
+      "type": "registry:block",
+      "files": [
+        {
+          "path": "src/registry/examples/echarts/ex-svg-renderer-echarts-heatmap-chart.tsx",
+          "type": "registry:block"
+        }
+      ]
+    },
+    {
+      "name": "ex-loading-state-echarts-heatmap-chart",
+      "registryDependencies": [
+        "@evilcharts/echarts-heatmap-chart"
+      ],
+      "type": "registry:block",
+      "files": [
+        {
+          "path": "src/registry/examples/echarts/ex-loading-state-echarts-heatmap-chart.tsx",
+          "type": "registry:block"
+        }
+      ]
+    },
+    {
+      "name": "ex-monday-start-echarts-heatmap-chart",
+      "registryDependencies": [
+        "@evilcharts/echarts-heatmap-chart"
+      ],
+      "type": "registry:block",
+      "files": [
+        {
+          "path": "src/registry/examples/echarts/ex-monday-start-echarts-heatmap-chart.tsx",
+          "type": "registry:block"
+        }
+      ]
+    },
+    {
+      "name": "ex-clickable-echarts-heatmap-chart",
+      "registryDependencies": [
+        "@evilcharts/echarts-heatmap-chart"
+      ],
+      "type": "registry:block",
+      "files": [
+        {
+          "path": "src/registry/examples/echarts/ex-clickable-echarts-heatmap-chart.tsx",
+          "type": "registry:block"
+        }
+      ]
+    },
+    {
+      "name": "ex-year-range-echarts-heatmap-chart",
+      "registryDependencies": [
+        "@evilcharts/echarts-heatmap-chart"
+      ],
+      "type": "registry:block",
+      "files": [
+        {
+          "path": "src/registry/examples/echarts/ex-year-range-echarts-heatmap-chart.tsx",
+          "type": "registry:block"
+        }
+      ]
+    },
+    {
+      "name": "ex-rounded-cells-echarts-heatmap-chart",
+      "registryDependencies": [
+        "@evilcharts/echarts-heatmap-chart"
+      ],
+      "type": "registry:block",
+      "files": [
+        {
+          "path": "src/registry/examples/echarts/ex-rounded-cells-echarts-heatmap-chart.tsx",
+          "type": "registry:block"
+        }
+      ]
+    },
+    {
+      "name": "ex-thresholds-echarts-heatmap-chart",
+      "registryDependencies": [
+        "@evilcharts/echarts-heatmap-chart"
+      ],
+      "type": "registry:block",
+      "files": [
+        {
+          "path": "src/registry/examples/echarts/ex-thresholds-echarts-heatmap-chart.tsx",
+          "type": "registry:block"
+        }
+      ]
+    },
+    {
       "name": "monospace-bar-chart",
       "description": "Monospace bar chart component",
       "dependencies": [
@@ -3929,6 +4053,63 @@
           "path": "src/registry/blocks/echarts/b-pipeline-echarts-sankey-chart.tsx",
           "type": "registry:block",
           "target": "components/evilcharts/blocks/pipeline-echarts-sankey-chart.tsx"
+        }
+      ]
+    },
+    {
+      "name": "contributions-echarts-heatmap-chart",
+      "description": "GitHub-style contribution graph with a yearly total and longest-streak summary",
+      "dependencies": [
+        "echarts",
+        "motion"
+      ],
+      "registryDependencies": [
+        "@evilcharts/echarts-heatmap-chart"
+      ],
+      "type": "registry:block",
+      "files": [
+        {
+          "path": "src/registry/blocks/echarts/b-contributions-echarts-heatmap-chart.tsx",
+          "type": "registry:block",
+          "target": "components/evilcharts/blocks/contributions-echarts-heatmap-chart.tsx"
+        }
+      ]
+    },
+    {
+      "name": "deploys-echarts-heatmap-chart",
+      "description": "Six months of deploy frequency on a Monday-first calendar with a three-stat header",
+      "dependencies": [
+        "echarts",
+        "motion"
+      ],
+      "registryDependencies": [
+        "@evilcharts/echarts-heatmap-chart"
+      ],
+      "type": "registry:block",
+      "files": [
+        {
+          "path": "src/registry/blocks/echarts/b-deploys-echarts-heatmap-chart.tsx",
+          "type": "registry:block",
+          "target": "components/evilcharts/blocks/deploys-echarts-heatmap-chart.tsx"
+        }
+      ]
+    },
+    {
+      "name": "incidents-echarts-heatmap-chart",
+      "description": "A quarter of on-call alerts with fixed severity thresholds and a clickable day detail header",
+      "dependencies": [
+        "echarts",
+        "motion"
+      ],
+      "registryDependencies": [
+        "@evilcharts/echarts-heatmap-chart"
+      ],
+      "type": "registry:block",
+      "files": [
+        {
+          "path": "src/registry/blocks/echarts/b-incidents-echarts-heatmap-chart.tsx",
+          "type": "registry:block",
+          "target": "components/evilcharts/blocks/incidents-echarts-heatmap-chart.tsx"
         }
       ]
     }
