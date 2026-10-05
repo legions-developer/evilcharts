@@ -1,8 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { notFound } from "next/navigation";
 
-import { source } from "@/lib/source";
+import { getDocContent } from "@/lib/content";
 import { processMdxForLLMs } from "@/lib/llm";
+import { source } from "@/lib/source";
 
 export const revalidate = false;
 
@@ -15,7 +16,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ slu
     notFound();
   }
 
-  const rawContent = await page.data.getText("raw");
+  const rawContent = getDocContent(page.path);
   const processedContent = processMdxForLLMs(rawContent);
 
   return new NextResponse(processedContent, {

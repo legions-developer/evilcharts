@@ -39,10 +39,18 @@ bunx eslint <files...>      # lint only touched files
 bunx tsc --noEmit           # type-check
 bun run registry:build      # rebuild registry artifacts without cleaning first
 bun run registry:fresh      # remove and rebuild all registry artifacts
-bun run build               # registry:fresh followed by next build
+bun run build               # registry/content generation followed by next build
+bun run content:build       # bundle source/MDX strings for runtime rendering
+bun run build:cloudflare    # full Next.js build adapted for Cloudflare Workers
+bun run preview:cloudflare  # serve the built Worker with local bindings
+bun run verify:cloudflare  # check the running preview's delivery endpoints
 ```
 
 There is currently no automated test suite. For most changes, use scoped ESLint plus TypeScript. Run `registry:fresh` for registry work and a production build for routing, MDX, metadata, or integration changes when practical.
+
+The Cloudflare HTTP verification script is a deployment smoke check, run against
+the built preview (default `http://localhost:8787`) or an explicit staging URL.
+See `docs/cloudflare.md` for deployment, environment variables, and cutover checks.
 
 `CONTRIBUTING.md` and older prose may mention obsolete paths or package-manager commands. The scripts in `package.json` and the current source tree are authoritative.
 
@@ -130,6 +138,24 @@ Agent-readable delivery is a first-class surface:
 `src/lib/agent-docs.ts` derives these surfaces from the Fumadocs source and provider availability. `src/lib/llm.ts` converts custom MDX into readable markdown and embeds registry source. When adding a custom MDX component or changing provider publication, verify both the browser docs and markdown/agent output.
 
 Axiom tracking in `src/lib/axiom.ts` is optional and must remain harmless when its environment variables are absent. Never expose or commit `.env*` values.
+
+### Cloudflare hosting
+
+`open-next.config.ts` and `wrangler.jsonc` adapt the Next.js build to Workers with
+R2 incremental caching, a Durable Object revalidation queue, and Cloudflare Images.
+Keep the Worker name and self-reference binding aligned. `/r/*` must run through
+the Worker so static asset delivery does not bypass registry analytics.
+
+`src/scripts/build-content.mts` generates ignored `src/generated/content.json`
+from registry manifests, source files, and raw MDX. `src/lib/content.ts` serves
+those bundled strings during rendering and revalidation. Do not restore runtime
+repository filesystem reads or Fumadocs `getText("raw")` calls. `bun run build`
+generates content after the registry; `bun run dev` generates it before starting
+Next.js and watches source changes. Generated content must never be edited by hand.
+
+Vercel Analytics remains enabled on Vercel builds during migration; other builds
+can use the optional Cloudflare Web Analytics token. Provider availability is
+independent of hosting and must not change as part of a deployment.
 
 ## Common change workflows
 

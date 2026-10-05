@@ -5,8 +5,31 @@ import {
   transformerNotationHighlight,
   transformerNotationWordHighlight,
 } from "@shikijs/transformers";
+import { createJavaScriptRegexEngine } from "shiki/engine/javascript";
+import { createHighlighterCore, isSpecialLang } from "shiki/core";
+import typescript from "shiki/langs/typescript.mjs";
+import javascript from "shiki/langs/javascript.mjs";
+import minLight from "shiki/themes/min-light.mjs";
 import type { ShikiTransformer } from "shiki";
-import { codeToHtml } from "shiki";
+import vesper from "shiki/themes/vesper.mjs";
+import jsonc from "shiki/langs/jsonc.mjs";
+import json from "shiki/langs/json.mjs";
+import bash from "shiki/langs/bash.mjs";
+import tsx from "shiki/langs/tsx.mjs";
+import jsx from "shiki/langs/jsx.mjs";
+import css from "shiki/langs/css.mjs";
+
+let highlighter: ReturnType<typeof createHighlighterCore> | undefined;
+
+function getHighlighter() {
+  // Workers cannot compile Shiki's default WASM engine from a buffer. Bundle the
+  // grammars/themes we render and reuse the native JavaScript engine per isolate.
+  return (highlighter ??= createHighlighterCore({
+    engine: createJavaScriptRegexEngine(),
+    langs: [tsx, typescript, jsx, javascript, css, json, jsonc, bash],
+    themes: [minLight, vesper],
+  }));
+}
 
 // Strip [!code ...] annotations from raw code for copying
 export function stripCodeAnnotations(code: string): string {
@@ -87,9 +110,8 @@ export const transformers = [
         }
       }
     },
-    line(node) {
-      node.properties["data-line"] = "";
-    },
+    // rehype-pretty-code adds data-line after parsing Shiki's HTML. Adding it
+    // here as well creates duplicate JSX properties in compiled MDX.
   },
   transformerNotationHighlight(),
   transformerNotationWordHighlight(),
@@ -104,9 +126,15 @@ export async function highlightCode(
   options?: { showLineNumbers?: boolean },
 ) {
   const { showLineNumbers = true } = options ?? {};
+  const highlighter = await getHighlighter();
+  // New source extensions remain readable until their grammar is added above.
+  const lang =
+    isSpecialLang(language) || highlighter.getLoadedLanguages().includes(language)
+      ? language
+      : "text";
 
-  const html = await codeToHtml(code, {
-    lang: language,
+  const html = highlighter.codeToHtml(code, {
+    lang,
     themes: {
       light: "min-light",
       dark: "vesper",

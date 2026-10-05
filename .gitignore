@@ -45,3 +45,11 @@ next-env.d.ts
  
 #public
 /public/r
+
+# Build-generated documentation/source data
+/src/generated/
+
+# Cloudflare local state and build output
+/.open-next/
+/.wrangler/
+.dev.vars*
