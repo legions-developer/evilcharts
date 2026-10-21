@@ -33,6 +33,8 @@ const LEGACY_PLURAL_CHARTS = [
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  // The repository maintains its own canonical AGENTS.md.
+  agentRules: false,
   async redirects() {
     return [
       // Neither provider has an index page — the intro is shared at /docs — so a

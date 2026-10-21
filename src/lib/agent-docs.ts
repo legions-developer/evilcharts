@@ -4,6 +4,7 @@ import {
   PROVIDER_META,
   type Provider,
 } from "@/globals/constants/providers";
+import { getDocContent } from "@/lib/content";
 import { processMdxForLLMs } from "@/lib/llm";
 import { absoluteUrl } from "@/lib/utils";
 import { source } from "@/lib/source";
@@ -125,7 +126,7 @@ export async function generateLlmsFullTxt() {
   const pages = getAgentDocPages();
   const sections = await Promise.all(
     pages.map(async (page) => {
-      const raw = await page.data.getText("raw");
+      const raw = getDocContent(page.path);
       const content = processMdxForLLMs(raw).trim();
       const summary = getPageSummary(page);
       const description = summary.description ? `\n\n> ${summary.description}` : "";

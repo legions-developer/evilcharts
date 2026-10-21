@@ -1,9 +1,7 @@
 import type { RegistryItem } from "shadcn/schema";
-import { Project, ScriptKind } from "ts-morph";
-import { promises as fs } from "node:fs";
-import { tmpdir } from "node:os";
 import path from "node:path";
 
+import { getRegistryMetadata, getSourceContent } from "@/lib/content";
 import { Index } from "@/registry/__index__";
 
 export function getRegistryComponent(name: string) {
@@ -11,78 +9,27 @@ export function getRegistryComponent(name: string) {
 }
 
 export async function getRegistryItem(name: string) {
-  const item = Index[name];
+  const item = getRegistryMetadata(name);
 
   if (!item) {
     return null;
   }
 
-  // Convert all file paths to object.
-  // TODO: remove when we migrate to new registry.
-  item.files = item.files.map((file: unknown) =>
-    typeof file === "string" ? { path: file } : file,
-  );
-
-  // Type assertion for now - TODO: implement proper validation
-  const typedItem = item as RegistryItem;
-
-  const files = typedItem.files || [];
-
-  // Read every file concurrently — the reads are independent of each other.
-  const processedFiles = await Promise.all(
-    files.map(async (file) => {
-      const content = await getFileContent(file);
-      const relativePath = path.relative(process.cwd(), file.path);
-
-      return {
-        ...file,
-        content,
-        path: relativePath,
-      };
-    }),
-  );
+  const processedFiles = (item.files ?? []).map((file) => {
+    const content = getSourceContent(file.path);
+    if (content === undefined) {
+      throw new Error(`Registry source is missing from the content build: ${file.path}`);
+    }
+    return { ...file, content: fixImport(content) };
+  });
 
   // Fix file paths.
   const finalFiles = fixFilePaths(processedFiles);
 
   return {
-    ...typedItem,
+    ...item,
     files: finalFiles,
   };
-}
-
-async function getFileContent(file: { path: string; type?: string }) {
-  // Resolve TypeScript path aliases (@/) to actual filesystem paths
-  const resolvedPath = file.path.replace(/^@\//, path.join(process.cwd(), "src") + "/");
-  const raw = await fs.readFile(resolvedPath, "utf-8");
-
-  const project = new Project({
-    compilerOptions: {},
-  });
-
-  const tempFile = await createTempSourceFile(file.path);
-  const sourceFile = project.createSourceFile(tempFile, raw, {
-    scriptKind: ScriptKind.TSX,
-  });
-
-  // Remove meta variables.
-  // removeVariable(sourceFile, "iframeHeight")
-  // removeVariable(sourceFile, "containerClassName")
-  // removeVariable(sourceFile, "description")
-
-  let code = sourceFile.getFullText();
-
-  // Some registry items uses default export.
-  // We want to use named export instead.
-  // TODO: do we really need this? - @shadcn.
-  // if (file.type !== "registry:page") {
-  //   code = code.replaceAll("export default", "export")
-  // }
-
-  // Fix imports.
-  code = fixImport(code);
-
-  return code;
 }
 
 function getFileTarget(file: { path: string; type?: string; target?: string }) {
@@ -114,19 +61,7 @@ function getFileTarget(file: { path: string; type?: string; target?: string }) {
   return target ?? "";
 }
 
-async function createTempSourceFile(filename: string) {
-  const dir = await fs.mkdtemp(path.join(tmpdir(), "shadcn-"));
-  return path.join(dir, filename);
-}
-
-function fixFilePaths(
-  files: Array<{
-    path: string;
-    type?: string;
-    target?: string;
-    content?: string;
-  }>,
-) {
+function fixFilePaths(files: NonNullable<RegistryItem["files"]>) {
   if (!files) {
     return [];
   }

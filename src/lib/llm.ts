@@ -1,7 +1,6 @@
-import fs from "fs"
-import path from "path"
-import { Index } from "@/registry/__index__"
-import { source } from "@/lib/source"
+import { getMdxAttribute, mdxComponentPattern } from "@/lib/mdx-tags";
+import { getRegistryMetadata, getSourceContent } from "@/lib/content";
+import { source } from "@/lib/source";
 
 const showcaseItems = [
   {
@@ -44,66 +43,44 @@ const showcaseItems = [
     description: "Show flows between stages with weighted links.",
     url: "/docs/recharts/sankey-chart",
   },
-]
+];
 
 const packageInstallCommands = {
   npm: "npm install",
   yarn: "yarn add",
   bun: "bun add",
   pnpm: "pnpm add",
-}
+};
 
 const shadcnCliCommands = {
   npm: "npx shadcn@latest add",
   yarn: "yarn shadcn@latest add",
   bun: "bunx --bun shadcn@latest add",
   pnpm: "pnpm dlx shadcn@latest add",
-}
-
-/**
- * Resolve a `@/...` import path to an absolute filesystem path.
- * e.g. `@/registry/examples/ex-area-chart.tsx` → `/abs/path/src/registry/examples/ex-area-chart.tsx`
- */
-function resolveAliasPath(aliasPath: string): string {
-  const relative = aliasPath.replace(/^@\//, "")
-  return path.join(process.cwd(), "src", relative)
-}
+};
 
 function getComponentsList() {
-  const components = source.pageTree.children.find(
-    (page) => page.$id === "components"
-  )
+  const components = source.pageTree.children.find((page) => page.$id === "components");
 
   if (components?.type !== "folder") {
-    return ""
+    return "";
   }
 
-  const list = components.children.filter(
-    (component) => component.type === "page"
-  )
+  const list = components.children.filter((component) => component.type === "page");
 
-  return list
-    .map((component) => `- [${component.name}](${component.url})`)
-    .join("\n")
+  return list.map((component) => `- [${component.name}](${component.url})`).join("\n");
 }
 
 function parseCommands(commands: string) {
-  return [...commands.matchAll(/["']([^"']+)["']/g)].map((match) => match[1])
+  return [...commands.matchAll(/["']([^"']+)["']/g)].map((match) => match[1]);
 }
 
-function getAttribute(tag: string, name: string) {
-  return tag.match(new RegExp(`${name}="([^"]+)"`))?.[1]
-}
-
-function renderPackageCommands(
-  commands: string,
-  commandMap: Record<string, string>,
-) {
-  const packages = parseCommands(commands).join(" ")
+function renderPackageCommands(commands: string, commandMap: Record<string, string>) {
+  const packages = parseCommands(commands).join(" ");
 
   return Object.entries(commandMap)
     .map(([manager, command]) => `### ${manager}\n\n\`\`\`bash\n${command} ${packages}\n\`\`\``)
-    .join("\n\n")
+    .join("\n\n");
 }
 
 function stripMdxComponentTags(content: string) {
@@ -143,92 +120,82 @@ function stripMdxComponentTags(content: string) {
       },
     )
     .replace(/<Link\s+href="([^"]+)"[^>]*>([\s\S]*?)<\/Link>/g, "[$2]($1)")
-    .replace(/<ShowcaseGrid\s*\/>/g, getShowcaseList())
+    .replace(/<ShowcaseGrid\s*\/>/g, getShowcaseList());
 }
 
 function getShowcaseList() {
   return showcaseItems
     .map((item) => `- [${item.name}](${item.url}) - ${item.description}`)
-    .join("\n")
+    .join("\n");
 }
 
 function renderRegistrySource(name: string, title?: string) {
-  const component = Index[name]
+  const component = getRegistryMetadata(name);
   if (!component?.files?.length) {
-    return undefined
+    return undefined;
   }
 
-  const filePath = component.files[0]?.path
+  const filePath = component.files[0]?.path;
   if (!filePath) {
-    return undefined
+    return undefined;
   }
 
-  const absolutePath = resolveAliasPath(filePath)
-
-  if (!fs.existsSync(absolutePath)) {
-    return undefined
+  let src = getSourceContent(filePath);
+  if (src === undefined) {
+    return undefined;
   }
-
-  let src = fs.readFileSync(absolutePath, "utf8")
 
   // Rewrite internal registry paths to user-facing paths.
-  src = src.replaceAll("@/registry/ui/", "@/components/evilcharts/ui/")
-  src = src.replaceAll(
-    "@/registry/charts/",
-    "@/components/evilcharts/charts/",
-  )
-  src = src.replaceAll("@/registry/examples/", "@/components/")
-  src = src.replaceAll("@/registry/blocks/", "@/components/evilcharts/blocks/")
-  src = src.replaceAll("export default", "export")
+  src = src.replaceAll("@/registry/ui/", "@/components/evilcharts/ui/");
+  src = src.replaceAll("@/registry/charts/", "@/components/evilcharts/charts/");
+  src = src.replaceAll("@/registry/examples/", "@/components/");
+  src = src.replaceAll("@/registry/blocks/", "@/components/evilcharts/blocks/");
+  src = src.replaceAll("export default", "export");
 
-  const heading = title ? `### ${title}\n\n` : ""
+  const heading = title ? `### ${title}\n\n` : "";
 
   return `${heading}\`\`\`tsx
 ${src}
-\`\`\``
+\`\`\``;
 }
 
 export function processMdxForLLMs(content: string) {
-  content = stripMdxComponentTags(content)
+  content = stripMdxComponentTags(content);
 
   // Replace <ComponentsList /> with a markdown list of components.
-  const componentsListRegex = /<ComponentsList\s*\/>/g
-  content = content.replace(componentsListRegex, getComponentsList())
+  const componentsListRegex = /<ComponentsList\s*\/>/g;
+  content = content.replace(componentsListRegex, getComponentsList());
 
   content = content.replace(
     /<CommandBlock\s+commands=\{\[([\s\S]*?)\]\}\s*\/>/g,
     (_match, commands) => renderPackageCommands(commands, packageInstallCommands),
-  )
+  );
 
-  content = content.replace(
-    /<CliBlock\s+commands=\{\[([\s\S]*?)\]\}\s*\/>/g,
-    (_match, commands) => renderPackageCommands(commands, shadcnCliCommands),
-  )
+  content = content.replace(/<CliBlock\s+commands=\{\[([\s\S]*?)\]\}\s*\/>/g, (_match, commands) =>
+    renderPackageCommands(commands, shadcnCliCommands),
+  );
 
-  content = content.replace(
-    /<ComponentSource[\s\S]*?\/>/g,
-    (match) => {
-      const name = getAttribute(match, "name")
-      const title = getAttribute(match, "title")
+  content = content.replace(mdxComponentPattern("ComponentSource"), (match) => {
+    const name = getMdxAttribute(match, "name");
+    const title = getMdxAttribute(match, "title");
 
-      return name ? renderRegistrySource(name, title) ?? match : match
-    },
-  )
+    return name ? (renderRegistrySource(name, title) ?? match) : match;
+  });
 
   // Replace <ComponentPreview ... name="xxx" ... /> with actual source code.
-  return content.replace(/<ComponentPreview[\s\S]*?\/>/g, (match) => {
-    const name = getAttribute(match, "name")
-    const title = getAttribute(match, "title")
+  return content.replace(mdxComponentPattern("ComponentPreview"), (match) => {
+    const name = getMdxAttribute(match, "name");
+    const title = getMdxAttribute(match, "title");
 
     if (!name) {
-      return match
+      return match;
     }
 
     try {
-      return renderRegistrySource(name, title) ?? match
+      return renderRegistrySource(name, title) ?? match;
     } catch (error) {
-      console.error(`Error processing ComponentPreview ${name}:`, error)
-      return match
+      console.error(`Error processing ComponentPreview ${name}:`, error);
+      return match;
     }
-  })
+  });
 }
