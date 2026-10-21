@@ -557,7 +557,7 @@ function createTooltipFormatter(ctx: OptionBuildContext) {
     const param = (Array.isArray(params) ? params[0] : params) as {
       seriesId?: string;
       seriesName?: string;
-      value?: number[];
+      value?: (number | null)[];
     } | null;
     if (!param) return "";
 
@@ -578,6 +578,7 @@ function createTooltipFormatter(ctx: OptionBuildContext) {
     const body = categories
       .map((category, i) => {
         const raw = values[i];
+        if (raw == null) return "";
         const value = typeof raw === "number" ? raw.toLocaleString() : String(raw ?? "");
         return tooltipRow({
           indicatorHtml: tooltipIndicatorHtml(key, colorsCount),
@@ -645,7 +646,10 @@ function buildRadarSeries(ctx: OptionBuildContext): RadarSeriesOption[] {
       resolved.tokens.background,
     );
 
-    const value = categories.map((_, i) => Number(data[i]?.[key]) || 0);
+    const value = categories.map((_, i) => {
+      const raw = data[i]?.[key];
+      return raw == null ? null : Number(raw) || 0;
+    });
 
     // ECharts radar has no per-state symbolSize and no numeric emphasis scale, so
     // the hover marker swaps STYLE (e.g. colored-border → solid) at the resting

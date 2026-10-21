@@ -933,7 +933,7 @@ function buildBrushOption(
       type: "line",
       xAxisIndex: 1,
       yAxisIndex: 1,
-      data: data.map((row) => Number(row[key]) || 0),
+      data: data.map((row) => (row[key] == null ? null : Number(row[key]) || 0)),
       smooth: curve.smooth,
       step: curve.step,
       connectNulls: line.connectNulls,
@@ -1033,7 +1033,7 @@ function buildLineSeries(ctx: OptionBuildContext): LineSeriesOption[] {
     const restingVisible = line.dotVariant !== "none";
     const dotOpacity = opacity.dot;
 
-    const values = data.map((row) => Number(row[key]) || 0);
+    const values = data.map((row) => (row[key] == null ? null : Number(row[key]) || 0));
     const n = values.length;
     // Hover-reveal is a root-level mode and owns the whole line rendering, so it
     // takes precedence over a per-line buffer tail (and the glow overlay) when
