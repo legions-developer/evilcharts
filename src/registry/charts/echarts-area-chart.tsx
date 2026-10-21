@@ -1032,7 +1032,7 @@ function buildBrushOption(
       type: "line",
       xAxisIndex: 1,
       yAxisIndex: 1,
-      data: data.map((row) => Number(row[key]) || 0),
+      data: data.map((row) => (row[key] == null ? null : Number(row[key]) || 0)),
       stack: isStacked ? "__mini-total" : undefined,
       smooth: curve.smooth,
       step: curve.step,
@@ -1129,6 +1129,7 @@ function buildAreaSeries(ctx: OptionBuildContext): LineSeriesOption[] {
     const curve = curveConfig(area.curveType ?? curveType);
 
     const values = data.map((row, i) => {
+      if (row[key] == null) return null;
       const value = Number(row[key]) || 0;
       if (!isExpanded) return value;
       const total = rowTotals[i];
@@ -1421,16 +1422,17 @@ function sliceFrom<T>(vals: readonly T[], idx: number): (T | null)[] {
 
 // Per-series PLOTTED top value per category index — expanded normalization and
 // stack accumulation applied — so pointer hit-testing can reason in data space.
-function computePlottedTops(ctx: OptionBuildContext): Record<string, number[]> {
+function computePlottedTops(ctx: OptionBuildContext): Record<string, (number | null)[]> {
   const { data, areas, seriesKeys, isStacked, isExpanded } = ctx;
   const rowTotals = isExpanded
     ? data.map((row) => seriesKeys.reduce((sum, key) => sum + (Number(row[key]) || 0), 0))
     : [];
   const running = new Array(data.length).fill(0);
-  const tops: Record<string, number[]> = {};
+  const tops: Record<string, (number | null)[]> = {};
   for (const area of areas) {
     const key = area.dataKey;
     tops[key] = data.map((row, i) => {
+      if (row[key] == null) return null;
       let value = Number(row[key]) || 0;
       if (isExpanded) value = rowTotals[i] ? value / rowTotals[i] : 0;
       return isStacked ? (running[i] += value) : value;
@@ -1447,7 +1449,7 @@ function computePlottedTops(ctx: OptionBuildContext): Record<string, number[]> {
 // Returns null when the pointer is outside the grid or above every line.
 function resolveAreaAtPixel(
   chart: EChartsInstance,
-  tops: Record<string, number[]>,
+  tops: Record<string, (number | null)[]>,
   keys: string[],
   x: number,
   y: number,
@@ -1463,7 +1465,7 @@ function resolveAreaAtPixel(
   let abovePixelY = -Infinity;
   for (const key of keys) {
     const value = tops[key]?.[index];
-    if (value === undefined) continue;
+    if (value == null) continue;
     const pixelY = chart.convertToPixel({ gridIndex: 0 }, [index, value])[1];
     const dist = Math.abs(pixelY - y);
     if (dist < nearestDist) {
@@ -1495,7 +1497,7 @@ type LiveState = {
   loadingRows: number[] | null; // skeleton data, lazily rolled and re-rolled per shimmer sweep
   categories: string[]; // x labels of the last build, for the brush label pills
   dataLength: number; // row count, for the datazoom index math
-  plottedTops: Record<string, number[]>; // per-series plotted line value per index, for pointer hit-testing
+  plottedTops: Record<string, (number | null)[]>; // per-series plotted line value per index, for pointer hit-testing
   seriesKeyByIndex: (string | undefined)[]; // built series order → key, so a polygon click's seriesIndex recovers its key past interleaved buffer/reveal/mini series
   companionIdsByKey: Map<string, string[]>; // per-key silent companion series ids (buffer tail, reveal base) — highlighted/downplayed with their parent
   revealIndex: number | null; // hover-reveal pointer x-index (null = idle); read by builds and the reveal hover handler

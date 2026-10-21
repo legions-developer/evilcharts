@@ -938,11 +938,12 @@ function createTooltipFormatter(ctx: OptionBuildContext) {
         const p = param as {
           seriesId?: string;
           seriesName?: string;
-          value?: number | string;
+          value?: number | string | null;
         };
         // Internal series (the brush's mini chart, the loading skeleton) never
         // surface in the tooltip.
         if (String(p.seriesId ?? "").startsWith("__")) return "";
+        if (p.value == null) return "";
         const key = p.seriesId ?? p.seriesName ?? "";
         const item = config[key];
         const colorsCount = item ? getColorsCount(item) : 1;
@@ -1051,7 +1052,7 @@ function buildBrushOption(
       type: "line",
       xAxisIndex: 1,
       yAxisIndex: 1,
-      data: data.map((row) => Number(row[key]) || 0),
+      data: data.map((row) => (row[key] == null ? null : Number(row[key]) || 0)),
       smooth: curve.smooth,
       step: curve.step,
       connectNulls: input.connectNulls,
@@ -1140,7 +1141,7 @@ function buildBarSeries(ctx: OptionBuildContext): BarSeriesOption[] {
     const base = slots[0];
     const multiColor = slots.length > 1;
     const fillDim = seriesFillDim(selectedDataKey, key);
-    const values = data.map((row) => Number(row[key]) || 0);
+    const values = data.map((row) => (row[key] == null ? null : Number(row[key]) || 0));
     const barAnim = bar.animationType ?? animationType;
 
     // Glow — a soft canvas shadow behind the bar, the analogue of the Recharts
@@ -1155,6 +1156,7 @@ function buildBarSeries(ctx: OptionBuildContext): BarSeriesOption[] {
     const dataPoints =
       bar.glow && multiColor
         ? values.map((value, i) => {
+            if (value === null) return null;
             const t = values.length > 1 ? i / (values.length - 1) : 0;
             return {
               value,
@@ -1221,7 +1223,7 @@ function buildLineSeries(ctx: OptionBuildContext): LineSeriesOption[] {
     const paint = seriesPaint(slots);
     const dim = seriesDim(selectedDataKey, key);
     const curve = curveConfig(line.curveType ?? curveType);
-    const values = data.map((row) => Number(row[key]) || 0);
+    const values = data.map((row) => (row[key] == null ? null : Number(row[key]) || 0));
 
     const restingDot = dotStyle(line.dotVariant, paint, resolved.tokens.background);
     const activeDot = dotStyle(line.activeDotVariant, paint, resolved.tokens.background);
@@ -1234,6 +1236,7 @@ function buildLineSeries(ctx: OptionBuildContext): LineSeriesOption[] {
     const dataPoints = !multiColor
       ? values
       : values.map((value, i) => {
+          if (value === null) return null;
           const t = values.length > 1 ? i / (values.length - 1) : 0;
           const pointColor = sampleGradient(slots, t);
           return {
@@ -1325,7 +1328,7 @@ function buildLineGlowSeries(ctx: OptionBuildContext): LineSeriesOption[] {
       const paint = seriesPaint(slots);
       const dim = seriesDim(selectedDataKey, key);
       const curve = curveConfig(line.curveType ?? curveType);
-      const values = data.map((row) => Number(row[key]) || 0);
+      const values = data.map((row) => (row[key] == null ? null : Number(row[key]) || 0));
 
       // Widest (faintest) first so it paints beneath the tighter, brighter layers.
       return [...LINE_GLOW_LAYERS].reverse().map((layer, i) => ({

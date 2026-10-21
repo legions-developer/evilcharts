@@ -980,11 +980,12 @@ function createTooltipFormatter(ctx: OptionBuildContext) {
         const p = param as {
           seriesId?: string;
           seriesName?: string;
-          value?: number | string;
+          value?: number | string | null;
         };
         // Internal series (the brush's mini chart, the loading skeleton) never
         // surface in the tooltip.
         if (String(p.seriesId ?? "").startsWith("__")) return "";
+        if (p.value == null) return "";
         const key = p.seriesId ?? p.seriesName ?? "";
         const item = config[key];
         const colorsCount = item ? getColorsCount(item) : 1;
@@ -1079,7 +1080,7 @@ function buildBrushOption(
       type: "bar",
       xAxisIndex: 1,
       yAxisIndex: 1,
-      data: data.map((row) => Number(row[key]) || 0),
+      data: data.map((row) => (row[key] == null ? null : Number(row[key]) || 0)),
       stack: isStacked ? "__mini-total" : undefined,
       silent: true,
       barCategoryGap: "20%",
@@ -1193,6 +1194,7 @@ function buildBarSeries(ctx: OptionBuildContext): BarSeriesOption[] {
       : null;
 
     const values = data.map((row, i) => {
+      if (row[key] == null) return null;
       const value = Number(row[key]) || 0;
       if (!isPercent) return value;
       const total = rowTotals[i];
@@ -1243,6 +1245,7 @@ function buildBarSeries(ctx: OptionBuildContext): BarSeriesOption[] {
       ctx.maxHighlightIndex != null ||
       (bufferStyle && lastIndex >= 0)
         ? values.map((value, i) => {
+            if (value === null) return null;
             const isBuffer = !!bufferStyle && i === lastIndex;
             if (!isBuffer && !glowFor && !isStripped && !isExpandable && !isMuted(i)) return value;
             return {
