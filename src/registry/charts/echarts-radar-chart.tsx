@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  escapeTooltipHtml,
   resolveTooltipPosition,
   roundnessClass,
   tooltipIndicatorHtml,
@@ -593,7 +594,7 @@ function createTooltipFormatter(ctx: OptionBuildContext) {
     // surface for a non-selected series and keeps a foreground-colored header (no
     // text-primary) — both byte-identical to the pre-refactor markup.
     return `<div class="grid min-w-32 items-start gap-1.5 border border-border/50 px-2.5 py-1.5 text-xs shadow-xl${dimmed} ${roundnessClass[tooltipSlot.roundness]} ${tooltipVariantClass[tooltipSlot.variant]}">
-      <div class="font-medium">${labelText}</div>
+      <div class="font-medium">${escapeTooltipHtml(labelText)}</div>
       <div class="grid gap-1.5">${body}</div>
     </div>`;
   };

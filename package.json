@@ -7,6 +7,7 @@
     "build": "bun run registry:fresh && next build",
     "start": "next start",
     "lint": "eslint",
+    "test:tooltip": "node --import tsx --test tests/echarts-tooltip.test.ts",
     "clean": "rm -rf node_modules && rm -rf .next && rm -rf .source",
     "registry:build": "bun run ./src/scripts/build-registry.mts",
     "registry:clean": "rm -rf public/r && rm -rf registry.json && rm -rf src/registry/__index__.tsx",
