@@ -27,16 +27,30 @@ export const tooltipVariantClass: Record<TooltipVariant, string> = {
   "frosted-glass": "bg-background/50 backdrop-blur-md",
 };
 
+// ECharts inserts formatter strings as HTML. Encode plain text and quoted
+// attribute values at their interpolation sites, while keeping the chart's
+// own shell/row markup intact.
+export function escapeTooltipHtml(value: string): string {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
 // The standard series indicator swatch — a rounded square filled with the
 // series' solid var or multi-stop gradient (indicatorBackground). A chart drops
 // this into a tooltipRow's `indicatorHtml`.
 export function tooltipIndicatorHtml(key: string, colorsCount: number): string {
-  return `<div class="h-2.5 w-2.5 shrink-0 rounded-[2px]" style="background:${indicatorBackground(key, colorsCount)}"></div>`;
+  const background = escapeTooltipHtml(indicatorBackground(key, colorsCount));
+  return `<div class="h-2.5 w-2.5 shrink-0 rounded-[2px]" style="background:${background}"></div>`;
 }
 
 // One tooltip row: indicator swatch + label/value pair. `dimmed` is a class
 // fragment (e.g. " opacity-30") appended to the row so the selection/hover dim
-// stays byte-identical to the inlined markup.
+// stays byte-identical to the inlined markup. `indicatorHtml` must be trusted
+// chart-generated markup; labelText and valueText are always treated as text.
 export function tooltipRow({
   indicatorHtml,
   labelText,
@@ -48,17 +62,18 @@ export function tooltipRow({
   valueText: string;
   dimmed: string;
 }): string {
-  return `<div class="flex w-full flex-wrap items-center gap-2${dimmed}">
+  return `<div class="flex w-full flex-wrap items-center gap-2${escapeTooltipHtml(dimmed)}">
           ${indicatorHtml}
           <div class="flex flex-1 items-center justify-between gap-4 leading-none">
-            <span class="text-muted-foreground">${labelText}</span>
-            <span class="text-foreground font-mono font-medium tabular-nums">${valueText}</span>
+            <span class="text-muted-foreground">${escapeTooltipHtml(labelText)}</span>
+            <span class="text-foreground font-mono font-medium tabular-nums">${escapeTooltipHtml(valueText)}</span>
           </div>
         </div>`;
 }
 
 // The outer tooltip surface — border, padding, shadow, roundness + variant
-// classes — wrapping the axis label and the composed rows.
+// classes — wrapping the axis label and the composed rows. `body` must be
+// trusted chart-generated markup (for example, composed tooltipRow results).
 export function tooltipShell({
   label,
   body,
@@ -71,7 +86,7 @@ export function tooltipShell({
   variant: TooltipVariant;
 }): string {
   return `<div class="grid min-w-32 items-start gap-1.5 border border-border/50 px-2.5 py-1.5 text-xs shadow-xl ${roundnessClass[roundness]} ${tooltipVariantClass[variant]}">
-      <div class="font-medium text-primary">${label}</div>
+      <div class="font-medium text-primary">${escapeTooltipHtml(label)}</div>
       <div class="grid gap-1.5">${body}</div>
     </div>`;
 }

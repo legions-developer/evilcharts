@@ -35,6 +35,7 @@ Do not add another package manager lockfile. Avoid new runtime dependencies unle
 bun install                 # install dependencies
 bun run dev                 # local Next.js server
 bun run lint                # lint the repository
+bun run test:tooltip        # ECharts tooltip escaping regression tests
 bunx eslint <files...>      # lint only touched files
 bunx tsc --noEmit           # type-check
 bun run registry:build      # rebuild registry artifacts without cleaning first
@@ -42,7 +43,7 @@ bun run registry:fresh      # remove and rebuild all registry artifacts
 bun run build               # registry:fresh followed by next build
 ```
 
-There is currently no automated test suite. For most changes, use scoped ESLint plus TypeScript. Run `registry:fresh` for registry work and a production build for routing, MDX, metadata, or integration changes when practical.
+Targeted ECharts tooltip escaping tests live in `tests/echarts-tooltip.test.ts`; run them with `bun run test:tooltip` when changing tooltip HTML. For most other changes, use scoped ESLint plus TypeScript. Run `registry:fresh` for registry work and a production build for routing, MDX, metadata, or integration changes when practical.
 
 `CONTRIBUTING.md` and older prose may mention obsolete paths or package-manager commands. The scripts in `package.json` and the current source tree are authoritative.
 
