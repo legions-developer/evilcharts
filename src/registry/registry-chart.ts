@@ -155,6 +155,21 @@ export const charts: Registry["items"] = [
     ],
   },
   {
+    name: "echarts-heatmap-chart",
+    description:
+      "Calendar heatmap component rendered with Apache ECharts — GitHub contribution graph style",
+    registryDependencies: ["@evilcharts/echarts-chart", "@evilcharts/echarts-tooltip"],
+    dependencies: ["echarts", "motion"],
+    type: "registry:component",
+    files: [
+      {
+        path: "charts/echarts-heatmap-chart.tsx",
+        type: "registry:component",
+        target: TARGET_BASE_PATH + "/echarts-heatmap-chart.tsx",
+      },
+    ],
+  },
+  {
     name: "recharts-area-chart",
     description: "Area chart component",
     registryDependencies: [
@@ -310,6 +325,21 @@ export const charts: Registry["items"] = [
         path: "charts/recharts-sankey-chart.tsx",
         type: "registry:component",
         target: TARGET_BASE_PATH + "/recharts-sankey-chart.tsx",
+      },
+    ],
+  },
+  {
+    name: "recharts-heatmap-chart",
+    description:
+      "Calendar heatmap component rendered with Recharts — GitHub contribution graph style",
+    registryDependencies: ["@evilcharts/recharts-chart", "@evilcharts/recharts-tooltip"],
+    dependencies: ["recharts", "motion"],
+    type: "registry:component",
+    files: [
+      {
+        path: "charts/recharts-heatmap-chart.tsx",
+        type: "registry:component",
+        target: TARGET_BASE_PATH + "/recharts-heatmap-chart.tsx",
       },
     ],
   },

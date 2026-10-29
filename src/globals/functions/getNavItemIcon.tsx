@@ -7,6 +7,7 @@ import {
   RadialChartIcon,
   RadarChartIcon,
   SankeyChartIcon,
+  HeatmapChartIcon,
 } from "@/assets/icons";
 
 // Custom icons for each item in the sidebar of MDX files.
@@ -33,6 +34,8 @@ export function getNavItemIcon(tag?: string) {
       return <RadarChartIcon />;
     case "sankey-chart":
       return <SankeyChartIcon />;
+    case "heatmap-chart":
+      return <HeatmapChartIcon />;
     default:
       return null;
   }

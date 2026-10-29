@@ -18,6 +18,7 @@ const RECHARTS_CHARTS = [
   "pie-chart",
   "radial-chart",
   "sankey-chart",
+  "heatmap-chart",
 ].join("|");
 
 // Plural spellings from a much older version of the site, still cached by Google.

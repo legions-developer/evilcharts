@@ -1,6 +1,7 @@
 "use client";
 
 import { ComposedPreview } from "@/components/docs/svg-previews/composed-preview";
+import { HeatmapPreview } from "@/components/docs/svg-previews/heatmap-preview";
 import { SankeyPreview } from "@/components/docs/svg-previews/sankey-preview";
 import { RadialPreview } from "@/components/docs/svg-previews/radial-preview";
 import { RadarPreview } from "@/components/docs/svg-previews/radar-preview";
@@ -69,6 +70,12 @@ const CHARTS: Chart[] = [
     description: "Show flows between stages with weighted links.",
     Component: SankeyPreview,
     slug: "sankey-chart",
+  },
+  {
+    name: "Heatmap Chart",
+    description: "Map daily activity onto a calendar, GitHub style.",
+    Component: HeatmapPreview,
+    slug: "heatmap-chart",
   },
 ];
 

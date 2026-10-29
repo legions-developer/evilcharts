@@ -60,6 +60,50 @@ export const blocks: Registry["items"] = [
     ],
   },
   {
+    name: "contributions-heatmap-chart",
+    description: "GitHub-style contribution graph with a yearly total and longest-streak summary",
+    dependencies: ["recharts", "motion"],
+    registryDependencies: ["@evilcharts/recharts-heatmap-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "blocks/recharts/b-contributions-heatmap-chart.tsx",
+        type: "registry:block",
+        target: TARGET_BASE_PATH + "/contributions-heatmap-chart.tsx",
+      },
+    ],
+  },
+  {
+    name: "sales-heatmap-chart",
+    description:
+      "A year of shop orders on a Monday-first calendar: weekend peaks, a summer lull, and the holiday rush",
+    dependencies: ["recharts", "motion"],
+    registryDependencies: ["@evilcharts/recharts-heatmap-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "blocks/recharts/b-sales-heatmap-chart.tsx",
+        type: "registry:block",
+        target: TARGET_BASE_PATH + "/sales-heatmap-chart.tsx",
+      },
+    ],
+  },
+  {
+    name: "workouts-heatmap-chart",
+    description:
+      "Clickable workout tracker with pinned duration levels, a day-detail header, and streak stats",
+    dependencies: ["recharts", "motion"],
+    registryDependencies: ["@evilcharts/recharts-heatmap-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "blocks/recharts/b-workouts-heatmap-chart.tsx",
+        type: "registry:block",
+        target: TARGET_BASE_PATH + "/workouts-heatmap-chart.tsx",
+      },
+    ],
+  },
+  {
     name: "latency-echarts-area-chart",
     description: "Latency percentile monitor with an HTML stat row, on the ECharts area chart",
     dependencies: ["echarts", "motion"],
@@ -310,6 +354,50 @@ export const blocks: Registry["items"] = [
         path: "blocks/echarts/b-pipeline-echarts-sankey-chart.tsx",
         type: "registry:block",
         target: TARGET_BASE_PATH + "/pipeline-echarts-sankey-chart.tsx",
+      },
+    ],
+  },
+  {
+    name: "contributions-echarts-heatmap-chart",
+    description: "GitHub-style contribution graph with a yearly total and longest-streak summary",
+    dependencies: ["echarts", "motion"],
+    registryDependencies: ["@evilcharts/echarts-heatmap-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "blocks/echarts/b-contributions-echarts-heatmap-chart.tsx",
+        type: "registry:block",
+        target: TARGET_BASE_PATH + "/contributions-echarts-heatmap-chart.tsx",
+      },
+    ],
+  },
+  {
+    name: "sales-echarts-heatmap-chart",
+    description:
+      "A year of shop orders on a Monday-first calendar: weekend peaks, a summer lull, and the holiday rush",
+    dependencies: ["echarts", "motion"],
+    registryDependencies: ["@evilcharts/echarts-heatmap-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "blocks/echarts/b-sales-echarts-heatmap-chart.tsx",
+        type: "registry:block",
+        target: TARGET_BASE_PATH + "/sales-echarts-heatmap-chart.tsx",
+      },
+    ],
+  },
+  {
+    name: "workouts-echarts-heatmap-chart",
+    description:
+      "Clickable workout tracker with pinned duration levels, a day-detail header, and streak stats",
+    dependencies: ["echarts", "motion"],
+    registryDependencies: ["@evilcharts/echarts-heatmap-chart"],
+    type: "registry:block",
+    files: [
+      {
+        path: "blocks/echarts/b-workouts-echarts-heatmap-chart.tsx",
+        type: "registry:block",
+        target: TARGET_BASE_PATH + "/workouts-echarts-heatmap-chart.tsx",
       },
     ],
   },
